@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Shield, Zap, Brain, Globe, Headphones, Award } from 'lucide-react';
@@ -9,68 +10,68 @@ const WhyChooseUs = () => {
       title: 'AI-First Approach',
       description: 'Built from the ground up with artificial intelligence at its core, providing smart insights and automation.',
       stats: '95% Accuracy',
-      color: 'from-purple-500 to-indigo-500'
+      color: 'from-blue-400 to-indigo-400'
     },
     {
       icon: Shield,
       title: 'Enterprise Security',
       description: 'Bank-level encryption and security protocols to keep your business data safe and compliant.',
       stats: 'SOC 2 Certified',
-      color: 'from-green-500 to-teal-500'
+      color: 'from-green-400 to-teal-400'
     },
     {
       icon: Zap,
       title: 'Lightning Fast',
       description: 'Optimized performance with sub-second response times and real-time synchronization across all devices.',
       stats: '<200ms Response',
-      color: 'from-yellow-500 to-orange-500'
+      color: 'from-yellow-400 to-amber-400'
     },
     {
       icon: Globe,
       title: 'Global Scale',
       description: 'Supports multiple currencies, languages, and time zones. Perfect for international businesses.',
       stats: '50+ Countries',
-      color: 'from-blue-500 to-cyan-500'
+      color: 'from-sky-400 to-cyan-400'
     },
     {
       icon: Headphones,
       title: '24/7 Support',
       description: 'Round-the-clock customer support with dedicated success managers for enterprise clients.',
       stats: '<2min Response',
-      color: 'from-pink-500 to-rose-500'
+      color: 'from-pink-400 to-rose-400'
     },
     {
       icon: Award,
       title: 'Industry Leading',
       description: 'Recognized by industry experts and trusted by thousands of businesses worldwide.',
       stats: '4.9/5 Rating',
-      color: 'from-amber-500 to-yellow-500'
+      color: 'from-amber-400 to-yellow-300'
     }
   ];
 
   return (
-    <section id="why-choose-us" className="py-24 bg-gradient-to-br from-[#f7fafc] via-[#eafdff] to-[#e8f9f5]">
+    <section id="why-choose-us" className="py-24 bg-gradient-to-br from-[#f4fcff] via-[#eafdff] to-[#f3fced]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#119fb9] via-[#72cfc1] to-[#65eacf]">
+          <h2 className="text-4xl md:text-6xl font-display font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#109fb9] via-[#72cfc1] to-[#65eacf] head-accent">
             Why Choose{" "}
             <span className="bg-gradient-to-r from-[#24d1b2] to-[#54a3b8] bg-clip-text text-transparent">
               BizBase?
             </span>
           </h2>
-          <p className="text-xl text-[#6ab1bb] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-[#71b8bb] max-w-3xl mx-auto leading-relaxed font-display">
             We're not just another business platform. We're your competitive advantage in the digital age.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {reasons.map((reason, index) => (
-            <Card key={index} className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-4 border-0 bg-white/90 backdrop-blur-sm">
+            <Card key={index} className="group card-glass card-hover hover:ring-2 hover:ring-[#99f1ea] transition-all duration-500 hover:-translate-y-3">
               <CardContent className="p-8 text-center">
-                <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r ${reason.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r ${reason.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 animate-pulse-glow`}>
                   <reason.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-[#109fb9]">{reason.title}</h3>
-                <p className="text-[#65aabd] mb-6 leading-relaxed">{reason.description}</p>
+                <h3 className="text-2xl font-bold mb-4 text-[#109fb9] group-hover:text-[#18d8cb] font-display">{reason.title}</h3>
+                <p className="text-[#65aabd] mb-6 leading-relaxed font-sans">{reason.description}</p>
                 <div className={`inline-block px-4 py-2 rounded-full bg-gradient-to-r ${reason.color} text-white font-semibold text-sm`}>
                   {reason.stats}
                 </div>
@@ -81,22 +82,14 @@ const WhyChooseUs = () => {
         <div className="text-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
             {/* Stats */}
-            <div className="text-center">
-              <div className="text-4xl font-bold text-[#109fb9] mb-2">10K+</div>
-              <div className="text-[#65aabd]">Active Users</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-[#109fb9] mb-2">99.9%</div>
-              <div className="text-[#65aabd]">Uptime</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-[#109fb9] mb-2">150+</div>
-              <div className="text-[#65aabd]">Integrations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-[#109fb9] mb-2">50M+</div>
-              <div className="text-[#65aabd]">Data Points</div>
-            </div>
+            <div className="text-4xl font-bold text-[#109fb9] mb-2">10K+</div>
+            <div className="text-[#65aabd]">Active Users</div>
+            <div className="text-4xl font-bold text-[#109fb9] mb-2">99.9%</div>
+            <div className="text-[#65aabd]">Uptime</div>
+            <div className="text-4xl font-bold text-[#109fb9] mb-2">150+</div>
+            <div className="text-[#65aabd]">Integrations</div>
+            <div className="text-4xl font-bold text-[#109fb9] mb-2">50M+</div>
+            <div className="text-[#65aabd]">Data Points</div>
           </div>
         </div>
       </div>

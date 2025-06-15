@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,8 +97,8 @@
   }
 
   body {
-    /* Replace dark bg with a fresh, clean bg - soft gradient or light pastel */
-    background: linear-gradient(135deg, #f8fbfc 0%, #eef6fc 100%);
+    /* Brighter, more playful soft blue mint gradient */
+    background: linear-gradient(120deg, #f8fbfc 0%, #e2f9fa 51%, #e1f4fc 100%);
     color: hsl(var(--foreground));
     font-family: 'Poppins', 'Playfair Display', 'Inter', 'sans-serif';
     min-height: 100vh;
@@ -107,12 +108,12 @@
 
 /* Animation Keyframes */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(20px);}
+  to   { opacity: 1; transform: translateY(0);}
 }
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.94) translateY(10px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: scale(0.95) translateY(10px);}
+  to   { opacity: 1; transform: scale(1) translateY(0);}
 }
 @keyframes slide-in-left {
   from { opacity: 0; transform: translateX(-50px);}
@@ -122,16 +123,81 @@
   from { opacity: 0; transform: translateX(60px);}
   to { opacity: 1; transform: translateX(0);}
 }
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(75,216,207,0.25);}
+  70% { box-shadow: 0 0 15px 8px rgba(81,202,241,0.13);}
+  100% { box-shadow: 0 0 0 0 rgba(75,216,207,0.13);}
+}
 
 .animate-fade-in {
-  animation: fade-in 0.9s cubic-bezier(0.4,0,0.2,1) both;
+  animation: fade-in 0.95s cubic-bezier(0.4,0,0.2,1) both;
 }
 .animate-scale-in {
-  animation: scale-in 0.8s cubic-bezier(0.25,1,0.5,1.2) both;
+  animation: scale-in 0.85s cubic-bezier(0.25,1,0.5,1.2) both;
 }
 .animate-slide-in-left {
-  animation: slide-in-left 0.8s cubic-bezier(0.4,0,0.2,1) both;
+  animation: slide-in-left 0.85s cubic-bezier(0.4,0,0.2,1) both;
 }
 .animate-slide-in-right {
-  animation: slide-in-right 0.8s cubic-bezier(0.4,0,0.2,1) both;
+  animation: slide-in-right 0.85s cubic-bezier(0.4,0,0.2,1) both;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2.2s cubic-bezier(0.4,0,0.2,1) infinite;
+}
+
+
+/************ UI UPGRADE CLASSES ************/
+
+.card-glass {
+  @apply bg-white/80 shadow-xl backdrop-blur-[2.5px] border-0 ring-1 ring-[#e3f6fc]/80;
+}
+.card-hover:not([disabled]):hover {
+  @apply hover:shadow-2xl hover:scale-[1.025] hover:bg-gradient-to-br hover:from-[#f1fcfe]/90 hover:to-[#e6f6ed]/95 ring-2 ring-[#caf0fa]/60;
+  transition: all 0.22s cubic-bezier(0.37,0.71,0.18,0.99);
+}
+
+.story-link {
+  @apply relative inline-block;
+}
+.story-link::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0; bottom: -2px;
+  width: 100%;
+  height: 2.5px;
+  background: linear-gradient(90deg, #39bad7 0%, #1cbc99 100%);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.story-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Nicer card shadow on hover */
+.card-glass.card-hover:hover {
+  box-shadow: 0 6px 32px 2px #b7f0f7ce, 0 2px 12px 0 #94ebf080;
+}
+
+/* Professional accent underline for headings */
+.head-accent {
+  @apply relative;
+}
+.head-accent::after {
+  content: '';
+  display: block;
+  width: 42px;
+  height: 4px;
+  border-radius: 2px;
+  margin: 12px auto 0;
+  background: linear-gradient(90deg, #39bad7 0%, #1cbc99 100%);
+}
+
+/* playful element border highlight on hover */
+.feature-hover:hover {
+  box-shadow: 0 0 0 4px #d9faff9c;
+  border-color: #69e4e3;
+  background: linear-gradient(90deg, #eafffc 80%, #effdff 100%);
 }
