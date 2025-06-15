@@ -1,4 +1,3 @@
-
 import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
@@ -111,4 +110,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
