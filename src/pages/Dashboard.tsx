@@ -52,7 +52,7 @@ const Dashboard = () => {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-gray-50">
         <AppSidebar />
-        <div className="flex-1 min-w-0 md:ml-64 bg-gray-50 transition-all">
+        <div className="flex-1 ml-0 md:ml-64 bg-gray-50">
           <DashboardHeader />
           <main className="p-4 md:p-8 max-w-6xl mx-auto w-full">
             <div className="mb-8">
