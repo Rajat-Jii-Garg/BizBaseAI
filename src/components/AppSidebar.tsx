@@ -31,6 +31,7 @@ const menuItems = [
   { title: 'Finance', url: '/dashboard/finance', icon: BarChart },
   { title: 'AI Assistant', url: '/dashboard/ai-assistant', icon: Brain },
   { title: 'Settings', url: '/dashboard/settings', icon: Gear },
+  { title: 'FAQ & Support', url: '/faq', icon: FileText },
 ];
 
 const AppSidebar = () => {

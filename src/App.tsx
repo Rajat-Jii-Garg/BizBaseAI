@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +14,8 @@ import Projects from "./pages/Projects";
 import HR from "./pages/HR";
 import Finance from "./pages/Finance";
 import Settings from "./pages/Settings";
+import FAQ from "./pages/FAQ";
+import Error500 from "./pages/Error500";
 import Loader from "@/components/Loader";
 import * as React from "react";
 
@@ -47,6 +48,8 @@ const App = () => {
           <Route path="/dashboard/finance" element={<Finance />} />
           <Route path="/dashboard/ai-assistant" element={<AIAssistant />} />
           <Route path="/dashboard/settings" element={<Settings />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/500" element={<Error500 />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>

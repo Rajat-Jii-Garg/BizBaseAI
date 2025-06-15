@@ -1,3 +1,4 @@
+
 import React from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
@@ -8,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
   const { toast } = useToast();
+  const [profilePhoto, setProfilePhoto] = React.useState<string | undefined>(undefined);
 
   function handleProfileSave(e: React.FormEvent) {
     e.preventDefault();
@@ -17,7 +19,13 @@ const Settings = () => {
     e.preventDefault();
     toast({ title: "Saved", description: "Company settings saved (dummy, not persistent)." });
   }
-
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePhoto(URL.createObjectURL(file));
+      toast({ title: "Profile photo uploaded (UI only)" });
+    }
+  }
   return (
     <div className="flex h-screen bg-gray-50">
       <AppSidebar />
@@ -32,6 +40,19 @@ const Settings = () => {
               </CardHeader>
               <CardContent>
                 <form className="space-y-4" onSubmit={handleProfileSave}>
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <img
+                        src={profilePhoto || "https://randomuser.me/api/portraits/men/1.jpg"}
+                        alt="Profile"
+                        className="w-16 h-16 rounded-full object-cover border"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-500 mb-1">Change Photo</label>
+                      <Input type="file" accept="image/*" onChange={handlePhotoChange} className="text-xs" />
+                    </div>
+                  </div>
                   <div>
                     <label className="text-sm text-gray-500">Name</label>
                     <Input type="text" placeholder="John Doe" />
@@ -68,5 +89,4 @@ const Settings = () => {
     </div>
   );
 };
-
 export default Settings;

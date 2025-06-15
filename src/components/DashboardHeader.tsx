@@ -1,10 +1,13 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell, Search, Menu } from 'lucide-react';
+import { Search, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import UserProfileDropdown from "./UserProfileDropdown";
 import { Link, useLocation } from "react-router-dom";
+import NotificationsCenter from "./NotificationsCenter";
+import ThemeSwitcher from "./ThemeSwitcher";
+import GlobalSearchModal from "./GlobalSearchModal";
 
 const breadcrumbsMap: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -14,11 +17,24 @@ const breadcrumbsMap: Record<string, string> = {
   "/dashboard/finance": "Finance",
   "/dashboard/ai-assistant": "AI Assistant",
   "/dashboard/settings": "Settings",
+  "/faq": "FAQ & Support",
 };
 
 const DashboardHeader = () => {
   const location = useLocation();
   const segments = location.pathname.split("/").filter(Boolean);
+
+  // Global search modal
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  React.useEffect(() => {
+    const handleCombo = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleCombo);
+    return () => window.removeEventListener("keydown", handleCombo);
+  }, []);
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 ml-64">
@@ -28,10 +44,19 @@ const DashboardHeader = () => {
             <Menu className="w-5 h-5" />
           </Button>
           <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <button
+              className="absolute left-3 top-2 h-8 rounded hover:bg-gray-100 px-1 transition"
+              title="Search (Ctrl+K)"
+              onClick={() => setSearchOpen(true)}
+              type="button"
+            >
+              <Search className="h-4 w-4 text-gray-400" />
+            </button>
             <Input
-              placeholder="Search anything..."
+              placeholder="Search anything... (Ctrl+K)"
               className="pl-10 w-64 bg-gray-50 border-gray-200"
+              onFocus={() => setSearchOpen(true)}
+              readOnly
             />
           </div>
           {/* Breadcrumbs */}
@@ -49,19 +74,22 @@ const DashboardHeader = () => {
                   </li>
                 );
               })}
+              {location.pathname.startsWith("/faq") && (
+                <>
+                  <span className="mx-2">/</span>
+                  <Link to="/faq" className="hover:underline">{breadcrumbsMap["/faq"]}</Link>
+                </>
+              )}
             </ol>
           </nav>
         </div>
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              3
-            </span>
-          </Button>
+        <div className="flex items-center space-x-2">
+          <ThemeSwitcher />
+          <NotificationsCenter />
           <UserProfileDropdown />
         </div>
       </div>
+      <GlobalSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 };
