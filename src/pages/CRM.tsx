@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import DashboardSidebar from '@/components/DashboardSidebar';
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from '@/components/AppSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,8 +11,6 @@ import { Plus, Mail, Phone, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import SidebarProvider from '@/components/SidebarProvider';
-import AppSidebar from '@/components/AppSidebar';
 
 const CRM = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -188,3 +188,4 @@ const CRM = () => {
   );
 };
 export default CRM;
+
