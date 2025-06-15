@@ -1,4 +1,3 @@
-
 import React from 'react';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
@@ -49,12 +48,11 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex min-h-screen w-full bg-gray-50">
       <DashboardSidebar />
-      <div className="flex-1">
+      <div className="flex-1 min-w-0 md:ml-64">
         <DashboardHeader />
-        
-        <main className="ml-64 p-6">
+        <main className="p-4 md:p-8 max-w-6xl mx-auto w-full">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back, John! 👋

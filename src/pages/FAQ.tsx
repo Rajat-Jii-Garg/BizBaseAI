@@ -23,25 +23,22 @@ const faqs = [
 ];
 
 const FAQ = () => (
-  <SidebarProvider>
-    <div className="flex min-h-screen bg-gray-50 w-full">
-      <AppSidebar />
-      <div className="flex-1 min-w-0">
-        <DashboardHeader />
-        <main className="ml-0 md:ml-64 p-4 md:p-8 max-w-3xl mx-auto w-full">
-          <h1 className="text-3xl font-bold mb-6 text-gray-900">🔥 FAQ & Support</h1>
-          <div className="space-y-5">
-            {faqs.map((f, i) =>
-              <div key={i} className="bg-white shadow rounded-lg p-4 border">
-                <div className="font-semibold text-blue-600">{f.q}</div>
-                <div className="text-gray-700 mt-1">{f.a}</div>
-              </div>
-            )}
-          </div>
-        </main>
-      </div>
+  <div className="flex min-h-screen w-full bg-gray-50">
+    <AppSidebar />
+    <div className="flex-1 min-w-0 md:ml-64">
+      <DashboardHeader />
+      <main className="p-4 md:p-8 max-w-3xl mx-auto w-full">
+        <h1 className="text-3xl font-bold mb-6 text-gray-900">🔥 FAQ & Support</h1>
+        <div className="space-y-5">
+          {faqs.map((f, i) =>
+            <div key={i} className="bg-white shadow rounded-lg p-4 border">
+              <div className="font-semibold text-blue-600">{f.q}</div>
+              <div className="text-gray-700 mt-1">{f.a}</div>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
-  </SidebarProvider>
+  </div>
 );
-
 export default FAQ;
