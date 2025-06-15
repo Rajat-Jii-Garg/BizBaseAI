@@ -43,16 +43,19 @@ const AppSidebar = () => {
           <SidebarGroupLabel>BizBase</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title} active={location.pathname === item.url}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.url} className="flex items-center gap-2 px-2 py-2 animate-fade-in">
-                      <item.icon className="w-5 h-5" />
-                      <span className="font-medium">{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuItems.map((item) => {
+                const isActive = location.pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild data-active={isActive}>
+                      <Link to={item.url} className="flex items-center gap-2 px-2 py-2 animate-fade-in">
+                        <item.icon className="w-5 h-5" />
+                        <span className="font-medium">{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
