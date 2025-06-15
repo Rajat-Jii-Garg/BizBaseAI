@@ -16,12 +16,12 @@ const finances = [
 const Finance = () => {
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-gray-50 w-full">
+      <div className="flex min-h-screen bg-gray-50 w-full">
         <AppSidebar />
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <DashboardHeader />
-          <main className="ml-64 p-6">
-            <div className="mb-8 flex items-center justify-between">
+          <main className="ml-0 md:ml-64 p-4 md:p-8 max-w-5xl mx-auto w-full">
+            <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Finance & Accounting</h1>
                 <p className="text-gray-600">Track your financial pulse with live insights</p>
@@ -30,7 +30,7 @@ const Finance = () => {
                 Add Transaction
               </button>
             </div>
-            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            <div className="grid xs:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
               {finances.map(item => (
                 <Card key={item.type}>
                   <CardContent className="flex items-center p-6 gap-4">
@@ -43,7 +43,7 @@ const Finance = () => {
                 </Card>
               ))}
             </div>
-            <div className="w-full min-h-[140px] bg-gradient-to-r from-green-100/50 via-white to-purple-100/50 rounded-xl flex items-center justify-center text-2xl text-purple-700 font-bold shadow animate-fade-in">
+            <div className="w-full min-h-[140px] bg-gradient-to-r from-green-100/50 via-white to-purple-100/50 rounded-xl flex items-center justify-center text-2xl text-purple-700 font-bold shadow animate-fade-in p-4 text-center">
               AI Smart: “Your monthly burn rate decreased 9% vs last month. Try reducing unused SaaS subscriptions for more savings.”
             </div>
           </main>

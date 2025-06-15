@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
@@ -6,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Brain, Send, Sparkles, TrendingUp, FileText, Users } from 'lucide-react';
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/AppSidebar";
 
 const AIAssistant = () => {
   const [message, setMessage] = useState('');
@@ -75,103 +76,102 @@ const AIAssistant = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <DashboardSidebar />
-      <div className="flex-1">
-        <DashboardHeader />
-        
-        <main className="ml-64 p-6 h-full">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-              <Brain className="w-8 h-8 mr-3 text-purple-600" />
-              BizCopilot AI Assistant
-            </h1>
-            <p className="text-gray-600">Your intelligent business companion for insights and automation</p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-            {/* Quick Actions */}
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Sparkles className="w-5 h-5 text-purple-600" />
-                  <span>Quick Actions</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {quickActions.map((action, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleQuickAction(action.prompt)}
-                      className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-200 cursor-pointer transition-all duration-200"
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className="p-2 bg-purple-100 rounded-lg">
-                          <action.icon className="w-4 h-4 text-purple-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900">{action.title}</h4>
-                          <p className="text-sm text-gray-600 mt-1">{action.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Chat Interface */}
-            <Card className="lg:col-span-2 flex flex-col">
-              <CardHeader>
-                <CardTitle>Chat with BizCopilot</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                {/* Messages */}
-                <div className="flex-1 space-y-4 mb-4 overflow-y-auto max-h-96">
-                  {messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
+    <SidebarProvider>
+      <div className="flex min-h-screen bg-gray-50 w-full">
+        <AppSidebar />
+        <div className="flex-1 min-w-0">
+          <DashboardHeader />
+          <main className="ml-0 md:ml-64 p-4 md:p-8 max-w-6xl mx-auto w-full">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
+                <Brain className="w-8 h-8 mr-3 text-purple-600" />
+                BizCopilot AI Assistant
+              </h1>
+              <p className="text-gray-600">Your intelligent business companion for insights and automation</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+              {/* Quick Actions */}
+              <Card className="lg:col-span-1">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Sparkles className="w-5 h-5 text-purple-600" />
+                    <span>Quick Actions</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {quickActions.map((action, index) => (
                       <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          msg.type === 'user'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
-                        }`}
+                        key={index}
+                        onClick={() => handleQuickAction(action.prompt)}
+                        className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-200 cursor-pointer transition-all duration-200"
                       >
-                        <p className="text-sm">{msg.content}</p>
-                        <p className={`text-xs mt-1 ${msg.type === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
-                          {msg.timestamp}
-                        </p>
+                        <div className="flex items-start space-x-3">
+                          <div className="p-2 bg-purple-100 rounded-lg">
+                            <action.icon className="w-4 h-4 text-purple-600" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900">{action.title}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{action.description}</p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Input */}
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="Ask me anything about your business..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    className="flex-1"
-                  />
-                  <Button
-                    onClick={handleSendMessage}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+              {/* Chat Interface */}
+              <Card className="lg:col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle>Chat with BizCopilot</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col">
+                  {/* Messages */}
+                  <div className="flex-1 space-y-4 mb-4 overflow-y-auto max-h-96">
+                    {messages.map((msg) => (
+                      <div
+                        key={msg.id}
+                        className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                            msg.type === 'user'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-900'
+                          }`}
+                        >
+                          <p className="text-sm">{msg.content}</p>
+                          <p className={`text-xs mt-1 ${msg.type === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
+                            {msg.timestamp}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Input */}
+                  <div className="flex space-x-2">
+                    <Input
+                      placeholder="Ask me anything about your business..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={handleSendMessage}
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

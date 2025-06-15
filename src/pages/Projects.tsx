@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from '@/components/AppSidebar';
@@ -46,12 +45,12 @@ const statusColor = {
 const Projects = () => {
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-gray-50 w-full">
+      <div className="flex min-h-screen bg-gray-50 w-full">
         <AppSidebar />
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <DashboardHeader />
-          <main className="ml-64 p-6">
-            <div className="mb-8 flex items-center justify-between">
+          <main className="ml-0 md:ml-64 p-4 md:p-8 max-w-6xl mx-auto w-full">
+            <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Projects</h1>
                 <p className="text-gray-600">Collaborate & Track Progress with AI-driven Insights</p>
@@ -61,7 +60,6 @@ const Projects = () => {
                 New Project
               </Button>
             </div>
-            {/* Kanban-style fake board */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {["Planning", "In Progress", "Done"].map((status) => (
                 <Card key={status}>

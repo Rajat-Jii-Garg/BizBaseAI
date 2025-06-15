@@ -53,7 +53,7 @@ const Settings = () => {
                 </CardHeader>
                 <CardContent>
                   <form className="space-y-5" onSubmit={handleProfileSave}>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
                       <Avatar className="w-16 h-16">
                         <AvatarImage
                           src={profilePhoto || "https://randomuser.me/api/portraits/men/1.jpg"}
