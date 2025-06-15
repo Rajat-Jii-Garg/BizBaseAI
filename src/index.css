@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -200,4 +199,32 @@
   box-shadow: 0 0 0 4px #d9faff9c;
   border-color: #69e4e3;
   background: linear-gradient(90deg, #eafffc 80%, #effdff 100%);
+}
+
+.text-gradient-main {
+  background: linear-gradient(90deg, #21d4fd 18%, #b721ff 48%, #39dfa2 97%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-highlight {
+  background: linear-gradient(90deg, #ffce70, #2fd7e0 70%, #bebbfe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-accent {
+  background: linear-gradient(90deg, #4fc9fa 20%, #df6fff 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.shadow-title-glow {
+  text-shadow: 0 2px 16px #b7eefe88, 0 1px 4px #ece3f7cc, 0 0px 8px #49e9de2a;
+}
+.shadow-text-pop {
+  text-shadow: 0 2px 12px #6fd7ffa8, 0 2px 5px #afafd1a6;
 }

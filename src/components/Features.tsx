@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
@@ -68,13 +67,13 @@ const Features = () => {
     <section id="features" className="py-20 bg-gradient-to-b from-white via-[#eefffc] to-[#e8f8fa] animate-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-display font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#73b7fd] via-[#17bfa5] to-[#07dfb5] animate-fade-in head-accent">
+          <h2 className="text-4xl md:text-5xl font-display font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#318bce] via-[#1edfd6] to-[#8d4ff9] animate-fade-in head-accent drop-shadow-title-glow">
             Powerful Features for{' '}
-            <span className="bg-gradient-to-r from-[#62e2cb] to-[#2897c8] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#62e2cb] to-[#2897c8] bg-clip-text text-transparent font-extrabold">
               Modern Business
             </span>
           </h2>
-          <p className="text-xl text-[#5eb9b7] max-w-3xl mx-auto font-display">
+          <p className="text-xl font-semibold max-w-3xl mx-auto font-display text-gradient-highlight">
             Everything you need to run your business efficiently, powered by cutting-edge AI technology.
           </p>
         </div>
@@ -89,8 +88,10 @@ const Features = () => {
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-115 group-hover:shadow-2xl transition-transform duration-200 shadow-lg animate-pulse-glow`}>
                   <feature.icon className="w-7 h-7 text-white drop-shadow-md" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-[#18a4b6] font-display group-hover:text-[#19dfb2] transition">{feature.title}</h3>
-                <p className="text-[#5ba2ac] leading-relaxed font-sans">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-3 font-display text-gradient-accent group-hover:text-gradient-main transition">
+                  {feature.title}
+                </h3>
+                <p className="text-[#3b99c9] leading-relaxed font-sans font-medium">{feature.description}</p>
               </CardContent>
             </Card>
           ))}

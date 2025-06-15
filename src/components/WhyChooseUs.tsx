@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Shield, Zap, Brain, Globe, Headphones, Award } from 'lucide-react';
@@ -53,14 +52,14 @@ const WhyChooseUs = () => {
     <section id="why-choose-us" className="py-24 bg-gradient-to-br from-[#f4fcff] via-[#eafdff] to-[#f3fced]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-display font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#109fb9] via-[#72cfc1] to-[#65eacf] head-accent">
+          <h2 className="text-4xl md:text-6xl font-display font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#109fb9] via-[#72cfc1] to-[#da8efd] head-accent shadow-title-glow">
             Why Choose{" "}
-            <span className="bg-gradient-to-r from-[#24d1b2] to-[#54a3b8] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#24d1b2] via-[#9b70f8] to-[#54a3b8] bg-clip-text text-transparent font-extrabold">
               BizBase?
             </span>
           </h2>
-          <p className="text-xl text-[#71b8bb] max-w-3xl mx-auto leading-relaxed font-display">
-            We're not just another business platform. We're your competitive advantage in the digital age.
+          <p className="text-xl font-semibold max-w-3xl mx-auto leading-relaxed font-display text-gradient-highlight">
+            We're not just another business platform. We're your <span className="font-black text-violet-600">competitive advantage</span> in the digital age.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
@@ -70,9 +69,9 @@ const WhyChooseUs = () => {
                 <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r ${reason.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 animate-pulse-glow`}>
                   <reason.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-[#109fb9] group-hover:text-[#18d8cb] font-display">{reason.title}</h3>
-                <p className="text-[#65aabd] mb-6 leading-relaxed font-sans">{reason.description}</p>
-                <div className={`inline-block px-4 py-2 rounded-full bg-gradient-to-r ${reason.color} text-white font-semibold text-sm`}>
+                <h3 className="text-2xl font-bold mb-4 font-display text-gradient-accent group-hover:text-gradient-main transition">{reason.title}</h3>
+                <p className="text-[#4971e0] font-medium mb-6 leading-relaxed font-sans">{reason.description}</p>
+                <div className={`inline-block px-4 py-2 rounded-full bg-gradient-to-r ${reason.color} text-white font-bold text-sm`}>
                   {reason.stats}
                 </div>
               </CardContent>
@@ -82,14 +81,14 @@ const WhyChooseUs = () => {
         <div className="text-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
             {/* Stats */}
-            <div className="text-4xl font-bold text-[#109fb9] mb-2">10K+</div>
-            <div className="text-[#65aabd]">Active Users</div>
-            <div className="text-4xl font-bold text-[#109fb9] mb-2">99.9%</div>
-            <div className="text-[#65aabd]">Uptime</div>
-            <div className="text-4xl font-bold text-[#109fb9] mb-2">150+</div>
-            <div className="text-[#65aabd]">Integrations</div>
-            <div className="text-4xl font-bold text-[#109fb9] mb-2">50M+</div>
-            <div className="text-[#65aabd]">Data Points</div>
+            <div className="text-4xl font-bold text-gradient-main mb-2 drop-shadow-md">10K+</div>
+            <div className="text-gradient-accent">Active Users</div>
+            <div className="text-4xl font-bold text-gradient-main mb-2 drop-shadow-md">99.9%</div>
+            <div className="text-gradient-accent">Uptime</div>
+            <div className="text-4xl font-bold text-gradient-main mb-2 drop-shadow-md">150+</div>
+            <div className="text-gradient-accent">Integrations</div>
+            <div className="text-4xl font-bold text-gradient-main mb-2 drop-shadow-md">50M+</div>
+            <div className="text-gradient-accent">Data Points</div>
           </div>
         </div>
       </div>
