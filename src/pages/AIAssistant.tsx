@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from '@/components/AppSidebar';
@@ -5,7 +6,7 @@ import DashboardHeader from '@/components/DashboardHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, User, Code, File,化 } from 'lucide-react';
+import { MessageSquare, User, Code, File } from 'lucide-react';
 
 const AIAssistant = () => {
   return (
@@ -43,7 +44,8 @@ const AIAssistant = () => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <化 className="w-5 h-5 text-blue-500 mt-1" />
+                    {/* Replacing 化 with User as Assistant avatar */}
+                    <User className="w-5 h-5 text-blue-500 mt-1" />
                     <div>
                       <p className="text-sm font-medium text-blue-900">AI Assistant</p>
                       <p className="text-sm text-gray-700">Sales have increased by 15% compared to the previous quarter, with significant growth in the tech sector.</p>
