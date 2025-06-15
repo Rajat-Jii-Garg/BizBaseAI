@@ -18,7 +18,20 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				display: ['Poppins', 'Playfair Display', 'serif'],
+				sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+			},
 			colors: {
+				primaryBlue: "#1E4EB7",
+				accentGreen: "#30dd8a",
+				accentBlue: "#2bb6fc",
+				// Add soft mint, blue, etc.
+				mint: "#e3f9f6",
+				card: {
+					DEFAULT: "#ffffff",
+					background: "#f5f6fa",
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',

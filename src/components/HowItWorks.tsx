@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { UserPlus, Settings, Zap, TrendingUp } from 'lucide-react';
@@ -40,16 +39,16 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-24 bg-gradient-to-tr from-[#222032] via-[#262343] to-[#37256a]">
+    <section id="how-it-works" className="py-24 bg-gradient-to-tr from-[#e4f9f6] via-[#e5f1fc] to-[#e7f0fa]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-white">
-            How{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <h2 className="text-5xl md:text-6xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#1855c1] via-[#2bb6fc] to-[#1dbb9f]">
+            How{" "}
+            <span className="bg-gradient-to-r from-[#23b29c] to-[#44cee1] bg-clip-text text-transparent">
               It Works
             </span>
           </h2>
-          <p className="text-xl text-[#b6b1e1] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-[#2991b2] max-w-3xl mx-auto leading-relaxed">
             Get started with BizBase in just 4 simple steps. Our AI-powered platform makes business management effortless.
           </p>
         </div>
@@ -57,7 +56,7 @@ const HowItWorks = () => {
           {steps.map((step, index) => (
             <div key={index} className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-12`}>
               <div className="flex-1">
-                <Card className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 bg-gradient-to-br from-[#242047] to-[#393172] overflow-hidden">
+                <Card className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 bg-white/90 overflow-hidden">
                   <div className="relative h-64 lg:h-80 overflow-hidden">
                     <img 
                       src={step.image} 
@@ -69,7 +68,7 @@ const HowItWorks = () => {
                       <step.icon className="w-8 h-8 text-white" />
                     </div>
                     <div className="absolute bottom-6 left-6">
-                      <span className="text-6xl font-bold text-white/80">{step.step}</span>
+                      <span className="text-6xl font-bold text-[#1855c1]/80">{step.step}</span>
                     </div>
                   </div>
                 </Card>
@@ -79,10 +78,10 @@ const HowItWorks = () => {
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
                     <step.icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-lg font-semibold text-[#cdc8ed]">Step {step.step}</span>
+                  <span className="text-lg font-semibold text-[#2991b2]">Step {step.step}</span>
                 </div>
-                <h3 className="text-4xl font-bold text-white leading-tight">{step.title}</h3>
-                <p className="text-xl text-[#d1dbff] leading-relaxed">{step.description}</p>
+                <h3 className="text-4xl font-bold font-display text-[#1855c1] leading-tight">{step.title}</h3>
+                <p className="text-xl text-[#2291b1] leading-relaxed">{step.description}</p>
                 <div className={`w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`}></div>
               </div>
             </div>

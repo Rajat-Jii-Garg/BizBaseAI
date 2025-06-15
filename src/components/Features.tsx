@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
@@ -65,28 +64,28 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="py-20 bg-gradient-to-b from-[#1a1731] via-[#232144] to-[#292343]">
+    <section id="features" className="py-20 bg-gradient-to-b from-[#e4f9f6] via-[#e5f1fc] to-[#e7f0fa]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+          <h2 className="text-4xl md:text-5xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#1855c1] via-[#2bb6fc] to-[#1dbb9f]">
             Powerful Features for{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#23b29c] to-[#44cee1] bg-clip-text text-transparent">
               Modern Business
             </span>
           </h2>
-          <p className="text-xl text-[#bab9e2] max-w-3xl mx-auto">
+          <p className="text-xl text-[#2991b2] max-w-3xl mx-auto">
             Everything you need to run your business efficiently, powered by cutting-edge AI technology.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-0 bg-gradient-to-br from-[#29245c] to-[#31294d]">
+            <Card key={index} className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-white">{feature.title}</h3>
-                <p className="text-[#bfbdf1] leading-relaxed">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-[#1855c1]">{feature.title}</h3>
+                <p className="text-[#2ca6c4] leading-relaxed">{feature.description}</p>
               </CardContent>
             </Card>
           ))}
