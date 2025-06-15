@@ -1,12 +1,23 @@
-
 import React from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
+  const { toast } = useToast();
+
+  function handleProfileSave(e: React.FormEvent) {
+    e.preventDefault();
+    toast({ title: "Saved", description: "Profile updated (dummy, not persistent)." });
+  }
+  function handleCompanySave(e: React.FormEvent) {
+    e.preventDefault();
+    toast({ title: "Saved", description: "Company settings saved (dummy, not persistent)." });
+  }
+
   return (
     <div className="flex h-screen bg-gray-50">
       <AppSidebar />
@@ -20,7 +31,7 @@ const Settings = () => {
                 <CardTitle>Profile Settings</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={handleProfileSave}>
                   <div>
                     <label className="text-sm text-gray-500">Name</label>
                     <Input type="text" placeholder="John Doe" />
@@ -38,7 +49,7 @@ const Settings = () => {
                 <CardTitle>Company Settings</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={handleCompanySave}>
                   <div>
                     <label className="text-sm text-gray-500">Company Name</label>
                     <Input type="text" placeholder="BizBase Inc." />
