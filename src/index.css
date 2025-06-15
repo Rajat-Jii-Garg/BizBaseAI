@@ -1,8 +1,7 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
   :root {
@@ -98,7 +97,39 @@
   }
 
   body {
-    @apply bg-gradient-to-br from-[#e3f9f6] via-[#d6ebfc] to-[#e9edff] text-foreground;
-    min-height: 100vh;
+    /* animated dark mint/blue background for sleek look */
+    @apply bg-gradient-to-br from-[#081d2a] via-[#102a42] to-[#1b445e] text-foreground min-h-screen;
+    font-family: 'Poppins', 'Playfair Display', 'Inter', 'sans-serif';
   }
+}
+
+/* Animation Keyframes */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-50px);}
+  to { opacity: 1; transform: translateX(0);}
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(60px);}
+  to { opacity: 1; transform: translateX(0);}
+}
+
+.animate-fade-in {
+  animation: fade-in 0.9s cubic-bezier(0.4,0,0.2,1) both;
+}
+.animate-scale-in {
+  animation: scale-in 0.8s cubic-bezier(0.25,1,0.5,1.2) both;
+}
+.animate-slide-in-left {
+  animation: slide-in-left 0.8s cubic-bezier(0.4,0,0.2,1) both;
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.8s cubic-bezier(0.4,0,0.2,1) both;
 }

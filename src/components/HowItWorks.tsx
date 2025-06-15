@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { UserPlus, Settings, Zap, TrendingUp } from 'lucide-react';
@@ -9,7 +10,7 @@ const HowItWorks = () => {
       icon: UserPlus,
       title: 'Sign Up & Setup',
       description: 'Create your account in seconds and set up your business profile with our intelligent onboarding.',
-      color: 'from-[#3537b1] to-[#5dbbe4]',
+      color: 'from-[#05c2e9] to-[#23e6b3]',
       image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop'
     },
     {
@@ -17,7 +18,7 @@ const HowItWorks = () => {
       icon: Settings,
       title: 'Configure Your Workspace',
       description: 'Customize modules based on your business needs. Our AI will suggest the best configuration.',
-      color: 'from-[#34cfa2] to-[#80cdf7]',
+      color: 'from-[#36e6c9] to-[#2884fc]',
       image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop'
     },
     {
@@ -25,7 +26,7 @@ const HowItWorks = () => {
       icon: Zap,
       title: 'Import & Automate',
       description: 'Import your existing data and set up smart automations to streamline your workflows.',
-      color: 'from-[#7649be] to-[#884df8]',
+      color: 'from-[#7649be] to-[#59faaa]',
       image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop'
     },
     {
@@ -33,42 +34,61 @@ const HowItWorks = () => {
       icon: TrendingUp,
       title: 'Scale & Optimize',
       description: 'Watch your business grow with AI-powered insights and recommendations for continuous improvement.',
-      color: 'from-[#ff8540] to-[#b94dcf]',
+      color: 'from-[#3efcca] to-[#3977fd]',
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop'
     }
   ];
 
+  // Animation helpers
+  const getAnim = (index: number) => {
+    // Alternate directions for desktop: slide-in-left/right
+    if (index % 2 === 0) return 'animate-slide-in-right';
+    return 'animate-slide-in-left';
+  };
+
   return (
-    <section id="how-it-works" className="py-24 bg-gradient-to-tr from-[#e4f9f6] via-[#e5f1fc] to-[#e7f0fa]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="py-24 bg-gradient-to-tr from-[#163551] via-[#094275] to-[#16425a] relative overflow-hidden">
+      {/* Subtle mint glow overlay */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute -top-8 left-[40%] w-[400px] h-[480px] bg-gradient-to-br from-[#04fbc4]/25 to-[#079cf6]/80 rounded-full opacity-30 blur-2xl" />
+        <div className="absolute top-[60%] right-[3%] w-[180px] h-[200px] bg-gradient-to-br from-[#13e9e2]/40 to-[#29c6fb]/85 rounded-full opacity-25 blur-3xl" />
+      </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#1855c1] via-[#2bb6fc] to-[#1dbb9f]">
+          <h2 className="text-5xl md:text-6xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#7ffeec] via-[#88b8fd] to-[#27cac9] animate-fade-in">
             How{" "}
-            <span className="bg-gradient-to-r from-[#23b29c] to-[#44cee1] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#43e7d4] to-[#15adfa] bg-clip-text text-transparent">
               It Works
             </span>
           </h2>
-          <p className="text-xl text-[#2991b2] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-[#bdefff] max-w-3xl mx-auto leading-relaxed">
             Get started with BizBase in just 4 simple steps. Our AI-powered platform makes business management effortless.
           </p>
         </div>
-        <div className="space-y-16">
+        <div className="space-y-20">
           {steps.map((step, index) => (
-            <div key={index} className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-12`}>
+            <div
+              key={index}
+              className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-14 ${getAnim(index)} opacity-0 will-change-transform animate-fade-in`}
+              style={{
+                animationDelay: `${350 + index * 220}ms`,
+                animationFillMode: 'forwards'
+              }}
+            >
               <div className="flex-1">
-                <Card className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 bg-white/90 overflow-hidden">
+                <Card className="group hover:shadow-[0_8px_48px_4px_rgba(44,206,225,0.27)] transition-all duration-500 hover:-translate-y-2 border-0 bg-gradient-to-br from-[#102443] via-[#16425a] to-[#0e525c] ring-1 ring-[#12ffde1f] overflow-hidden">
                   <div className="relative h-64 lg:h-80 overflow-hidden">
                     <img 
                       src={step.image} 
                       alt={step.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-20`}></div>
-                    <div className={`absolute top-6 left-6 w-16 h-16 rounded-2xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-lg`}>
+                    <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-20`} />
+                    <div className={`absolute top-6 left-6 w-16 h-16 rounded-2xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-xl`}>
                       <step.icon className="w-8 h-8 text-white" />
                     </div>
                     <div className="absolute bottom-6 left-6">
-                      <span className="text-6xl font-bold text-[#1855c1]/80">{step.step}</span>
+                      <span className="text-6xl font-bold text-[#1decff]/80 font-display">{step.step}</span>
                     </div>
                   </div>
                 </Card>
@@ -78,11 +98,11 @@ const HowItWorks = () => {
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
                     <step.icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-lg font-semibold text-[#2991b2]">Step {step.step}</span>
+                  <span className="text-lg font-semibold text-[#42e8e1] font-display">Step {step.step}</span>
                 </div>
-                <h3 className="text-4xl font-bold font-display text-[#1855c1] leading-tight">{step.title}</h3>
-                <p className="text-xl text-[#2291b1] leading-relaxed">{step.description}</p>
-                <div className={`w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`}></div>
+                <h3 className="text-4xl font-bold font-display text-white leading-tight">{step.title}</h3>
+                <p className="text-xl text-[#bbf7fb] leading-relaxed">{step.description}</p>
+                <div className={`w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`} />
               </div>
             </div>
           ))}
