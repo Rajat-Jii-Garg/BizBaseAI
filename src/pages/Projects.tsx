@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from '@/components/AppSidebar';
@@ -59,11 +58,8 @@ const Projects = () => {
   const projectStatuses = ["Planning", "In Progress", "Done"];
   return (
     <SidebarProvider>
-      <div className="flex w-full min-h-screen bg-gray-50">
-        {/* Sidebar */}
+      <div className="flex min-h-screen w-full bg-gray-50">
         <AppSidebar />
-
-        {/* Main Content */}
         <div className="flex-1 min-w-0 md:ml-64 bg-gray-50 transition-all">
           <DashboardHeader />
           <main className="py-10 px-2 md:px-8 max-w-7xl mx-auto w-full">
@@ -131,4 +127,3 @@ const Projects = () => {
 };
 
 export default Projects;
-
