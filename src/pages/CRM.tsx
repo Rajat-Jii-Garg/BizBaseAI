@@ -65,123 +65,125 @@ const CRM = () => {
   );
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-50">
-      <AppSidebar />
-      <div className="flex-1 min-w-0 md:ml-64">
-        <DashboardHeader />
-        <main className="p-4 md:p-8 max-w-6xl mx-auto w-full">
-          <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">CRM</h1>
-              <p className="text-gray-600">Manage your leads and customer relationships</p>
-            </div>
-            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" onClick={() => setModalOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Lead
-            </Button>
-          </div>
-          {/* Search */}
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-3 h-4 w-4 text-gray-400">
-                    <Mail className="h-4 w-4" />
-                  </span>
-                  <Input
-                    placeholder="Search leads..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-gray-50">
+        <AppSidebar />
+        <div className="flex-1 min-w-0 md:ml-64">
+          <DashboardHeader />
+          <main className="p-4 md:p-8 max-w-6xl mx-auto w-full">
+            <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">CRM</h1>
+                <p className="text-gray-600">Manage your leads and customer relationships</p>
               </div>
-            </CardContent>
-          </Card>
-          {/* Table or Skeleton/Empty State */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Leads</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div>
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-5 py-2">
-                      <Skeleton className="h-5 w-1/4" />
-                      <Skeleton className="h-5 w-1/4" />
-                      <Skeleton className="h-5 w-1/5" />
-                      <Skeleton className="h-8 w-16 ml-auto" />
-                    </div>
-                  ))}
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" onClick={() => setModalOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Lead
+              </Button>
+            </div>
+            {/* Search */}
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-3 h-4 w-4 text-gray-400">
+                      <Mail className="h-4 w-4" />
+                    </span>
+                    <Input
+                      placeholder="Search leads..."
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
-              ) : filteredLeads.length === 0 ? (
-                <div className="flex flex-col items-center p-8">
-                  <span className="text-5xl mb-3">📭</span>
-                  <h3 className="font-bold text-lg mb-1">No leads found</h3>
-                  <p className="text-sm text-gray-500 mb-4 text-center">Get started by adding your first lead.</p>
-                  <Button onClick={() => setModalOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Lead
-                  </Button>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm text-left">
-                    <thead>
-                      <tr className="text-xs text-gray-500 bg-gray-50">
-                        <th className="py-2 px-4">Company</th>
-                        <th className="py-2 px-4">Contact</th>
-                        <th className="py-2 px-4">Email</th>
-                        <th className="py-2 px-4">Phone</th>
-                        <th className="py-2 px-4">Stage</th>
-                        <th className="py-2 px-4">Score</th>
-                        <th className="py-2 px-4">Value</th>
-                        <th className="py-2 px-4">Last Contact</th>
-                        <th className="py-2 px-4"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredLeads.map(lead => (
-                        <tr key={lead.id} className="border-b hover:bg-gray-50 transition">
-                          <td className="py-2 px-4 font-medium text-gray-900">{lead.name}</td>
-                          <td className="py-2 px-4">{lead.contact}</td>
-                          <td className="py-2 px-4">{lead.email}</td>
-                          <td className="py-2 px-4">{lead.phone}</td>
-                          <td className="py-2 px-4"><Badge className={getStageColor(lead.stage)}>{lead.stage}</Badge></td>
-                          <td className="py-2 px-4 flex items-center gap-1">
-                            <Star className={`w-4 h-4 ${getScoreColor(lead.score)}`} />
-                            <span className={`font-medium ${getScoreColor(lead.score)}`}>{lead.score}</span>
-                          </td>
-                          <td className="py-2 px-4">{lead.value}</td>
-                          <td className="py-2 px-4">{lead.lastContact}</td>
-                          <td className="py-2 px-4"><Button size="sm" variant="outline">View Details</Button></td>
+              </CardContent>
+            </Card>
+            {/* Table or Skeleton/Empty State */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Leads</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div>
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-5 py-2">
+                        <Skeleton className="h-5 w-1/4" />
+                        <Skeleton className="h-5 w-1/4" />
+                        <Skeleton className="h-5 w-1/5" />
+                        <Skeleton className="h-8 w-16 ml-auto" />
+                      </div>
+                    ))}
+                  </div>
+                ) : filteredLeads.length === 0 ? (
+                  <div className="flex flex-col items-center p-8">
+                    <span className="text-5xl mb-3">📭</span>
+                    <h3 className="font-bold text-lg mb-1">No leads found</h3>
+                    <p className="text-sm text-gray-500 mb-4 text-center">Get started by adding your first lead.</p>
+                    <Button onClick={() => setModalOpen(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Lead
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm text-left">
+                      <thead>
+                        <tr className="text-xs text-gray-500 bg-gray-50">
+                          <th className="py-2 px-4">Company</th>
+                          <th className="py-2 px-4">Contact</th>
+                          <th className="py-2 px-4">Email</th>
+                          <th className="py-2 px-4">Phone</th>
+                          <th className="py-2 px-4">Stage</th>
+                          <th className="py-2 px-4">Score</th>
+                          <th className="py-2 px-4">Value</th>
+                          <th className="py-2 px-4">Last Contact</th>
+                          <th className="py-2 px-4"></th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          {/* Add Lead Dialog */}
-          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Lead</DialogTitle>
-              </DialogHeader>
-              <form className="space-y-4 mt-3" onSubmit={handleAddLead}>
-                <Input placeholder="Company Name" required />
-                <Input placeholder="Contact Name" required />
-                <Input placeholder="Email" type="email" required />
-                <Input placeholder="Phone" required />
-                <Button type="submit" className="w-full bg-blue-600 text-white">Save Lead</Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </main>
+                      </thead>
+                      <tbody>
+                        {filteredLeads.map(lead => (
+                          <tr key={lead.id} className="border-b hover:bg-gray-50 transition">
+                            <td className="py-2 px-4 font-medium text-gray-900">{lead.name}</td>
+                            <td className="py-2 px-4">{lead.contact}</td>
+                            <td className="py-2 px-4">{lead.email}</td>
+                            <td className="py-2 px-4">{lead.phone}</td>
+                            <td className="py-2 px-4"><Badge className={getStageColor(lead.stage)}>{lead.stage}</Badge></td>
+                            <td className="py-2 px-4 flex items-center gap-1">
+                              <Star className={`w-4 h-4 ${getScoreColor(lead.score)}`} />
+                              <span className={`font-medium ${getScoreColor(lead.score)}`}>{lead.score}</span>
+                            </td>
+                            <td className="py-2 px-4">{lead.value}</td>
+                            <td className="py-2 px-4">{lead.lastContact}</td>
+                            <td className="py-2 px-4"><Button size="sm" variant="outline">View Details</Button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            {/* Add Lead Dialog */}
+            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Lead</DialogTitle>
+                </DialogHeader>
+                <form className="space-y-4 mt-3" onSubmit={handleAddLead}>
+                  <Input placeholder="Company Name" required />
+                  <Input placeholder="Contact Name" required />
+                  <Input placeholder="Email" type="email" required />
+                  <Input placeholder="Phone" required />
+                  <Button type="submit" className="w-full bg-blue-600 text-white">Save Lead</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 export default CRM;
