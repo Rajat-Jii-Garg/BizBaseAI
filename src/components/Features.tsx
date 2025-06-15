@@ -65,16 +65,16 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="py-20 bg-gradient-to-b from-[#16425a] via-[#102a38] to-[#16344a] animate-fade-in">
+    <section id="features" className="py-20 bg-gradient-to-b from-white via-[#eafdff] to-[#f8fbfc] animate-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#7ffeec] via-[#88b8fd] to-[#27cac9] animate-fade-in">
+          <h2 className="text-4xl md:text-5xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#62b1f7] via-[#119fb9] to-[#47dfab] animate-fade-in">
             Powerful Features for{' '}
-            <span className="bg-gradient-to-r from-[#43e7d4] to-[#15adfa] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#6cdfc1] to-[#1296c8] bg-clip-text text-transparent">
               Modern Business
             </span>
           </h2>
-          <p className="text-xl text-[#94e2ff] max-w-3xl mx-auto">
+          <p className="text-xl text-[#6ab1bb] max-w-3xl mx-auto">
             Everything you need to run your business efficiently, powered by cutting-edge AI technology.
           </p>
         </div>
@@ -82,15 +82,15 @@ const Features = () => {
           {features.map((feature, index) => (
             <Card
               key={index}
-              className={`group hover:shadow-2xl transition-transform duration-300 hover:-translate-y-2 border-0 bg-gradient-to-br ${feature.gradient} backdrop-blur-xl animate-scale-in`}
+              className={`group hover:shadow-2xl transition-transform duration-300 hover:-translate-y-2 border-0 bg-white/90 backdrop-blur-[2px] animate-scale-in`}
               style={{ animationDelay: `${250 + index * 85}ms` }}
             >
               <CardContent className="p-6">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200 shadow-lg`}>
                   <feature.icon className="w-6 h-6 text-white drop-shadow-md" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-white font-display">{feature.title}</h3>
-                <p className="text-[#e4fdfd] leading-relaxed">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-[#1895b9] font-display">{feature.title}</h3>
+                <p className="text-[#54a3b8] leading-relaxed">{feature.description}</p>
               </CardContent>
             </Card>
           ))}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { UserPlus, Settings, Zap, TrendingUp } from 'lucide-react';
@@ -47,21 +46,21 @@ const HowItWorks = () => {
   };
 
   return (
-    <section id="how-it-works" className="py-24 bg-gradient-to-tr from-[#163551] via-[#094275] to-[#16425a] relative overflow-hidden">
-      {/* Subtle mint glow overlay */}
+    <section id="how-it-works" className="py-24 bg-gradient-to-tr from-[#eafdff] via-[#f5fbfc] to-white relative overflow-hidden">
+      {/* Replace dark overlays with lighter ones */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute -top-8 left-[40%] w-[400px] h-[480px] bg-gradient-to-br from-[#04fbc4]/25 to-[#079cf6]/80 rounded-full opacity-30 blur-2xl" />
-        <div className="absolute top-[60%] right-[3%] w-[180px] h-[200px] bg-gradient-to-br from-[#13e9e2]/40 to-[#29c6fb]/85 rounded-full opacity-25 blur-3xl" />
+        <div className="absolute -top-8 left-[40%] w-[400px] h-[480px] bg-gradient-to-br from-[#d5fafd]/30 to-[#c8e3fc]/70 rounded-full opacity-30 blur-2xl" />
+        <div className="absolute top-[60%] right-[3%] w-[180px] h-[200px] bg-gradient-to-br from-[#d7faf2]/25 to-[#e3f7ff]/65 rounded-full opacity-25 blur-3xl" />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#7ffeec] via-[#88b8fd] to-[#27cac9] animate-fade-in">
+          <h2 className="text-5xl md:text-6xl font-extrabold font-display mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#109fb9] via-[#54c5c5] to-[#a5f5e2] animate-fade-in">
             How{" "}
-            <span className="bg-gradient-to-r from-[#43e7d4] to-[#15adfa] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#59e1c2] to-[#119fb9] bg-clip-text text-transparent">
               It Works
             </span>
           </h2>
-          <p className="text-xl text-[#bdefff] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-[#6ab1bb] max-w-3xl mx-auto leading-relaxed">
             Get started with BizBase in just 4 simple steps. Our AI-powered platform makes business management effortless.
           </p>
         </div>
@@ -76,19 +75,19 @@ const HowItWorks = () => {
               }}
             >
               <div className="flex-1">
-                <Card className="group hover:shadow-[0_8px_48px_4px_rgba(44,206,225,0.27)] transition-all duration-500 hover:-translate-y-2 border-0 bg-gradient-to-br from-[#102443] via-[#16425a] to-[#0e525c] ring-1 ring-[#12ffde1f] overflow-hidden">
+                <Card className="group hover:shadow-[0_8px_48px_4px_rgba(44,206,225,0.17)] transition-all duration-500 hover:-translate-y-2 border-0 bg-white/95 ring-1 ring-[#eaf8fb] overflow-hidden">
                   <div className="relative h-64 lg:h-80 overflow-hidden">
                     <img 
                       src={step.image} 
                       alt={step.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-20`} />
+                    <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-10`} />
                     <div className={`absolute top-6 left-6 w-16 h-16 rounded-2xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-xl`}>
                       <step.icon className="w-8 h-8 text-white" />
                     </div>
                     <div className="absolute bottom-6 left-6">
-                      <span className="text-6xl font-bold text-[#1decff]/80 font-display">{step.step}</span>
+                      <span className="text-6xl font-bold text-[#1decff]/60 font-display">{step.step}</span>
                     </div>
                   </div>
                 </Card>
@@ -98,10 +97,10 @@ const HowItWorks = () => {
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
                     <step.icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-lg font-semibold text-[#42e8e1] font-display">Step {step.step}</span>
+                  <span className="text-lg font-semibold text-[#1baccd] font-display">Step {step.step}</span>
                 </div>
-                <h3 className="text-4xl font-bold font-display text-white leading-tight">{step.title}</h3>
-                <p className="text-xl text-[#bbf7fb] leading-relaxed">{step.description}</p>
+                <h3 className="text-4xl font-bold font-display text-[#119fb9] leading-tight">{step.title}</h3>
+                <p className="text-xl text-[#54a3b8] leading-relaxed">{step.description}</p>
                 <div className={`w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`} />
               </div>
             </div>

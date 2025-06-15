@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,9 +96,12 @@
   }
 
   body {
-    /* animated dark mint/blue background for sleek look */
-    @apply bg-gradient-to-br from-[#081d2a] via-[#102a42] to-[#1b445e] text-foreground min-h-screen;
+    /* Replace dark bg with a fresh, clean bg - soft gradient or light pastel */
+    background: linear-gradient(135deg, #f8fbfc 0%, #eef6fc 100%);
+    color: hsl(var(--foreground));
     font-family: 'Poppins', 'Playfair Display', 'Inter', 'sans-serif';
+    min-height: 100vh;
+    /* Remove previous dark bg classes! */
   }
 }
 
