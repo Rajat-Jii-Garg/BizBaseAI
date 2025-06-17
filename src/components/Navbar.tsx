@@ -1,47 +1,72 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, Sparkles } from 'lucide-react';
+import { LogIn, Sparkles, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
-    // 🌌 Premium blue/green gradient background
-    <nav className="fixed top-0 w-full z-50 bg-gradient-to-r from-[#102245] via-[#16355d] to-[#1cb6af] border-b border-[#263557] shadow-lg">
+    <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-slate-200/50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-9 h-9 bg-gradient-to-br from-[#1bb6bd] to-[#2857c4] rounded-xl flex items-center justify-center shadow-lg">
-              <Sparkles className="w-6 h-6 text-white drop-shadow-md" />
+        <div className="flex justify-between items-center h-20">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+              <Sparkles className="w-7 h-7 text-white" />
             </div>
-            <span className="text-2xl font-extrabold font-display bg-gradient-to-r from-[#31d68a] via-[#5dadfe] to-[#2d77d1] bg-clip-text text-transparent drop-shadow-sm tracking-wide select-none">
-              BizBase
-            </span>
+            <div className="flex flex-col">
+              <span className="text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                BizBase
+              </span>
+              <span className="text-xs text-slate-500 font-medium -mt-1">AI Business OS</span>
+            </div>
           </Link>
           
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-white/80 hover:text-white transition-all story-link text-base font-semibold">Features</a>
-            <a href="#solutions" className="text-white/80 hover:text-white transition-all story-link text-base font-semibold">Solutions</a>
-            <a href="#pricing" className="text-white/80 hover:text-white transition-all story-link text-base font-semibold">Pricing</a>
-            <a href="#contact" className="text-white/80 hover:text-white transition-all story-link text-base font-semibold">Contact</a>
+            <a href="#features" className="text-slate-700 hover:text-blue-600 transition-colors font-semibold relative group">
+              Features
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
+            </a>
+            <a href="#solutions" className="text-slate-700 hover:text-blue-600 transition-colors font-semibold relative group">
+              Solutions
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
+            </a>
+            <a href="#pricing" className="text-slate-700 hover:text-blue-600 transition-colors font-semibold relative group">
+              Pricing
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
+            </a>
+            <a href="#contact" className="text-slate-700 hover:text-blue-600 transition-colors font-semibold relative group">
+              Contact
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
+            </a>
           </div>
           
-          <div className="flex items-center space-x-3">
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
             <Link to="/login">
-              <Button variant="ghost" className="flex items-center space-x-2 text-white/80 hover:text-white hover:bg-[#124e5e]/40 rounded-lg font-semibold">
+              <Button variant="ghost" className="flex items-center space-x-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl font-semibold px-6">
                 <LogIn className="w-4 h-4" />
                 <span>Login</span>
               </Button>
             </Link>
             <Link to="/signup">
-              <Button className="bg-gradient-to-r from-[#36d98f] to-[#2857c4] hover:from-[#1bcda3] hover:to-[#164aa7] text-white shadow-lg font-bold px-6 py-2 rounded-lg border-0 transition-all duration-150">
-                Get Started
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl font-bold px-8 py-3 rounded-xl border-0 transform hover:scale-105 transition-all duration-300">
+                Get Started Free
               </Button>
             </Link>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button variant="ghost" size="sm" className="p-2">
+              <Menu className="w-6 h-6 text-slate-700" />
+            </Button>
           </div>
         </div>
       </div>
     </nav>
   );
 };
+
 export default Navbar;

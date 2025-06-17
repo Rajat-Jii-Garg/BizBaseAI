@@ -10,39 +10,37 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-// Helper: Get icon by string name
-import * as LucideIcons from "lucide-react";
+import { Home, Inbox, Calendar, Search, Settings } from "lucide-react";
 
 const items = [
   {
     title: "Home",
     url: "/",
-    icon: "Home",
+    icon: Home,
   },
   {
     title: "Inbox",
     url: "#",
-    icon: "Inbox",
+    icon: Inbox,
   },
   {
     title: "Calendar",
     url: "#",
-    icon: "Calendar",
+    icon: Calendar,
   },
   {
     title: "Search",
     url: "#",
-    icon: "Search",
+    icon: Search,
   },
   {
     title: "Settings",
     url: "#",
-    icon: "Settings",
+    icon: Settings,
   },
 ];
 
-export default function AppSidebar(props: { isCollapsed?: boolean }) {
+export default function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
@@ -51,10 +49,7 @@ export default function AppSidebar(props: { isCollapsed?: boolean }) {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                // Defensive: only render if Lucide icon is a React component
-                const Icon = LucideIcons[item.icon as keyof typeof LucideIcons];
-                const isIconValid =
-                  typeof Icon === "function" || typeof Icon === "object";
+                const IconComponent = item.icon;
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
@@ -62,9 +57,7 @@ export default function AppSidebar(props: { isCollapsed?: boolean }) {
                         href={item.url}
                         className="flex items-center gap-3 px-2 py-2 rounded-lg font-semibold transition bg-gradient-to-l from-white/0 via-white/20 to-white/0 hover:from-[#d2faff]/50 hover:to-[#aeeeee]/50 hover:bg-opacity-60 hover:shadow-xl group"
                       >
-                        {isIconValid ? (
-                          <Icon className="w-5 h-5 text-[#47bada] group-hover:text-[#1cbc99] transition" />
-                        ) : null}
+                        <IconComponent className="w-5 h-5 text-[#47bada] group-hover:text-[#1cbc99] transition" />
                         <span className="tracking-wide">{item.title}</span>
                       </a>
                     </SidebarMenuButton>
