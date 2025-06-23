@@ -24,6 +24,10 @@ import {
   Briefcase
 } from 'lucide-react';
 
+interface AppSidebarProps {
+  isCollapsed?: boolean;
+}
+
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'CRM', href: '/crm', icon: Users },
@@ -36,7 +40,7 @@ const navigation = [
   { name: 'Help', href: '/faq', icon: HelpCircle },
 ];
 
-const AppSidebar = () => {
+const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed = false }) => {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">

@@ -16,7 +16,8 @@ import {
   MoreHorizontal,
   Search,
   Filter,
-  ArrowUpRight
+  ArrowUpRight,
+  Archive
 } from "lucide-react";
 
 const Projects = () => {
@@ -317,7 +318,7 @@ const Projects = () => {
           <TabsContent value="archived">
             <div className="text-center py-12">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                <Archive size={24} className="text-gray-500" />
+                <Archive className="text-gray-500" />
               </div>
               <h3 className="text-lg font-medium mb-2">No archived projects</h3>
               <p className="text-muted-foreground mb-4">You haven't archived any projects yet.</p>
@@ -403,24 +404,3 @@ const Projects = () => {
 };
 
 export default Projects;
-
-function Archive(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="20" height="5" x="2" y="3" rx="1" />
-      <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
-      <path d="M10 12h4" />
-    </svg>
-  );
-}
