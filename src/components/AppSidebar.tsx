@@ -1,73 +1,78 @@
 
-import React from "react";
+import React from 'react';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { Home, Inbox, Calendar, Search, Settings } from "lucide-react";
+} from '@/components/ui/sidebar';
+import { 
+  Home, 
+  Users, 
+  Building2, 
+  DollarSign, 
+  BarChart3, 
+  Settings, 
+  HelpCircle,
+  Brain,
+  Briefcase
+} from 'lucide-react';
 
-const items = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
+const navigation = [
+  { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'CRM', href: '/crm', icon: Users },
+  { name: 'Projects', href: '/projects', icon: Briefcase },
+  { name: 'Finance', href: '/finance', icon: DollarSign },
+  { name: 'HR Management', href: '/hr', icon: Building2 },
+  { name: 'AI Assistant', href: '/ai-assistant', icon: Brain },
+  { name: 'Analytics', href: '#', icon: BarChart3 },
+  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Help', href: '/faq', icon: HelpCircle },
 ];
 
-export default function AppSidebar() {
+const AppSidebar = () => {
   return (
     <Sidebar>
+      <SidebarHeader className="p-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
+          <span className="font-bold text-lg">BizBase</span>
+        </div>
+      </SidebarHeader>
+      
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <a
-                        href={item.url}
-                        className="flex items-center gap-3 px-2 py-2 rounded-lg font-semibold transition bg-gradient-to-l from-white/0 via-white/20 to-white/0 hover:from-[#d2faff]/50 hover:to-[#aeeeee]/50 hover:bg-opacity-60 hover:shadow-xl group"
-                      >
-                        <IconComponent className="w-5 h-5 text-[#47bada] group-hover:text-[#1cbc99] transition" />
-                        <span className="tracking-wide">{item.title}</span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              {navigation.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.href} className="flex items-center space-x-3">
+                      <item.icon className="w-5 h-5" />
+                      <span>{item.name}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      
+      <SidebarFooter className="p-4">
+        <div className="text-xs text-gray-500">
+          © 2024 BizBase
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
-}
+};
+
+export default AppSidebar;
