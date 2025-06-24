@@ -33,7 +33,7 @@ const Signup = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate('/dashboard/business-setup');
     }
   }, [user, navigate]);
 
@@ -93,7 +93,7 @@ const Signup = () => {
       return;
     }
     
-    const { error } = await signUp(signupData.email, signupData.password, signupData.fullName);
+    const { error } = await signUp(signupData.email, signupData.password, signupData.fullName, signupData.phone);
     
     if (error) {
       if (error.message.includes('already registered')) {
@@ -101,14 +101,15 @@ const Signup = () => {
       } else {
         setErrors({ general: error.message });
       }
+      setLoading(false);
     } else {
       setShowOTPModal(true);
       toast({
         title: "Account Created!",
         description: "Please check your email to verify your account.",
       });
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, phone?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
@@ -34,9 +34,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // If user is confirmed, redirect to business setup
+        if (event === 'SIGNED_IN' && session?.user?.email_confirmed_at) {
+          console.log('User signed in and email confirmed');
+        }
       }
     );
 
@@ -50,20 +56,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, phone?: string) => {
     try {
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/dashboard/business-setup`,
           data: {
             full_name: fullName,
+            phone: phone,
           }
         }
       });
 
       if (error) {
+        console.error('Signup error:', error);
         toast({
           title: 'Signup Error',
           description: error.message,
@@ -78,6 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { error };
     } catch (error: any) {
+      console.error('Signup catch error:', error);
       return { error };
     }
   };
@@ -90,6 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
+        console.error('Login error:', error);
         toast({
           title: 'Login Error',
           description: error.message,
@@ -104,6 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return { error };
     } catch (error: any) {
+      console.error('Login catch error:', error);
       return { error };
     }
   };
@@ -116,6 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: 'Successfully signed out from BizBase.',
       });
     } catch (error: any) {
+      console.error('Signout error:', error);
       toast({
         title: 'Error',
         description: 'Failed to sign out.',

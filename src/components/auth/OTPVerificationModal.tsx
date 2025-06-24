@@ -78,8 +78,8 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
         
         setTimeout(() => {
           if (purpose === 'signup') {
-            // Redirect to dashboard after successful verification
-            navigate('/dashboard');
+            // Redirect to business setup after successful verification
+            navigate('/dashboard/business-setup');
           }
           onClose();
         }, 2000);
@@ -134,7 +134,7 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Verification Complete!</h3>
             <p className="text-gray-600">
               {purpose === 'signup' 
-                ? "Welcome to BizBase! Redirecting to your dashboard..." 
+                ? "Welcome to BizBase! Redirecting to business setup..." 
                 : "You can now proceed to reset your password."}
             </p>
           </CardContent>

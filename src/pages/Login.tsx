@@ -18,7 +18,7 @@ const Login = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
   const navigate = useNavigate();
-  const { signIn, user, resetPassword } = useAuth();
+  const { signIn, user } = useAuth();
   const { toast } = useToast();
 
   // Redirect if already logged in
@@ -65,7 +65,7 @@ const Login = () => {
       if (error.message.includes('Invalid login credentials')) {
         setErrors({ general: 'Invalid email or password. Please try again.' });
       } else if (error.message.includes('Email not confirmed')) {
-        setErrors({ general: 'Please verify your email before signing in.' });
+        setErrors({ general: 'Please verify your email before signing in. Check your inbox for the verification link.' });
       } else {
         setErrors({ general: error.message });
       }
@@ -86,6 +86,7 @@ const Login = () => {
     }
     
     setLoading(true);
+    const { resetPassword } = useAuth();
     const { error } = await resetPassword(loginData.email);
     
     if (error) {
