@@ -72,12 +72,13 @@ const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
         toast({
           title: "Verification Successful!",
           description: purpose === 'signup' 
-            ? "Your account has been created successfully." 
+            ? "Your account has been verified successfully." 
             : "You can now reset your password."
         });
         
         setTimeout(() => {
           if (purpose === 'signup') {
+            // Redirect to dashboard after successful verification
             navigate('/dashboard');
           }
           onClose();

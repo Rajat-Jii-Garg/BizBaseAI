@@ -4,30 +4,29 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  UserCheck, 
-  FolderOpen, 
-  TrendingUp, 
-  Calculator, 
-  Brain,
   Settings,
   LogOut,
-  Sparkles
+  Sparkles,
+  Building2,
+  Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardSidebar = () => {
   const location = useLocation();
+  const { signOut } = useAuth();
   
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Users, label: 'CRM', path: '/dashboard/crm' },
-    { icon: UserCheck, label: 'HR', path: '/dashboard/hr' },
-    { icon: FolderOpen, label: 'Projects', path: '/dashboard/projects' },
-    { icon: TrendingUp, label: 'Sales', path: '/dashboard/sales' },
-    { icon: Calculator, label: 'Finance', path: '/dashboard/finance' },
-    { icon: Brain, label: 'AI Assistant', path: '/dashboard/ai-assistant' },
+    { icon: Building2, label: 'Business Setup', path: '/dashboard/business-setup' },
     { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
   ];
+
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40">
@@ -61,15 +60,22 @@ const DashboardSidebar = () => {
           );
         })}
       </nav>
+
+      {/* Quick Setup Action */}
+      <div className="p-4">
+        <Link to="/dashboard/business-setup">
+          <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white">
+            <Plus className="w-4 h-4 mr-2" />
+            Setup Your Business
+          </Button>
+        </Link>
+      </div>
       
       <div className="absolute bottom-4 left-4 right-4">
         <Button 
           variant="ghost" 
           className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-          onClick={() => {
-            // Handle logout
-            window.location.href = '/';
-          }}
+          onClick={handleLogout}
         >
           <LogOut className="w-5 h-5 mr-3" />
           Logout

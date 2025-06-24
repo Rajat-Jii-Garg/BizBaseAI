@@ -86,6 +86,11 @@ const App = () => {
                 <Settings />
               </ProtectedRoute>
             } />
+            <Route path="/dashboard/business-setup" element={
+              <ProtectedRoute>
+                <BusinessSetup />
+              </ProtectedRoute>
+            } />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/500" element={<Error500 />} />
             <Route path="*" element={<NotFound />} />
