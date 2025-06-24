@@ -22,6 +22,7 @@ import Finance from "./pages/Finance";
 import Settings from "./pages/Settings";
 import FAQ from "./pages/FAQ";
 import Error500 from "./pages/Error500";
+import BusinessSetup from "./pages/BusinessSetup";
 import Loader from "@/components/Loader";
 import * as React from "react";
 
