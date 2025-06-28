@@ -8,10 +8,12 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, phone?: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, phone: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
+  sendOTP: (email: string, purpose: string) => Promise<{ error: any }>;
+  verifyOTP: (email: string, otp: string, purpose: string) => Promise<{ error: any; success?: boolean }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,11 +40,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // If user is confirmed, redirect to business setup
-        if (event === 'SIGNED_IN' && session?.user?.email_confirmed_at) {
-          console.log('User signed in and email confirmed');
-        }
       }
     );
 
@@ -56,13 +53,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, phone?: string) => {
+  const signUp = async (email: string, password: string, fullName: string, phone: string) => {
     try {
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard/business-setup`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
             full_name: fullName,
             phone: phone,
@@ -76,11 +73,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: 'Signup Error',
           description: error.message,
           variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Account Created!',
-          description: 'Please check your email to verify your account.',
         });
       }
 
@@ -161,6 +153,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const sendOTP = async (email: string, purpose: string) => {
+    try {
+      const response = await fetch('/supabase/functions/v1/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.supabaseKey}`,
+        },
+        body: JSON.stringify({ email, purpose }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send OTP');
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error('Send OTP error:', error);
+      return { error };
+    }
+  };
+
+  const verifyOTP = async (email: string, otp: string, purpose: string) => {
+    try {
+      const response = await fetch('/supabase/functions/v1/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.supabaseKey}`,
+        },
+        body: JSON.stringify({ email, otp, purpose }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to verify OTP');
+      }
+
+      return { error: null, success: data.success };
+    } catch (error: any) {
+      console.error('Verify OTP error:', error);
+      return { error, success: false };
+    }
+  };
+
   const value = {
     user,
     session,
@@ -169,6 +209,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signOut,
     resetPassword,
+    sendOTP,
+    verifyOTP,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

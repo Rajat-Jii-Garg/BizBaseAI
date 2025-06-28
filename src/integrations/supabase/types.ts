@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      otp_verifications: {
+        Row: {
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          otp_code: string
+          purpose: string
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          expires_at?: string
+          id?: string
+          otp_code: string
+          purpose: string
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          otp_code?: string
+          purpose?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -16,9 +46,11 @@ export type Database = {
           company_name: string | null
           created_at: string | null
           email: string | null
+          email_verified: boolean | null
           full_name: string | null
           id: string
           phone: string | null
+          profile_completed: boolean | null
           subscription_plan: string | null
           updated_at: string | null
         }
@@ -28,9 +60,11 @@ export type Database = {
           company_name?: string | null
           created_at?: string | null
           email?: string | null
+          email_verified?: boolean | null
           full_name?: string | null
           id: string
           phone?: string | null
+          profile_completed?: boolean | null
           subscription_plan?: string | null
           updated_at?: string | null
         }
@@ -40,9 +74,11 @@ export type Database = {
           company_name?: string | null
           created_at?: string | null
           email?: string | null
+          email_verified?: boolean | null
           full_name?: string | null
           id?: string
           phone?: string | null
+          profile_completed?: boolean | null
           subscription_plan?: string | null
           updated_at?: string | null
         }
@@ -53,7 +89,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_otp: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      send_otp_email: {
+        Args: { user_email: string; otp_purpose: string }
+        Returns: string
+      }
+      verify_otp: {
+        Args: { user_email: string; provided_otp: string; otp_purpose: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

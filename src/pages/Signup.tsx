@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import OTPVerificationModal from '@/components/auth/OTPVerificationModal';
+import EnhancedOTPModal from '@/components/auth/EnhancedOTPModal';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
 
@@ -33,7 +33,7 @@ const Signup = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/dashboard/business-setup');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -104,12 +104,16 @@ const Signup = () => {
       setLoading(false);
     } else {
       setShowOTPModal(true);
-      toast({
-        title: "Account Created!",
-        description: "Please check your email to verify your account.",
-      });
       setLoading(false);
     }
+  };
+
+  const handleOTPVerified = () => {
+    toast({
+      title: "Welcome to BizBase!",
+      description: "Your account has been created and verified successfully.",
+    });
+    navigate('/dashboard');
   };
 
   return (
@@ -133,7 +137,7 @@ const Signup = () => {
               </span>
             </Link>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Your Account</h1>
-            <p className="text-gray-600">Join thousands of businesses growing with BizBase</p>
+            <p className="text-gray-600">Join thousands of professionals growing with BizBase</p>
           </div>
 
           {/* Error Display */}
@@ -144,14 +148,14 @@ const Signup = () => {
           )}
 
           {/* Signup Card */}
-          <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90 glass">
+          <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
             <CardHeader className="space-y-1 pb-4">
               <CardTitle className="text-center text-xl">Sign Up</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignup} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName">Full Name *</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
@@ -171,7 +175,7 @@ const Signup = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email">Email Address *</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
@@ -191,7 +195,7 @@ const Signup = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">Phone Number *</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
@@ -211,13 +215,13 @@ const Signup = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Password *</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a strong password"
+                      placeholder="Create a strong password (min 8 characters)"
                       value={signupData.password}
                       onChange={(e) => {
                         setSignupData(prev => ({ ...prev, password: e.target.value }));
@@ -238,7 +242,7 @@ const Signup = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">Confirm Password *</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
@@ -314,13 +318,13 @@ const Signup = () => {
         </div>
       </div>
 
-      {/* OTP Verification Modal */}
-      <OTPVerificationModal 
+      {/* Enhanced OTP Verification Modal */}
+      <EnhancedOTPModal 
         isOpen={showOTPModal}
         onClose={() => setShowOTPModal(false)}
-        purpose="signup"
+        onVerified={handleOTPVerified}
         email={signupData.email}
-        phone={signupData.phone}
+        purpose="signup"
       />
     </div>
   );

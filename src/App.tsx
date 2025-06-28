@@ -54,7 +54,7 @@ const App = () => {
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
-                <Dashboard />
+                <ProfileDashboard />
               </ProtectedRoute>
             } />
             <Route path="/dashboard/crm" element={
