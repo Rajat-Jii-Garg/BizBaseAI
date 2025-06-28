@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import EnhancedOTPModal from '@/components/auth/EnhancedOTPModal';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
+import { supabase } from '@/integrations/supabase/client';
 
 const Signup = () => {
   const [signupData, setSignupData] = useState({
@@ -93,27 +94,70 @@ const Signup = () => {
       return;
     }
     
-    const { error } = await signUp(signupData.email, signupData.password, signupData.fullName, signupData.phone);
+    // Store signup data temporarily in localStorage
+    localStorage.setItem('pendingSignup', JSON.stringify(signupData));
     
-    if (error) {
-      if (error.message.includes('already registered')) {
-        setErrors({ general: 'This email is already registered. Please try signing in.' });
-      } else {
-        setErrors({ general: error.message });
-      }
-      setLoading(false);
-    } else {
-      setShowOTPModal(true);
-      setLoading(false);
-    }
+    // Show OTP modal
+    setShowOTPModal(true);
+    setLoading(false);
   };
 
-  const handleOTPVerified = () => {
-    toast({
-      title: "Welcome to BizBase!",
-      description: "Your account has been created and verified successfully.",
-    });
-    navigate('/dashboard');
+  const handleOTPVerified = async () => {
+    try {
+      // Get stored signup data
+      const storedData = localStorage.getItem('pendingSignup');
+      if (!storedData) {
+        toast({
+          title: "Error",
+          description: "Signup data not found. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const pendingSignup = JSON.parse(storedData);
+      
+      // Now create the actual user account
+      const { error } = await supabase.auth.signUp({
+        email: pendingSignup.email,
+        password: pendingSignup.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            full_name: pendingSignup.fullName,
+            phone: pendingSignup.phone,
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Account creation error:', error);
+        toast({
+          title: 'Account Creation Error',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Clear stored data
+      localStorage.removeItem('pendingSignup');
+      
+      toast({
+        title: "Welcome to BizBase!",
+        description: "Your account has been created and verified successfully.",
+      });
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Signup completion error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete signup. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
