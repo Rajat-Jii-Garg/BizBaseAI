@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import ProfileDashboard from "./pages/ProfileDashboard";
 import CRM from "./pages/CRM";
 import AIAssistant from "./pages/AIAssistant";
 import NotFound from "./pages/NotFound";

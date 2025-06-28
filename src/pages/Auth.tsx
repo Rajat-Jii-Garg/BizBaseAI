@@ -144,7 +144,7 @@ const Auth = () => {
       return;
     }
     
-    const { error } = await signUp(signupData.email, signupData.password, signupData.fullName);
+    const { error } = await signUp(signupData.email, signupData.password, signupData.fullName, signupData.phone);
     
     if (error) {
       if (error.message.includes('already registered')) {

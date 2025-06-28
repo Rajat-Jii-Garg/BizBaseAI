@@ -155,19 +155,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const sendOTP = async (email: string, purpose: string) => {
     try {
-      const response = await fetch('/supabase/functions/v1/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
-        },
-        body: JSON.stringify({ email, purpose }),
+      const { data, error } = await supabase.functions.invoke('send-otp', {
+        body: { email, purpose }
       });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send OTP');
+      if (error) {
+        throw error;
       }
 
       return { error: null };
@@ -179,22 +172,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const verifyOTP = async (email: string, otp: string, purpose: string) => {
     try {
-      const response = await fetch('/supabase/functions/v1/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
-        },
-        body: JSON.stringify({ email, otp, purpose }),
+      const { data, error } = await supabase.functions.invoke('verify-otp', {
+        body: { email, otp, purpose }
       });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to verify OTP');
+      if (error) {
+        throw error;
       }
 
-      return { error: null, success: data.success };
+      return { error: null, success: data?.success };
     } catch (error: any) {
       console.error('Verify OTP error:', error);
       return { error, success: false };
