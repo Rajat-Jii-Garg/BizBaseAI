@@ -12,7 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
-  sendOTP: (email: string, purpose: string) => Promise<{ error: any }>;
+  sendOTP: (email: string, purpose: string) => Promise<{ error: any; otp?: string }>;
   verifyOTP: (email: string, otp: string, purpose: string) => Promise<{ error: any; success?: boolean }>;
 }
 
@@ -55,10 +55,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName: string, phone: string) => {
     try {
-      // Don't create user account yet, just store signup data temporarily
-      // We'll create the account only after OTP verification
-      console.log('Signup data prepared:', { email, password, fullName, phone });
+      // Store signup data temporarily for later use
+      localStorage.setItem('pendingSignup', JSON.stringify({
+        email,
+        password,
+        fullName,
+        phone
+      }));
       
+      console.log('Signup data stored for OTP verification');
       return { error: null };
     } catch (error: any) {
       console.error('Signup preparation error:', error);
@@ -146,9 +151,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
 
-      return { error: null };
+      console.log('OTP Response:', data);
+
+      // Show OTP in console and toast for testing
+      if (data?.otp) {
+        console.log(`🔑 TESTING OTP for ${email}: ${data.otp}`);
+        toast({
+          title: "OTP Sent!",
+          description: `Check console for OTP (Testing): ${data.otp}`,
+          duration: 10000,
+        });
+      }
+
+      return { error: null, otp: data?.otp };
     } catch (error: any) {
       console.error('Send OTP error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send OTP. Please try again.",
+        variant: "destructive"
+      });
       return { error };
     }
   };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -97,9 +96,14 @@ const Signup = () => {
     // Store signup data temporarily in localStorage
     localStorage.setItem('pendingSignup', JSON.stringify(signupData));
     
-    // Show OTP modal
+    // Show OTP modal immediately
     setShowOTPModal(true);
     setLoading(false);
+    
+    toast({
+      title: "Verification Required",
+      description: "Please check your email for the verification code.",
+    });
   };
 
   const handleOTPVerified = async () => {
@@ -116,6 +120,8 @@ const Signup = () => {
       }
       
       const pendingSignup = JSON.parse(storedData);
+      
+      console.log('Creating user account after OTP verification...');
       
       // Now create the actual user account
       const { error } = await supabase.auth.signUp({
@@ -145,11 +151,14 @@ const Signup = () => {
       
       toast({
         title: "Welcome to BizBase!",
-        description: "Your account has been created and verified successfully.",
+        description: "Your account has been created successfully.",
       });
       
       // Navigate to dashboard
-      navigate('/dashboard');
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
+      
     } catch (error: any) {
       console.error('Signup completion error:', error);
       toast({
@@ -365,7 +374,11 @@ const Signup = () => {
       {/* Enhanced OTP Verification Modal */}
       <EnhancedOTPModal 
         isOpen={showOTPModal}
-        onClose={() => setShowOTPModal(false)}
+        onClose={() => {
+          setShowOTPModal(false);
+          // Clear any stored signup data if user closes modal
+          localStorage.removeItem('pendingSignup');
+        }}
         onVerified={handleOTPVerified}
         email={signupData.email}
         purpose="signup"

@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     // Generate and store OTP
-    const { data: otpData, error: otpError } = await supabase.rpc('send_otp_email', {
+    const { data: otpCode, error: otpError } = await supabase.rpc('send_otp_email', {
       user_email: email,
       otp_purpose: purpose
     });
@@ -35,16 +35,55 @@ const handler = async (req: Request): Promise<Response> => {
       throw otpError;
     }
 
-    console.log(`OTP for ${email}: ${otpData}`);
+    console.log(`OTP generated for ${email}: ${otpCode}`);
 
-    // For now, we'll return the OTP in response for testing
-    // In production, integrate with actual email service like Resend
-    
+    // For now, we'll use a simple email simulation
+    // In production, you would integrate with Resend or another email service
+    const emailContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #3b82f6; margin: 0;">BizBase</h1>
+          <p style="color: #666; margin: 5px 0;">Your Business Management Platform</p>
+        </div>
+        
+        <div style="background: #f8fafc; border-radius: 8px; padding: 30px; text-align: center;">
+          <h2 style="color: #1e293b; margin-bottom: 20px;">Email Verification</h2>
+          <p style="color: #475569; margin-bottom: 30px;">
+            Please use the following 6-digit code to verify your email address:
+          </p>
+          
+          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <span style="font-size: 32px; font-weight: bold; color: #3b82f6; letter-spacing: 8px;">
+              ${otpCode}
+            </span>
+          </div>
+          
+          <p style="color: #64748b; font-size: 14px; margin-top: 30px;">
+            This code will expire in 10 minutes. If you didn't request this verification, please ignore this email.
+          </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #94a3b8; font-size: 12px;">
+            © 2024 BizBase. All rights reserved.
+          </p>
+        </div>
+      </div>
+    `;
+
+    // Log the email content for now (in production, this would be sent via email service)
+    console.log("Email HTML content:", emailContent);
+    console.log(`EMAIL TO: ${email}`);
+    console.log(`SUBJECT: BizBase - Email Verification Code`);
+    console.log(`OTP CODE: ${otpCode}`);
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: "OTP sent successfully",
-        otp: otpData // Remove this in production
+        // Temporary: Return OTP for testing (remove in production)
+        otp: otpCode,
+        emailPreview: emailContent
       }), 
       {
         status: 200,
