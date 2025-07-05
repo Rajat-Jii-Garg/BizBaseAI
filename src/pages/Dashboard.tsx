@@ -37,7 +37,11 @@ import {
   BookOpen,
   Settings,
   Camera,
-  Edit
+  Edit,
+  ChevronRight,
+  Building2,
+  Lightbulb,
+  Rocket
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -81,12 +85,12 @@ const Dashboard = () => {
   ];
 
   const quickActions = [
-    { title: "AI Career Coach", icon: Brain, color: "from-blue-500 to-purple-600" },
-    { title: "Smart Networking", icon: Network, color: "from-green-500 to-blue-500" },
-    { title: "Business Tools", icon: Briefcase, color: "from-purple-500 to-pink-500" },
-    { title: "Market Analysis", icon: TrendingUp, color: "from-orange-500 to-red-500" },
-    { title: "Live Events", icon: Video, color: "from-indigo-500 to-purple-500" },
-    { title: "Learning Hub", icon: BookOpen, color: "from-teal-500 to-green-500" }
+    { title: "AI Career Coach", icon: Brain, color: "from-blue-500 to-purple-600", description: "Get personalized career advice" },
+    { title: "Smart Networking", icon: Network, color: "from-green-500 to-blue-500", description: "Find relevant connections" },
+    { title: "Business Tools", icon: Briefcase, color: "from-purple-500 to-pink-500", description: "Access pro tools" },
+    { title: "Market Analysis", icon: TrendingUp, color: "from-orange-500 to-red-500", description: "Industry insights" },
+    { title: "Live Events", icon: Video, color: "from-indigo-500 to-purple-500", description: "Join virtual events" },
+    { title: "Learning Hub", icon: BookOpen, color: "from-teal-500 to-green-500", description: "Skill development" }
   ];
 
   const recentActivity = [
@@ -122,14 +126,6 @@ const Dashboard = () => {
       type: "engagement",
       avatar: null
     },
-    {
-      id: 5,
-      action: "Weekly performance report ready",
-      time: "1 day ago",
-      user: "Analytics System",
-      type: "report",
-      avatar: null
-    },
   ];
 
   const trendingTopics = [
@@ -137,31 +133,29 @@ const Dashboard = () => {
     { topic: "#RemoteWork", posts: "12.8K", trend: "+32%" },
     { topic: "#StartupLife", posts: "9.4K", trend: "+28%" },
     { topic: "#TechTrends", posts: "8.7K", trend: "+19%" },
-    { topic: "#Leadership", posts: "7.3K", trend: "+15%" }
   ];
 
   const upcomingEvents = [
     { title: "AI in Business Summit", date: "Dec 15, 2024", time: "10:00 AM", attendees: 2500 },
     { title: "Networking Mixer", date: "Dec 18, 2024", time: "6:00 PM", attendees: 150 },
     { title: "Startup Pitch Night", date: "Dec 20, 2024", time: "7:00 PM", attendees: 300 },
-    { title: "Tech Leadership Workshop", date: "Dec 22, 2024", time: "2:00 PM", attendees: 450 }
   ];
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="space-y-6">
         {/* Welcome Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-6 lg:p-8 text-white">
+          <div className="flex flex-col lg:flex-row items-center justify-between">
+            <div className="text-center lg:text-left mb-4 lg:mb-0">
+              <h1 className="text-2xl lg:text-3xl font-bold mb-2">
                 Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Professional'}! 🚀
               </h1>
               <p className="text-white/90 text-lg">
                 Your professional network is growing stronger every day
               </p>
             </div>
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
                 <Crown className="w-12 h-12 text-white" />
               </div>
@@ -170,20 +164,20 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {stats.map((stat, index) => (
-            <Card key={index} className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-              <CardContent className="p-6">
+            <Card key={index} className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-4 lg:p-6">
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <p className="text-xl lg:text-2xl font-bold text-gray-900">{stat.value}</p>
                   </div>
-                  <div className={`${stat.color} p-3 rounded-xl`}>
-                    <stat.icon className="h-6 w-6 text-white" />
+                  <div className={`${stat.color} p-2 lg:p-3 rounded-xl`}>
+                    <stat.icon className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
                   </div>
                 </div>
-                <div className="flex items-center mt-4 text-sm text-green-600">
+                <div className="flex items-center mt-3 lg:mt-4 text-sm text-green-600">
                   <ArrowUp className="h-4 w-4 mr-1" />
                   <span>{stat.change} from last month</span>
                 </div>
@@ -192,37 +186,41 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-xl flex items-center">
-              <Zap className="w-5 h-5 mr-2 text-yellow-500" />
-              Professional Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {quickActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className={`h-24 flex flex-col gap-2 bg-gradient-to-r ${action.color} text-white border-0 hover:scale-105 transition-all duration-300`}
-                >
-                  <action.icon className="w-6 h-6" />
-                  <span className="text-xs font-medium text-center">{action.title}</span>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Dashboard Content */}
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Quick Actions */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center">
+                  <Zap className="w-5 h-5 mr-2 text-yellow-500" />
+                  Professional Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {quickActions.map((action, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      className={`p-6 h-auto flex flex-col gap-3 bg-gradient-to-r ${action.color} text-white border-0 hover:scale-105 transition-all duration-300`}
+                    >
+                      <action.icon className="w-8 h-8" />
+                      <div className="text-center">
+                        <div className="font-medium text-sm">{action.title}</div>
+                        <div className="text-xs opacity-90 mt-1">{action.description}</div>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Performance Chart */}
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-6">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                   <h2 className="text-xl font-semibold">Professional Performance</h2>
                   <select className="border rounded-lg px-3 py-2 text-sm bg-white shadow-sm">
                     <option>Last 7 days</option>
@@ -230,10 +228,10 @@ const Dashboard = () => {
                     <option>Last 90 days</option>
                   </select>
                 </div>
-                <div className="h-80 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
+                <div className="h-64 lg:h-80 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
                   <div className="text-center">
                     <BarChart3 className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-                    <p className="text-gray-600">Advanced Analytics Dashboard</p>
+                    <p className="text-gray-600 font-medium">Advanced Analytics Dashboard</p>
                     <p className="text-sm text-gray-500 mt-2">Real-time professional insights</p>
                   </div>
                 </div>
@@ -260,29 +258,29 @@ const Dashboard = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                  <Button variant="ghost" className="text-blue-600 hover:bg-blue-50">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mt-4 pt-4 border-t">
+                  <Button variant="ghost" className="text-blue-600 hover:bg-blue-50 text-sm">
                     <Camera className="w-4 h-4 mr-2" />
                     Media
                   </Button>
-                  <Button variant="ghost" className="text-green-600 hover:bg-green-50">
+                  <Button variant="ghost" className="text-green-600 hover:bg-green-50 text-sm">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Article
                   </Button>
-                  <Button variant="ghost" className="text-purple-600 hover:bg-purple-50">
+                  <Button variant="ghost" className="text-purple-600 hover:bg-purple-50 text-sm">
                     <Trophy className="w-4 h-4 mr-2" />
                     Achievement
                   </Button>
-                  <Button variant="ghost" className="text-orange-600 hover:bg-orange-50">
+                  <Button variant="ghost" className="text-orange-600 hover:bg-orange-50 text-sm">
                     <Video className="w-4 h-4 mr-2" />
-                    Live Event
+                    Event
                   </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Right Sidebar */}
+          {/* Right Column - Sidebar Content */}
           <div className="space-y-6">
             {/* Recent Activity */}
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
@@ -300,16 +298,16 @@ const Dashboard = () => {
               <CardContent>
                 <div className="space-y-4">
                   {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50/50 rounded-lg">
+                    <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50/50 rounded-lg transition-colors">
                       <div className="bg-blue-100 p-2 rounded-full">
                         <Clock className="h-4 w-4 text-blue-600" />
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{activity.action}</p>
                         <div className="flex text-xs text-gray-500 mt-1">
-                          <span>{activity.user}</span>
+                          <span className="truncate">{activity.user}</span>
                           <span className="mx-2">•</span>
-                          <span>{activity.time}</span>
+                          <span className="whitespace-nowrap">{activity.time}</span>
                         </div>
                       </div>
                     </div>
@@ -326,18 +324,18 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center">
                   <TrendingUp className="w-5 h-5 mr-2 text-orange-500" />
-                  Trending Business Topics
+                  Trending Topics
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {trendingTopics.map((topic, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50/50 rounded-lg cursor-pointer">
-                      <div>
-                        <p className="font-medium text-blue-600">{topic.topic}</p>
+                    <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50/50 rounded-lg cursor-pointer transition-colors">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-blue-600 truncate">{topic.topic}</p>
                         <p className="text-xs text-gray-500">{topic.posts} posts</p>
                       </div>
-                      <Badge variant="outline" className="text-green-600 border-green-200">
+                      <Badge variant="outline" className="text-green-600 border-green-200 ml-2">
                         {topic.trend}
                       </Badge>
                     </div>
@@ -351,15 +349,15 @@ const Dashboard = () => {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center">
                   <Calendar className="w-5 h-5 mr-2 text-purple-600" />
-                  Professional Events
+                  Events
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {upcomingEvents.map((event, index) => (
                     <div key={index} className="p-3 border rounded-lg hover:bg-gray-50/50 transition-colors">
-                      <h4 className="font-medium text-gray-900">{event.title}</h4>
-                      <p className="text-sm text-gray-600">{event.date} at {event.time}</p>
+                      <h4 className="font-medium text-gray-900 text-sm">{event.title}</h4>
+                      <p className="text-sm text-gray-600 mt-1">{event.date} at {event.time}</p>
                       <div className="flex items-center mt-2">
                         <Users className="w-4 h-4 text-gray-400 mr-1" />
                         <span className="text-xs text-gray-500">{event.attendees} attending</span>
@@ -378,7 +376,7 @@ const Dashboard = () => {
 
         {/* Professional Tools Section */}
         <Card className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border-0 shadow-xl">
-          <CardContent className="p-8">
+          <CardContent className="p-6 lg:p-8">
             <div className="text-center">
               <Briefcase className="w-12 h-12 mx-auto mb-4 text-white/90" />
               <h2 className="text-2xl font-bold mb-3">Professional Growth Tools</h2>
@@ -386,7 +384,7 @@ const Dashboard = () => {
                 Access AI-powered tools designed to accelerate your professional journey
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <Button 
                   variant="secondary"
                   className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
