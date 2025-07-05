@@ -268,10 +268,10 @@ const ProfileDashboard = () => {
                     <div className="text-center">
                       <Rocket className="w-12 h-12 mx-auto mb-4 text-white/90" />
                       <h1 className="text-3xl font-bold mb-3">
-                        Welcome to ProConnect, {profile?.full_name?.split(' ')[0] || 'Professional'}! 🚀
+                        Welcome to BizBase, {profile?.full_name?.split(' ')[0] || 'Professional'}! 🚀
                       </h1>
                       <p className="text-white/90 mb-6 text-lg">
-                        Your professional networking platform with advanced features and AI-powered connections.
+                        Your next-generation business networking platform with advanced AI-powered features and professional growth tools.
                       </p>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -281,7 +281,7 @@ const ProfileDashboard = () => {
                           onClick={() => setActiveTab('networking')}
                         >
                           <Users className="w-4 h-4 mr-2" />
-                          Find Connections
+                          Smart Networking
                         </Button>
                         
                         <Button 
@@ -290,7 +290,7 @@ const ProfileDashboard = () => {
                           onClick={() => setActiveTab('tools')}
                         >
                           <Zap className="w-4 h-4 mr-2" />
-                          AI Networking
+                          AI Business Tools
                         </Button>
                       </div>
                     </div>
@@ -312,7 +312,7 @@ const ProfileDashboard = () => {
                           variant="outline" 
                           className="w-full justify-start text-gray-500 hover:bg-gray-50 h-12 bg-gray-50/50"
                         >
-                          Share your professional thoughts...
+                          Share your business insights and professional thoughts...
                         </Button>
                       </div>
                     </div>
@@ -320,7 +320,7 @@ const ProfileDashboard = () => {
                     <div className="flex items-center justify-between mt-4 pt-4 border-t">
                       <Button variant="ghost" className="text-blue-600 hover:bg-blue-50">
                         <Camera className="w-4 h-4 mr-2" />
-                        Photo
+                        Media
                       </Button>
                       <Button variant="ghost" className="text-green-600 hover:bg-green-50">
                         <BookOpen className="w-4 h-4 mr-2" />
@@ -332,7 +332,7 @@ const ProfileDashboard = () => {
                       </Button>
                       <Button variant="ghost" className="text-orange-600 hover:bg-orange-50">
                         <Target className="w-4 h-4 mr-2" />
-                        Poll
+                        Business Poll
                       </Button>
                     </div>
                   </CardContent>
@@ -344,7 +344,7 @@ const ProfileDashboard = () => {
                     <CardTitle className="flex items-center justify-between">
                       <div className="flex items-center">
                         <Globe className="w-5 h-5 mr-2 text-blue-600" />
-                        Professional Feed
+                        Business Network Feed
                       </div>
                       <Button variant="ghost" size="sm">
                         <Settings className="w-4 h-4" />
@@ -396,7 +396,7 @@ const ProfileDashboard = () => {
                     <CardTitle className="text-sm flex items-center justify-between">
                       <div className="flex items-center">
                         <Users className="w-4 h-4 mr-2 text-blue-600" />
-                        People You May Know
+                        Business Connections
                       </div>
                       <Button variant="ghost" size="sm" onClick={() => setActiveTab('networking')}>
                         View All
@@ -431,7 +431,7 @@ const ProfileDashboard = () => {
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center">
                       <Briefcase className="w-4 h-4 mr-2 text-purple-600" />
-                      Professional Tools
+                      Business Tools
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -441,7 +441,7 @@ const ProfileDashboard = () => {
                       onClick={() => setActiveTab('tools')}
                     >
                       <Star className="w-4 h-4 mr-3" />
-                      AI Career Advisor
+                      AI Business Advisor
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -449,7 +449,7 @@ const ProfileDashboard = () => {
                       onClick={() => setActiveTab('tools')}
                     >
                       <Target className="w-4 h-4 mr-3" />
-                      Skill Matcher
+                      Market Analysis
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -465,7 +465,7 @@ const ProfileDashboard = () => {
                       onClick={() => setActiveTab('tools')}
                     >
                       <Rocket className="w-4 h-4 mr-3" />
-                      Startup Incubator
+                      Business Incubator
                     </Button>
                   </CardContent>
                 </Card>
@@ -475,25 +475,25 @@ const ProfileDashboard = () => {
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center">
                       <Trophy className="w-4 h-4 mr-2 text-purple-600" />
-                      Platform Insights
+                      BizBase Insights
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-700">Active Professionals</span>
-                      <span className="font-bold text-purple-600">50K+</span>
+                      <span className="font-bold text-purple-600">75K+</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-700">Success Stories</span>
-                      <span className="font-bold text-green-600">5,200+</span>
+                      <span className="text-gray-700">Business Success Stories</span>
+                      <span className="font-bold text-green-600">8,200+</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-700">AI Connections Made</span>
-                      <span className="font-bold text-blue-600">25K+</span>
+                      <span className="font-bold text-blue-600">42K+</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-700">Job Placements</span>
-                      <span className="font-bold text-orange-600">3,800+</span>
+                      <span className="text-gray-700">Business Opportunities</span>
+                      <span className="font-bold text-orange-600">15,800+</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -518,9 +518,9 @@ const ProfileDashboard = () => {
               <CardContent className="p-8">
                 <div className="text-center">
                   <TrendingUp className="w-12 h-12 mx-auto mb-4 text-white/90" />
-                  <h1 className="text-3xl font-bold mb-3">Professional Insights</h1>
+                  <h1 className="text-3xl font-bold mb-3">Business Intelligence & Insights</h1>
                   <p className="text-white/90 text-lg">
-                    Advanced analytics and insights for your professional growth
+                    Advanced analytics and AI-powered insights for accelerated business growth
                   </p>
                 </div>
               </CardContent>
@@ -529,11 +529,11 @@ const ProfileDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
                 <CardHeader>
-                  <CardTitle className="text-lg">Career Trajectory</CardTitle>
+                  <CardTitle className="text-lg">Business Growth Trajectory</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-green-600 mb-2">Upward</div>
-                  <p className="text-sm text-gray-600">Your career is trending positively with 15% growth this quarter</p>
+                  <div className="text-3xl font-bold text-green-600 mb-2">Exponential</div>
+                  <p className="text-sm text-gray-600">Your business metrics show 28% growth this quarter with AI optimization</p>
                 </CardContent>
               </Card>
               
@@ -542,18 +542,18 @@ const ProfileDashboard = () => {
                   <CardTitle className="text-lg">Market Position</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-blue-600 mb-2">Top 10%</div>
-                  <p className="text-sm text-gray-600">You rank in the top 10% of professionals in your field</p>
+                  <div className="text-3xl font-bold text-blue-600 mb-2">Top 5%</div>
+                  <p className="text-sm text-gray-600">You rank in the top 5% of business professionals in your industry</p>
                 </CardContent>
               </Card>
               
               <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
                 <CardHeader>
-                  <CardTitle className="text-lg">Influence Score</CardTitle>
+                  <CardTitle className="text-lg">Business Influence Score</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-purple-600 mb-2">8.7/10</div>
-                  <p className="text-sm text-gray-600">Your professional influence is exceptionally strong</p>
+                  <div className="text-3xl font-bold text-purple-600 mb-2">9.2/10</div>
+                  <p className="text-sm text-gray-600">Your business influence and network reach is exceptionally strong</p>
                 </CardContent>
               </Card>
             </div>
