@@ -93,7 +93,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">5</span>
               </Button>
               
-              <Button variant="ghost" size="icon" className="hover:bg-green-50">
+              <Button variant="ghost" size="icon" className="hover:bg-green-50 relative">
                 <MessageSquare className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
               </Button>
@@ -121,64 +121,64 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
       </header>
 
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <div className="flex">
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
-      {/* Sidebar */}
-      <aside className={`fixed left-0 top-16 h-full w-72 bg-white/90 backdrop-blur-xl shadow-xl border-r border-gray-100 z-40 transform transition-transform duration-300 ease-in-out ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0 lg:static lg:h-auto`}>
-        <div className="p-6 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">Business Dashboard</h3>
-          <p className="text-sm text-gray-500">Manage your professional network</p>
-        </div>
-        
-        <nav className="p-4 space-y-2">
-          {menuItems.map((item, index) => (
-            <Button
-              key={index}
-              variant={item.active ? "default" : "ghost"}
-              className={`w-full justify-start text-sm h-11 ${
-                item.active 
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' 
-                  : 'hover:bg-gray-100 text-gray-700'
-              }`}
-              onClick={() => navigate(item.path)}
-            >
-              <item.icon className="w-5 h-5 mr-3" />
-              {item.label}
-            </Button>
-          ))}
-        </nav>
-
-        {/* Quick Actions */}
-        <div className="p-4 border-t border-gray-100 mt-4">
-          <div className="space-y-2">
-            <Button variant="outline" className="w-full justify-start text-sm bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:from-green-100 hover:to-emerald-100">
-              <Users className="w-4 h-4 mr-2" />
-              Find Connections
-            </Button>
-            <Button variant="outline" className="w-full justify-start text-sm bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:from-purple-100 hover:to-pink-100">
-              <Briefcase className="w-4 h-4 mr-2" />
-              Business Tools
-            </Button>
+        {/* Sidebar */}
+        <aside className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-72 bg-white/90 backdrop-blur-xl shadow-xl border-r border-gray-100 z-40 transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 lg:static lg:z-auto`}>
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">Business Dashboard</h3>
+            <p className="text-sm text-gray-500">Manage your professional network</p>
           </div>
-        </div>
-      </aside>
+          
+          <nav className="p-4 space-y-2">
+            {menuItems.map((item, index) => (
+              <Button
+                key={index}
+                variant={item.active ? "default" : "ghost"}
+                className={`w-full justify-start text-sm h-11 ${
+                  item.active 
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                }`}
+                onClick={() => navigate(item.path)}
+              >
+                <item.icon className="w-5 h-5 mr-3" />
+                {item.label}
+              </Button>
+            ))}
+          </nav>
 
-      {/* Main Content */}
-      <main className={`transition-all duration-300 ease-in-out ${
-        sidebarOpen ? 'lg:ml-72' : 'lg:ml-72'
-      }`}>
-        <div className="p-6 min-h-screen">
-          {children}
-        </div>
-      </main>
+          {/* Quick Actions */}
+          <div className="p-4 border-t border-gray-100 mt-4">
+            <div className="space-y-2">
+              <Button variant="outline" className="w-full justify-start text-sm bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:from-green-100 hover:to-emerald-100">
+                <Users className="w-4 h-4 mr-2" />
+                Find Connections
+              </Button>
+              <Button variant="outline" className="w-full justify-start text-sm bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:from-purple-100 hover:to-pink-100">
+                <Briefcase className="w-4 h-4 mr-2" />
+                Business Tools
+              </Button>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 lg:ml-72">
+          <div className="p-6 min-h-screen">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

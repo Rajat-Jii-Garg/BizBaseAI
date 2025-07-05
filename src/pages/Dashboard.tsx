@@ -1,6 +1,11 @@
+
 import React from "react";
-import AppSidebar from "@/components/AppSidebar";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart3,
   Users,
@@ -10,140 +15,297 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  Star,
+  Target,
+  Award,
+  Brain,
+  Zap,
+  Trophy,
+  Crown,
+  Network,
+  MessageSquare,
+  Bell,
+  Eye,
+  Heart,
+  Share2,
+  Plus,
+  ArrowUp,
+  Briefcase,
+  Globe,
+  Coffee,
+  Video,
+  BookOpen,
+  Settings,
+  Camera,
+  Edit
 } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
+import DashboardLayout from '@/components/DashboardLayout';
 
 const Dashboard = () => {
+  const { user } = useAuth();
+
   const stats = [
     {
-      title: "Total Revenue",
-      value: "$24,345",
-      change: "+12.5%",
-      icon: DollarSign,
-      trend: "up",
-    },
-    {
-      title: "Active Users",
-      value: "1,293",
-      change: "+18.2%",
+      title: "Network Growth",
+      value: "2,847",
+      change: "+23.5%",
       icon: Users,
       trend: "up",
+      color: "bg-blue-500"
     },
     {
-      title: "Pending Tasks",
-      value: "48",
-      change: "-5.1%",
-      icon: CheckCircle,
-      trend: "down",
-    },
-    {
-      title: "Open Tickets",
-      value: "23",
-      change: "+3.7%",
-      icon: AlertCircle,
+      title: "Profile Views",
+      value: "12,458",
+      change: "+18.2%",
+      icon: Eye,
       trend: "up",
+      color: "bg-green-500"
     },
+    {
+      title: "Business Opportunities",
+      value: "156",
+      change: "+45.1%",
+      icon: Target,
+      trend: "up",
+      color: "bg-purple-500"
+    },
+    {
+      title: "Professional Score",
+      value: "94/100",
+      change: "+8.7%",
+      icon: Trophy,
+      trend: "up",
+      color: "bg-orange-500"
+    },
+  ];
+
+  const quickActions = [
+    { title: "AI Career Coach", icon: Brain, color: "from-blue-500 to-purple-600" },
+    { title: "Smart Networking", icon: Network, color: "from-green-500 to-blue-500" },
+    { title: "Business Tools", icon: Briefcase, color: "from-purple-500 to-pink-500" },
+    { title: "Market Analysis", icon: TrendingUp, color: "from-orange-500 to-red-500" },
+    { title: "Live Events", icon: Video, color: "from-indigo-500 to-purple-500" },
+    { title: "Learning Hub", icon: BookOpen, color: "from-teal-500 to-green-500" }
   ];
 
   const recentActivity = [
     {
       id: 1,
-      action: "New client onboarded",
-      time: "2 hours ago",
+      action: "Sarah Johnson viewed your profile",
+      time: "2 minutes ago",
       user: "Sarah Johnson",
+      type: "view",
+      avatar: null
     },
     {
       id: 2,
-      action: "Invoice #3452 paid",
-      time: "5 hours ago",
-      user: "Finance Team",
+      action: "You gained 15 new connections",
+      time: "1 hour ago",
+      user: "Network Growth",
+      type: "connection",
+      avatar: null
     },
     {
       id: 3,
-      action: "Project milestone completed",
-      time: "Yesterday",
-      user: "Dev Team",
+      action: "New business opportunity in Tech",
+      time: "3 hours ago",
+      user: "BizBase AI",
+      type: "opportunity",
+      avatar: null
     },
     {
       id: 4,
-      action: "New feature request submitted",
-      time: "Yesterday",
-      user: "Customer Support",
+      action: "Your post got 127 likes",
+      time: "5 hours ago",
+      user: "Content Analytics",
+      type: "engagement",
+      avatar: null
     },
     {
       id: 5,
-      action: "Weekly report generated",
-      time: "2 days ago",
-      user: "System",
+      action: "Weekly performance report ready",
+      time: "1 day ago",
+      user: "Analytics System",
+      type: "report",
+      avatar: null
     },
   ];
 
+  const trendingTopics = [
+    { topic: "#AIInBusiness", posts: "15.2K", trend: "+45%" },
+    { topic: "#RemoteWork", posts: "12.8K", trend: "+32%" },
+    { topic: "#StartupLife", posts: "9.4K", trend: "+28%" },
+    { topic: "#TechTrends", posts: "8.7K", trend: "+19%" },
+    { topic: "#Leadership", posts: "7.3K", trend: "+15%" }
+  ];
+
+  const upcomingEvents = [
+    { title: "AI in Business Summit", date: "Dec 15, 2024", time: "10:00 AM", attendees: 2500 },
+    { title: "Networking Mixer", date: "Dec 18, 2024", time: "6:00 PM", attendees: 150 },
+    { title: "Startup Pitch Night", date: "Dec 20, 2024", time: "7:00 PM", attendees: 300 },
+    { title: "Tech Leadership Workshop", date: "Dec 22, 2024", time: "2:00 PM", attendees: 450 }
+  ];
+
   return (
-    <div className="flex">
-      <AppSidebar isCollapsed={false} />
-      <div className="flex-1 p-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Dashboard Overview</h1>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => (
-              <Card key={index} className="border-none shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm text-gray-500 mb-1">{stat.title}</p>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                    </div>
-                    <div className="bg-blue-100 p-2 rounded-lg">
-                      <stat.icon className="h-6 w-6 text-blue-600" />
-                    </div>
-                  </div>
-                  <div
-                    className={`flex items-center mt-4 text-sm ${
-                      stat.trend === "up"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    <TrendingUp className="h-4 w-4 mr-1" />
-                    <span>{stat.change} from last month</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Welcome Header */}
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">
+                Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Professional'}! 🚀
+              </h1>
+              <p className="text-white/90 text-lg">
+                Your professional network is growing stronger every day
+              </p>
+            </div>
+            <div className="hidden md:block">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+                <Crown className="w-12 h-12 text-white" />
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Chart Section */}
-            <Card className="lg:col-span-2 border-none shadow-md">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => (
+            <Card key={index} className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  </div>
+                  <div className={`${stat.color} p-3 rounded-xl`}>
+                    <stat.icon className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+                <div className="flex items-center mt-4 text-sm text-green-600">
+                  <ArrowUp className="h-4 w-4 mr-1" />
+                  <span>{stat.change} from last month</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center">
+              <Zap className="w-5 h-5 mr-2 text-yellow-500" />
+              Professional Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {quickActions.map((action, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  className={`h-24 flex flex-col gap-2 bg-gradient-to-r ${action.color} text-white border-0 hover:scale-105 transition-all duration-300`}
+                >
+                  <action.icon className="w-6 h-6" />
+                  <span className="text-xs font-medium text-center">{action.title}</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Dashboard Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Performance Chart */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-semibold">Performance Overview</h2>
-                  <select className="border rounded px-2 py-1 text-sm">
+                  <h2 className="text-xl font-semibold">Professional Performance</h2>
+                  <select className="border rounded-lg px-3 py-2 text-sm bg-white shadow-sm">
                     <option>Last 7 days</option>
                     <option>Last 30 days</option>
                     <option>Last 90 days</option>
                   </select>
                 </div>
-                <div className="h-80 flex items-center justify-center bg-gray-100 rounded-lg">
-                  <BarChart3 className="h-16 w-16 text-gray-400" />
-                  <p className="ml-4 text-gray-500">Chart visualization goes here</p>
+                <div className="h-80 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
+                  <div className="text-center">
+                    <BarChart3 className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                    <p className="text-gray-600">Advanced Analytics Dashboard</p>
+                    <p className="text-sm text-gray-500 mt-2">Real-time professional insights</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
-            <Card className="border-none shadow-md">
+            {/* Content Creation */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-6">
-                <h2 className="text-lg font-semibold mb-6">Recent Activity</h2>
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                      {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start text-gray-500 hover:bg-gray-50 h-12 bg-gray-50/50"
+                    >
+                      Share your professional insights and business thoughts...
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                  <Button variant="ghost" className="text-blue-600 hover:bg-blue-50">
+                    <Camera className="w-4 h-4 mr-2" />
+                    Media
+                  </Button>
+                  <Button variant="ghost" className="text-green-600 hover:bg-green-50">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Article
+                  </Button>
+                  <Button variant="ghost" className="text-purple-600 hover:bg-purple-50">
+                    <Trophy className="w-4 h-4 mr-2" />
+                    Achievement
+                  </Button>
+                  <Button variant="ghost" className="text-orange-600 hover:bg-orange-50">
+                    <Video className="w-4 h-4 mr-2" />
+                    Live Event
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            {/* Recent Activity */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Bell className="w-5 h-5 mr-2 text-blue-600" />
+                    Recent Activity
+                  </div>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                    {recentActivity.length}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-4">
                   {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-start">
-                      <div className="bg-blue-100 p-2 rounded-full mr-4">
+                    <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50/50 rounded-lg">
+                      <div className="bg-blue-100 p-2 rounded-full">
                         <Clock className="h-4 w-4 text-blue-600" />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium">{activity.action}</p>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{activity.action}</p>
                         <div className="flex text-xs text-gray-500 mt-1">
                           <span>{activity.user}</span>
                           <span className="mx-2">•</span>
@@ -153,33 +315,115 @@ const Dashboard = () => {
                     </div>
                   ))}
                 </div>
-                <button className="w-full mt-6 text-center text-sm text-blue-600 hover:text-blue-800">
-                  View all activity
-                </button>
+                <Button variant="ghost" className="w-full mt-4 text-blue-600 hover:bg-blue-50">
+                  View All Activity
+                </Button>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Calendar Section */}
-          <div className="mt-8">
-            <Card className="border-none shadow-md">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-semibold">Upcoming Schedule</h2>
-                  <button className="text-blue-600 text-sm hover:text-blue-800">
-                    + Add Event
-                  </button>
+            {/* Trending Topics */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center">
+                  <TrendingUp className="w-5 h-5 mr-2 text-orange-500" />
+                  Trending Business Topics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {trendingTopics.map((topic, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50/50 rounded-lg cursor-pointer">
+                      <div>
+                        <p className="font-medium text-blue-600">{topic.topic}</p>
+                        <p className="text-xs text-gray-500">{topic.posts} posts</p>
+                      </div>
+                      <Badge variant="outline" className="text-green-600 border-green-200">
+                        {topic.trend}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
-                <div className="h-64 flex items-center justify-center bg-gray-100 rounded-lg">
-                  <Calendar className="h-16 w-16 text-gray-400" />
-                  <p className="ml-4 text-gray-500">Calendar view goes here</p>
+              </CardContent>
+            </Card>
+
+            {/* Upcoming Events */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center">
+                  <Calendar className="w-5 h-5 mr-2 text-purple-600" />
+                  Professional Events
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {upcomingEvents.map((event, index) => (
+                    <div key={index} className="p-3 border rounded-lg hover:bg-gray-50/50 transition-colors">
+                      <h4 className="font-medium text-gray-900">{event.title}</h4>
+                      <p className="text-sm text-gray-600">{event.date} at {event.time}</p>
+                      <div className="flex items-center mt-2">
+                        <Users className="w-4 h-4 text-gray-400 mr-1" />
+                        <span className="text-xs text-gray-500">{event.attendees} attending</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+                <Button variant="ghost" className="w-full mt-4 text-purple-600 hover:bg-purple-50">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Event
+                </Button>
               </CardContent>
             </Card>
           </div>
         </div>
+
+        {/* Professional Tools Section */}
+        <Card className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border-0 shadow-xl">
+          <CardContent className="p-8">
+            <div className="text-center">
+              <Briefcase className="w-12 h-12 mx-auto mb-4 text-white/90" />
+              <h2 className="text-2xl font-bold mb-3">Professional Growth Tools</h2>
+              <p className="text-white/90 mb-6">
+                Access AI-powered tools designed to accelerate your professional journey
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Button 
+                  variant="secondary"
+                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
+                >
+                  <Brain className="w-4 h-4 mr-2" />
+                  AI Coach
+                </Button>
+                
+                <Button 
+                  variant="secondary"
+                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
+                >
+                  <Target className="w-4 h-4 mr-2" />
+                  Skill Matcher
+                </Button>
+
+                <Button 
+                  variant="secondary"
+                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Salary Insights
+                </Button>
+
+                <Button 
+                  variant="secondary"
+                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
+                >
+                  <Globe className="w-4 h-4 mr-2" />
+                  Market Analysis
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
