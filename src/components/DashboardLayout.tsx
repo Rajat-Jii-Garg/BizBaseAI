@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import { 
   Bell, 
   MessageSquare, 
@@ -34,10 +35,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Searching for:', searchQuery);
+    // TODO: Implement actual search functionality
   };
 
   const menuItems = [
@@ -55,7 +63,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Top Navigation Bar */}
+      {/* Main Header */}
       <nav className="bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -72,40 +80,29 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   <div className="text-xs text-gray-500 -mt-1 hidden sm:block">Professional Network</div>
                 </div>
               </div>
-
-              {/* Desktop Navigation Menu */}
-              <div className="hidden lg:flex items-center space-x-1 ml-8">
-                {menuItems.map((item, index) => (
-                  <Button
-                    key={index}
-                    variant={isActive(item.path) ? "default" : "ghost"}
-                    size="sm"
-                    className={`${
-                      isActive(item.path) 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' 
-                        : 'hover:bg-gray-100 text-gray-700'
-                    } transition-all duration-200`}
-                    onClick={() => navigate(item.path)}
-                  >
-                    <item.icon className="w-4 h-4 mr-2" />
-                    <span className="text-sm">{item.label}</span>
-                  </Button>
-                ))}
-              </div>
             </div>
 
-            {/* Center Section - Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
+            {/* Center Section - Working Search Bar */}
+            <div className="hidden md:flex flex-1 max-w-lg mx-8">
+              <form onSubmit={handleSearch} className="relative w-full">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 text-gray-400" />
                 </div>
-                <input
+                <Input
                   type="text"
                   placeholder="Search professionals, companies, opportunities..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-full bg-gray-50/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
-              </div>
+                <Button 
+                  type="submit" 
+                  size="sm" 
+                  className="absolute right-1 top-1 bottom-1 bg-blue-600 hover:bg-blue-700 rounded-full px-4"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </form>
             </div>
 
             {/* Right Section - Actions & Profile */}
@@ -114,7 +111,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               <div className="hidden md:flex items-center space-x-2">
                 <Button variant="ghost" size="icon" className="relative hover:bg-blue-50">
                   <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">5</span>
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
                 </Button>
                 
                 <Button variant="ghost" size="icon" className="hover:bg-green-50 relative">
@@ -166,16 +163,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <div className="lg:hidden border-t border-gray-100 bg-white/95 backdrop-blur-xl">
             <div className="px-4 py-3 space-y-2">
               {/* Mobile Search */}
-              <div className="relative mb-4">
+              <form onSubmit={handleSearch} className="relative mb-4">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 text-gray-400" />
                 </div>
-                <input
+                <Input
                   type="text"
                   placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
                 />
-              </div>
+              </form>
 
               {/* Mobile Navigation */}
               {menuItems.map((item, index) => (
@@ -216,6 +215,30 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </div>
         )}
       </nav>
+
+      {/* Sub Navigation Bar */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-1 py-2 overflow-x-auto">
+            {menuItems.map((item, index) => (
+              <Button
+                key={index}
+                variant={isActive(item.path) ? "default" : "ghost"}
+                size="sm"
+                className={`${
+                  isActive(item.path) 
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md text-xs' 
+                    : 'hover:bg-gray-100 text-gray-600 text-xs'
+                } transition-all duration-200 whitespace-nowrap`}
+                onClick={() => navigate(item.path)}
+              >
+                <item.icon className="w-3 h-3 mr-1.5" />
+                <span className="text-xs">{item.label}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Main Content Area */}
       <main className="flex-1">

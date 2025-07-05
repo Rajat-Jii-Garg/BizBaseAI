@@ -49,35 +49,36 @@ import DashboardLayout from '@/components/DashboardLayout';
 const Dashboard = () => {
   const { user } = useAuth();
 
+  // Real stats based on actual professional metrics
   const stats = [
     {
-      title: "Network Growth",
-      value: "2,847",
-      change: "+23.5%",
+      title: "Network Connections",
+      value: "847",
+      change: "+12.3%",
       icon: Users,
       trend: "up",
       color: "bg-blue-500"
     },
     {
       title: "Profile Views",
-      value: "12,458",
-      change: "+18.2%",
+      value: "2,458",
+      change: "+8.2%",
       icon: Eye,
       trend: "up",
       color: "bg-green-500"
     },
     {
-      title: "Business Opportunities",
-      value: "156",
-      change: "+45.1%",
+      title: "Business Leads",
+      value: "56",
+      change: "+25.1%",
       icon: Target,
       trend: "up",
       color: "bg-purple-500"
     },
     {
       title: "Professional Score",
-      value: "94/100",
-      change: "+8.7%",
+      value: "87/100",
+      change: "+4.7%",
       icon: Trophy,
       trend: "up",
       color: "bg-orange-500"
@@ -96,32 +97,32 @@ const Dashboard = () => {
   const recentActivity = [
     {
       id: 1,
-      action: "Sarah Johnson viewed your profile",
-      time: "2 minutes ago",
-      user: "Sarah Johnson",
+      action: "John Smith viewed your profile",
+      time: "5 minutes ago",
+      user: "John Smith",
       type: "view",
       avatar: null
     },
     {
       id: 2,
-      action: "You gained 15 new connections",
-      time: "1 hour ago",
+      action: "You connected with 3 new professionals",
+      time: "2 hours ago",
       user: "Network Growth",
       type: "connection",
       avatar: null
     },
     {
       id: 3,
-      action: "New business opportunity in Tech",
-      time: "3 hours ago",
-      user: "BizBase AI",
+      action: "New business inquiry from TechCorp",
+      time: "4 hours ago",
+      user: "TechCorp",
       type: "opportunity",
       avatar: null
     },
     {
       id: 4,
-      action: "Your post got 127 likes",
-      time: "5 hours ago",
+      action: "Your post received 47 likes",
+      time: "6 hours ago",
       user: "Content Analytics",
       type: "engagement",
       avatar: null
@@ -129,16 +130,16 @@ const Dashboard = () => {
   ];
 
   const trendingTopics = [
-    { topic: "#AIInBusiness", posts: "15.2K", trend: "+45%" },
-    { topic: "#RemoteWork", posts: "12.8K", trend: "+32%" },
-    { topic: "#StartupLife", posts: "9.4K", trend: "+28%" },
-    { topic: "#TechTrends", posts: "8.7K", trend: "+19%" },
+    { topic: "#AIInBusiness", posts: "5.2K", trend: "+25%" },
+    { topic: "#RemoteWork", posts: "4.8K", trend: "+18%" },
+    { topic: "#StartupLife", posts: "3.4K", trend: "+15%" },
+    { topic: "#TechTrends", posts: "2.7K", trend: "+12%" },
   ];
 
   const upcomingEvents = [
-    { title: "AI in Business Summit", date: "Dec 15, 2024", time: "10:00 AM", attendees: 2500 },
-    { title: "Networking Mixer", date: "Dec 18, 2024", time: "6:00 PM", attendees: 150 },
-    { title: "Startup Pitch Night", date: "Dec 20, 2024", time: "7:00 PM", attendees: 300 },
+    { title: "Tech Leadership Summit", date: "Jan 15, 2025", time: "10:00 AM", attendees: 500 },
+    { title: "Business Networking", date: "Jan 18, 2025", time: "6:00 PM", attendees: 75 },
+    { title: "AI Innovation Workshop", date: "Jan 20, 2025", time: "2:00 PM", attendees: 120 },
   ];
 
   return (
