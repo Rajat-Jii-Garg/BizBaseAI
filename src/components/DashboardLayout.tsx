@@ -6,6 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { 
   Bell, 
   MessageSquare, 
   Network, 
@@ -23,7 +31,12 @@ import {
   BarChart3,
   Calendar,
   Plus,
-  X
+  X,
+  ChevronDown,
+  Edit,
+  Shield,
+  CreditCard,
+  HelpCircle
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -49,7 +62,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
 
   const menuItems = [
-    { icon: Home, label: 'Dashboard', path: '/dashboard' },
+    { icon: Home, label: 'Home', path: '/dashboard' },
+    { icon: User, label: 'My Profile', path: '/dashboard/profile' },
     { icon: Network, label: 'Network', path: '/dashboard/network' },
     { icon: Briefcase, label: 'Business', path: '/dashboard/business' },
     { icon: BarChart3, label: 'Analytics', path: '/dashboard/analytics' },
@@ -125,25 +139,68 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 </Button>
               </div>
               
-              {/* User Profile */}
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-9 w-9 ring-2 ring-blue-200 shadow-md">
-                  <AvatarImage src={user?.user_metadata?.avatar_url} />
-                  <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
-                    {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="hidden md:block">
-                  <p className="text-sm font-medium text-gray-900">
-                    {user?.user_metadata?.full_name || 'Professional User'}
-                  </p>
-                  <p className="text-xs text-gray-500">Pro Member</p>
-                </div>
-                <Button variant="ghost" onClick={handleSignOut} className="text-sm hover:bg-red-50 hover:text-red-600 hidden md:flex">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
+              {/* User Profile Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-lg">
+                    <Avatar className="h-9 w-9 ring-2 ring-blue-200 shadow-md">
+                      <AvatarImage src={user?.user_metadata?.avatar_url} />
+                      <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                        {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="hidden md:block text-left">
+                      <p className="text-sm font-medium text-gray-900">
+                        {user?.user_metadata?.full_name || 'Professional User'}
+                      </p>
+                      <p className="text-xs text-gray-500">Pro Member</p>
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-gray-400 hidden md:block" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl border border-gray-100">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user?.user_metadata?.full_name || 'Professional User'}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/profile')} className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>My Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Edit className="mr-2 h-4 w-4" />
+                    <span>Edit Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Privacy</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    <span>Billing</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    <span>Help & Support</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 focus:text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* Mobile Menu Button */}
               <Button
@@ -216,10 +273,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         )}
       </nav>
 
-      {/* Sub Navigation Bar */}
+      {/* Centered Sub Navigation Bar */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-1 py-2 overflow-x-auto">
+          <div className="flex items-center justify-center space-x-1 py-2 overflow-x-auto">
             {menuItems.map((item, index) => (
               <Button
                 key={index}
@@ -229,11 +286,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   isActive(item.path) 
                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md text-xs' 
                     : 'hover:bg-gray-100 text-gray-600 text-xs'
-                } transition-all duration-200 whitespace-nowrap`}
+                } transition-all duration-200 whitespace-nowrap px-3 py-1.5`}
                 onClick={() => navigate(item.path)}
               >
                 <item.icon className="w-3 h-3 mr-1.5" />
-                <span className="text-xs">{item.label}</span>
+                <span className="text-xs font-medium">{item.label}</span>
               </Button>
             ))}
           </div>
