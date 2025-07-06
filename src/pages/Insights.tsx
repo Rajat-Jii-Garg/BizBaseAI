@@ -3,183 +3,199 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { 
   TrendingUp, 
-  BarChart3, 
-  Users, 
-  Eye, 
-  Target, 
-  DollarSign,
-  Calendar,
-  Award,
-  Share2,
-  Download,
-  RefreshCw,
+  Search, 
   Filter,
+  BarChart3,
+  PieChart,
+  LineChart,
+  Eye,
+  Users,
+  MessageSquare,
+  Heart,
+  Share2,
+  Target,
+  Award,
+  Zap,
+  Brain,
+  Globe,
+  Calendar,
+  Clock,
   ArrowUp,
   ArrowDown,
-  Globe,
-  Brain,
-  Zap,
   Star,
   Building2,
-  LineChart,
-  PieChart,
-  Activity
+  Briefcase,
+  Network,
+  ChevronRight,
+  Download,
+  RefreshCw,
+  Settings
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 
 const Insights = () => {
+  const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
 
-  const keyMetrics = [
-    {
-      title: "Profile Views",
-      value: "3,847",
-      change: "+23.5%",
-      trend: "up",
-      icon: Eye,
-      color: "bg-blue-500",
-      period: "Last 30 days"
-    },
-    {
-      title: "Network Growth",
-      value: "1,247",
-      change: "+15.3%",
-      trend: "up",
-      icon: Users,
-      color: "bg-green-500",
-      period: "Total connections"
-    },
-    {
-      title: "Engagement Rate",
-      value: "8.9%",
-      change: "+2.1%",
-      trend: "up",
-      icon: TrendingUp,
-      color: "bg-purple-500",
-      period: "Average interaction"
-    },
-    {
-      title: "Business Opportunities",
-      value: "89",
-      change: "+31.5%",
-      trend: "up",
-      icon: Target,
-      color: "bg-orange-500",
-      period: "Active leads"
-    }
-  ];
-
-  const industryBenchmarks = [
-    {
-      metric: "Professional Network Size",
-      yourValue: 1247,
-      industryAverage: 850,
-      percentile: 85,
-      status: "Above Average"
-    },
-    {
-      metric: "Profile Completeness",
-      yourValue: 95,
-      industryAverage: 78,
-      percentile: 92,
-      status: "Excellent"
-    },
-    {
-      metric: "Engagement Level",
-      yourValue: 8.9,
-      industryAverage: 6.2,
-      percentile: 78,
-      status: "Good"
-    },
-    {
-      metric: "Content Performance",
-      yourValue: 7.3,
-      industryAverage: 5.8,
-      percentile: 73,
-      status: "Good"
-    }
-  ];
-
-  const growthInsights = [
-    {
-      title: "Peak Activity Hours",
-      description: "Your audience is most active between 9 AM - 11 AM and 2 PM - 4 PM on weekdays",
-      recommendation: "Schedule your posts during these peak hours for maximum engagement",
-      impact: "High",
-      category: "Content Strategy"
-    },
-    {
-      title: "Industry Trending Topics",
-      description: "AI & Machine Learning, Sustainable Business, and Remote Work are trending in your industry",
-      recommendation: "Create content around these topics to increase visibility",
-      impact: "Medium",
-      category: "Content Ideas"
-    },
-    {
-      title: "Network Expansion Opportunity",
-      description: "You have strong connections in Technology but limited reach in Finance sector",
-      recommendation: "Connect with finance professionals to diversify your network",
-      impact: "High",
-      category: "Networking"
-    },
-    {
-      title: "Skills Recognition",
-      description: "Your Project Management skills are highly endorsed but Marketing skills need more visibility",
-      recommendation: "Share case studies showcasing your marketing expertise",
-      impact: "Medium",
-      category: "Professional Branding"
-    }
-  ];
+  const profileMetrics = {
+    profileViews: { value: 3684, change: 22.1, trend: 'up' },
+    searchAppearances: { value: 1247, change: 15.3, trend: 'up' },
+    postImpressions: { value: 8932, change: 31.5, trend: 'up' },
+    engagementRate: { value: 7.8, change: 0.8, trend: 'up' }
+  };
 
   const contentPerformance = [
     {
+      id: 1,
+      title: "Digital Marketing Trends for 2025",
       type: "Article",
-      title: "The Future of Remote Work in Tech Industry",
-      views: 2340,
-      likes: 187,
-      comments: 23,
-      shares: 45,
-      engagement: 10.9,
-      date: "5 days ago"
-    },
-    {
-      type: "Post",
-      title: "5 Key Lessons from Building a Startup",
-      views: 1890,
+      views: 2845,
       likes: 156,
-      comments: 31,
-      shares: 28,
-      engagement: 11.4,
-      date: "1 week ago"
+      comments: 23,
+      shares: 18,
+      engagement: 6.8,
+      publishDate: "2 days ago",
+      performance: "excellent"
     },
     {
+      id: 2,
+      title: "AI in Business: A Practical Guide",
+      type: "Post",
+      views: 1923,
+      likes: 89,
+      comments: 12,
+      shares: 7,
+      engagement: 5.6,
+      publishDate: "1 week ago",
+      performance: "good"
+    },
+    {
+      id: 3,
+      title: "Leadership Lessons from Tech Giants",
       type: "Video",
-      title: "Project Management Best Practices",
-      views: 3120,
-      likes: 298,
-      comments: 42,
-      shares: 67,
-      engagement: 13.0,
-      date: "2 weeks ago"
+      views: 1456,
+      likes: 67,
+      comments: 8,
+      shares: 4,
+      engagement: 5.4,
+      publishDate: "2 weeks ago",
+      performance: "good"
+    },
+    {
+      id: 4,
+      title: "Remote Work Productivity Tips",
+      type: "Post",
+      views: 892,
+      likes: 34,
+      comments: 5,
+      shares: 2,
+      engagement: 4.6,
+      publishDate: "3 weeks ago",
+      performance: "average"
     }
   ];
+
+  const networkInsights = [
+    {
+      category: "Industry Leaders",
+      count: 124,
+      growth: 12,
+      topConnections: ["Tech Executives", "Marketing Directors", "Product Managers"]
+    },
+    {
+      category: "Potential Collaborators",
+      count: 67,
+      growth: 8,
+      topConnections: ["Consultants", "Freelancers", "Agency Owners"]
+    },
+    {
+      category: "Industry Peers",
+      count: 234,
+      growth: 15,
+      topConnections: ["Marketing Specialists", "Business Analysts", "Sales Professionals"]
+    },
+    {
+      category: "Thought Leaders",
+      count: 89,
+      growth: 21,
+      topConnections: ["Authors", "Speakers", "Industry Experts"]
+    }
+  ];
+
+  const industryTrends = [
+    { topic: "Artificial Intelligence", engagement: 12400, trend: 45, category: "Technology" },
+    { topic: "Sustainable Business", engagement: 9800, trend: 38, category: "ESG" },
+    { topic: "Remote Leadership", engagement: 7600, trend: 29, category: "Management" },
+    { topic: "Digital Transformation", engagement: 6800, trend: 25, category: "Technology" },
+    { topic: "Customer Experience", engagement: 5400, trend: 22, category: "Marketing" },
+    { topic: "Data Privacy", engagement: 4200, trend: 18, category: "Legal" }
+  ];
+
+  const recommendations = [
+    {
+      type: "content",
+      title: "Post More Video Content",
+      description: "Video posts receive 3x more engagement than text posts in your network",
+      impact: "High",
+      effort: "Medium"
+    },
+    {
+      type: "network",
+      title: "Connect with Industry Leaders",
+      description: "Expanding connections in the Technology sector could increase visibility by 40%",
+      impact: "High",
+      effort: "Low"
+    },
+    {
+      type: "timing",
+      title: "Optimal Posting Time",
+      description: "Your audience is most active on Tuesdays and Thursdays at 10 AM",
+      impact: "Medium",
+      effort: "Low"
+    },
+    {
+      type: "engagement",
+      title: "Increase Comment Responses",
+      description: "Responding to comments within 2 hours increases future engagement by 25%",
+      impact: "Medium",
+      effort: "Low"
+    }
+  ];
+
+  const getPerformanceBadge = (performance: string) => {
+    switch (performance) {
+      case 'excellent': return <Badge className="bg-green-100 text-green-600">Excellent</Badge>;
+      case 'good': return <Badge className="bg-blue-100 text-blue-600">Good</Badge>;
+      case 'average': return <Badge className="bg-yellow-100 text-yellow-600">Average</Badge>;
+      default: return <Badge variant="outline">Unknown</Badge>;
+    }
+  };
+
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'High': return 'text-red-600 bg-red-50';
+      case 'Medium': return 'text-yellow-600 bg-yellow-50';
+      case 'Low': return 'text-green-600 bg-green-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
+  };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 rounded-2xl p-8 text-white">
+        <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-2xl p-8 text-white">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold mb-2 flex items-center">
-                <BarChart3 className="w-8 h-8 mr-3" />
-                Professional Insights & Analytics
+                <TrendingUp className="w-8 h-8 mr-3" />
+                Professional Insights
               </h1>
-              <p className="text-cyan-100">Data-driven insights to accelerate your professional growth</p>
+              <p className="text-purple-100">Analyze your professional growth and optimize your networking strategy</p>
             </div>
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
               <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30">
@@ -188,164 +204,222 @@ const Insights = () => {
               </Button>
               <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                 <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh Data
+                Refresh
               </Button>
             </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Input
+              type="text"
+              placeholder="Search insights, metrics, and trends..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-white/20 border-white/30 text-white placeholder-white/70 rounded-full focus:bg-white/30"
+            />
           </div>
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {keyMetrics.map((metric, index) => (
-            <Card key={index} className="bg-white/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all hover:scale-105">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-600 mb-2">{metric.title}</p>
-                    <p className="text-2xl lg:text-3xl font-bold text-gray-900 mb-1">{metric.value}</p>
-                    <p className="text-xs text-gray-500">{metric.period}</p>
-                  </div>
-                  <div className={`${metric.color} p-3 rounded-xl`}>
-                    <metric.icon className="h-6 w-6 text-white" />
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Profile Views</p>
+                  <p className="text-2xl font-bold text-blue-600">{profileMetrics.profileViews.value.toLocaleString()}</p>
                 </div>
-                <div className="flex items-center text-sm text-green-600 bg-green-50 rounded-lg px-3 py-2">
-                  <ArrowUp className="h-4 w-4 mr-2" />
-                  <span className="font-medium">{metric.change}</span>
-                  <span className="text-gray-500 ml-2">vs last month</span>
+                <Eye className="w-8 h-8 text-blue-600" />
+              </div>
+              <div className="flex items-center text-sm text-green-600 mt-2">
+                <ArrowUp className="h-4 w-4 mr-1" />
+                <span className="font-medium">+{profileMetrics.profileViews.change}%</span>
+                <span className="text-gray-500 ml-1">vs last month</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Search Appearances</p>
+                  <p className="text-2xl font-bold text-green-600">{profileMetrics.searchAppearances.value.toLocaleString()}</p>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+                <Search className="w-8 h-8 text-green-600" />
+              </div>
+              <div className="flex items-center text-sm text-green-600 mt-2">
+                <ArrowUp className="h-4 w-4 mr-1" />
+                <span className="font-medium">+{profileMetrics.searchAppearances.change}%</span>
+                <span className="text-gray-500 ml-1">vs last month</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Post Impressions</p>
+                  <p className="text-2xl font-bold text-purple-600">{profileMetrics.postImpressions.value.toLocaleString()}</p>
+                </div>
+                <BarChart3 className="w-8 h-8 text-purple-600" />
+              </div>
+              <div className="flex items-center text-sm text-green-600 mt-2">
+                <ArrowUp className="h-4 w-4 mr-1" />
+                <span className="font-medium">+{profileMetrics.postImpressions.change}%</span>
+                <span className="text-gray-500 ml-1">vs last month</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Engagement Rate</p>
+                  <p className="text-2xl font-bold text-orange-600">{profileMetrics.engagementRate.value}%</p>
+                </div>
+                <Heart className="w-8 h-8 text-orange-600" />
+              </div>
+              <div className="flex items-center text-sm text-green-600 mt-2">
+                <ArrowUp className="h-4 w-4 mr-1" />
+                <span className="font-medium">+{profileMetrics.engagementRate.change}%</span>
+                <span className="text-gray-500 ml-1">vs last month</span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-4 w-full max-w-2xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="benchmarks">Benchmarks</TabsTrigger>
-            <TabsTrigger value="recommendations">AI Insights</TabsTrigger>
+            <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="network">Network</TabsTrigger>
+            <TabsTrigger value="trends">Trends</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Network Growth Chart */}
+              {/* AI Recommendations */}
               <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <LineChart className="w-5 h-5 mr-2 text-blue-600" />
-                    Network Growth Trend
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <TrendingUp className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-                      <p className="text-gray-600">Interactive chart showing your network growth over the past 6 months</p>
-                      <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
-                        <div className="text-center">
-                          <div className="font-bold text-blue-600">+250</div>
-                          <div className="text-gray-500">New Connections</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-bold text-green-600">18%</div>
-                          <div className="text-gray-500">Growth Rate</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-bold text-purple-600">92%</div>
-                          <div className="text-gray-500">Acceptance Rate</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Profile Analytics */}
-              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Eye className="w-5 h-5 mr-2 text-green-600" />
-                    Profile Analytics
+                    <Brain className="w-5 h-5 mr-2 text-purple-600" />
+                    AI Recommendations
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                      <div>
-                        <p className="font-semibold text-blue-900">Profile Views</p>
-                        <p className="text-sm text-blue-600">Daily average: 127 views</p>
+                    {recommendations.map((rec, index) => (
+                      <div key={index} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold text-gray-900">{rec.title}</h4>
+                          <Badge className={getImpactColor(rec.impact)}>
+                            {rec.impact} Impact
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3">{rec.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Effort: {rec.effort}</span>
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </div>
                       </div>
-                      <div className="text-2xl font-bold text-blue-600">3,847</div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                      <div>
-                        <p className="font-semibold text-green-900">Search Appearances</p>
-                        <p className="text-sm text-green-600">Times appeared in search</p>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Network Insights */}
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Network className="w-5 h-5 mr-2 text-blue-600" />
+                    Network Analysis
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {networkInsights.map((insight, index) => (
+                      <div key={index} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-gray-900">{insight.category}</h4>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-lg font-bold text-blue-600">{insight.count}</span>
+                            <Badge className="bg-green-100 text-green-600">+{insight.growth}</Badge>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {insight.topConnections.map((connection, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {connection}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
-                      <div className="text-2xl font-bold text-green-600">892</div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                      <div>
-                        <p className="font-semibold text-purple-900">Profile Actions</p>
-                        <p className="text-sm text-purple-600">Clicks on contact info</p>
-                      </div>
-                      <div className="text-2xl font-bold text-purple-600">156</div>
-                    </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
 
-            {/* Top Performing Content */}
+          <TabsContent value="content" className="space-y-6">
             <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Activity className="w-5 h-5 mr-2 text-orange-600" />
-                    Top Performing Content
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="w-5 h-5 mr-2 text-green-600" />
+                  Content Performance
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {contentPerformance.map((content, index) => (
-                    <div key={index} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex items-start justify-between mb-2">
+                  {contentPerformance.map((content) => (
+                    <div key={content.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-1">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h4 className="font-semibold text-gray-900">{content.title}</h4>
                             <Badge variant="outline">{content.type}</Badge>
-                            <span className="text-sm text-gray-500">{content.date}</span>
+                            {getPerformanceBadge(content.performance)}
                           </div>
-                          <h4 className="font-semibold text-gray-900">{content.title}</h4>
+                          <p className="text-sm text-gray-500">{content.publishDate}</p>
                         </div>
-                        <Badge className="bg-green-100 text-green-700">
-                          {content.engagement}% engagement
-                        </Badge>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-blue-600">{content.engagement}% engagement</p>
+                        </div>
                       </div>
                       
-                      <div className="grid grid-cols-4 gap-4 text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <Eye className="w-4 h-4 mr-1" />
-                          {content.views} views
+                      <div className="grid grid-cols-4 gap-4 text-center">
+                        <div>
+                          <div className="flex items-center justify-center mb-1">
+                            <Eye className="w-4 h-4 text-gray-500 mr-1" />
+                            <span className="text-sm font-medium">{content.views.toLocaleString()}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">Views</p>
                         </div>
-                        <div className="flex items-center">
-                          <Award className="w-4 h-4 mr-1" />
-                          {content.likes} likes
+                        <div>
+                          <div className="flex items-center justify-center mb-1">
+                            <Heart className="w-4 h-4 text-red-500 mr-1" />
+                            <span className="text-sm font-medium">{content.likes}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">Likes</p>
                         </div>
-                        <div className="flex items-center">
-                          <Users className="w-4 h-4 mr-1" />
-                          {content.comments} comments
+                        <div>
+                          <div className="flex items-center justify-center mb-1">
+                            <MessageSquare className="w-4 h-4 text-blue-500 mr-1" />
+                            <span className="text-sm font-medium">{content.comments}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">Comments</p>
                         </div>
-                        <div className="flex items-center">
-                          <Share2 className="w-4 h-4 mr-1" />
-                          {content.shares} shares
+                        <div>
+                          <div className="flex items-center justify-center mb-1">
+                            <Share2 className="w-4 h-4 text-green-500 mr-1" />
+                            <span className="text-sm font-medium">{content.shares}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">Shares</p>
                         </div>
                       </div>
                     </div>
@@ -355,17 +429,37 @@ const Insights = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="performance" className="space-y-6">
+          <TabsContent value="network" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
                 <CardHeader>
-                  <CardTitle>Content Engagement Over Time</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <Users className="w-5 h-5 mr-2 text-blue-600" />
+                    Connection Growth
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <BarChart3 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                      <p className="text-gray-600">Weekly engagement metrics and trends</p>
+                  <div className="text-center mb-6">
+                    <p className="text-3xl font-bold text-blue-600 mb-2">1,247</p>
+                    <p className="text-gray-600">Total Connections</p>
+                    <div className="flex items-center justify-center text-green-600 mt-2">
+                      <ArrowUp className="w-4 h-4 mr-1" />
+                      <span className="font-medium">+15.3% this month</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Industry Leaders</span>
+                      <span className="font-medium">124 (10%)</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Peers</span>
+                      <span className="font-medium">567 (45%)</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Junior Professionals</span>
+                      <span className="font-medium">556 (45%)</span>
                     </div>
                   </div>
                 </CardContent>
@@ -373,13 +467,57 @@ const Insights = () => {
 
               <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
                 <CardHeader>
-                  <CardTitle>Audience Demographics</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <Building2 className="w-5 h-5 mr-2 text-purple-600" />
+                    Industry Distribution
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <PieChart className="w-16 h-16 text-purple-500 mx-auto mb-4" />
-                      <p className="text-gray-600">Geographic and industry distribution of your network</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Technology</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '45%' }}></div>
+                        </div>
+                        <span className="text-sm font-medium">45%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Marketing</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="bg-green-600 h-2 rounded-full" style={{ width: '25%' }}></div>
+                        </div>
+                        <span className="text-sm font-medium">25%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Finance</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="bg-purple-600 h-2 rounded-full" style={{ width: '15%' }}></div>
+                        </div>
+                        <span className="text-sm font-medium">15%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Healthcare</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="bg-orange-600 h-2 rounded-full" style={{ width: '10%' }}></div>
+                        </div>
+                        <span className="text-sm font-medium">10%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Other</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="bg-gray-600 h-2 rounded-full" style={{ width: '5%' }}></div>
+                        </div>
+                        <span className="text-sm font-medium">5%</span>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -387,92 +525,31 @@ const Insights = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="benchmarks" className="space-y-6">
+          <TabsContent value="trends" className="space-y-6">
             <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Target className="w-5 h-5 mr-2 text-blue-600" />
-                  Industry Benchmarks Comparison
+                  <Globe className="w-5 h-5 mr-2 text-indigo-600" />
+                  Industry Trends
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  {industryBenchmarks.map((benchmark, index) => (
-                    <div key={index} className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-semibold text-gray-900">{benchmark.metric}</h4>
-                        <Badge className={`${
-                          benchmark.status === 'Excellent' ? 'bg-green-100 text-green-700' :
-                          benchmark.status === 'Good' ? 'bg-blue-100 text-blue-700' :
-                          'bg-orange-100 text-orange-700'
-                        }`}>
-                          {benchmark.status}
-                        </Badge>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Your Performance</span>
-                          <span className="font-semibold">{benchmark.yourValue}{benchmark.metric.includes('Size') ? '' : '%'}</span>
+                <div className="space-y-4">
+                  {industryTrends.map((trend, index) => (
+                    <div key={index} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-3">
+                          <h4 className="font-semibold text-gray-900">{trend.topic}</h4>
+                          <Badge variant="outline">{trend.category}</Badge>
                         </div>
-                        <Progress value={benchmark.percentile} className="h-2" />
-                        <div className="flex justify-between text-xs text-gray-500">
-                          <span>Industry Average: {benchmark.industryAverage}{benchmark.metric.includes('Size') ? '' : '%'}</span>
-                          <span>{benchmark.percentile}th percentile</span>
+                        <div className="flex items-center space-x-2">
+                          <ArrowUp className="w-4 h-4 text-green-600" />
+                          <span className="text-green-600 font-medium">+{trend.trend}%</span>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="recommendations" className="space-y-6">
-            <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Brain className="w-5 h-5 mr-2 text-purple-600" />
-                  AI-Powered Growth Recommendations
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {growthInsights.map((insight, index) => (
-                    <div key={index} className="p-6 border rounded-lg hover:shadow-md transition-shadow">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h4 className="font-semibold text-gray-900">{insight.title}</h4>
-                            <Badge variant="outline" className="text-xs">
-                              {insight.category}
-                            </Badge>
-                          </div>
-                          <p className="text-gray-600 text-sm mb-3">{insight.description}</p>
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <p className="text-blue-900 text-sm">
-                              <strong>Recommendation:</strong> {insight.recommendation}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge className={`ml-4 ${
-                          insight.impact === 'High' ? 'bg-red-100 text-red-700' :
-                          insight.impact === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
-                          {insight.impact} Impact
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex space-x-2">
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                          <Zap className="w-4 h-4 mr-2" />
-                          Apply Suggestion
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          Schedule Reminder
-                        </Button>
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-gray-600">{trend.engagement.toLocaleString()} professionals engaged</p>
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
                       </div>
                     </div>
                   ))}
@@ -482,39 +559,39 @@ const Insights = () => {
           </TabsContent>
         </Tabs>
 
-        {/* AI Insights CTA */}
-        <Card className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border-0 shadow-2xl">
+        {/* Analytics CTA */}
+        <Card className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white border-0 shadow-xl">
           <CardContent className="p-8">
             <div className="text-center">
-              <Brain className="w-12 h-12 mx-auto mb-4 text-white/90" />
-              <h2 className="text-2xl font-bold mb-3">Unlock Advanced AI Insights</h2>
-              <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-                Get personalized recommendations, predictive analytics, and competitive intelligence to accelerate your professional growth.
+              <Award className="w-12 h-12 mx-auto mb-4 text-white/90" />
+              <h2 className="text-2xl font-bold mb-3">Advanced Analytics Available</h2>
+              <p className="text-white/90 mb-6">
+                Unlock deeper insights with our premium analytics suite and grow your professional presence faster
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button 
                   variant="secondary"
                   className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
                 >
-                  <Globe className="w-4 h-4 mr-2" />
-                  Market Intelligence
+                  <Brain className="w-4 h-4 mr-2" />
+                  AI Insights
                 </Button>
                 
                 <Button 
                   variant="secondary"
                   className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
                 >
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  Predictive Analytics
+                  <Target className="w-4 h-4 mr-2" />
+                  Goal Tracking
                 </Button>
 
                 <Button 
                   variant="secondary"
                   className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
                 >
-                  <Star className="w-4 h-4 mr-2" />
-                  Personal AI Coach
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Custom Reports
                 </Button>
               </div>
             </div>
