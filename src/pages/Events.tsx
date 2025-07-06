@@ -122,7 +122,15 @@ const Events = () => {
       time: "6:00 PM - 9:00 PM",
       location: "Silicon Valley Innovation Center",
       type: "In-Person",
+      category: "Competition",
       attendees: 300,
+      price: "$50",
+      isPaid: true,
+      isBookmarked: false,
+      rating: 4.5,
+      organizer: "Startup Valley",
+      image: "/api/placeholder/300/200",
+      tags: ["Startup", "Investment", "Pitching"],
       status: "registered"
     }
   ];
