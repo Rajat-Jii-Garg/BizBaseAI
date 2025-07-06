@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -126,12 +125,7 @@ const Auth = () => {
           });
         }
       } else {
-        const { error } = await signUp(formData.email, formData.password, {
-          full_name: formData.fullName,
-          phone: formData.phone,
-          company_name: formData.companyName,
-          business_type: formData.businessType
-        });
+        const { error } = await signUp(formData.email, formData.password, formData.fullName, formData.phone);
         
         if (error) {
           if (error.message.includes('User already registered')) {
@@ -449,7 +443,8 @@ const Auth = () => {
         isOpen={showOTPModal}
         onClose={() => setShowOTPModal(false)}
         email={pendingEmail}
-        onSuccess={handleOTPSuccess}
+        onVerified={handleOTPSuccess}
+        purpose="signup"
       />
     </div>
   );
