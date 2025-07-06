@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,13 +45,20 @@ import {
   MapPin,
   Mail,
   Phone,
-  ExternalLink
+  ExternalLink,
+  X,
+  Send,
+  Image,
+  FileText,
+  Mic
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [postContent, setPostContent] = useState('');
 
   // Professional stats with real industry metrics
   const stats = [
@@ -138,54 +145,6 @@ const Dashboard = () => {
     }
   ];
 
-  const recentActivity = [
-    {
-      id: 1,
-      action: "Sarah Johnson from Goldman Sachs viewed your profile",
-      time: "12 minutes ago",
-      user: "Sarah Johnson",
-      company: "Goldman Sachs",
-      type: "profile_view",
-      avatar: null
-    },
-    {
-      id: 2,
-      action: "Connected with 5 professionals from Microsoft event",
-      time: "1 hour ago",
-      user: "Network Expansion",
-      company: "Microsoft",
-      type: "connection",
-      avatar: null
-    },
-    {
-      id: 3,
-      action: "New partnership inquiry from TechVentures Inc.",
-      time: "3 hours ago",
-      user: "TechVentures Inc.",
-      company: "Venture Capital",
-      type: "business_inquiry",
-      avatar: null
-    },
-    {
-      id: 4,
-      action: "Your industry analysis post got 127 professional engagements",
-      time: "5 hours ago",
-      user: "Content Performance",
-      company: "LinkedIn Analytics",
-      type: "content_engagement",
-      avatar: null
-    },
-    {
-      id: 5,
-      action: "Invitation to speak at FinTech Summit 2025",
-      time: "8 hours ago",
-      user: "FinTech Summit",
-      company: "Industry Conference",
-      type: "speaking_opportunity",
-      avatar: null
-    }
-  ];
-
   const industryTrends = [
     { topic: "AI in Finance", engagement: "8.7K", trend: "+45%", category: "Technology" },
     { topic: "Sustainable Business", engagement: "6.3K", trend: "+38%", category: "ESG" },
@@ -228,47 +187,117 @@ const Dashboard = () => {
     { goal: "Launch consulting practice", progress: 45, target: "Q2 2025" }
   ];
 
+  const handlePost = () => {
+    if (postContent.trim()) {
+      console.log('Posting:', postContent);
+      // TODO: Implement actual post functionality
+      setPostContent('');
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        {/* Professional Welcome Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl p-6 lg:p-8 text-white shadow-2xl">
-          <div className="flex flex-col lg:flex-row items-center justify-between">
-            <div className="text-center lg:text-left mb-6 lg:mb-0">
-              <div className="flex items-center justify-center lg:justify-start mb-4">
-                <Crown className="w-8 h-8 mr-3 text-yellow-300" />
-                <Badge className="bg-yellow-400/20 text-yellow-100 border-yellow-300/30">
-                  Premium Professional
-                </Badge>
+        {/* Professional Welcome Header - With Close Button */}
+        {showWelcome && (
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl p-6 lg:p-8 text-white shadow-2xl relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 text-white hover:bg-white/20 rounded-full"
+              onClick={() => setShowWelcome(false)}
+            >
+              <X className="w-5 h-5" />
+            </Button>
+            <div className="flex flex-col lg:flex-row items-center justify-between pr-12">
+              <div className="text-center lg:text-left mb-6 lg:mb-0">
+                <div className="flex items-center justify-center lg:justify-start mb-4">
+                  <Crown className="w-8 h-8 mr-3 text-yellow-300" />
+                  <Badge className="bg-yellow-400/20 text-yellow-100 border-yellow-300/30">
+                    Premium Professional
+                  </Badge>
+                </div>
+                <h1 className="text-3xl lg:text-4xl font-bold mb-3">
+                  Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Professional'}!
+                </h1>
+                <p className="text-white/90 text-lg mb-4">
+                  Your professional influence is growing • Ready to make your next big move?
+                </p>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-4 text-sm">
+                  <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Global Professional
+                  </div>
+                  <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
+                    <Award className="w-4 h-4 mr-2" />
+                    Industry Expert
+                  </div>
+                  <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
+                    <Rocket className="w-4 h-4 mr-2" />
+                    Growth Leader
+                  </div>
+                </div>
               </div>
-              <h1 className="text-3xl lg:text-4xl font-bold mb-3">
-                Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Professional'}!
-              </h1>
-              <p className="text-white/90 text-lg mb-4">
-                Your professional influence is growing • Ready to make your next big move?
-              </p>
-              <div className="flex flex-wrap justify-center lg:justify-start gap-4 text-sm">
-                <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Global Professional
+              <div className="hidden lg:block">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                  <Trophy className="w-16 h-16 text-yellow-300 mx-auto" />
                 </div>
-                <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
-                  <Award className="w-4 h-4 mr-2" />
-                  Industry Expert
-                </div>
-                <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
-                  <Rocket className="w-4 h-4 mr-2" />
-                  Growth Leader
-                </div>
-              </div>
-            </div>
-            <div className="hidden lg:block">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <Trophy className="w-16 h-16 text-yellow-300 mx-auto" />
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Enhanced Content Creation Hub */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-4 mb-4">
+              <Avatar className="h-12 w-12 ring-2 ring-blue-200">
+                <AvatarImage src={user?.user_metadata?.avatar_url} />
+                <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <textarea
+                  value={postContent}
+                  onChange={(e) => setPostContent(e.target.value)}
+                  placeholder="Share your business insights, professional thoughts, achievements, or industry updates..."
+                  className="w-full p-4 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                  rows={3}
+                />
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="flex items-center space-x-4">
+                <Button variant="ghost" className="text-blue-600 hover:bg-blue-50 flex items-center">
+                  <Image className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Photo</span>
+                </Button>
+                <Button variant="ghost" className="text-green-600 hover:bg-green-50 flex items-center">
+                  <Video className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Video</span>
+                </Button>
+                <Button variant="ghost" className="text-purple-600 hover:bg-purple-50 flex items-center">
+                  <FileText className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Article</span>
+                </Button>
+                <Button variant="ghost" className="text-orange-600 hover:bg-orange-50 flex items-center">
+                  <Trophy className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Achievement</span>
+                </Button>
+              </div>
+              <Button 
+                onClick={handlePost}
+                disabled={!postContent.trim()}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                Post
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Professional Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -363,94 +392,10 @@ const Dashboard = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Content Creation Hub */}
-            <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4 mb-4">
-                  <Avatar className="h-12 w-12 ring-2 ring-blue-200">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} />
-                    <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
-                      {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start text-gray-500 hover:bg-gray-50 h-12 bg-gradient-to-r from-gray-50 to-blue-50 border-blue-200"
-                    >
-                      <Edit className="w-4 h-4 mr-3" />
-                      Share your professional insights and industry expertise...
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t">
-                  <Button variant="ghost" className="text-blue-600 hover:bg-blue-50 flex-col h-16">
-                    <Camera className="w-5 h-5 mb-1" />
-                    <span className="text-xs">Media Post</span>
-                  </Button>
-                  <Button variant="ghost" className="text-green-600 hover:bg-green-50 flex-col h-16">
-                    <BookOpen className="w-5 h-5 mb-1" />
-                    <span className="text-xs">Article</span>
-                  </Button>
-                  <Button variant="ghost" className="text-purple-600 hover:bg-purple-50 flex-col h-16">
-                    <Trophy className="w-5 h-5 mb-1" />
-                    <span className="text-xs">Achievement</span>
-                  </Button>
-                  <Button variant="ghost" className="text-orange-600 hover:bg-orange-50 flex-col h-16">
-                    <Video className="w-5 h-5 mb-1" />
-                    <span className="text-xs">Live Event</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
-          {/* Right Column - Activity & Insights */}
+          {/* Right Column - Insights & Trends */}
           <div className="space-y-8">
-            {/* Professional Activity Feed */}
-            <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Bell className="w-5 h-5 mr-2 text-blue-600" />
-                    Professional Activity
-                  </div>
-                  <Badge className="bg-blue-100 text-blue-700">
-                    {recentActivity.length} new
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-start space-x-3 p-3 hover:bg-gray-50/50 rounded-lg transition-colors cursor-pointer group">
-                      <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-2 rounded-full group-hover:scale-110 transition-transform">
-                        <Clock className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 mb-1">{activity.action}</p>
-                        <div className="flex items-center text-xs text-gray-500 mb-1">
-                          <span className="truncate">{activity.company}</span>
-                          <span className="mx-2">•</span>
-                          <span className="whitespace-nowrap">{activity.time}</span>
-                        </div>
-                        <Badge variant="secondary" className="text-xs">
-                          {activity.type.replace('_', ' ')}
-                        </Badge>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
-                    </div>
-                  ))}
-                </div>
-                <Button variant="ghost" className="w-full mt-4 text-blue-600 hover:bg-blue-50">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View All Activity
-                </Button>
-              </CardContent>
-            </Card>
-
             {/* Industry Trends */}
             <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
               <CardHeader>

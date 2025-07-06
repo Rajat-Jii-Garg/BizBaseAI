@@ -24,19 +24,14 @@ import {
   User,
   Home,
   Users,
-  Briefcase,
-  TrendingUp,
-  BookOpen,
-  Building2,
-  BarChart3,
   Calendar,
-  Plus,
   X,
   ChevronDown,
   Edit,
   Shield,
   CreditCard,
-  HelpCircle
+  HelpCircle,
+  Building2
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -61,16 +56,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     // TODO: Implement actual search functionality
   };
 
+  const handleRegisterBusiness = () => {
+    navigate('/business-setup');
+  };
+
   const menuItems = [
     { icon: Home, label: 'Home', path: '/dashboard' },
-    { icon: User, label: 'My Profile', path: '/dashboard/profile' },
-    { icon: Network, label: 'Network', path: '/dashboard/network' },
-    { icon: Briefcase, label: 'Business', path: '/dashboard/business' },
-    { icon: BarChart3, label: 'Analytics', path: '/dashboard/analytics' },
-    { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
+    { icon: Users, label: 'Connections', path: '/dashboard/connections' },
     { icon: Calendar, label: 'Events', path: '/dashboard/events' },
-    { icon: BookOpen, label: 'Learning', path: '/dashboard/learning' },
-    { icon: Building2, label: 'CRM', path: '/dashboard/crm' },
+    { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
+    { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -96,23 +91,23 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               </div>
             </div>
 
-            {/* Center Section - Working Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            {/* Center Section - Enhanced Search Bar */}
+            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
               <form onSubmit={handleSearch} className="relative w-full">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
                 </div>
                 <Input
                   type="text"
-                  placeholder="Search professionals, companies, opportunities..."
+                  placeholder="Search professionals, companies, opportunities, events..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-full bg-gray-50/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-full bg-gray-50/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
                 />
                 <Button 
                   type="submit" 
                   size="sm" 
-                  className="absolute right-1 top-1 bottom-1 bg-blue-600 hover:bg-blue-700 rounded-full px-4"
+                  className="absolute right-2 top-1.5 bottom-1.5 bg-blue-600 hover:bg-blue-700 rounded-full px-6"
                 >
                   <Search className="h-4 w-4" />
                 </Button>
@@ -121,21 +116,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
             {/* Right Section - Actions & Profile */}
             <div className="flex items-center space-x-3">
-              {/* Quick Actions */}
+              {/* Register Business Button */}
               <div className="hidden md:flex items-center space-x-2">
-                <Button variant="ghost" size="icon" className="relative hover:bg-blue-50">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
-                </Button>
-                
-                <Button variant="ghost" size="icon" className="hover:bg-green-50 relative">
-                  <MessageSquare className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
-                </Button>
-
-                <Button variant="outline" size="sm" className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:from-green-100 hover:to-emerald-100">
-                  <Plus className="w-4 h-4 mr-1" />
-                  Create
+                <Button 
+                  onClick={handleRegisterBusiness}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Register My Business
                 </Button>
               </div>
               
@@ -184,11 +172,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
                     <Shield className="mr-2 h-4 w-4" />
-                    <span>Privacy</span>
+                    <span>Privacy & Security</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
                     <CreditCard className="mr-2 h-4 w-4" />
-                    <span>Billing</span>
+                    <span>Billing & Plans</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
                     <HelpCircle className="mr-2 h-4 w-4" />
@@ -253,19 +241,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 </Button>
               ))}
 
-              {/* Mobile Actions */}
-              <div className="pt-3 border-t border-gray-100 space-y-2">
-                <Button variant="ghost" className="w-full justify-start text-blue-600">
-                  <Bell className="w-4 h-4 mr-3" />
-                  Notifications
-                </Button>
-                <Button variant="ghost" className="w-full justify-start text-green-600">
-                  <MessageSquare className="w-4 h-4 mr-3" />
-                  Messages
-                </Button>
-                <Button variant="ghost" onClick={handleSignOut} className="w-full justify-start text-red-600">
-                  <LogOut className="w-4 h-4 mr-3" />
-                  Sign Out
+              {/* Mobile Register Business */}
+              <div className="pt-3 border-t border-gray-100">
+                <Button 
+                  onClick={handleRegisterBusiness}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Register My Business
                 </Button>
               </div>
             </div>
