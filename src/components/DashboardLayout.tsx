@@ -303,9 +303,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Removed padding to make it full width */}
       <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="w-full max-w-none">
           {children}
         </div>
       </main>
