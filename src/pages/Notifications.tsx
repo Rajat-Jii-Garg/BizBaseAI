@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -374,7 +373,7 @@ const Notifications = () => {
                                       handleMarkAsUnread(notification.id);
                                     }}
                                   >
-                                    <MarkAsUnreadIcon className="w-4 h-4 mr-1" />
+                                    <Mail className="w-4 h-4 mr-1" />
                                     Mark Unread
                                   </Button>
                                 )}
