@@ -31,7 +31,12 @@ import {
   Shield,
   CreditCard,
   HelpCircle,
-  Building2
+  Building2,
+  TrendingUp,
+  Briefcase,
+  Target,
+  Star,
+  Zap
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -66,6 +71,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     { icon: Calendar, label: 'Events', path: '/dashboard/events' },
     { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
     { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
+    { icon: TrendingUp, label: 'Insights', path: '/dashboard/insights' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -92,7 +98,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             </div>
 
             {/* Center Section - Enhanced Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+            <div className="hidden md:flex flex-1 max-w-4xl mx-8">
               <form onSubmit={handleSearch} className="relative w-full">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
@@ -162,13 +168,30 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     <User className="mr-2 h-4 w-4" />
                     <span>My Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
                     <Edit className="mr-2 h-4 w-4" />
                     <span>Edit Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Briefcase className="mr-2 h-4 w-4" />
+                    <span>Pro Tools</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Target className="mr-2 h-4 w-4" />
+                    <span>Business Analytics</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Star className="mr-2 h-4 w-4" />
+                    <span>AI Assistant</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Zap className="mr-2 h-4 w-4" />
+                    <span>Premium Features</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
                     <Shield className="mr-2 h-4 w-4" />

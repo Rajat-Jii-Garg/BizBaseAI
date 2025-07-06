@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart3,
   Users,
@@ -13,8 +12,6 @@ import {
   Calendar,
   TrendingUp,
   CheckCircle,
-  Clock,
-  AlertCircle,
   Star,
   Target,
   Award,
@@ -23,8 +20,6 @@ import {
   Trophy,
   Crown,
   Network,
-  MessageSquare,
-  Bell,
   Eye,
   Heart,
   Share2,
@@ -35,25 +30,24 @@ import {
   Coffee,
   Video,
   BookOpen,
-  Settings,
   Camera,
-  Edit,
   ChevronRight,
   Building2,
   Lightbulb,
   Rocket,
   MapPin,
-  Mail,
-  Phone,
-  ExternalLink,
   X,
   Send,
   Image,
   FileText,
-  Mic
+  Link,
+  Smile,
+  Hash,
+  AtSign
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
+import { Textarea } from "@/components/ui/textarea";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -247,7 +241,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Enhanced Content Creation Hub */}
+        {/* Enhanced Professional Content Creation Hub */}
         <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="p-6">
             <div className="flex items-start space-x-4 mb-4">
@@ -258,33 +252,40 @@ const Dashboard = () => {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <textarea
+                <Textarea
                   value={postContent}
                   onChange={(e) => setPostContent(e.target.value)}
                   placeholder="Share your business insights, professional thoughts, achievements, or industry updates..."
-                  className="w-full p-4 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                  rows={3}
+                  className="w-full p-4 border border-gray-200 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none min-h-[120px]"
                 />
               </div>
             </div>
             
             <div className="flex items-center justify-between pt-4 border-t">
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" className="text-blue-600 hover:bg-blue-50 flex items-center">
+              <div className="flex items-center space-x-2 md:space-x-4 flex-wrap gap-2">
+                <Button variant="ghost" className="text-blue-600 hover:bg-blue-50 flex items-center text-sm">
                   <Image className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Photo</span>
+                  <span className="hidden sm:inline">Photo</span>
                 </Button>
-                <Button variant="ghost" className="text-green-600 hover:bg-green-50 flex items-center">
+                <Button variant="ghost" className="text-green-600 hover:bg-green-50 flex items-center text-sm">
                   <Video className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Video</span>
+                  <span className="hidden sm:inline">Video</span>
                 </Button>
-                <Button variant="ghost" className="text-purple-600 hover:bg-purple-50 flex items-center">
+                <Button variant="ghost" className="text-purple-600 hover:bg-purple-50 flex items-center text-sm">
                   <FileText className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Article</span>
+                  <span className="hidden sm:inline">Article</span>
                 </Button>
-                <Button variant="ghost" className="text-orange-600 hover:bg-orange-50 flex items-center">
+                <Button variant="ghost" className="text-orange-600 hover:bg-orange-50 flex items-center text-sm">
                   <Trophy className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Achievement</span>
+                  <span className="hidden sm:inline">Achievement</span>
+                </Button>
+                <Button variant="ghost" className="text-red-600 hover:bg-red-50 flex items-center text-sm">
+                  <Link className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Link</span>
+                </Button>
+                <Button variant="ghost" className="text-yellow-600 hover:bg-yellow-50 flex items-center text-sm">
+                  <Smile className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Poll</span>
                 </Button>
               </div>
               <Button 
