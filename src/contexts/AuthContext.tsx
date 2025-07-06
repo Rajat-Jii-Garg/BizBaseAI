@@ -14,6 +14,7 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<{ error: any }>;
   sendOTP: (email: string, purpose: string) => Promise<{ error: any; otp?: string }>;
   verifyOTP: (email: string, otp: string, purpose: string) => Promise<{ error: any; success?: boolean }>;
+  completeSignup: (email: string, password: string, fullName: string, phone: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName: string, phone: string) => {
     try {
-      // Store signup data temporarily for later use
+      // Store signup data temporarily for OTP verification
       localStorage.setItem('pendingSignup', JSON.stringify({
         email,
         password,
@@ -67,6 +68,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: null };
     } catch (error: any) {
       console.error('Signup preparation error:', error);
+      return { error };
+    }
+  };
+
+  const completeSignup = async (email: string, password: string, fullName: string, phone: string) => {
+    try {
+      console.log('Creating user account after OTP verification...');
+      
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            full_name: fullName,
+            phone: phone,
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Account creation error:', error);
+        toast({
+          title: 'Account Creation Error',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return { error };
+      }
+
+      toast({
+        title: "Account Created Successfully!",
+        description: "Welcome to BizBase. You're now signed in.",
+      });
+      
+      return { error: null };
+    } catch (error: any) {
+      console.error('Complete signup error:', error);
       return { error };
     }
   };
@@ -158,8 +197,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log(`🔑 TESTING OTP for ${email}: ${data.otp}`);
         toast({
           title: "OTP Sent!",
-          description: `Check console for OTP (Testing): ${data.otp}`,
-          duration: 10000,
+          description: data.message || `Verification code sent to ${email}`,
+          duration: 5000,
         });
       }
 
@@ -202,6 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     resetPassword,
     sendOTP,
     verifyOTP,
+    completeSignup,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

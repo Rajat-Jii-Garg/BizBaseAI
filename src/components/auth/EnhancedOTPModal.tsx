@@ -6,6 +6,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { Shield, Mail, CheckCircle, X, ArrowLeft, Loader2, Copy, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface EnhancedOTPModalProps {
   isOpen: boolean;
@@ -31,7 +32,8 @@ const EnhancedOTPModal: React.FC<EnhancedOTPModalProps> = ({
   const [testingOTP, setTestingOTP] = useState<string>('');
   
   const { toast } = useToast();
-  const { sendOTP, verifyOTP } = useAuth();
+  const { sendOTP, verifyOTP, completeSignup } = useAuth();
+  const navigate = useNavigate();
 
   // Auto-send OTP when modal opens
   useEffect(() => {
@@ -71,10 +73,6 @@ const EnhancedOTPModal: React.FC<EnhancedOTPModalProps> = ({
       if (receivedOTP) {
         setTestingOTP(receivedOTP);
       }
-      toast({
-        title: "OTP Sent!",
-        description: `Verification code sent to ${email}`,
-      });
       setTimeLeft(60);
       setCanResend(false);
     }
@@ -100,18 +98,48 @@ const EnhancedOTPModal: React.FC<EnhancedOTPModalProps> = ({
         description: "The code you entered is incorrect. Please try again.",
         variant: "destructive"
       });
-    } else {
-      setVerified(true);
-      toast({
-        title: "Verification Successful!",
-        description: "Your email has been verified successfully."
-      });
-      
-      setTimeout(() => {
-        onVerified();
-        onClose();
-      }, 1500);
+      setLoading(false);
+      return;
     }
+
+    // OTP verification successful
+    if (purpose === 'signup') {
+      // Complete the signup process
+      const storedData = localStorage.getItem('pendingSignup');
+      if (storedData) {
+        const { email: signupEmail, password, fullName, phone } = JSON.parse(storedData);
+        const { error: signupError } = await completeSignup(signupEmail, password, fullName, phone);
+        
+        if (signupError) {
+          toast({
+            title: "Signup Error",
+            description: signupError.message,
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+        
+        // Clear stored data
+        localStorage.removeItem('pendingSignup');
+      }
+    }
+
+    setVerified(true);
+    toast({
+      title: "Verification Successful!",
+      description: purpose === 'signup' 
+        ? "Your account has been created successfully!" 
+        : "Your email has been verified successfully."
+    });
+    
+    setTimeout(() => {
+      onVerified();
+      onClose();
+      if (purpose === 'signup') {
+        navigate('/dashboard');
+      }
+    }, 1500);
     
     setLoading(false);
   };
@@ -154,7 +182,9 @@ const EnhancedOTPModal: React.FC<EnhancedOTPModalProps> = ({
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Verification Complete!</h3>
             <p className="text-gray-600">
-              Welcome to BizBase! Redirecting to your dashboard...
+              {purpose === 'signup' 
+                ? "Welcome to BizBase! Redirecting to your dashboard..." 
+                : "Email verified successfully!"}
             </p>
           </CardContent>
         </Card>

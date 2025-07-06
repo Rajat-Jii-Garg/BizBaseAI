@@ -37,59 +37,114 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`OTP generated for ${email}: ${otpCode}`);
 
-    // For now, we'll use a simple email simulation
-    // In production, you would integrate with Resend or another email service
-    const emailContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #3b82f6; margin: 0;">BizBase</h1>
-          <p style="color: #666; margin: 5px 0;">Your Business Management Platform</p>
-        </div>
-        
-        <div style="background: #f8fafc; border-radius: 8px; padding: 30px; text-align: center;">
-          <h2 style="color: #1e293b; margin-bottom: 20px;">Email Verification</h2>
-          <p style="color: #475569; margin-bottom: 30px;">
-            Please use the following 6-digit code to verify your email address:
-          </p>
-          
-          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
-            <span style="font-size: 32px; font-weight: bold; color: #3b82f6; letter-spacing: 8px;">
-              ${otpCode}
-            </span>
-          </div>
-          
-          <p style="color: #64748b; font-size: 14px; margin-top: 30px;">
-            This code will expire in 10 minutes. If you didn't request this verification, please ignore this email.
-          </p>
-        </div>
-        
-        <div style="text-align: center; margin-top: 30px;">
-          <p style="color: #94a3b8; font-size: 12px;">
-            © 2024 BizBase. All rights reserved.
-          </p>
-        </div>
-      </div>
-    `;
+    // Check if we have Resend API key to send actual emails
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    
+    if (resendApiKey) {
+      // Send actual email using Resend
+      try {
+        const emailResponse = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "BizBase <noreply@resend.dev>",
+            to: [email],
+            subject: "BizBase - Email Verification Code",
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                  <h1 style="color: #3b82f6; margin: 0;">BizBase</h1>
+                  <p style="color: #666; margin: 5px 0;">Your Business Management Platform</p>
+                </div>
+                
+                <div style="background: #f8fafc; border-radius: 8px; padding: 30px; text-align: center;">
+                  <h2 style="color: #1e293b; margin-bottom: 20px;">Email Verification</h2>
+                  <p style="color: #475569; margin-bottom: 30px;">
+                    Please use the following 6-digit code to verify your email address:
+                  </p>
+                  
+                  <div style="background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <span style="font-size: 32px; font-weight: bold; color: #3b82f6; letter-spacing: 8px;">
+                      ${otpCode}
+                    </span>
+                  </div>
+                  
+                  <p style="color: #64748b; font-size: 14px; margin-top: 30px;">
+                    This code will expire in 10 minutes. If you didn't request this verification, please ignore this email.
+                  </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                  <p style="color: #94a3b8; font-size: 12px;">
+                    © 2024 BizBase. All rights reserved.
+                  </p>
+                </div>
+              </div>
+            `
+          })
+        });
 
-    // Log the email content for now (in production, this would be sent via email service)
-    console.log("Email HTML content:", emailContent);
-    console.log(`EMAIL TO: ${email}`);
-    console.log(`SUBJECT: BizBase - Email Verification Code`);
-    console.log(`OTP CODE: ${otpCode}`);
+        if (!emailResponse.ok) {
+          const errorData = await emailResponse.text();
+          console.error("Resend API error:", errorData);
+          throw new Error(`Failed to send email: ${errorData}`);
+        }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "OTP sent successfully",
-        // Temporary: Return OTP for testing (remove in production)
-        otp: otpCode,
-        emailPreview: emailContent
-      }), 
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders }
+        const emailData = await emailResponse.json();
+        console.log("Email sent successfully via Resend:", emailData);
+
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: "OTP sent successfully to your email",
+            otp: otpCode // For testing - remove in production
+          }), 
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json", ...corsHeaders }
+          }
+        );
+
+      } catch (emailError) {
+        console.error("Email sending error:", emailError);
+        // Fallback to console log if email fails
+        console.log(`EMAIL FALLBACK - OTP for ${email}: ${otpCode}`);
+        
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: "OTP generated (email service unavailable)",
+            otp: otpCode,
+            note: "Check console for OTP - email service needs configuration"
+          }), 
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json", ...corsHeaders }
+          }
+        );
       }
-    );
+    } else {
+      // No email service configured - log to console for testing
+      console.log(`EMAIL TO: ${email}`);
+      console.log(`SUBJECT: BizBase - Email Verification Code`);
+      console.log(`OTP CODE: ${otpCode}`);
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: "OTP sent successfully",
+          otp: otpCode,
+          emailPreview: `Your verification code is: ${otpCode}`
+        }), 
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders }
+        }
+      );
+    }
 
   } catch (error: any) {
     console.error("Error in send-otp function:", error);
