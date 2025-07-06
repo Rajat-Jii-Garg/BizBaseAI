@@ -14,9 +14,11 @@ import {
   Eye,
   X,
   Trophy,
-  Loader2
+  Loader2,
+  User
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import PostCreator from '@/components/PostCreator';
 import PostCard from '@/components/PostCard';
@@ -26,6 +28,7 @@ import { useConnections } from '@/hooks/useConnections';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [showWelcome, setShowWelcome] = useState(true);
   
   const { 
@@ -55,6 +58,10 @@ const Dashboard = () => {
 
   const handleRejectRequest = (connectionId: string) => {
     respondToRequest(connectionId, 'rejected');  
+  };
+
+  const handleViewProfile = () => {
+    navigate('/profile');
   };
 
   return (
@@ -88,8 +95,8 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left Sidebar */}
           <div className="lg:col-span-1 space-y-4">
-            {/* Profile Card */}
-            <Card className="bg-white shadow-sm border border-gray-200">
+            {/* Enhanced Profile Card */}
+            <Card className="bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl border-0">
               <CardContent className="p-4 text-center">
                 <Avatar className="h-16 w-16 mx-auto mb-3 ring-2 ring-blue-200">
                   <AvatarImage src={user?.user_metadata?.avatar_url} />
@@ -101,8 +108,14 @@ const Dashboard = () => {
                   {user?.user_metadata?.full_name || 'Professional User'}
                 </h3>
                 <p className="text-sm text-gray-600 mb-3">Premium Member</p>
-                <Button variant="outline" size="sm" className="w-full text-xs">
-                  View Profile
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-xs"
+                  onClick={handleViewProfile}
+                >
+                  <User className="w-3 h-3 mr-1" />
+                  View Full Profile
                 </Button>
               </CardContent>
             </Card>
@@ -162,7 +175,12 @@ const Dashboard = () => {
               ) : posts.length === 0 ? (
                 <Card className="bg-white shadow-sm border border-gray-200">
                   <CardContent className="p-8 text-center">
-                    <p className="text-gray-600 mb-4">No posts yet. Create your first post to get started!</p>
+                    <div className="text-gray-400 mb-4">
+                      <Trophy className="w-16 h-16 mx-auto mb-4" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Welcome to BizBase!</h3>
+                    <p className="text-gray-600 mb-4">No posts yet. Create your first post to get started and connect with other professionals!</p>
+                    <p className="text-sm text-gray-500">Share your thoughts, achievements, and professional insights.</p>
                   </CardContent>
                 </Card>
               ) : (
