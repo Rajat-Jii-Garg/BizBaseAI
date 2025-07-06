@@ -28,7 +28,7 @@ import {
   CheckCircle2,
   Circle,
   Pin,
-  Mute,
+  VolumeX,
   Plus,
   Filter
 } from 'lucide-react';

@@ -21,7 +21,7 @@ import {
   CheckCircle,
   X,
   Trash2,
-  MarkAsUnreadIcon,
+  Mail,
   AlertCircle,
   Info,
   TrendingUp,
