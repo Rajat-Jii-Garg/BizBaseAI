@@ -37,7 +37,7 @@ const DashboardHeader = () => {
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 ml-64">
+    <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="sm" className="md:hidden">
