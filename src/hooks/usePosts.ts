@@ -29,36 +29,59 @@ export const usePosts = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
+      // First get posts without profile joins
+      const { data: postsData, error } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profiles!inner(full_name, avatar_url)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
+      if (!postsData) {
+        setPosts([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get unique user IDs to fetch profiles
+      const userIds = Array.from(new Set(postsData.map(post => post.user_id)));
+
+      // Fetch profiles for these users
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
+
+      // Create a map of profiles
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
       // Check which posts current user has liked
-      if (user && data) {
-        const postIds = data.map(post => post.id);
+      let likedPostIds = new Set<string>();
+      if (user && postsData.length > 0) {
+        const postIds = postsData.map(post => post.id);
         const { data: likes } = await supabase
           .from('post_likes')
           .select('post_id')
           .eq('user_id', user.id)
           .in('post_id', postIds);
 
-        const likedPostIds = new Set(likes?.map(like => like.post_id) || []);
-        
-        const postsWithLikes = data.map(post => ({
-          ...post,
-          user_has_liked: likedPostIds.has(post.id)
-        }));
-
-        setPosts(postsWithLikes);
-      } else {
-        setPosts(data || []);
+        likedPostIds = new Set(likes?.map(like => like.post_id) || []);
       }
+
+      // Combine posts with profile data and like status
+      const postsWithProfiles = postsData.map(post => ({
+        ...post,
+        likes_count: post.likes_count || 0,
+        comments_count: post.comments_count || 0,
+        shares_count: post.shares_count || 0,
+        profiles: profilesMap.get(post.user_id) || { full_name: 'Unknown User' },
+        user_has_liked: likedPostIds.has(post.id)
+      }));
+
+      setPosts(postsWithProfiles);
     } catch (error: any) {
       console.error('Error fetching posts:', error);
       toast({

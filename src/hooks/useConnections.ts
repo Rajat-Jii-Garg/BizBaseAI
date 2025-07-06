@@ -32,21 +32,45 @@ export const useConnections = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // First get connections without profile joins
+      const { data: connectionsData, error } = await supabase
         .from('connections')
-        .select(`
-          *,
-          requester_profile:profiles!connections_requester_id_fkey(full_name, avatar_url),
-          addressee_profile:profiles!connections_addressee_id_fkey(full_name, avatar_url)
-        `)
+        .select('*')
         .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
 
       if (error) throw error;
 
-      const accepted = data?.filter(conn => conn.status === 'accepted') || [];
-      const pending = data?.filter(conn => 
+      // Get unique user IDs to fetch profiles
+      const userIds = new Set<string>();
+      connectionsData?.forEach(conn => {
+        userIds.add(conn.requester_id);
+        userIds.add(conn.addressee_id);
+      });
+
+      // Fetch profiles for these users
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', Array.from(userIds));
+
+      // Create a map of profiles
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
+      // Combine connections with profile data
+      const connectionsWithProfiles = connectionsData?.map(conn => ({
+        ...conn,
+        status: conn.status as 'pending' | 'accepted' | 'rejected',
+        requester_profile: profilesMap.get(conn.requester_id) || { full_name: 'Unknown User' },
+        addressee_profile: profilesMap.get(conn.addressee_id) || { full_name: 'Unknown User' }
+      })) || [];
+
+      const accepted = connectionsWithProfiles.filter(conn => conn.status === 'accepted');
+      const pending = connectionsWithProfiles.filter(conn => 
         conn.status === 'pending' && conn.addressee_id === user.id
-      ) || [];
+      );
 
       setConnections(accepted);
       setPendingRequests(pending);
