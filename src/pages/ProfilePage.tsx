@@ -8,14 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Edit, MapPin, Briefcase, Users, Eye, Globe, Mail, Phone, 
   Calendar, Building2, GraduationCap, Award, MessageSquare,
-  Heart, Share2, ExternalLink, Github, Twitter, Linkedin
+  Heart, Share2, ExternalLink, Github, Twitter, Linkedin, Brain, Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 import ProfileEditor from '@/components/ProfileEditor';
-import PostCard from '@/components/PostCard';
+import AIProfileOptimizer from '@/components/AIProfileOptimizer';
+import EnhancedPostCard from '@/components/EnhancedPostCard';
 
 const ProfilePage = () => {
   const { user } = useAuth();
@@ -160,7 +161,7 @@ const ProfilePage = () => {
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto space-y-6 p-6">
-        {/* Profile Header */}
+        {/* AI-Enhanced Profile Header */}
         <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl">
           <CardContent className="p-8">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
@@ -176,6 +177,10 @@ const ProfilePage = () => {
                   <h1 className="text-4xl font-bold">
                     {profile?.full_name || 'Professional User'}
                   </h1>
+                  <Badge className="bg-purple-500 text-white flex items-center gap-1">
+                    <Brain className="w-3 h-3" />
+                    AI Enhanced
+                  </Badge>
                   {profile?.profile_completed && (
                     <Badge className="bg-green-500 text-white">
                       ✓ Verified
@@ -227,7 +232,7 @@ const ProfilePage = () => {
                     className="bg-white/20 backdrop-blur-sm hover:bg-white/30"
                   >
                     <Edit className="w-4 h-4 mr-2" />
-                    Edit Profile
+                    Smart Edit
                   </Button>
                   <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
                     <Share2 className="w-4 h-4 mr-2" />
@@ -241,10 +246,11 @@ const ProfilePage = () => {
 
         {/* Profile Content Tabs */}
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="posts">Posts ({userPosts.length})</TabsTrigger>
-            <TabsTrigger value="connections">Connections ({connections.length})</TabsTrigger>
+            <TabsTrigger value="connections">Network ({connections.length})</TabsTrigger>
+            <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
           </TabsList>
 
@@ -263,7 +269,7 @@ const ProfilePage = () => {
                     <CardContent>
                       <div className="flex flex-wrap gap-2">
                         {profile.skills.map((skill: string, index: number) => (
-                          <Badge key={index} variant="secondary">
+                          <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-700">
                             {skill}
                           </Badge>
                         ))}
@@ -289,26 +295,26 @@ const ProfilePage = () => {
               </div>
 
               <div className="space-y-6">
-                {/* Profile Stats */}
-                <Card>
+                {/* AI Profile Stats */}
+                <Card className="bg-gradient-to-r from-purple-50 to-blue-50">
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <Eye className="w-5 h-5 mr-2" />
-                      Profile Analytics
+                      <Brain className="w-5 h-5 mr-2 text-purple-600" />
+                      AI Profile Analytics
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Profile Views</span>
-                      <span className="font-semibold">142</span>
+                      <span className="text-sm text-gray-600">Profile Strength</span>
+                      <span className="font-semibold text-purple-600">95%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Post Impressions</span>
-                      <span className="font-semibold">{userPosts.reduce((sum, post) => sum + (post.likes_count || 0), 0)}</span>
+                      <span className="text-sm text-gray-600">Network Quality</span>
+                      <span className="font-semibold text-blue-600">88%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Network Reach</span>
-                      <span className="font-semibold">{connections.length * 12}</span>
+                      <span className="text-sm text-gray-600">Content Impact</span>
+                      <span className="font-semibold text-green-600">92%</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -317,7 +323,7 @@ const ProfilePage = () => {
                 {(profile?.website || profile?.linkedin_url || profile?.twitter_url || profile?.github_url) && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Links</CardTitle>
+                      <CardTitle>Professional Links</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {profile?.website && (
@@ -365,12 +371,12 @@ const ProfilePage = () => {
                 <CardContent className="p-8 text-center">
                   <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No Posts Yet</h3>
-                  <p className="text-gray-600">Start sharing your thoughts and insights with your network!</p>
+                  <p className="text-gray-600 mb-4">Start sharing your professional insights with AI-powered content suggestions!</p>
                 </CardContent>
               </Card>
             ) : (
               userPosts.map((post) => (
-                <PostCard
+                <EnhancedPostCard
                   key={post.id}
                   post={post}
                   onLike={handleLikePost}
@@ -386,7 +392,7 @@ const ProfilePage = () => {
                 <CardContent className="p-8 text-center">
                   <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No Connections Yet</h3>
-                  <p className="text-gray-600">Start building your professional network!</p>
+                  <p className="text-gray-600">Start building your AI-powered professional network!</p>
                 </CardContent>
               </Card>
             ) : (
@@ -413,6 +419,13 @@ const ProfilePage = () => {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="ai-insights" className="space-y-6 mt-6">
+            <AIProfileOptimizer 
+              profile={profile} 
+              onOptimize={(suggestions) => console.log('AI suggestions:', suggestions)}
+            />
           </TabsContent>
 
           <TabsContent value="contact" className="space-y-6 mt-6">

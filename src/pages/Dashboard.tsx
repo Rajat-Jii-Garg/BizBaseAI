@@ -16,15 +16,17 @@ import {
   Trophy,
   Loader2,
   User,
-  UserPlus
+  UserPlus,
+  Brain,
+  Sparkles
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
-import PostCreator from '@/components/PostCreator';
-import PostCard from '@/components/PostCard';
+import SmartPostComposer from '@/components/SmartPostComposer';
+import EnhancedPostCard from '@/components/EnhancedPostCard';
 import ConnectionsList from '@/components/ConnectionsList';
-import NetworkingCard from '@/components/NetworkingCard';
+import AINetworkingAssistant from '@/components/AINetworkingAssistant';
 import { usePosts } from '@/hooks/usePosts';
 import { useConnections } from '@/hooks/useConnections';
 import { supabase } from '@/integrations/supabase/client';
@@ -104,6 +106,10 @@ const Dashboard = () => {
     navigate('/profile');
   };
 
+  const handleSuggestConnection = (profileId: string) => {
+    console.log('Connecting to profile:', profileId);
+  };
+
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -121,14 +127,15 @@ const Dashboard = () => {
               </Button>
               <div className="flex items-center justify-between pr-8">
                 <div>
-                  <h2 className="text-xl font-semibold mb-1">
-                    Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Professional'}!
+                  <h2 className="text-xl font-semibold mb-1 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    Welcome to BizBase AI, {user?.user_metadata?.full_name?.split(' ')[0] || 'Professional'}!
                   </h2>
                   <p className="text-white/90 text-sm">
-                    Ready to connect and grow your professional network?
+                    🚀 Experience next-gen professional networking with AI-powered insights
                   </p>
                 </div>
-                <Trophy className="w-12 h-12 text-yellow-300" />
+                <Brain className="w-12 h-12 text-purple-300" />
               </div>
             </div>
           )}
@@ -148,7 +155,10 @@ const Dashboard = () => {
                   <h3 className="font-semibold text-gray-900 mb-1">
                     {user?.user_metadata?.full_name || 'Professional User'}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-3">Premium Member</p>
+                  <p className="text-sm text-gray-600 mb-3 flex items-center justify-center gap-1">
+                    <Brain className="w-3 h-3" />
+                    AI-Enhanced Profile
+                  </p>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -156,7 +166,7 @@ const Dashboard = () => {
                     onClick={handleViewProfile}
                   >
                     <User className="w-3 h-3 mr-1" />
-                    View Full Profile
+                    View Smart Profile
                   </Button>
                 </CardContent>
               </Card>
@@ -164,7 +174,10 @@ const Dashboard = () => {
               {/* Analytics */}
               <Card className="bg-white shadow-sm border border-gray-200">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-semibold text-gray-900">Analytics</CardTitle>
+                  <CardTitle className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4" />
+                    AI Analytics
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0 space-y-3">
                   {profileStats.map((stat, index) => (
@@ -182,6 +195,50 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
+              {/* AI Networking Assistant */}
+              <AINetworkingAssistant onSuggestConnection={handleSuggestConnection} />
+            </div>
+
+            {/* Main Feed */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Smart Post Composer */}
+              <SmartPostComposer onCreatePost={createPost} />
+
+              {/* Posts Feed */}
+              <div className="space-y-4">
+                {postsLoading ? (
+                  <Card className="bg-white shadow-sm border border-gray-200">
+                    <CardContent className="p-8 text-center">
+                      <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+                      <p className="text-gray-600">Loading posts...</p>
+                    </CardContent>
+                  </Card>
+                ) : posts.length === 0 ? (
+                  <Card className="bg-white shadow-sm border border-gray-200">
+                    <CardContent className="p-8 text-center">
+                      <div className="text-gray-400 mb-4">
+                        <Brain className="w-16 h-16 mx-auto mb-4" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Welcome to BizBase AI!</h3>
+                      <p className="text-gray-600 mb-4">Start your AI-powered professional journey! Create your first post to connect with other professionals.</p>
+                      <p className="text-sm text-gray-500">✨ Use AI suggestions to create engaging content</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  posts.map((post) => (
+                    <EnhancedPostCard
+                      key={post.id}
+                      post={post}
+                      onLike={toggleLike}
+                      onShare={sharePost}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Right Sidebar */}
+            <div className="lg:col-span-1 space-y-4">
               {/* Connections */}
               {connectionsLoading ? (
                 <Card className="bg-white shadow-sm border border-gray-200">
@@ -197,151 +254,64 @@ const Dashboard = () => {
                   onRejectRequest={handleRejectRequest}
                 />
               )}
-            </div>
 
-            {/* Main Feed */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Post Creator */}
-              <PostCreator onCreatePost={createPost} />
-
-              {/* Posts Feed */}
-              <div className="space-y-4">
-                {postsLoading ? (
-                  <Card className="bg-white shadow-sm border border-gray-200">
-                    <CardContent className="p-8 text-center">
-                      <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-                      <p className="text-gray-600">Loading posts...</p>
-                    </CardContent>
-                  </Card>
-                ) : posts.length === 0 ? (
-                  <Card className="bg-white shadow-sm border border-gray-200">
-                    <CardContent className="p-8 text-center">
-                      <div className="text-gray-400 mb-4">
-                        <Trophy className="w-16 h-16 mx-auto mb-4" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Welcome to BizBase!</h3>
-                      <p className="text-gray-600 mb-4">No posts yet. Create your first post to get started and connect with other professionals!</p>
-                      <p className="text-sm text-gray-500">Share your thoughts, achievements, and professional insights.</p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  posts.map((post) => (
-                    <PostCard
-                      key={post.id}
-                      post={post}
-                      onLike={toggleLike}
-                      onShare={sharePost}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Right Sidebar */}
-            <div className="lg:col-span-1 space-y-4">
-              {/* People You May Know */}
-              {suggestedConnections.length > 0 && (
-                <Card className="bg-white shadow-sm border border-gray-200">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      People You May Know
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-0 space-y-3">
-                    {suggestedConnections.slice(0, 3).map((profile) => (
-                      <NetworkingCard 
-                        key={profile.id} 
-                        profile={profile}
-                        onConnect={fetchSuggestedConnections}
-                      />
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Industry News */}
+              {/* Industry Trends */}
               <Card className="bg-white shadow-sm border border-gray-200">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
                     <TrendingUp className="w-4 h-4 mr-2" />
-                    Industry News
+                    AI Trending Topics
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0 space-y-3">
                   <div className="space-y-2">
-                    <h5 className="text-xs font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
+                    <h5 className="text-xs font-medium text-gray-900 hover:text-blue-600 cursor-pointer flex items-center gap-1">
+                      <Brain className="w-3 h-3" />
                       AI transforms business operations
                     </h5>
-                    <p className="text-xs text-gray-600">8,234 professionals talking about this</p>
+                    <p className="text-xs text-gray-600">8,234 professionals discussing</p>
                   </div>
                   <div className="space-y-2">
                     <h5 className="text-xs font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
-                      Remote work trends in 2025
+                      Future of remote collaboration
                     </h5>
-                    <p className="text-xs text-gray-600">5,678 professionals talking about this</p>
+                    <p className="text-xs text-gray-600">5,678 professionals discussing</p>
                   </div>
                   <div className="space-y-2">
                     <h5 className="text-xs font-medium text-gray-900 hover:text-blue-600 cursor-pointer">
-                      Sustainable business practices
+                      Sustainable business innovation
                     </h5>
-                    <p className="text-xs text-gray-600">3,421 professionals talking about this</p>
+                    <p className="text-xs text-gray-600">3,421 professionals discussing</p>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Upcoming Events */}
-              <Card className="bg-white shadow-sm border border-gray-200">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Events
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-0 space-y-3">
-                  <div className="space-y-2">
-                    <h5 className="text-xs font-medium text-gray-900">Tech Leadership Summit</h5>
-                    <p className="text-xs text-gray-600">January 25, 2025</p>
-                    <p className="text-xs text-gray-500">2,500+ attending</p>
-                  </div>
-                  <div className="space-y-2">
-                    <h5 className="text-xs font-medium text-gray-900">AI & Future of Work</h5>
-                    <p className="text-xs text-gray-600">January 28, 2025</p>
-                    <p className="text-xs text-gray-500">850+ attending</p>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full text-xs h-7">
-                    <Plus className="w-3 h-3 mr-1" />
-                    Discover Events
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Professional Goals */}
+              {/* Smart Goals */}
               <Card className="bg-white shadow-sm border border-gray-200">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
                     <Target className="w-4 h-4 mr-2" />
-                    Goals 2025
+                    AI Goals Tracker
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0 space-y-3">
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-700">Network Growth</span>
+                      <span className="text-xs text-gray-700">Network Expansion</span>
                       <span className="text-xs font-semibold text-blue-600">83%</span>
                     </div>
                     <Progress value={83} className="h-1" />
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-700">Skill Development</span>
-                      <span className="text-xs font-semibold text-blue-600">65%</span>
+                      <span className="text-xs text-gray-700">Content Engagement</span>
+                      <span className="text-xs font-semibold text-blue-600">91%</span>
                     </div>
-                    <Progress value={65} className="h-1" />
+                    <Progress value={91} className="h-1" />
                   </div>
                   <Button variant="outline" size="sm" className="w-full text-xs h-7">
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add Goal
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    AI Insights
                   </Button>
                 </CardContent>
               </Card>
