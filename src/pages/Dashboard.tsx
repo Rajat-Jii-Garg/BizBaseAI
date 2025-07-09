@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,7 +15,8 @@ import {
   X,
   Trophy,
   Loader2,
-  User
+  User,
+  UserPlus
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -23,13 +24,16 @@ import DashboardLayout from '@/components/DashboardLayout';
 import PostCreator from '@/components/PostCreator';
 import PostCard from '@/components/PostCard';
 import ConnectionsList from '@/components/ConnectionsList';
+import NetworkingCard from '@/components/NetworkingCard';
 import { usePosts } from '@/hooks/usePosts';
 import { useConnections } from '@/hooks/useConnections';
+import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showWelcome, setShowWelcome] = useState(true);
+  const [suggestedConnections, setSuggestedConnections] = useState<any[]>([]);
   
   const { 
     posts, 
@@ -45,6 +49,42 @@ const Dashboard = () => {
     loading: connectionsLoading,
     respondToRequest 
   } = useConnections();
+
+  // Fetch suggested connections
+  useEffect(() => {
+    if (user) {
+      fetchSuggestedConnections();
+    }
+  }, [user]);
+
+  const fetchSuggestedConnections = async () => {
+    try {
+      // Get profiles excluding current user and existing connections
+      const { data: connectedUserIds } = await supabase
+        .from('connections')
+        .select('addressee_id, requester_id')
+        .or(`requester_id.eq.${user?.id},addressee_id.eq.${user?.id}`);
+
+      const excludeIds = [
+        user?.id,
+        ...(connectedUserIds?.map(conn => 
+          conn.requester_id === user?.id ? conn.addressee_id : conn.requester_id
+        ) || [])
+      ];
+
+      const { data: suggestions, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .not('id', 'in', `(${excludeIds.join(',')})`)
+        .not('full_name', 'is', null)
+        .limit(5);
+
+      if (error) throw error;
+      setSuggestedConnections(suggestions || []);
+    } catch (error) {
+      console.error('Error fetching suggested connections:', error);
+    }
+  };
 
   const profileStats = [
     { label: "Profile Views", value: "1,247", change: "+15.3%", icon: Eye },
@@ -199,6 +239,27 @@ const Dashboard = () => {
 
             {/* Right Sidebar */}
             <div className="lg:col-span-1 space-y-4">
+              {/* People You May Know */}
+              {suggestedConnections.length > 0 && (
+                <Card className="bg-white shadow-sm border border-gray-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      People You May Know
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0 space-y-3">
+                    {suggestedConnections.slice(0, 3).map((profile) => (
+                      <NetworkingCard 
+                        key={profile.id} 
+                        profile={profile}
+                        onConnect={fetchSuggestedConnections}
+                      />
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Industry News */}
               <Card className="bg-white shadow-sm border border-gray-200">
                 <CardHeader className="pb-2">
