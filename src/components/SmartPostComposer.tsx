@@ -9,18 +9,11 @@ import {
   Camera, 
   Image, 
   Video, 
-  FileText, 
-  Mic, 
   Loader2, 
-  Sparkles,
-  Brain,
-  Palette,
-  Zap,
   Eye,
-  TrendingUp
+  Zap
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 
 interface SmartPostComposerProps {
   onCreatePost: (content: string, mediaUrl?: string, mediaType?: string) => Promise<void>;
@@ -29,11 +22,9 @@ interface SmartPostComposerProps {
 const SmartPostComposer: React.FC<SmartPostComposerProps> = ({ onCreatePost }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const { user } = useAuth();
-  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,21 +45,6 @@ const SmartPostComposer: React.FC<SmartPostComposerProps> = ({ onCreatePost }) =
     fileInputRef.current?.click();
   };
 
-  const generateAISuggestions = async () => {
-    const suggestions = [
-      "💡 Share a professional insight about your recent project experience",
-      "🚀 Discuss emerging trends in your industry",
-      "🎯 Highlight a key achievement or milestone",
-      "🤝 Share valuable advice for fellow professionals",
-      "📈 Analyze market developments or opportunities"
-    ];
-    setAiSuggestions(suggestions);
-  };
-
-  const applySuggestion = (suggestion: string) => {
-    setContent(suggestion.replace(/^[^\s]+\s/, ''));
-  };
-
   const handleSubmit = async () => {
     if (!content.trim() && !mediaFile) return;
 
@@ -76,7 +52,6 @@ const SmartPostComposer: React.FC<SmartPostComposerProps> = ({ onCreatePost }) =
     try {
       let mediaUrl = '';
       if (mediaFile) {
-        // In a real app, you'd upload to storage here
         mediaUrl = mediaPreview || '';
       }
       
@@ -84,7 +59,6 @@ const SmartPostComposer: React.FC<SmartPostComposerProps> = ({ onCreatePost }) =
       setContent('');
       setMediaFile(null);
       setMediaPreview(null);
-      setAiSuggestions([]);
     } finally {
       setLoading(false);
     }
@@ -142,27 +116,6 @@ const SmartPostComposer: React.FC<SmartPostComposerProps> = ({ onCreatePost }) =
             </Button>
           </div>
         )}
-
-        {/* AI Suggestions */}
-        {aiSuggestions.length > 0 && (
-          <div className="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-            <div className="flex items-center gap-2 mb-3">
-              <Brain className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-800">AI Content Suggestions</span>
-            </div>
-            <div className="space-y-2">
-              {aiSuggestions.map((suggestion, index) => (
-                <div
-                  key={index}
-                  className="p-2 bg-white rounded-md cursor-pointer hover:bg-purple-100 transition-colors"
-                  onClick={() => applySuggestion(suggestion)}
-                >
-                  <p className="text-sm text-gray-700">{suggestion}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
         
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -192,29 +145,11 @@ const SmartPostComposer: React.FC<SmartPostComposerProps> = ({ onCreatePost }) =
               className="text-purple-600 hover:bg-purple-50 flex items-center gap-2"
             >
               <Video className="w-5 h-5" />
-              <span className="text-sm font-medium">Record</span>
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-orange-600 hover:bg-orange-50 flex items-center gap-2"
-              onClick={generateAISuggestions}
-            >
-              <Sparkles className="w-5 h-5" />
-              <span className="text-sm font-medium">AI Ideas</span>
+              <span className="text-sm font-medium">Video</span>
             </Button>
           </div>
           
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline"
-              size="sm"
-              className="text-purple-600 border-purple-200 hover:bg-purple-50"
-            >
-              <TrendingUp className="w-4 h-4 mr-1" />
-              Boost
-            </Button>
             <Button 
               onClick={handleSubmit}
               disabled={(!content.trim() && !mediaFile) || loading}

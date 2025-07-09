@@ -10,7 +10,6 @@ import {
   TrendingUp, 
   MessageSquare, 
   Sparkles,
-  Target,
   Zap,
   UserPlus,
   Star,
@@ -64,7 +63,6 @@ const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggest
   ];
 
   const handleSmartIntro = (suggestion: any) => {
-    // This would generate a personalized introduction message
     console.log(`Generating smart intro for ${suggestion.name}`);
   };
 
@@ -72,8 +70,8 @@ const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggest
     <div className="space-y-4">
       {/* AI Networking Stats */}
       <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <Brain className="w-5 h-5 text-indigo-600" />
             AI Networking Insights
             <Badge variant="secondary" className="bg-indigo-100 text-indigo-700">
@@ -107,8 +105,8 @@ const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggest
 
       {/* Smart Connection Suggestions */}
       <Card className="bg-white shadow-lg border-0">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center justify-between text-lg">
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-blue-600" />
               Smart Connections
@@ -125,7 +123,7 @@ const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggest
         </CardHeader>
         <CardContent className="space-y-4">
           {smartSuggestions.map((suggestion) => (
-            <div key={suggestion.id} className="p-4 border border-gray-100 rounded-lg hover:shadow-md transition-shadow">
+            <Card key={suggestion.id} className="p-4 border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarImage src={suggestion.avatar} />
@@ -182,7 +180,7 @@ const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggest
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
           
           <Button variant="ghost" className="w-full">
