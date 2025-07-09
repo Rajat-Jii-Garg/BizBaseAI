@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -35,7 +36,9 @@ import {
   Briefcase,
   Target,
   Star,
-  Zap
+  Zap,
+  Brain,
+  Sparkles
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -64,148 +67,193 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
 
   const menuItems = [
-    { icon: Home, label: 'Home', path: '/dashboard' },
-    { icon: Users, label: 'Connections', path: '/dashboard/connections' },
-    { icon: Calendar, label: 'Events', path: '/dashboard/events' },
-    { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
+    { icon: Home, label: 'Home', path: '/dashboard', isActive: true },
+    { icon: Users, label: 'My Network', path: '/dashboard/connections' },
     { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
+    { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
+    { icon: Calendar, label: 'Events', path: '/dashboard/events' },
     { icon: TrendingUp, label: 'Insights', path: '/dashboard/insights' },
+    { icon: Brain, label: 'AI Assistant', path: '/dashboard/ai-assistant' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen">
-      {/* Main Header */}
-      <nav className="bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-100 sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-50">
+      {/* Enhanced Header */}
+      <nav className="bg-white shadow-lg border-b-2 border-blue-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Left Section - Logo & Brand */}
+            {/* Logo & Brand */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Network className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl">
+                  <Network className="w-7 h-7 text-white" />
                 </div>
-                <div>
+                <div className="hidden md:block">
                   <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
                     BizBase
                   </span>
-                  <div className="text-xs text-gray-500 -mt-1 hidden sm:block">Professional Network</div>
+                  <div className="text-xs text-gray-500 -mt-1 flex items-center gap-1">
+                    <Brain className="w-3 h-3" />
+                    AI Professional Network
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Center Section - Enhanced Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-4xl mx-8">
+            {/* Enhanced Search Bar */}
+            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
               <form onSubmit={handleSearch} className="relative w-full">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
                 </div>
                 <Input
                   type="text"
-                  placeholder="Search professionals, companies, opportunities, events..."
+                  placeholder="Search professionals, companies, jobs, insights..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-full bg-gray-50/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  className="block w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base hover:border-blue-300"
                 />
                 <Button 
                   type="submit" 
                   size="sm" 
-                  className="absolute right-2 top-1.5 bottom-1.5 bg-blue-600 hover:bg-blue-700 rounded-full px-6"
+                  className="absolute right-2 top-1.5 bottom-1.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl px-6 shadow-md"
                 >
                   <Search className="h-4 w-4" />
                 </Button>
               </form>
             </div>
 
-            {/* Right Section - Actions & Profile */}
+            {/* Right Section */}
             <div className="flex items-center space-x-3">
-              {/* Register Business Button */}
-              <div className="hidden md:flex items-center space-x-2">
-                <Button 
+              {/* Action Buttons */}
+              <div className="hidden lg:flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-2 border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
                   onClick={handleRegisterBusiness}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
                 >
                   <Building2 className="w-4 h-4 mr-2" />
-                  Register My Business
+                  Register Business
                 </Button>
               </div>
-              
-              {/* User Profile Dropdown */}
+
+              {/* Notifications */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hover:bg-gray-100 rounded-xl"
+              >
+                <Bell className="w-5 h-5 text-gray-600" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs flex items-center justify-center">
+                  <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+                </span>
+              </Button>
+
+              {/* Messages */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hover:bg-gray-100 rounded-xl"
+              >
+                <MessageSquare className="w-5 h-5 text-gray-600" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full text-xs flex items-center justify-center">
+                  <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+                </span>
+              </Button>
+
+              {/* Profile Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-lg">
-                    <Avatar className="h-9 w-9 ring-2 ring-blue-200 shadow-md">
+                  <Button variant="ghost" className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-xl border-2 border-transparent hover:border-gray-200">
+                    <Avatar className="h-10 w-10 ring-2 ring-blue-200 shadow-lg">
                       <AvatarImage src={user?.user_metadata?.avatar_url} />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                      <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold">
                         {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="hidden md:block text-left">
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-semibold text-gray-900">
                         {user?.user_metadata?.full_name || 'Professional User'}
                       </p>
-                      <p className="text-xs text-gray-500">Pro Member</p>
+                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" />
+                        AI Enhanced
+                      </p>
                     </div>
                     <ChevronDown className="w-4 h-4 text-gray-400 hidden md:block" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl border border-gray-100">
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user?.user_metadata?.full_name || 'Professional User'}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground truncate">
-                        {user?.email}
-                      </p>
+                <DropdownMenuContent align="end" className="w-64 bg-white shadow-2xl border-2 border-gray-100 rounded-xl">
+                  <DropdownMenuLabel className="font-normal p-4">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={user?.user_metadata?.avatar_url} />
+                        <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold">
+                          {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-semibold leading-none text-gray-900">
+                          {user?.user_metadata?.full_name || 'Professional User'}
+                        </p>
+                        <p className="text-xs leading-none text-gray-500 mt-1 truncate">
+                          {user?.email}
+                        </p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className="text-xs text-green-600">Online</span>
+                        </div>
+                      </div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/dashboard/profile')} className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer p-3">
+                    <User className="mr-3 h-4 w-4" />
                     <span>My Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Edit className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem className="cursor-pointer p-3">
+                    <Edit className="mr-3 h-4 w-4" />
                     <span>Edit Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Briefcase className="mr-2 h-4 w-4" />
-                    <span>Pro Tools</span>
+                  <DropdownMenuItem className="cursor-pointer p-3">
+                    <Briefcase className="mr-3 h-4 w-4" />
+                    <span>Professional Tools</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Target className="mr-2 h-4 w-4" />
-                    <span>Business Analytics</span>
+                  <DropdownMenuItem className="cursor-pointer p-3">
+                    <Target className="mr-3 h-4 w-4" />
+                    <span>Goals & Analytics</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Star className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem className="cursor-pointer p-3">
+                    <Brain className="mr-3 h-4 w-4" />
                     <span>AI Assistant</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Zap className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem className="cursor-pointer p-3">
+                    <Star className="mr-3 h-4 w-4" />
                     <span>Premium Features</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer p-3">
+                    <Settings className="mr-3 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Shield className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem className="cursor-pointer p-3">
+                    <Shield className="mr-3 h-4 w-4" />
                     <span>Privacy & Security</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <CreditCard className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem className="cursor-pointer p-3">
+                    <CreditCard className="mr-3 h-4 w-4" />
                     <span>Billing & Plans</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <HelpCircle className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem className="cursor-pointer p-3">
+                    <HelpCircle className="mr-3 h-4 w-4" />
                     <span>Help & Support</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 focus:text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 focus:text-red-600 p-3">
+                    <LogOut className="mr-3 h-4 w-4" />
                     <span>Sign Out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -215,7 +263,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden rounded-xl"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -226,10 +274,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-gray-100 bg-white/95 backdrop-blur-xl">
-            <div className="px-4 py-3 space-y-2">
+          <div className="lg:hidden border-t border-gray-100 bg-white shadow-xl">
+            <div className="px-4 py-6 space-y-4">
               {/* Mobile Search */}
-              <form onSubmit={handleSearch} className="relative mb-4">
+              <form onSubmit={handleSearch} className="relative mb-6">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 text-gray-400" />
                 </div>
@@ -238,7 +286,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
+                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl bg-gray-50"
                 />
               </form>
 
@@ -247,28 +295,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <Button
                   key={index}
                   variant={isActive(item.path) ? "default" : "ghost"}
-                  className={`w-full justify-start ${
+                  className={`w-full justify-start py-3 px-4 rounded-xl ${
                     isActive(item.path) 
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' 
-                      : 'hover:bg-gray-100 text-gray-700'
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                      : 'hover:bg-gray-50 text-gray-700'
                   }`}
                   onClick={() => {
                     navigate(item.path);
                     setMobileMenuOpen(false);
                   }}
                 >
-                  <item.icon className="w-4 h-4 mr-3" />
+                  <item.icon className="w-5 h-5 mr-3" />
                   {item.label}
                 </Button>
               ))}
 
               {/* Mobile Register Business */}
-              <div className="pt-3 border-t border-gray-100">
+              <div className="pt-4 border-t border-gray-100">
                 <Button 
                   onClick={handleRegisterBusiness}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl py-3"
                 >
-                  <Building2 className="w-4 h-4 mr-2" />
+                  <Building2 className="w-5 h-5 mr-2" />
                   Register My Business
                 </Button>
               </div>
@@ -277,31 +325,33 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         )}
       </nav>
 
-      {/* Centered Sub Navigation Bar */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+      {/* Enhanced Sub Navigation */}
+      <div className="bg-white border-b border-gray-100 shadow-sm sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center space-x-1 py-2 overflow-x-auto">
-            {menuItems.map((item, index) => (
-              <Button
-                key={index}
-                variant={isActive(item.path) ? "default" : "ghost"}
-                size="sm"
-                className={`${
-                  isActive(item.path) 
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md text-xs' 
-                    : 'hover:bg-gray-100 text-gray-600 text-xs'
-                } transition-all duration-200 whitespace-nowrap px-3 py-1.5`}
-                onClick={() => navigate(item.path)}
-              >
-                <item.icon className="w-3 h-3 mr-1.5" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </Button>
-            ))}
+          <div className="flex items-center justify-center py-3 overflow-x-auto">
+            <div className="flex items-center space-x-1">
+              {menuItems.map((item, index) => (
+                <Button
+                  key={index}
+                  variant={isActive(item.path) ? "default" : "ghost"}
+                  size="sm"
+                  className={`${
+                    isActive(item.path) 
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' 
+                      : 'hover:bg-gray-100 text-gray-600'
+                  } transition-all duration-200 whitespace-nowrap px-4 py-2 rounded-xl font-medium`}
+                  onClick={() => navigate(item.path)}
+                >
+                  <item.icon className="w-4 h-4 mr-2" />
+                  <span>{item.label}</span>
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <main className="flex-1">
         {children}
       </main>
