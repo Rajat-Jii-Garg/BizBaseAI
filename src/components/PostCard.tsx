@@ -3,22 +3,16 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  ThumbsUp, 
-  MessageCircle, 
-  Share2, 
-  MoreHorizontal,
-  CheckCircle
-} from 'lucide-react';
+import { MoreHorizontal, CheckCircle } from 'lucide-react';
 import { Post } from '@/hooks/usePosts';
+import PostEngagementActions from './PostEngagementActions';
 
 interface PostCardProps {
   post: Post;
-  onLike: (postId: string) => void;
-  onShare: (postId: string) => void;
+  onEngagementUpdate: () => void;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, onLike, onShare }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, onEngagementUpdate }) => {
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -70,48 +64,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onShare }) => {
         </div>
 
         {/* Post Engagement */}
-        <div className="border-t border-gray-100 pt-3">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-4 text-xs text-gray-600">
-              <span>{post.likes_count} likes</span>
-              <span>{post.comments_count} comments</span>
-              <span>{post.shares_count} shares</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-around border-t border-gray-100 pt-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`flex-1 h-8 hover:bg-gray-50 ${
-                post.user_has_liked ? 'text-blue-600' : 'text-gray-600'
-              }`}
-              onClick={() => onLike(post.id)}
-            >
-              <ThumbsUp className={`w-4 h-4 mr-1 ${
-                post.user_has_liked ? 'fill-current' : ''
-              }`} />
-              <span className="text-xs">Like</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex-1 h-8 hover:bg-gray-50 text-gray-600"
-            >
-              <MessageCircle className="w-4 h-4 mr-1" />
-              <span className="text-xs">Comment</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex-1 h-8 hover:bg-gray-50 text-gray-600"
-              onClick={() => onShare(post.id)}
-            >
-              <Share2 className="w-4 h-4 mr-1" />
-              <span className="text-xs">Share</span>
-            </Button>
-          </div>
-        </div>
+        <PostEngagementActions
+          postId={post.id}
+          likesCount={post.likes_count || 0}
+          commentsCount={post.comments_count || 0}
+          sharesCount={post.shares_count || 0}
+          userHasLiked={post.user_has_liked || false}
+          onEngagementUpdate={onEngagementUpdate}
+        />
       </CardContent>
     </Card>
   );

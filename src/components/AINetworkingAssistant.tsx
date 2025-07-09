@@ -92,13 +92,16 @@ const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggest
             </div>
           </div>
           
-          <div className="space-y-2">
-            <h4 className="font-medium text-sm">Smart Tips</h4>
-            {networkingTips.slice(0, 2).map((tip, index) => (
-              <div key={index} className="p-2 bg-white rounded text-xs text-gray-700">
-                💡 {tip}
-              </div>
-            ))}
+          <div className="bg-white rounded-lg p-3">
+            <h4 className="font-medium text-sm mb-2">Smart Tips</h4>
+            <div className="space-y-2">
+              {networkingTips.slice(0, 2).map((tip, index) => (
+                <div key={index} className="text-xs text-gray-700 flex items-start">
+                  <span className="mr-2">💡</span>
+                  <span>{tip}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -123,7 +126,7 @@ const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggest
         </CardHeader>
         <CardContent className="space-y-4">
           {smartSuggestions.map((suggestion) => (
-            <Card key={suggestion.id} className="p-4 border border-gray-100 hover:shadow-md transition-shadow">
+            <div key={suggestion.id} className="p-4 border border-gray-100 rounded-lg hover:shadow-md transition-shadow">
               <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarImage src={suggestion.avatar} />
@@ -180,7 +183,7 @@ const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggest
                   </div>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
           
           <Button variant="ghost" className="w-full">

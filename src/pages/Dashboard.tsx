@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +32,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import SmartPostComposer from '@/components/SmartPostComposer';
-import EnhancedPostCard from '@/components/EnhancedPostCard';
+import PostCard from '@/components/PostCard';
 import ConnectionsList from '@/components/ConnectionsList';
 import AINetworkingAssistant from '@/components/AINetworkingAssistant';
 import { usePosts } from '@/hooks/usePosts';
@@ -50,8 +49,7 @@ const Dashboard = () => {
     posts, 
     loading: postsLoading, 
     createPost, 
-    toggleLike, 
-    sharePost 
+    refreshPosts 
   } = usePosts();
   
   const { 
@@ -61,7 +59,6 @@ const Dashboard = () => {
     respondToRequest 
   } = useConnections();
 
-  // Fetch suggested connections
   useEffect(() => {
     if (user) {
       fetchSuggestedConnections();
@@ -70,7 +67,6 @@ const Dashboard = () => {
 
   const fetchSuggestedConnections = async () => {
     try {
-      // Get profiles excluding current user and existing connections
       const { data: connectedUserIds } = await supabase
         .from('connections')
         .select('addressee_id, requester_id')
@@ -170,7 +166,6 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Sidebar - Profile & Stats */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Enhanced Profile Card */}
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
                 <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600"></div>
                 <CardContent className="p-6 text-center relative">
@@ -213,7 +208,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Quick Stats */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -242,7 +236,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Quick Actions */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -271,10 +264,8 @@ const Dashboard = () => {
 
             {/* Main Content Feed */}
             <div className="lg:col-span-6 space-y-6">
-              {/* Smart Post Composer */}
               <SmartPostComposer onCreatePost={createPost} />
 
-              {/* Posts Feed */}
               <div className="space-y-6">
                 {postsLoading ? (
                   <Card className="bg-white shadow-lg border-0">
@@ -307,11 +298,10 @@ const Dashboard = () => {
                   </Card>
                 ) : (
                   posts.map((post) => (
-                    <EnhancedPostCard
+                    <PostCard
                       key={post.id}
                       post={post}
-                      onLike={toggleLike}
-                      onShare={sharePost}
+                      onEngagementUpdate={refreshPosts}
                     />
                   ))
                 )}
@@ -320,10 +310,8 @@ const Dashboard = () => {
 
             {/* Right Sidebar - Connections & Insights */}
             <div className="lg:col-span-3 space-y-6">
-              {/* AI Networking Assistant */}
               <AINetworkingAssistant onSuggestConnection={handleSuggestConnection} />
 
-              {/* Connections */}
               {connectionsLoading ? (
                 <Card className="bg-white shadow-lg border-0">
                   <CardContent className="p-6 flex items-center justify-center">
@@ -339,7 +327,6 @@ const Dashboard = () => {
                 />
               )}
 
-              {/* Industry Insights */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -384,7 +371,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* AI Goals Tracker */}
               <Card className="bg-gradient-to-br from-purple-50 to-blue-50 shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -426,7 +412,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Learning Resources */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
