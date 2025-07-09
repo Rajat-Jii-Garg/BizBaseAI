@@ -229,46 +229,82 @@ export type Database = {
       }
       profiles: {
         Row: {
+          achievements: Json | null
           avatar_url: string | null
+          bio: string | null
           business_type: string | null
           company_name: string | null
           created_at: string | null
+          current_position: string | null
+          education: string | null
           email: string | null
           email_verified: boolean | null
+          experience_years: number | null
           full_name: string | null
+          github_url: string | null
           id: string
+          industry: string | null
+          linkedin_url: string | null
+          location: string | null
           phone: string | null
           profile_completed: boolean | null
+          skills: Json | null
           subscription_plan: string | null
+          twitter_url: string | null
           updated_at: string | null
+          website: string | null
         }
         Insert: {
+          achievements?: Json | null
           avatar_url?: string | null
+          bio?: string | null
           business_type?: string | null
           company_name?: string | null
           created_at?: string | null
+          current_position?: string | null
+          education?: string | null
           email?: string | null
           email_verified?: boolean | null
+          experience_years?: number | null
           full_name?: string | null
+          github_url?: string | null
           id: string
+          industry?: string | null
+          linkedin_url?: string | null
+          location?: string | null
           phone?: string | null
           profile_completed?: boolean | null
+          skills?: Json | null
           subscription_plan?: string | null
+          twitter_url?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Update: {
+          achievements?: Json | null
           avatar_url?: string | null
+          bio?: string | null
           business_type?: string | null
           company_name?: string | null
           created_at?: string | null
+          current_position?: string | null
+          education?: string | null
           email?: string | null
           email_verified?: boolean | null
+          experience_years?: number | null
           full_name?: string | null
+          github_url?: string | null
           id?: string
+          industry?: string | null
+          linkedin_url?: string | null
+          location?: string | null
           phone?: string | null
           profile_completed?: boolean | null
+          skills?: Json | null
           subscription_plan?: string | null
+          twitter_url?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Relationships: []
       }
