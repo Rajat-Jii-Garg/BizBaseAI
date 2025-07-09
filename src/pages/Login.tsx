@@ -9,7 +9,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '', rememberMe: false });
@@ -21,7 +20,6 @@ const Login = () => {
   const { signIn, user } = useAuth();
   const { toast } = useToast();
 
-  // Redirect if already logged in
   useEffect(() => {
     if (user) {
       navigate('/dashboard');
@@ -40,7 +38,6 @@ const Login = () => {
     clearErrors();
     setLoading(true);
     
-    // Validation
     const newErrors: { [key: string]: string } = {};
     
     if (!loginData.email) {
@@ -79,31 +76,9 @@ const Login = () => {
     setLoading(false);
   };
 
-  const handleForgotPassword = async () => {
-    if (!loginData.email) {
-      setErrors({ email: 'Please enter your email address first' });
-      return;
-    }
-    
-    setLoading(true);
-    const { resetPassword } = useAuth();
-    const { error } = await resetPassword(loginData.email);
-    
-    if (error) {
-      setErrors({ general: error.message });
-    } else {
-      toast({
-        title: "Reset link sent!",
-        description: "Please check your email for password reset instructions.",
-      });
-    }
-    setLoading(false);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center space-x-2 mb-6 group">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -117,15 +92,13 @@ const Login = () => {
           <p className="text-gray-600">Sign in to your BizBase account</p>
         </div>
 
-        {/* Error Display */}
         {errors.general && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-600 text-sm">{errors.general}</p>
           </div>
         )}
 
-        {/* Login Card */}
-        <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90 glass">
+        <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-center text-xl">Sign In</CardTitle>
           </CardHeader>
@@ -178,7 +151,6 @@ const Login = () => {
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
 
-              {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -190,7 +162,6 @@ const Login = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={handleForgotPassword}
                   className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
                 >
                   Forgot password?
@@ -216,29 +187,11 @@ const Login = () => {
               </Button>
             </form>
 
-            {/* Social Login */}
-            <SocialLoginButtons />
-
-            {/* Link to Signup */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                <Link to="/auth" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
                   Sign up here
-                </Link>
-              </p>
-            </div>
-            
-            {/* Legal Links */}
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-600">
-                By signing in, you agree to our{' '}
-                <Link to="/terms" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                  Privacy Policy
                 </Link>
               </p>
             </div>

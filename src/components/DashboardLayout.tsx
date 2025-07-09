@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -58,7 +57,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
-    // TODO: Implement actual search functionality
   };
 
   const handleRegisterBusiness = () => {
@@ -77,7 +75,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen">
       {/* Main Header */}
       <nav className="bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -303,11 +301,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      {/* Main Content Area - Removed padding to make it full width */}
+      {/* Main Content Area */}
       <main className="flex-1">
-        <div className="w-full max-w-none">
-          {children}
-        </div>
+        {children}
       </main>
     </div>
   );

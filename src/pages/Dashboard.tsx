@@ -65,9 +65,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <DashboardLayout>
-        <div className="w-full max-w-none p-0 m-0">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Welcome Banner */}
           {showWelcome && (
             <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg relative mb-6">
@@ -287,8 +287,8 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </DashboardLayout>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

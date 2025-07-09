@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/sonner';
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
+import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
 import ProfilePage from '@/pages/ProfilePage';
 import ProfileDashboard from '@/pages/ProfileDashboard';
@@ -21,6 +22,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
