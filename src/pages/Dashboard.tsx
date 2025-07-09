@@ -134,7 +134,9 @@ const Dashboard = () => {
           {/* AI Welcome Banner */}
           {showWelcome && (
             <Card className="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl overflow-hidden relative">
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"%3E%3Cdefs%3E%3Cpattern id=\"grain\" width=\"100\" height=\"100\" patternUnits=\"userSpaceOnUse\"%3E%3Ccircle cx=\"50\" cy=\"50\" r=\"1\" fill=\"white\" opacity=\"0.1\"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\"100\" height=\"100\" fill=\"url(%23grain)\"/%3E%3C/svg%3E')] opacity-20"></div>
+              <div className="absolute inset-0 opacity-20">
+                <div className="w-full h-full bg-gradient-to-r from-blue-400/20 to-purple-400/20"></div>
+              </div>
               <CardContent className="p-6 relative z-10">
                 <Button
                   variant="ghost"
