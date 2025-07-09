@@ -2,464 +2,393 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { 
-  Edit, MapPin, Briefcase, Users, Eye, Globe, Mail, Phone, 
-  Calendar, Building2, GraduationCap, Award, MessageSquare,
-  Heart, Share2, ExternalLink, Github, Twitter, Linkedin, Brain, Sparkles
+  User, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Briefcase, 
+  Edit,
+  Save,
+  X,
+  Plus,
+  Star,
+  Award,
+  Calendar,
+  Link as LinkIcon
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/DashboardLayout';
-import ProfileEditor from '@/components/ProfileEditor';
-import AIProfileOptimizer from '@/components/AIProfileOptimizer';
-import EnhancedPostCard from '@/components/EnhancedPostCard';
 
 const ProfilePage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<any>(null);
-  const [userPosts, setUserPosts] = useState<any[]>([]);
-  const [connections, setConnections] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    company_name: '',
+    business_type: '',
+    avatar_url: '',
+    bio: '',
+    location: '',
+    website: '',
+    skills: [] as string[],
+    experience: [] as any[],
+    education: [] as any[]
+  });
 
   useEffect(() => {
     if (user) {
-      fetchProfileData();
+      fetchProfile();
     }
   }, [user]);
 
-  const fetchProfileData = async () => {
+  const fetchProfile = async () => {
     try {
-      // Fetch profile
-      const { data: profileData, error: profileError } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user?.id)
         .single();
 
-      if (profileError) throw profileError;
-      setProfile(profileData);
+      if (error) throw error;
 
-      // Fetch user's posts
-      const { data: postsData, error: postsError } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          profiles!posts_user_id_fkey(full_name, avatar_url)
-        `)
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false });
+      setProfile({
+        full_name: data.full_name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        company_name: data.company_name || '',
+        business_type: data.business_type || '',
+        avatar_url: data.avatar_url || '',
+        bio: '',
+        location: '',
+        website: '',
+        skills: [],
+        experience: [],
+        education: []
+      });
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
-      if (postsError) throw postsError;
-      setUserPosts(postsData || []);
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: profile.full_name,
+          phone: profile.phone,
+          company_name: profile.company_name,
+          business_type: profile.business_type,
+          avatar_url: profile.avatar_url
+        })
+        .eq('id', user?.id);
 
-      // Fetch connections
-      const { data: connectionsData, error: connectionsError } = await supabase
-        .from('connections')
-        .select(`
-          *,
-          profiles!connections_addressee_id_fkey(id, full_name, avatar_url, current_position)
-        `)
-        .eq('requester_id', user?.id)
-        .eq('status', 'accepted');
+      if (error) throw error;
 
-      if (connectionsError) throw connectionsError;
-      setConnections(connectionsData || []);
-
-    } catch (error: any) {
-      console.error('Error fetching profile data:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to load profile data',
-        variant: 'destructive'
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated."
+      });
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLikePost = async (postId: string) => {
-    try {
-      // Check if already liked
-      const { data: existingLike } = await supabase
-        .from('post_likes')
-        .select('id')
-        .eq('post_id', postId)
-        .eq('user_id', user?.id)
-        .single();
-
-      if (existingLike) {
-        // Unlike
-        await supabase
-          .from('post_likes')
-          .delete()
-          .eq('post_id', postId)
-          .eq('user_id', user?.id);
-      } else {
-        // Like
-        await supabase
-          .from('post_likes')
-          .insert({ post_id: postId, user_id: user?.id });
-      }
-
-      // Refresh posts
-      fetchProfileData();
-    } catch (error) {
-      console.error('Error toggling like:', error);
-    }
+  const handleInputChange = (field: string, value: string) => {
+    setProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
-
-  const handleSharePost = async (postId: string) => {
-    try {
-      await supabase
-        .from('post_shares')
-        .insert({ post_id: postId, user_id: user?.id });
-      
-      toast({
-        title: "Post Shared",
-        description: "Post has been shared successfully.",
-      });
-      
-      fetchProfileData();
-    } catch (error) {
-      console.error('Error sharing post:', error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (isEditing) {
-    return (
-      <DashboardLayout>
-        <div className="max-w-4xl mx-auto p-6">
-          <ProfileEditor
-            profile={profile}
-            onSave={() => {
-              setIsEditing(false);
-              fetchProfileData();
-            }}
-            onCancel={() => setIsEditing(false)}
-          />
-        </div>
-      </DashboardLayout>
-    );
-  }
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto space-y-6 p-6">
-        {/* AI-Enhanced Profile Header */}
-        <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl">
-          <CardContent className="p-8">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
-              <Avatar className="h-32 w-32 ring-4 ring-white/20 shadow-2xl">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-4xl font-bold">
-                  {profile?.full_name?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <h1 className="text-4xl font-bold">
-                    {profile?.full_name || 'Professional User'}
-                  </h1>
-                  <Badge className="bg-purple-500 text-white flex items-center gap-1">
-                    <Brain className="w-3 h-3" />
-                    AI Enhanced
-                  </Badge>
-                  {profile?.profile_completed && (
-                    <Badge className="bg-green-500 text-white">
-                      ✓ Verified
-                    </Badge>
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        {/* Profile Header */}
+        <Card className="bg-white shadow-xl border-0 overflow-hidden">
+          <div className="h-32 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600"></div>
+          <CardContent className="p-6 relative">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center space-x-6">
+                <Avatar className="h-24 w-24 -mt-16 ring-4 ring-white shadow-xl">
+                  <AvatarImage src={profile.avatar_url} />
+                  <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold text-2xl">
+                    {profile.full_name?.charAt(0) || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="pt-4">
+                  {isEditing ? (
+                    <div className="space-y-3">
+                      <Input
+                        value={profile.full_name}
+                        onChange={(e) => handleInputChange('full_name', e.target.value)}
+                        className="text-xl font-bold"
+                        placeholder="Full Name"
+                      />
+                      <Input
+                        value={profile.company_name}
+                        onChange={(e) => handleInputChange('company_name', e.target.value)}
+                        placeholder="Company Name"
+                      />
+                      <Input
+                        value={profile.business_type}
+                        onChange={(e) => handleInputChange('business_type', e.target.value)}
+                        placeholder="Business Type"
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                        {profile.full_name || 'Professional User'}
+                      </h1>
+                      <p className="text-gray-600 mb-2">
+                        {profile.company_name && `${profile.company_name} • `}
+                        {profile.business_type || 'Professional'}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <Mail className="w-4 h-4" />
+                          {profile.email}
+                        </div>
+                        {profile.phone && (
+                          <div className="flex items-center gap-1">
+                            <Phone className="w-4 h-4" />
+                            {profile.phone}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
-                
-                {profile?.current_position && (
-                  <p className="text-xl text-white/90 mb-2">
-                    {profile.current_position}
-                    {profile?.company_name && ` at ${profile.company_name}`}
-                  </p>
-                )}
-
-                {profile?.bio && (
-                  <p className="text-white/80 mb-4 max-w-2xl">
-                    {profile.bio}
-                  </p>
-                )}
-
-                <div className="flex flex-wrap items-center gap-4 text-white/80 mb-6">
-                  {profile?.location && (
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {profile.location}
-                    </div>
-                  )}
-                  {profile?.industry && (
-                    <div className="flex items-center">
-                      <Briefcase className="w-4 h-4 mr-1" />
-                      {profile.industry}
-                    </div>
-                  )}
-                  {profile?.experience_years > 0 && (
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      {profile.experience_years}+ years experience
-                    </div>
-                  )}
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-1" />
-                    {connections.length} connections
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button 
+              </div>
+              <div className="flex items-center gap-2">
+                {isEditing ? (
+                  <>
+                    <Button
+                      onClick={handleSave}
+                      disabled={loading}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Save
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditing(false)}
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button
                     onClick={() => setIsEditing(true)}
-                    className="bg-white/20 backdrop-blur-sm hover:bg-white/30"
+                    variant="outline"
                   >
                     <Edit className="w-4 h-4 mr-2" />
-                    Smart Edit
+                    Edit Profile
                   </Button>
-                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Share Profile
-                  </Button>
-                </div>
+                )}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Profile Content Tabs */}
-        <Tabs defaultValue="about" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="posts">Posts ({userPosts.length})</TabsTrigger>
-            <TabsTrigger value="connections">Network ({connections.length})</TabsTrigger>
-            <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
-            <TabsTrigger value="contact">Contact</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="about" className="space-y-6 mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                {/* Skills */}
-                {profile?.skills && profile.skills.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Award className="w-5 h-5 mr-2" />
-                        Skills & Expertise
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap gap-2">
-                        {profile.skills.map((skill: string, index: number) => (
-                          <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-700">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Education */}
-                {profile?.education && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <GraduationCap className="w-5 h-5 mr-2" />
-                        Education
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{profile.education}</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-
-              <div className="space-y-6">
-                {/* AI Profile Stats */}
-                <Card className="bg-gradient-to-r from-purple-50 to-blue-50">
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Brain className="w-5 h-5 mr-2 text-purple-600" />
-                      AI Profile Analytics
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Profile Strength</span>
-                      <span className="font-semibold text-purple-600">95%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Network Quality</span>
-                      <span className="font-semibold text-blue-600">88%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Content Impact</span>
-                      <span className="font-semibold text-green-600">92%</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Social Links */}
-                {(profile?.website || profile?.linkedin_url || profile?.twitter_url || profile?.github_url) && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Professional Links</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {profile?.website && (
-                        <a href={profile.website} target="_blank" rel="noopener noreferrer" 
-                           className="flex items-center text-blue-600 hover:text-blue-800">
-                          <Globe className="w-4 h-4 mr-2" />
-                          Website
-                          <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
-                      )}
-                      {profile?.linkedin_url && (
-                        <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" 
-                           className="flex items-center text-blue-600 hover:text-blue-800">
-                          <Linkedin className="w-4 h-4 mr-2" />
-                          LinkedIn
-                          <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
-                      )}
-                      {profile?.twitter_url && (
-                        <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer" 
-                           className="flex items-center text-blue-600 hover:text-blue-800">
-                          <Twitter className="w-4 h-4 mr-2" />
-                          Twitter
-                          <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
-                      )}
-                      {profile?.github_url && (
-                        <a href={profile.github_url} target="_blank" rel="noopener noreferrer" 
-                           className="flex items-center text-blue-600 hover:text-blue-800">
-                          <Github className="w-4 h-4 mr-2" />
-                          GitHub
-                          <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="posts" className="space-y-4 mt-6">
-            {userPosts.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Posts Yet</h3>
-                  <p className="text-gray-600 mb-4">Start sharing your professional insights with AI-powered content suggestions!</p>
-                </CardContent>
-              </Card>
-            ) : (
-              userPosts.map((post) => (
-                <EnhancedPostCard
-                  key={post.id}
-                  post={post}
-                  onLike={handleLikePost}
-                  onShare={handleSharePost}
-                />
-              ))
-            )}
-          </TabsContent>
-
-          <TabsContent value="connections" className="space-y-4 mt-6">
-            {connections.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Connections Yet</h3>
-                  <p className="text-gray-600">Start building your AI-powered professional network!</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {connections.map((connection) => (
-                  <Card key={connection.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-12 w-12">
-                          <AvatarImage src={connection.profiles?.avatar_url} />
-                          <AvatarFallback>
-                            {connection.profiles?.full_name?.charAt(0) || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <h3 className="font-semibold">{connection.profiles?.full_name}</h3>
-                          {connection.profiles?.current_position && (
-                            <p className="text-sm text-gray-600">{connection.profiles.current_position}</p>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="ai-insights" className="space-y-6 mt-6">
-            <AIProfileOptimizer 
-              profile={profile} 
-              onOptimize={(suggestions) => console.log('AI suggestions:', suggestions)}
-            />
-          </TabsContent>
-
-          <TabsContent value="contact" className="space-y-6 mt-6">
-            <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* About Section */}
+            <Card className="bg-white shadow-lg border-0">
               <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="w-5 h-5 text-blue-600" />
+                  About
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Mail className="w-5 h-5 text-gray-500" />
-                  <span>{user?.email}</span>
-                </div>
-                {profile?.phone && (
-                  <div className="flex items-center space-x-3">
-                    <Phone className="w-5 h-5 text-gray-500" />
-                    <span>{profile.phone}</span>
-                  </div>
-                )}
-                {profile?.location && (
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="w-5 h-5 text-gray-500" />
-                    <span>{profile.location}</span>
-                  </div>
-                )}
-                {profile?.company_name && (
-                  <div className="flex items-center space-x-3">
-                    <Building2 className="w-5 h-5 text-gray-500" />
-                    <span>{profile.company_name}</span>
-                  </div>
-                )}
+              <CardContent>
+                <Textarea
+                  value={profile.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  placeholder="Tell us about yourself, your expertise, and what you're passionate about..."
+                  className="min-h-[100px] resize-none"
+                  disabled={!isEditing}
+                />
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+
+            {/* Experience Section */}
+            <Card className="bg-white shadow-lg border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-green-600" />
+                    Experience
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Experience
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-gray-900">Senior Developer</h4>
+                        <p className="text-gray-600">Tech Solutions Inc.</p>
+                        <p className="text-sm text-gray-500">Jan 2022 - Present</p>
+                        <p className="text-sm text-gray-700 mt-2">
+                          Leading development of AI-powered applications and managing a team of 5 developers.
+                        </p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Education Section */}
+            <Card className="bg-white shadow-lg border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-5 h-5 text-purple-600" />
+                    Education
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Education
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-gray-900">Bachelor of Computer Science</h4>
+                        <p className="text-gray-600">University of Technology</p>
+                        <p className="text-sm text-gray-500">2018 - 2022</p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            {/* Skills Section */}
+            <Card className="bg-white shadow-lg border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-5 h-5 text-yellow-600" />
+                    Skills
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {['React', 'TypeScript', 'Node.js', 'AI/ML', 'Python', 'Leadership'].map((skill, index) => (
+                    <Badge key={index} variant="secondary" className="px-3 py-1">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Contact Info */}
+            <Card className="bg-white shadow-lg border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-blue-600" />
+                  Contact Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm">{profile.email}</span>
+                </div>
+                {profile.phone && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm">{profile.phone}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm">Location</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <LinkIcon className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm">Website</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Professional Stats */}
+            <Card className="bg-gradient-to-br from-blue-50 to-purple-50 shadow-lg border-0">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-gray-900">
+                  Professional Impact
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Profile Views</span>
+                  <span className="font-bold text-blue-600">1,247</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Connections</span>
+                  <span className="font-bold text-green-600">342</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Post Engagement</span>
+                  <span className="font-bold text-purple-600">89%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">AI Score</span>
+                  <span className="font-bold text-orange-600">92/100</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -102,9 +103,9 @@ const Dashboard = () => {
 
   const quickActions = [
     { label: "Create Post", icon: Plus, action: () => {}, color: "bg-blue-600" },
-    { label: "Find Connections", icon: UserPlus, action: () => {}, color: "bg-green-600" },
+    { label: "Find Connections", icon: UserPlus, action: () => navigate('/network'), color: "bg-green-600" },
     { label: "AI Insights", icon: Brain, action: () => {}, color: "bg-purple-600" },
-    { label: "Analytics", icon: BarChart3, action: () => {}, color: "bg-orange-600" },
+    { label: "Analytics", icon: BarChart3, action: () => navigate('/analytics'), color: "bg-orange-600" },
   ];
 
   const handleAcceptRequest = (connectionId: string) => {
@@ -127,7 +128,7 @@ const Dashboard = () => {
     <DashboardLayout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* AI Welcome Banner */}
+          {/* Welcome Banner */}
           {showWelcome && (
             <Card className="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl overflow-hidden relative">
               <div className="absolute inset-0 opacity-20">
@@ -166,6 +167,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Sidebar - Profile & Stats */}
             <div className="lg:col-span-3 space-y-6">
+              {/* Profile Card */}
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
                 <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600"></div>
                 <CardContent className="p-6 text-center relative">
@@ -208,6 +210,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
+              {/* Performance Analytics */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -236,6 +239,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
+              {/* Quick Actions */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -327,6 +331,7 @@ const Dashboard = () => {
                 />
               )}
 
+              {/* Industry Insights */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -371,6 +376,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
+              {/* AI Goals Tracker */}
               <Card className="bg-gradient-to-br from-purple-50 to-blue-50 shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -412,6 +418,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
+              {/* Learning Hub */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
