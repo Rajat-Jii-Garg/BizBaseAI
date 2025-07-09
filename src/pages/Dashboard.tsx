@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,16 +39,19 @@ import { usePosts } from '@/hooks/usePosts';
 import { useConnections } from '@/hooks/useConnections';
 import { useRealTimeEngagement } from '@/hooks/useRealTimeEngagement';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [showWelcome, setShowWelcome] = useState(true);
-  const [suggestedConnections, setSuggestedConnections] = useState<any[]>([]);
+  const [allPosts, setAllPosts] = useState<any[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
   
   const { 
-    posts, 
-    loading: postsLoading, 
+    posts: userPosts, 
+    loading: userPostsLoading, 
     createPost, 
     refreshPosts 
   } = usePosts();
@@ -61,40 +63,89 @@ const Dashboard = () => {
     respondToRequest 
   } = useConnections();
 
-  // Real-time engagement hook for 0.11 second updates
-  useRealTimeEngagement(refreshPosts);
+  // Real-time engagement hook
+  useRealTimeEngagement(fetchAllPosts);
 
   useEffect(() => {
     if (user) {
-      fetchSuggestedConnections();
+      fetchAllPosts();
     }
   }, [user]);
 
-  const fetchSuggestedConnections = async () => {
+  const fetchAllPosts = async () => {
+    if (!user) return;
+    
     try {
-      const { data: connectedUserIds } = await supabase
-        .from('connections')
-        .select('addressee_id, requester_id')
-        .or(`requester_id.eq.${user?.id},addressee_id.eq.${user?.id}`);
-
-      const excludeIds = [
-        user?.id,
-        ...(connectedUserIds?.map(conn => 
-          conn.requester_id === user?.id ? conn.addressee_id : conn.requester_id
-        ) || [])
-      ];
-
-      const { data: suggestions, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .not('id', 'in', `(${excludeIds.join(',')})`)
-        .not('full_name', 'is', null)
-        .limit(5);
+      setLoadingPosts(true);
+      
+      // Fetch all posts with user profiles and engagement data
+      const { data: posts, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          profiles!posts_user_id_fkey (
+            id,
+            full_name,
+            avatar_url,
+            current_position,
+            company_name
+          ),
+          post_likes!left (
+            user_id
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20);
 
       if (error) throw error;
-      setSuggestedConnections(suggestions || []);
+
+      // Process posts to include user engagement status
+      const processedPosts = posts?.map(post => ({
+        ...post,
+        user_has_liked: post.post_likes?.some((like: any) => like.user_id === user.id) || false
+      })) || [];
+
+      setAllPosts(processedPosts);
     } catch (error) {
-      console.error('Error fetching suggested connections:', error);
+      console.error('Error fetching all posts:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load posts",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingPosts(false);
+    }
+  };
+
+  const handleCreatePost = async (content: string, imageUrl?: string) => {
+    await createPost(content, imageUrl);
+    await fetchAllPosts(); // Refresh all posts after creation
+  };
+
+  const handleSuggestConnection = async (profileId: string) => {
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .insert({
+          requester_id: user?.id,
+          addressee_id: profileId,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Connection Request Sent!",
+        description: "Your connection request has been sent successfully."
+      });
+    } catch (error: any) {
+      console.error('Error sending connection request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send connection request",
+        variant: "destructive"
+      });
     }
   };
 
@@ -120,10 +171,6 @@ const Dashboard = () => {
 
   const handleViewProfile = () => {
     navigate('/profile');
-  };
-
-  const handleSuggestConnection = (profileId: string) => {
-    console.log('Connecting to profile:', profileId);
   };
 
   return (
@@ -169,7 +216,6 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Sidebar - Profile & Stats */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Profile Card */}
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
                 <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600"></div>
                 <CardContent className="p-6 text-center relative">
@@ -192,7 +238,7 @@ const Dashboard = () => {
                       <div className="text-xs text-gray-500">Connections</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-green-600">{posts.length}</div>
+                      <div className="text-lg font-bold text-green-600">{userPosts.length}</div>
                       <div className="text-xs text-gray-500">Posts</div>
                     </div>
                     <div className="text-center">
@@ -212,7 +258,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Performance Analytics */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -241,7 +286,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Quick Actions */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -270,17 +314,17 @@ const Dashboard = () => {
 
             {/* Main Content Feed */}
             <div className="lg:col-span-6 space-y-6">
-              <SmartPostComposer onCreatePost={createPost} />
+              <SmartPostComposer onCreatePost={handleCreatePost} />
 
               <div className="space-y-6">
-                {postsLoading ? (
+                {loadingPosts ? (
                   <Card className="bg-white shadow-lg border-0">
                     <CardContent className="p-12 text-center">
                       <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-600" />
                       <p className="text-gray-600 text-lg">Loading your personalized feed...</p>
                     </CardContent>
                   </Card>
-                ) : posts.length === 0 ? (
+                ) : allPosts.length === 0 ? (
                   <Card className="bg-white shadow-lg border-0">
                     <CardContent className="p-12 text-center">
                       <div className="text-gray-400 mb-6">
@@ -303,11 +347,11 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  posts.map((post) => (
+                  allPosts.map((post) => (
                     <PostCard
                       key={post.id}
                       post={post}
-                      onEngagementUpdate={refreshPosts}
+                      onEngagementUpdate={fetchAllPosts}
                     />
                   ))
                 )}

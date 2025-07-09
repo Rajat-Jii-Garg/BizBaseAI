@@ -13,7 +13,8 @@ import {
   Filter,
   MapPin,
   Briefcase,
-  Star
+  Star,
+  Loader2
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,15 +28,50 @@ const Network = () => {
   const [professionals, setProfessionals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [connectionRequests, setConnectionRequests] = useState<Set<string>>(new Set());
+  const [existingConnections, setExistingConnections] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    fetchProfessionals();
+    if (user) {
+      fetchProfessionals();
+      fetchExistingConnections();
+    }
   }, [user]);
+
+  const fetchExistingConnections = async () => {
+    if (!user) return;
+
+    try {
+      const { data: connections, error } = await supabase
+        .from('connections')
+        .select('addressee_id, requester_id, status')
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+
+      if (error) throw error;
+
+      const connectedIds = new Set<string>();
+      const pendingIds = new Set<string>();
+
+      connections?.forEach(conn => {
+        const otherId = conn.requester_id === user.id ? conn.addressee_id : conn.requester_id;
+        if (conn.status === 'accepted') {
+          connectedIds.add(otherId);
+        } else if (conn.status === 'pending' && conn.requester_id === user.id) {
+          pendingIds.add(conn.addressee_id);
+        }
+      });
+
+      setExistingConnections(connectedIds);
+      setConnectionRequests(pendingIds);
+    } catch (error) {
+      console.error('Error fetching connections:', error);
+    }
+  };
 
   const fetchProfessionals = async () => {
     if (!user) return;
 
     try {
+      setLoading(true);
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
@@ -46,6 +82,11 @@ const Network = () => {
       setProfessionals(profiles || []);
     } catch (error) {
       console.error('Error fetching professionals:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load professionals",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -67,24 +108,39 @@ const Network = () => {
 
       setConnectionRequests(prev => new Set([...prev, profileId]));
       toast({
-        title: "Connection Request Sent",
+        title: "Connection Request Sent!",
         description: "Your connection request has been sent successfully!"
       });
     } catch (error: any) {
       console.error('Error sending connection request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send connection request",
-        variant: "destructive"
-      });
+      if (error.code === '23505') {
+        toast({
+          title: "Already Connected",
+          description: "You've already sent a request to this user",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send connection request",
+          variant: "destructive"
+        });
+      }
     }
   };
 
   const filteredProfessionals = professionals.filter(prof =>
     prof.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     prof.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prof.business_type?.toLowerCase().includes(searchTerm.toLowerCase())
+    prof.current_position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    prof.industry?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getConnectionStatus = (profileId: string) => {
+    if (existingConnections.has(profileId)) return 'connected';
+    if (connectionRequests.has(profileId)) return 'pending';
+    return 'none';
+  };
 
   return (
     <DashboardLayout>
@@ -121,71 +177,90 @@ const Network = () => {
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-600 mt-4">Loading professionals...</p>
+            <Loader2 className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
+            <p className="text-gray-600">Loading professionals...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProfessionals.map((professional) => (
-              <Card key={professional.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={professional.avatar_url} />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
-                        {professional.full_name?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg text-gray-900">
-                        {professional.full_name}
-                      </h3>
-                      {professional.company_name && (
-                        <p className="text-sm text-gray-600 flex items-center gap-1">
-                          <Briefcase className="w-3 h-3" />
-                          {professional.company_name}
-                        </p>
-                      )}
-                      {professional.business_type && (
-                        <Badge variant="outline" className="mt-1 text-xs">
-                          {professional.business_type}
-                        </Badge>
-                      )}
+            {filteredProfessionals.map((professional) => {
+              const status = getConnectionStatus(professional.id);
+              
+              return (
+                <Card key={professional.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4 mb-4">
+                      <Avatar className="h-16 w-16">
+                        <AvatarImage src={professional.avatar_url} />
+                        <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
+                          {professional.full_name?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg text-gray-900">
+                          {professional.full_name}
+                        </h3>
+                        {professional.current_position && (
+                          <p className="text-sm text-gray-600 flex items-center gap-1">
+                            <Briefcase className="w-3 h-3" />
+                            {professional.current_position}
+                          </p>
+                        )}
+                        {professional.company_name && (
+                          <p className="text-sm text-gray-500">
+                            at {professional.company_name}
+                          </p>
+                        )}
+                        {professional.location && (
+                          <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                            <MapPin className="w-3 h-3" />
+                            {professional.location}
+                          </p>
+                        )}
+                        {professional.industry && (
+                          <Badge variant="outline" className="mt-2 text-xs">
+                            {professional.industry}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span>AI Match Score: {Math.floor(Math.random() * 30) + 70}%</span>
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        <span>AI Match Score: {Math.floor(Math.random() * 30) + 70}%</span>
+                      </div>
+                      <p className="text-xs text-purple-600">
+                        🎯 Suggested based on your professional interests
+                      </p>
                     </div>
-                    <p className="text-xs text-purple-600">
-                      🎯 Suggested based on your professional interests
-                    </p>
-                  </div>
 
-                  <div className="flex gap-2">
-                    {connectionRequests.has(professional.id) ? (
-                      <Button size="sm" variant="outline" disabled className="flex-1">
-                        Request Sent
+                    <div className="flex gap-2">
+                      {status === 'connected' ? (
+                        <Button size="sm" variant="outline" disabled className="flex-1">
+                          Connected
+                        </Button>
+                      ) : status === 'pending' ? (
+                        <Button size="sm" variant="outline" disabled className="flex-1">
+                          Request Sent
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          onClick={() => sendConnectionRequest(professional.id)}
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Connect
+                        </Button>
+                      )}
+                      <Button size="sm" variant="outline">
+                        <MessageSquare className="w-4 h-4" />
                       </Button>
-                    ) : (
-                      <Button 
-                        size="sm" 
-                        className="flex-1 bg-blue-600 hover:bg-blue-700"
-                        onClick={() => sendConnectionRequest(professional.id)}
-                      >
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        Connect
-                      </Button>
-                    )}
-                    <Button size="sm" variant="outline">
-                      <MessageSquare className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
 
@@ -194,7 +269,7 @@ const Network = () => {
             <CardContent className="p-12 text-center">
               <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No Professionals Found</h3>
-              <p className="text-gray-600">Try adjusting your search terms or filters.</p>
+              <p className="text-gray-600">Try adjusting your search terms or check back later for new members.</p>
             </CardContent>
           </Card>
         )}
