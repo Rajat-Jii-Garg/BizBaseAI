@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,6 +79,15 @@ const ProfilePage = () => {
       if (error) throw error;
 
       if (data) {
+        // Helper function to safely convert Json to string array
+        const safeJsonToStringArray = (jsonData: any): string[] => {
+          if (!jsonData) return [];
+          if (Array.isArray(jsonData)) {
+            return jsonData.filter(item => typeof item === 'string');
+          }
+          return [];
+        };
+
         setProfile({
           full_name: data.full_name || '',
           email: data.email || '',
@@ -97,8 +105,8 @@ const ProfilePage = () => {
           industry: data.industry || '',
           education: data.education || '',
           experience_years: data.experience_years || 0,
-          skills: data.skills || [],
-          achievements: data.achievements || []
+          skills: safeJsonToStringArray(data.skills),
+          achievements: safeJsonToStringArray(data.achievements)
         });
         
         calculateProfileScore(data);
