@@ -38,6 +38,7 @@ import ConnectionsList from '@/components/ConnectionsList';
 import AINetworkingAssistant from '@/components/AINetworkingAssistant';
 import { usePosts } from '@/hooks/usePosts';
 import { useConnections } from '@/hooks/useConnections';
+import { useRealTimeEngagement } from '@/hooks/useRealTimeEngagement';
 import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
@@ -59,6 +60,9 @@ const Dashboard = () => {
     loading: connectionsLoading,
     respondToRequest 
   } = useConnections();
+
+  // Real-time engagement hook for 0.11 second updates
+  useRealTimeEngagement(refreshPosts);
 
   useEffect(() => {
     if (user) {
@@ -95,7 +99,6 @@ const Dashboard = () => {
   };
 
   const profileStats = [
-    { label: "Profile Views", value: "1,247", change: "+15.3%", icon: Eye, color: "text-blue-600" },
     { label: "Post Reach", value: "8,934", change: "+22.1%", icon: BarChart3, color: "text-green-600" },
     { label: "Engagement", value: "456", change: "+8.7%", icon: TrendingUp, color: "text-purple-600" },
     { label: "Network Growth", value: "89", change: "+12.4%", icon: Users, color: "text-orange-600" },
@@ -105,7 +108,6 @@ const Dashboard = () => {
     { label: "Create Post", icon: Plus, action: () => {}, color: "bg-blue-600" },
     { label: "Find Connections", icon: UserPlus, action: () => navigate('/network'), color: "bg-green-600" },
     { label: "AI Insights", icon: Brain, action: () => {}, color: "bg-purple-600" },
-    { label: "Analytics", icon: BarChart3, action: () => navigate('/analytics'), color: "bg-orange-600" },
   ];
 
   const handleAcceptRequest = (connectionId: string) => {
@@ -205,7 +207,7 @@ const Dashboard = () => {
                     onClick={handleViewProfile}
                   >
                     <User className="w-4 h-4 mr-2" />
-                    View Profile
+                    Customize Profile
                   </Button>
                 </CardContent>
               </Card>
@@ -247,19 +249,19 @@ const Dashboard = () => {
                     Quick Actions
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-3">
+                <CardContent className="grid grid-cols-1 gap-3">
                   {quickActions.map((action, index) => (
                     <Button
                       key={index}
                       variant="outline"
                       size="sm"
-                      className="flex flex-col items-center p-4 h-auto space-y-2 hover:shadow-md transition-all"
+                      className="flex items-center justify-start p-4 h-auto space-x-3 hover:shadow-md transition-all"
                       onClick={action.action}
                     >
                       <div className={`p-2 rounded-lg ${action.color} text-white`}>
                         <action.icon className="w-4 h-4" />
                       </div>
-                      <span className="text-xs font-medium">{action.label}</span>
+                      <span className="text-sm font-medium">{action.label}</span>
                     </Button>
                   ))}
                 </CardContent>
@@ -371,76 +373,6 @@ const Dashboard = () => {
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         <span className="text-xs text-blue-600 font-medium">Growing</span>
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* AI Goals Tracker */}
-              <Card className="bg-gradient-to-br from-purple-50 to-blue-50 shadow-lg border-0">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Target className="w-5 h-5 text-purple-600" />
-                    AI Goals Tracker
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-700">Network Growth</span>
-                        <span className="text-sm font-bold text-purple-600">83%</span>
-                      </div>
-                      <Progress value={83} className="h-2 bg-purple-100" />
-                      <p className="text-xs text-gray-500 mt-1">12 new connections this month</p>
-                    </div>
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-700">Content Engagement</span>
-                        <span className="text-sm font-bold text-blue-600">91%</span>
-                      </div>
-                      <Progress value={91} className="h-2 bg-blue-100" />
-                      <p className="text-xs text-gray-500 mt-1">Excellent post performance</p>
-                    </div>
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-700">Profile Optimization</span>
-                        <span className="text-sm font-bold text-green-600">76%</span>
-                      </div>
-                      <Progress value={76} className="h-2 bg-green-100" />
-                      <p className="text-xs text-gray-500 mt-1">Add more skills to improve</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full bg-white/80 hover:bg-white">
-                    <Lightbulb className="w-4 h-4 mr-2 text-yellow-500" />
-                    Get AI Recommendations
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Learning Hub */}
-              <Card className="bg-white shadow-lg border-0">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-indigo-600" />
-                    Learning Hub
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="p-3 border border-gray-100 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                    <h5 className="text-sm font-semibold text-gray-900 mb-1">AI in Professional Networking</h5>
-                    <p className="text-xs text-gray-600 mb-2">5 min read • Trending</p>
-                    <div className="flex items-center gap-2">
-                      <Trophy className="w-3 h-3 text-yellow-500" />
-                      <span className="text-xs text-yellow-600">Earn Certificate</span>
-                    </div>
-                  </div>
-                  <div className="p-3 border border-gray-100 rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-                    <h5 className="text-sm font-semibold text-gray-900 mb-1">Building Your Digital Brand</h5>
-                    <p className="text-xs text-gray-600 mb-2">8 min read • Popular</p>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-3 h-3 text-blue-500" />
-                      <span className="text-xs text-blue-600">Join Discussion</span>
                     </div>
                   </div>
                 </CardContent>

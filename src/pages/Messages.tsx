@@ -17,76 +17,229 @@ import {
   Clock,
   CheckCheck,
   Paperclip,
-  Smile
+  Smile,
+  Online
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/DashboardLayout';
+
+interface Message {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  created_at: string;
+  read: boolean;
+  sender_name?: string;
+  sender_avatar?: string;
+}
+
+interface Conversation {
+  id: string;
+  name: string;
+  avatar: string;
+  lastMessage: string;
+  timestamp: string;
+  unread: number;
+  online: boolean;
+  userId: string;
+}
 
 const Messages = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [messageText, setMessageText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const mockConversations = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      avatar: '/placeholder.svg',
-      lastMessage: 'Thanks for the connection! Looking forward to collaborating.',
-      timestamp: '2 mins ago',
-      unread: 2,
-      online: true,
-      messages: [
-        { id: '1', sender: 'Sarah Johnson', text: 'Hi! Thanks for connecting with me.', timestamp: '10:30 AM', isOwn: false },
-        { id: '2', sender: 'You', text: 'Great to connect! I saw your work on AI projects.', timestamp: '10:32 AM', isOwn: true },
-        { id: '3', sender: 'Sarah Johnson', text: 'Thanks for the connection! Looking forward to collaborating.', timestamp: '10:35 AM', isOwn: false }
-      ]
-    },
-    {
-      id: '2',
-      name: 'Marketing Team',
-      avatar: '/placeholder.svg',
-      lastMessage: 'Meeting scheduled for tomorrow at 3 PM',
-      timestamp: '1 hour ago',
-      unread: 0,
-      online: false,
-      isGroup: true,
-      messages: [
-        { id: '1', sender: 'Alex', text: 'Can we schedule the marketing review?', timestamp: '9:15 AM', isOwn: false },
-        { id: '2', sender: 'You', text: 'Sure! What time works for everyone?', timestamp: '9:16 AM', isOwn: true },
-        { id: '3', sender: 'Marketing Team', text: 'Meeting scheduled for tomorrow at 3 PM', timestamp: '9:20 AM', isOwn: false }
-      ]
-    },
-    {
-      id: '3',
-      name: 'David Chen',
-      avatar: '/placeholder.svg',
-      lastMessage: 'The proposal looks good to me',
-      timestamp: '3 hours ago',
-      unread: 0,
-      online: true,
-      messages: [
-        { id: '1', sender: 'David Chen', text: 'Hi, I reviewed your proposal.', timestamp: '7:30 AM', isOwn: false },
-        { id: '2', sender: 'You', text: 'Thanks! What are your thoughts?', timestamp: '7:32 AM', isOwn: true },
-        { id: '3', sender: 'David Chen', text: 'The proposal looks good to me', timestamp: '7:35 AM', isOwn: false }
-      ]
+  useEffect(() => {
+    if (user) {
+      fetchConversations();
+      setupRealTimeMessages();
     }
-  ];
+  }, [user]);
 
-  const handleSendMessage = () => {
-    if (messageText.trim() && selectedChat) {
-      // Add message sending logic here
-      setMessageText('');
+  useEffect(() => {
+    if (selectedChat) {
+      fetchMessages(selectedChat);
+    }
+  }, [selectedChat]);
+
+  const setupRealTimeMessages = () => {
+    const channel = supabase
+      .channel('messages-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages'
+        },
+        (payload) => {
+          const newMessage = payload.new as Message;
+          if (newMessage.receiver_id === user?.id || newMessage.sender_id === user?.id) {
+            setMessages(prev => [...prev, newMessage]);
+            fetchConversations(); // Refresh conversations to update last message
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
+  const fetchConversations = async () => {
+    try {
+      // Get all connections of the current user
+      const { data: connections, error: connectionsError } = await supabase
+        .from('connections')
+        .select(`
+          requester_id,
+          addressee_id,
+          profiles!connections_requester_id_fkey(id, full_name, avatar_url),
+          addressee_profile:profiles!connections_addressee_id_fkey(id, full_name, avatar_url)
+        `)
+        .or(`requester_id.eq.${user?.id},addressee_id.eq.${user?.id}`)
+        .eq('status', 'accepted');
+
+      if (connectionsError) throw connectionsError;
+
+      // Create conversations from connections
+      const conversationsList: Conversation[] = [];
+      
+      for (const connection of connections || []) {
+        const otherUser = connection.requester_id === user?.id 
+          ? connection.addressee_profile 
+          : connection.profiles;
+        
+        if (otherUser) {
+          // Get last message with this user
+          const { data: lastMessages } = await supabase
+            .from('messages')
+            .select('*')
+            .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${otherUser.id}),and(sender_id.eq.${otherUser.id},receiver_id.eq.${user?.id})`)
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+          // Count unread messages
+          const { count: unreadCount } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('sender_id', otherUser.id)
+            .eq('receiver_id', user?.id)
+            .eq('read', false);
+
+          const lastMessage = lastMessages?.[0];
+          
+          conversationsList.push({
+            id: otherUser.id,
+            name: otherUser.full_name || 'Unknown User',
+            avatar: otherUser.avatar_url || '',
+            lastMessage: lastMessage?.content || 'Start a conversation',
+            timestamp: lastMessage ? new Date(lastMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+            unread: unreadCount || 0,
+            online: Math.random() > 0.5, // Simulate online status
+            userId: otherUser.id
+          });
+        }
+      }
+
+      setConversations(conversationsList);
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load conversations",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const selectedConversation = mockConversations.find(conv => conv.id === selectedChat);
+  const fetchMessages = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          sender:profiles!messages_sender_id_fkey(full_name, avatar_url)
+        `)
+        .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user?.id})`)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      const formattedMessages = data?.map(msg => ({
+        ...msg,
+        sender_name: msg.sender?.full_name,
+        sender_avatar: msg.sender?.avatar_url
+      })) || [];
+
+      setMessages(formattedMessages);
+
+      // Mark messages as read
+      await supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('sender_id', userId)
+        .eq('receiver_id', user?.id)
+        .eq('read', false);
+
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageText.trim() || !selectedChat || !user) return;
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: user.id,
+          receiver_id: selectedChat,
+          content: messageText.trim(),
+          read: false
+        });
+
+      if (error) throw error;
+
+      setMessageText('');
+      
+      toast({
+        title: "Message Sent",
+        description: "Your message has been delivered successfully"
+      });
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const selectedConversation = conversations.find(conv => conv.id === selectedChat);
+
+  const filteredConversations = conversations.filter(conv =>
+    conv.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[600px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[700px]">
           {/* Conversations List */}
           <div className="lg:col-span-4">
             <Card className="h-full bg-white shadow-lg border-0">
@@ -111,56 +264,65 @@ const Messages = () => {
                   />
                 </div>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-1">
-                  {mockConversations.map((conversation) => (
-                    <div
-                      key={conversation.id}
-                      onClick={() => setSelectedChat(conversation.id)}
-                      className={`p-4 cursor-pointer hover:bg-gray-50 border-b border-gray-100 transition-colors ${
-                        selectedChat === conversation.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="relative">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={conversation.avatar} />
-                            <AvatarFallback>
-                              {conversation.isGroup ? (
-                                <Users className="w-6 h-6" />
-                              ) : (
-                                conversation.name.charAt(0)
-                              )}
-                            </AvatarFallback>
-                          </Avatar>
-                          {conversation.online && !conversation.isGroup && (
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-semibold text-gray-900 truncate">
-                              {conversation.name}
-                            </h4>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xs text-gray-500">
-                                {conversation.timestamp}
-                              </span>
-                              {conversation.unread > 0 && (
-                                <Badge className="bg-blue-600 text-white rounded-full px-2 py-1 text-xs">
-                                  {conversation.unread}
-                                </Badge>
-                              )}
-                            </div>
+              <CardContent className="p-0 overflow-y-auto">
+                {loading ? (
+                  <div className="p-6 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-gray-500 mt-2">Loading conversations...</p>
+                  </div>
+                ) : filteredConversations.length === 0 ? (
+                  <div className="p-6 text-center">
+                    <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-500">No conversations yet</p>
+                    <p className="text-gray-400 text-sm">Connect with professionals to start messaging</p>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    {filteredConversations.map((conversation) => (
+                      <div
+                        key={conversation.id}
+                        onClick={() => setSelectedChat(conversation.id)}
+                        className={`p-4 cursor-pointer hover:bg-gray-50 border-b border-gray-100 transition-colors ${
+                          selectedChat === conversation.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="relative">
+                            <Avatar className="h-12 w-12">
+                              <AvatarImage src={conversation.avatar} />
+                              <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                                {conversation.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            {conversation.online && (
+                              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                            )}
                           </div>
-                          <p className="text-sm text-gray-600 truncate mt-1">
-                            {conversation.lastMessage}
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-semibold text-gray-900 truncate">
+                                {conversation.name}
+                              </h4>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-xs text-gray-500">
+                                  {conversation.timestamp}
+                                </span>
+                                {conversation.unread > 0 && (
+                                  <Badge className="bg-blue-600 text-white rounded-full px-2 py-1 text-xs">
+                                    {conversation.unread}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-600 truncate mt-1">
+                              {conversation.lastMessage}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -177,15 +339,11 @@ const Messages = () => {
                         <div className="relative">
                           <Avatar className="h-10 w-10">
                             <AvatarImage src={selectedConversation.avatar} />
-                            <AvatarFallback>
-                              {selectedConversation.isGroup ? (
-                                <Users className="w-5 h-5" />
-                              ) : (
-                                selectedConversation.name.charAt(0)
-                              )}
+                            <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                              {selectedConversation.name.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
-                          {selectedConversation.online && !selectedConversation.isGroup && (
+                          {selectedConversation.online && (
                             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                           )}
                         </div>
@@ -193,8 +351,15 @@ const Messages = () => {
                           <h3 className="font-semibold text-gray-900">
                             {selectedConversation.name}
                           </h3>
-                          <p className="text-xs text-gray-500">
-                            {selectedConversation.online ? 'Online' : 'Last seen 2 hours ago'}
+                          <p className="text-xs text-gray-500 flex items-center gap-1">
+                            {selectedConversation.online ? (
+                              <>
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                Online
+                              </>
+                            ) : (
+                              'Last seen 2 hours ago'
+                            )}
                           </p>
                         </div>
                       </div>
@@ -215,29 +380,29 @@ const Messages = () => {
                   {/* Messages */}
                   <CardContent className="flex-1 p-4 overflow-y-auto">
                     <div className="space-y-4">
-                      {selectedConversation.messages.map((message) => (
+                      {messages.map((message) => (
                         <div
                           key={message.id}
-                          className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'}`}
+                          className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
                         >
                           <div
                             className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                              message.isOwn
+                              message.sender_id === user?.id
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-gray-100 text-gray-900'
                             }`}
                           >
-                            {!message.isOwn && (
-                              <p className="text-xs font-medium mb-1">{message.sender}</p>
-                            )}
-                            <p className="text-sm">{message.text}</p>
+                            <p className="text-sm">{message.content}</p>
                             <div className="flex items-center justify-between mt-1">
                               <span className={`text-xs ${
-                                message.isOwn ? 'text-blue-100' : 'text-gray-500'
+                                message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-500'
                               }`}>
-                                {message.timestamp}
+                                {new Date(message.created_at).toLocaleTimeString([], { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit' 
+                                })}
                               </span>
-                              {message.isOwn && (
+                              {message.sender_id === user?.id && (
                                 <CheckCheck className="w-3 h-3 text-blue-100 ml-2" />
                               )}
                             </div>
