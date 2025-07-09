@@ -17,8 +17,7 @@ import {
   Clock,
   CheckCheck,
   Paperclip,
-  Smile,
-  Online
+  Smile
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -100,55 +99,62 @@ const Messages = () => {
       // Get all connections of the current user
       const { data: connections, error: connectionsError } = await supabase
         .from('connections')
-        .select(`
-          requester_id,
-          addressee_id,
-          profiles!connections_requester_id_fkey(id, full_name, avatar_url),
-          addressee_profile:profiles!connections_addressee_id_fkey(id, full_name, avatar_url)
-        `)
+        .select('*')
         .or(`requester_id.eq.${user?.id},addressee_id.eq.${user?.id}`)
         .eq('status', 'accepted');
 
       if (connectionsError) throw connectionsError;
 
-      // Create conversations from connections
+      // Get profiles for all connected users
+      const connectedUserIds = connections?.map(conn => 
+        conn.requester_id === user?.id ? conn.addressee_id : conn.requester_id
+      ) || [];
+
+      if (connectedUserIds.length === 0) {
+        setConversations([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', connectedUserIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create conversations from profiles
       const conversationsList: Conversation[] = [];
       
-      for (const connection of connections || []) {
-        const otherUser = connection.requester_id === user?.id 
-          ? connection.addressee_profile 
-          : connection.profiles;
+      for (const profile of profiles || []) {
+        // Get last message with this user
+        const { data: lastMessages } = await supabase
+          .from('messages')
+          .select('*')
+          .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${profile.id}),and(sender_id.eq.${profile.id},receiver_id.eq.${user?.id})`)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        // Count unread messages
+        const { count: unreadCount } = await supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('sender_id', profile.id)
+          .eq('receiver_id', user?.id)
+          .eq('read', false);
+
+        const lastMessage = lastMessages?.[0];
         
-        if (otherUser) {
-          // Get last message with this user
-          const { data: lastMessages } = await supabase
-            .from('messages')
-            .select('*')
-            .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${otherUser.id}),and(sender_id.eq.${otherUser.id},receiver_id.eq.${user?.id})`)
-            .order('created_at', { ascending: false })
-            .limit(1);
-
-          // Count unread messages
-          const { count: unreadCount } = await supabase
-            .from('messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('sender_id', otherUser.id)
-            .eq('receiver_id', user?.id)
-            .eq('read', false);
-
-          const lastMessage = lastMessages?.[0];
-          
-          conversationsList.push({
-            id: otherUser.id,
-            name: otherUser.full_name || 'Unknown User',
-            avatar: otherUser.avatar_url || '',
-            lastMessage: lastMessage?.content || 'Start a conversation',
-            timestamp: lastMessage ? new Date(lastMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
-            unread: unreadCount || 0,
-            online: Math.random() > 0.5, // Simulate online status
-            userId: otherUser.id
-          });
-        }
+        conversationsList.push({
+          id: profile.id,
+          name: profile.full_name || 'Unknown User',
+          avatar: profile.avatar_url || '',
+          lastMessage: lastMessage?.content || 'Start a conversation',
+          timestamp: lastMessage ? new Date(lastMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+          unread: unreadCount || 0,
+          online: Math.random() > 0.5, // Simulate online status
+          userId: profile.id
+        });
       }
 
       setConversations(conversationsList);
@@ -168,19 +174,23 @@ const Messages = () => {
     try {
       const { data, error } = await supabase
         .from('messages')
-        .select(`
-          *,
-          sender:profiles!messages_sender_id_fkey(full_name, avatar_url)
-        `)
+        .select('*')
         .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user?.id})`)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
+      // Get sender profiles for display names
+      const senderIds = [...new Set(data?.map(msg => msg.sender_id) || [])];
+      const { data: senderProfiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', senderIds);
+
       const formattedMessages = data?.map(msg => ({
         ...msg,
-        sender_name: msg.sender?.full_name,
-        sender_avatar: msg.sender?.avatar_url
+        sender_name: senderProfiles?.find(p => p.id === msg.sender_id)?.full_name,
+        sender_avatar: senderProfiles?.find(p => p.id === msg.sender_id)?.avatar_url
       })) || [];
 
       setMessages(formattedMessages);
