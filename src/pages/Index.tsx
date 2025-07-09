@@ -1,34 +1,46 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
-import ValueProposition from '@/components/ValueProposition';
 import Benefits from '@/components/Benefits';
-import WhoIsItFor from '@/components/WhoIsItFor';
 import HowItWorks from '@/components/HowItWorks';
-import WhyChooseUs from '@/components/WhyChooseUs';
-import ScreenshotsCarousel from '@/components/ScreenshotsCarousel';
 import Testimonials from '@/components/Testimonials';
 import PricingSection from '@/components/PricingSection';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <Navbar />
       <Hero />
-      <Benefits />
-      <ValueProposition />
       <Features />
-      <WhoIsItFor />
+      <Benefits />
       <HowItWorks />
-      <WhyChooseUs />
-      <ScreenshotsCarousel />
       <Testimonials />
       <PricingSection />
       <CallToAction />
+      
+      {/* Quick Auth Links Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            Ready to Get Started?
+          </h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Link to="/signup">Create Account</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/login">Sign In</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+      
       <Footer />
     </div>
   );

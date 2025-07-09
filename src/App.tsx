@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/sonner';
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import Login from '@/pages/Login';
+import Signup from '@/pages/Signup';
 import Dashboard from '@/pages/Dashboard';
 import ProfilePage from '@/pages/ProfilePage';
 import ProfileDashboard from '@/pages/ProfileDashboard';
@@ -23,6 +24,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
