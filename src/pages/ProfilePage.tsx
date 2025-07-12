@@ -136,7 +136,7 @@ const ProfilePage = () => {
     }
   };
 
-  const handleSaveProfile = async () => {
+  const handleUpdateProfile = async () => {
     await fetchProfile(user?.id || '');
     setIsEditing(false);
     toast({
@@ -151,8 +151,7 @@ const ProfilePage = () => {
         <div className="max-w-4xl mx-auto p-6">
           <ProfileEditor
             profile={profile}
-            onSave={handleSaveProfile}
-            onCancel={() => setIsEditing(false)}
+            onUpdate={handleUpdateProfile}
           />
         </div>
       </DashboardLayout>

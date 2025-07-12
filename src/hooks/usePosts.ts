@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -57,41 +56,23 @@ export const usePosts = () => {
       const userIds = Array.from(new Set(postsData.map(post => post.user_id)));
       console.log('Fetching profiles for user IDs:', userIds);
 
-      // Use a function to get profiles that bypasses RLS for viewing
+      // Fetch profiles directly
       const { data: profilesData, error: profilesError } = await supabase
-        .rpc('get_public_profiles', { user_ids: userIds })
-        .single();
+        .from('profiles')
+        .select('id, full_name, avatar_url, current_position, company_name')
+        .in('id', userIds);
 
-      // If the function doesn't exist, fall back to direct query
-      let profiles = [];
       if (profilesError) {
-        console.log('Using fallback profile fetch method');
-        // For now, we'll just use the current user's profile and basic info
-        for (const userId of userIds) {
-          try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('id, full_name, avatar_url, current_position, company_name')
-              .eq('id', userId)
-              .single();
-            
-            if (profile) {
-              profiles.push(profile);
-            }
-          } catch (e) {
-            // Skip if can't fetch individual profile
-            console.log(`Could not fetch profile for user ${userId}`);
-          }
-        }
-      } else {
-        profiles = profilesData || [];
+        console.error('Error fetching profiles:', profilesError);
       }
 
       // Create profiles map
       const profilesMap = new Map();
-      profiles.forEach((profile: any) => {
-        profilesMap.set(profile.id, profile);
-      });
+      if (profilesData) {
+        profilesData.forEach((profile: any) => {
+          profilesMap.set(profile.id, profile);
+        });
+      }
 
       // Check likes for current user
       let likedPostIds = new Set<string>();
