@@ -38,6 +38,30 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Initialize storage bucket
+  useEffect(() => {
+    const initializeStorage = async () => {
+      try {
+        // Check if bucket exists, if not create it
+        const { data: buckets } = await supabase.storage.listBuckets();
+        const bucketExists = buckets?.some(bucket => bucket.name === 'posts');
+        
+        if (!bucketExists) {
+          await supabase.storage.createBucket('posts', {
+            public: true,
+            allowedMimeTypes: ['image/*'],
+            fileSizeLimit: 10485760 // 10MB
+          });
+          console.log('Posts bucket created');
+        }
+      } catch (error) {
+        console.error('Error initializing storage:', error);
+      }
+    };
+
+    initializeStorage();
+  }, []);
+
   // Search users for mentions
   const searchUsers = async (query: string) => {
     if (!query) return;
@@ -163,58 +187,53 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
       const filePath = `posts/${fileName}`;
 
+      console.log('Uploading image to:', filePath);
+
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from('posts')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
+        .from('posts')
         .getPublicUrl(filePath);
 
+      console.log('Image uploaded successfully, public URL:', publicUrl);
       return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
       toast({
         title: "Upload Error",
-        description: "Failed to upload image",
+        description: "Failed to upload image. Please try again.",
         variant: "destructive"
       });
       return null;
     }
   };
 
-  // Process hashtags and mentions after post creation
-  const processPostContent = async (postId: string, content: string) => {
-    try {
-      // Process hashtags
-      await supabase.rpc('process_post_hashtags', {
-        post_id: postId,
-        content: content
-      });
-
-      // Process mentions
-      await supabase.rpc('process_post_mentions', {
-        post_id: postId,
-        content: content
-      });
-    } catch (error) {
-      console.error('Error processing post content:', error);
-    }
-  };
-
   // Handle submit
   const handleSubmit = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() && !imageFile) {
+      toast({
+        title: "Error",
+        description: "Please add some content or an image to your post.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setLoading(true);
     try {
       let imageUrl = null;
       if (imageFile) {
+        console.log('Uploading image...');
         imageUrl = await uploadImage(imageFile);
         if (!imageUrl) {
           setLoading(false);
@@ -222,26 +241,10 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
         }
       }
 
-      // Create post
-      const { data: postData, error } = await supabase
-        .from('posts')
-        .insert([
-          {
-            user_id: user?.id,
-            content,
-            image_url: imageUrl
-          }
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Process hashtags and mentions
-      await processPostContent(postData.id, content);
-
-      // Call parent callback
-      await onCreatePost(content, imageUrl || undefined);
+      console.log('Creating post with content:', content, 'imageUrl:', imageUrl);
+      
+      // Call parent callback to create post
+      await onCreatePost(content.trim(), imageUrl || undefined);
       
       // Reset form
       setContent('');
@@ -250,16 +253,11 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-
-      toast({
-        title: "Success",
-        description: "Post created successfully!"
-      });
     } catch (error: any) {
-      console.error('Error creating post:', error);
+      console.error('Error in handleSubmit:', error);
       toast({
         title: "Error",
-        description: "Failed to create post",
+        description: "Failed to create post. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -405,7 +403,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
           
           <Button 
             onClick={handleSubmit}
-            disabled={!content.trim() || loading}
+            disabled={(!content.trim() && !imageFile) || loading}
             size="sm"
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50 h-10 px-6 font-medium"
           >

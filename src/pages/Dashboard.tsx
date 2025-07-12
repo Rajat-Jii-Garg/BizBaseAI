@@ -68,38 +68,81 @@ const Dashboard = () => {
     if (!user) return;
     
     try {
+      console.log('Dashboard: Fetching all posts...');
       setLoadingPosts(true);
       
-      // Fetch all posts with user profiles, engagement data, hashtags, and mentions
-      const { data: posts, error } = await supabase
+      // First get all posts
+      const { data: postsData, error: postsError } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profiles!posts_user_id_fkey (
-            id,
-            full_name,
-            avatar_url,
-            current_position,
-            company_name
-          ),
-          post_likes!left (
-            user_id
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (postsError) {
+        console.error('Dashboard: Error fetching posts:', postsError);
+        throw postsError;
+      }
 
-      // Process posts to include user engagement status
-      const processedPosts = posts?.map(post => ({
+      console.log('Dashboard: Posts fetched:', postsData?.length || 0);
+
+      if (!postsData || postsData.length === 0) {
+        setAllPosts([]);
+        setLoadingPosts(false);
+        return;
+      }
+
+      // Get unique user IDs
+      const userIds = Array.from(new Set(postsData.map(post => post.user_id)));
+      console.log('Dashboard: Fetching profiles for user IDs:', userIds);
+
+      // Fetch profiles separately
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, current_position, company_name')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Dashboard: Error fetching profiles:', profilesError);
+      }
+
+      // Create profiles map
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
+      // Check likes for current user
+      let likedPostIds = new Set<string>();
+      if (user) {
+        const postIds = postsData.map(post => post.id);
+        const { data: likes } = await supabase
+          .from('post_likes')
+          .select('post_id')
+          .eq('user_id', user.id)
+          .in('post_id', postIds);
+
+        likedPostIds = new Set(likes?.map(like => like.post_id) || []);
+      }
+
+      // Combine data
+      const enrichedPosts = postsData.map(post => ({
         ...post,
-        user_has_liked: post.post_likes?.some((like: any) => like.user_id === user.id) || false
-      })) || [];
+        likes_count: post.likes_count || 0,
+        comments_count: post.comments_count || 0,
+        shares_count: post.shares_count || 0,
+        profiles: profilesMap.get(post.user_id) || { 
+          full_name: 'Unknown User',
+          avatar_url: null,
+          current_position: null,
+          company_name: null
+        },
+        user_has_liked: likedPostIds.has(post.id)
+      }));
 
-      setAllPosts(processedPosts);
+      console.log('Dashboard: Final enriched posts:', enrichedPosts);
+      setAllPosts(enrichedPosts);
     } catch (error) {
-      console.error('Error fetching all posts:', error);
+      console.error('Dashboard: Error fetching all posts:', error);
       toast({
         title: "Error",
         description: "Failed to load posts",
@@ -120,8 +163,13 @@ const Dashboard = () => {
   }, [user]);
 
   const handleCreatePost = async (content: string, imageUrl?: string) => {
-    await createPost(content, imageUrl);
-    await fetchAllPosts(); // Refresh all posts after creation
+    console.log('Dashboard: Creating post with content:', content, 'imageUrl:', imageUrl);
+    try {
+      await createPost(content, imageUrl);
+      await fetchAllPosts(); // Refresh all posts after creation
+    } catch (error) {
+      console.error('Dashboard: Error creating post:', error);
+    }
   };
 
   const handleSuggestConnection = async (profileId: string) => {

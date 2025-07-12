@@ -31,38 +31,51 @@ export const usePosts = () => {
 
   const fetchPosts = async () => {
     try {
-      // First get posts without profile joins
-      const { data: postsData, error } = await supabase
+      console.log('Fetching posts...');
+      setLoading(true);
+
+      // First get all posts
+      const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (postsError) {
+        console.error('Error fetching posts:', postsError);
+        throw postsError;
+      }
 
-      if (!postsData) {
+      console.log('Posts fetched:', postsData?.length || 0);
+
+      if (!postsData || postsData.length === 0) {
         setPosts([]);
         setLoading(false);
         return;
       }
 
-      // Get unique user IDs to fetch profiles
+      // Get unique user IDs
       const userIds = Array.from(new Set(postsData.map(post => post.user_id)));
+      console.log('Fetching profiles for user IDs:', userIds);
 
-      // Fetch profiles for these users
-      const { data: profilesData } = await supabase
+      // Fetch profiles separately
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url')
+        .select('id, full_name, avatar_url, current_position, company_name')
         .in('id', userIds);
 
-      // Create a map of profiles
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+      }
+
+      // Create profiles map
       const profilesMap = new Map();
       profilesData?.forEach(profile => {
         profilesMap.set(profile.id, profile);
       });
 
-      // Check which posts current user has liked
+      // Check likes for current user
       let likedPostIds = new Set<string>();
-      if (user && postsData.length > 0) {
+      if (user) {
         const postIds = postsData.map(post => post.id);
         const { data: likes } = await supabase
           .from('post_likes')
@@ -73,19 +86,25 @@ export const usePosts = () => {
         likedPostIds = new Set(likes?.map(like => like.post_id) || []);
       }
 
-      // Combine posts with profile data and like status
-      const postsWithProfiles = postsData.map(post => ({
+      // Combine data
+      const enrichedPosts = postsData.map(post => ({
         ...post,
         likes_count: post.likes_count || 0,
         comments_count: post.comments_count || 0,
         shares_count: post.shares_count || 0,
-        profiles: profilesMap.get(post.user_id) || { full_name: 'Unknown User' },
+        profiles: profilesMap.get(post.user_id) || { 
+          full_name: 'Unknown User',
+          avatar_url: null,
+          current_position: null,
+          company_name: null
+        },
         user_has_liked: likedPostIds.has(post.id)
       }));
 
-      setPosts(postsWithProfiles);
+      console.log('Final enriched posts:', enrichedPosts);
+      setPosts(enrichedPosts);
     } catch (error: any) {
-      console.error('Error fetching posts:', error);
+      console.error('Error in fetchPosts:', error);
       toast({
         title: "Error",
         description: "Failed to load posts",
@@ -97,32 +116,49 @@ export const usePosts = () => {
   };
 
   const createPost = async (content: string, imageUrl?: string) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create posts",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
-      const { error } = await supabase
+      console.log('Creating post with content:', content, 'imageUrl:', imageUrl);
+
+      const { data, error } = await supabase
         .from('posts')
         .insert([
           {
             user_id: user.id,
             content,
-            image_url: imageUrl
+            image_url: imageUrl || null
           }
-        ]);
+        ])
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating post in database:', error);
+        throw error;
+      }
+
+      console.log('Post created successfully:', data);
 
       toast({
         title: "Success",
         description: "Post created successfully!"
       });
 
-      fetchPosts(); // Refresh posts
+      // Refresh posts
+      await fetchPosts();
     } catch (error: any) {
       console.error('Error creating post:', error);
       toast({
         title: "Error",
-        description: "Failed to create post",
+        description: "Failed to create post: " + error.message,
         variant: "destructive"
       });
     }
@@ -158,7 +194,7 @@ export const usePosts = () => {
         if (error) throw error;
       }
 
-      fetchPosts(); // Refresh posts
+      await fetchPosts();
     } catch (error: any) {
       console.error('Error toggling like:', error);
       toast({
@@ -189,7 +225,7 @@ export const usePosts = () => {
         description: "Post shared successfully!"
       });
 
-      fetchPosts(); // Refresh posts
+      await fetchPosts();
     } catch (error: any) {
       console.error('Error sharing post:', error);
       toast({
@@ -201,7 +237,9 @@ export const usePosts = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
+    if (user) {
+      fetchPosts();
+    }
   }, [user]);
 
   return {
