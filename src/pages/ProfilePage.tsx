@@ -25,7 +25,8 @@ import {
   CheckCircle,
   ExternalLink,
   FileText,
-  Coins
+  Coins,
+  GraduationCap
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -121,6 +122,11 @@ const ProfilePage = () => {
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load profile data. Please refresh the page.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -129,7 +135,7 @@ const ProfilePage = () => {
     setIsEditing(false);
     toast({
       title: "Profile Updated",
-      description: "Your profile has been successfully updated."
+      description: "Your profile has been successfully updated and is now live!"
     });
   };
 
@@ -180,7 +186,7 @@ const ProfilePage = () => {
                     Pro Elite
                   </Badge>
                   {profile.actively_looking_for_work && (
-                    <Badge className="bg-green-100 text-green-700">
+                    <Badge className="bg-green-100 text-green-700 animate-pulse">
                       <Zap className="w-3 h-3 mr-1" />
                       Open to Work
                     </Badge>
@@ -192,7 +198,7 @@ const ProfilePage = () => {
                     {profile.current_position && `${profile.current_position}`}
                     {profile.company_name && ` at ${profile.company_name}`}
                   </p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                     {profile.industry && (
                       <div className="flex items-center gap-1">
                         <Briefcase className="w-4 h-4" />
@@ -216,10 +222,10 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Button
                     onClick={() => setIsEditing(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit Profile
@@ -260,11 +266,41 @@ const ProfilePage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed">
-                  {profile.bio || 'Add a bio to tell others about yourself and your professional journey.'}
-                </p>
+                {profile.bio ? (
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {profile.bio}
+                  </p>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>Add a bio to tell others about yourself and your professional journey.</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsEditing(true)}
+                      className="mt-3"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Add Bio
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
+
+            {/* Education Section */}
+            {profile.education && (
+              <Card className="bg-white shadow-lg border-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-purple-600" />
+                    Education
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700">{profile.education}</p>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Skills & Endorsements Section */}
             <SkillEndorsements 
@@ -279,36 +315,36 @@ const ProfilePage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <LinkIcon className="w-5 h-5 text-purple-600" />
-                    Links
+                    Links & Social Media
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {profile.website && (
                     <a href={profile.website} target="_blank" rel="noopener noreferrer" 
-                       className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
-                      <ExternalLink className="w-4 h-4" />
-                      Website
+                       className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border">
+                      <ExternalLink className="w-4 h-4 text-blue-600" />
+                      <span className="text-blue-600 hover:text-blue-800">Personal Website</span>
                     </a>
                   )}
                   {profile.linkedin_url && (
                     <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer"
-                       className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
-                      <ExternalLink className="w-4 h-4" />
-                      LinkedIn
+                       className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border">
+                      <ExternalLink className="w-4 h-4 text-blue-600" />
+                      <span className="text-blue-600 hover:text-blue-800">LinkedIn Profile</span>
                     </a>
                   )}
                   {profile.twitter_url && (
                     <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer"
-                       className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
-                      <ExternalLink className="w-4 h-4" />
-                      Twitter
+                       className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border">
+                      <ExternalLink className="w-4 h-4 text-blue-600" />
+                      <span className="text-blue-600 hover:text-blue-800">Twitter Profile</span>
                     </a>
                   )}
                   {profile.github_url && (
                     <a href={profile.github_url} target="_blank" rel="noopener noreferrer"
-                       className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
-                      <ExternalLink className="w-4 h-4" />
-                      GitHub
+                       className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border">
+                      <ExternalLink className="w-4 h-4 text-blue-600" />
+                      <span className="text-blue-600 hover:text-blue-800">GitHub Profile</span>
                     </a>
                   )}
                 </CardContent>
@@ -333,7 +369,10 @@ const ProfilePage = () => {
                   </div>
                   <p className="text-sm text-gray-600">Complete your profile to reach 100!</p>
                 </div>
-                <Progress value={profile.profile_completion_score} className="h-3 mb-4" />
+                <Progress 
+                  value={profile.profile_completion_score} 
+                  className="h-3 mb-4"
+                />
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Basic Info</span>
@@ -372,7 +411,10 @@ const ProfilePage = () => {
                   </div>
                   <p className="text-sm text-gray-600">Build your personal brand</p>
                 </div>
-                <Progress value={profile.personal_branding_score} className="h-3" />
+                <Progress 
+                  value={profile.personal_branding_score} 
+                  className="h-3"
+                />
               </CardContent>
             </Card>
 
@@ -408,12 +450,18 @@ const ProfilePage = () => {
                   <span className="font-bold text-blue-600">1,247</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Skills Endorsed</span>
+                  <span className="text-sm text-gray-600">Skills Listed</span>
                   <span className="font-bold text-green-600">{profile.skills.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Experience</span>
                   <span className="font-bold text-purple-600">{profile.experience_years} years</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Profile Strength</span>
+                  <span className={`font-bold ${profile.profile_completion_score >= 80 ? 'text-green-600' : profile.profile_completion_score >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+                    {profile.profile_completion_score >= 80 ? 'Strong' : profile.profile_completion_score >= 50 ? 'Good' : 'Needs Work'}
+                  </span>
                 </div>
               </CardContent>
             </Card>
