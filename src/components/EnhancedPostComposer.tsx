@@ -38,30 +38,6 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Initialize storage bucket
-  useEffect(() => {
-    const initializeStorage = async () => {
-      try {
-        // Check if bucket exists, if not create it
-        const { data: buckets } = await supabase.storage.listBuckets();
-        const bucketExists = buckets?.some(bucket => bucket.name === 'posts');
-        
-        if (!bucketExists) {
-          await supabase.storage.createBucket('posts', {
-            public: true,
-            allowedMimeTypes: ['image/*'],
-            fileSizeLimit: 10485760 // 10MB
-          });
-          console.log('Posts bucket created');
-        }
-      } catch (error) {
-        console.error('Error initializing storage:', error);
-      }
-    };
-
-    initializeStorage();
-  }, []);
-
   // Search users for mentions
   const searchUsers = async (query: string) => {
     if (!query) return;
@@ -185,9 +161,11 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
 
   // Upload image to Supabase Storage
   const uploadImage = async (file: File): Promise<string | null> => {
+    if (!user) return null;
+    
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+      const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `posts/${fileName}`;
 
       console.log('Uploading image to:', filePath);
@@ -253,6 +231,11 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+      
+      toast({
+        title: "Success",
+        description: "Post created successfully!"
+      });
     } catch (error: any) {
       console.error('Error in handleSubmit:', error);
       toast({
