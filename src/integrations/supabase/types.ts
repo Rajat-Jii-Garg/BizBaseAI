@@ -41,6 +41,30 @@ export type Database = {
         }
         Relationships: []
       }
+      endorsements: {
+        Row: {
+          created_at: string
+          endorsed_user_id: string
+          endorser_id: string
+          id: string
+          skill: string
+        }
+        Insert: {
+          created_at?: string
+          endorsed_user_id: string
+          endorser_id: string
+          id?: string
+          skill: string
+        }
+        Update: {
+          created_at?: string
+          endorsed_user_id?: string
+          endorser_id?: string
+          id?: string
+          skill?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -230,8 +254,10 @@ export type Database = {
       profiles: {
         Row: {
           achievements: Json | null
+          actively_looking_for_work: boolean | null
           avatar_url: string | null
           bio: string | null
+          bizcoins: number | null
           business_type: string | null
           company_name: string | null
           created_at: string | null
@@ -246,8 +272,12 @@ export type Database = {
           industry: string | null
           linkedin_url: string | null
           location: string | null
+          personal_branding_score: number | null
           phone: string | null
+          portfolio_url: string | null
           profile_completed: boolean | null
+          profile_completion_score: number | null
+          resume_url: string | null
           skills: Json | null
           subscription_plan: string | null
           twitter_url: string | null
@@ -256,8 +286,10 @@ export type Database = {
         }
         Insert: {
           achievements?: Json | null
+          actively_looking_for_work?: boolean | null
           avatar_url?: string | null
           bio?: string | null
+          bizcoins?: number | null
           business_type?: string | null
           company_name?: string | null
           created_at?: string | null
@@ -272,8 +304,12 @@ export type Database = {
           industry?: string | null
           linkedin_url?: string | null
           location?: string | null
+          personal_branding_score?: number | null
           phone?: string | null
+          portfolio_url?: string | null
           profile_completed?: boolean | null
+          profile_completion_score?: number | null
+          resume_url?: string | null
           skills?: Json | null
           subscription_plan?: string | null
           twitter_url?: string | null
@@ -282,8 +318,10 @@ export type Database = {
         }
         Update: {
           achievements?: Json | null
+          actively_looking_for_work?: boolean | null
           avatar_url?: string | null
           bio?: string | null
+          bizcoins?: number | null
           business_type?: string | null
           company_name?: string | null
           created_at?: string | null
@@ -298,8 +336,12 @@ export type Database = {
           industry?: string | null
           linkedin_url?: string | null
           location?: string | null
+          personal_branding_score?: number | null
           phone?: string | null
+          portfolio_url?: string | null
           profile_completed?: boolean | null
+          profile_completion_score?: number | null
+          resume_url?: string | null
           skills?: Json | null
           subscription_plan?: string | null
           twitter_url?: string | null
@@ -313,6 +355,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_profile_completion: {
+        Args: { profile_id: string }
+        Returns: number
+      }
       generate_otp: {
         Args: Record<PropertyKey, never>
         Returns: string

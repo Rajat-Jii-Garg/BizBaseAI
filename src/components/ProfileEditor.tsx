@@ -7,7 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus, Save, Camera } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Progress } from '@/components/ui/progress';
+import { X, Plus, Save, Camera, Upload, Star, Briefcase, MapPin, Link as LinkIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -36,7 +38,10 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onCancel
     industry: profile?.industry || '',
     education: profile?.education || '',
     experience_years: profile?.experience_years || 0,
-    skills: profile?.skills || []
+    skills: profile?.skills || [],
+    resume_url: profile?.resume_url || '',
+    portfolio_url: profile?.portfolio_url || '',
+    actively_looking_for_work: profile?.actively_looking_for_work || false
   });
   const [newSkill, setNewSkill] = useState('');
 
@@ -125,6 +130,18 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onCancel
               <Camera className="w-4 h-4 mr-2" />
               Change Photo
             </Button>
+          </div>
+
+          {/* Work Status Toggle */}
+          <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+            <div>
+              <Label className="text-base font-semibold text-green-800">Actively Looking for Work</Label>
+              <p className="text-sm text-green-600">Show potential employers you're open to opportunities</p>
+            </div>
+            <Switch
+              checked={formData.actively_looking_for_work}
+              onCheckedChange={(checked) => handleInputChange('actively_looking_for_work', checked)}
+            />
           </div>
 
           {/* Basic Information */}
@@ -248,6 +265,28 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onSave, onCancel
                   />
                 </Badge>
               ))}
+            </div>
+          </div>
+
+          {/* Resume & Portfolio */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="resume_url">Resume URL</Label>
+              <Input
+                id="resume_url"
+                value={formData.resume_url}
+                onChange={(e) => handleInputChange('resume_url', e.target.value)}
+                placeholder="Link to your resume"
+              />
+            </div>
+            <div>
+              <Label htmlFor="portfolio_url">Portfolio URL</Label>
+              <Input
+                id="portfolio_url"
+                value={formData.portfolio_url}
+                onChange={(e) => handleInputChange('portfolio_url', e.target.value)}
+                placeholder="Link to your portfolio"
+              />
             </div>
           </div>
 
