@@ -63,15 +63,6 @@ const Dashboard = () => {
     respondToRequest 
   } = useConnections();
 
-  // Real-time engagement hook
-  useRealTimeEngagement(fetchAllPosts);
-
-  useEffect(() => {
-    if (user) {
-      fetchAllPosts();
-    }
-  }, [user]);
-
   const fetchAllPosts = async () => {
     if (!user) return;
     
@@ -117,6 +108,15 @@ const Dashboard = () => {
       setLoadingPosts(false);
     }
   };
+
+  // Real-time engagement hook - now fetchAllPosts is declared before use
+  useRealTimeEngagement(fetchAllPosts);
+
+  useEffect(() => {
+    if (user) {
+      fetchAllPosts();
+    }
+  }, [user]);
 
   const handleCreatePost = async (content: string, imageUrl?: string) => {
     await createPost(content, imageUrl);

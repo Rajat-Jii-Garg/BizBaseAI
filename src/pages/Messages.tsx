@@ -47,30 +47,42 @@ const Messages = () => {
     try {
       setLoading(true);
       
-      // Get connections to show as potential conversations
-      const { data: connections, error } = await supabase
+      // First get connections
+      const { data: connections, error: connectionsError } = await supabase
         .from('connections')
-        .select(`
-          *,
-          requester:profiles!connections_requester_id_fkey(id, full_name, avatar_url),
-          addressee:profiles!connections_addressee_id_fkey(id, full_name, avatar_url)
-        `)
+        .select('*')
         .eq('status', 'accepted')
         .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
 
-      if (error) throw error;
+      if (connectionsError) throw connectionsError;
 
-      const conversationsList = connections?.map(conn => {
-        const otherUser = conn.requester_id === user.id ? conn.addressee : conn.requester;
-        return {
-          id: otherUser.id,
-          name: otherUser.full_name,
-          avatar: otherUser.avatar_url,
-          lastMessage: 'Start a conversation...',
-          isOnline: Math.random() > 0.5, // Simulate online status
-          unreadCount: 0
-        };
-      }) || [];
+      if (!connections || connections.length === 0) {
+        setConversations([]);
+        return;
+      }
+
+      // Get the other user IDs from connections
+      const otherUserIds = connections.map(conn => 
+        conn.requester_id === user.id ? conn.addressee_id : conn.requester_id
+      );
+
+      // Get profiles for these users
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', otherUserIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create conversations list
+      const conversationsList = profiles?.map(profile => ({
+        id: profile.id,
+        name: profile.full_name || 'Unknown User',
+        avatar: profile.avatar_url,
+        lastMessage: 'Start a conversation...',
+        isOnline: Math.random() > 0.5, // Simulate online status
+        unreadCount: 0
+      })) || [];
 
       setConversations(conversationsList);
     } catch (error) {
@@ -91,11 +103,7 @@ const Messages = () => {
     try {
       const { data: messages, error } = await supabase
         .from('messages')
-        .select(`
-          *,
-          sender:profiles!messages_sender_id_fkey(full_name, avatar_url),
-          receiver:profiles!messages_receiver_id_fkey(full_name, avatar_url)
-        `)
+        .select('*')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
         .order('created_at', { ascending: true });
 
