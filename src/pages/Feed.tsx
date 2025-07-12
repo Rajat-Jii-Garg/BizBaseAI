@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Users, MessageSquare, Share2, Loader2 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
-import PostCard from '@/components/PostCard';
+import EnhancedPostCard from '@/components/EnhancedPostCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -155,7 +155,7 @@ const Feed = () => {
             </Card>
           ) : (
             posts.map((post) => (
-              <PostCard
+              <EnhancedPostCard
                 key={post.id}
                 post={post}
                 onEngagementUpdate={fetchAllPosts}

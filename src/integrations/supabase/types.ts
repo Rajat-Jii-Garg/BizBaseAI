@@ -65,6 +65,27 @@ export type Database = {
         }
         Relationships: []
       }
+      hashtags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          usage_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          usage_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -157,6 +178,42 @@ export type Database = {
           },
         ]
       }
+      post_hashtags: {
+        Row: {
+          created_at: string
+          hashtag_id: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          hashtag_id: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          hashtag_id?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_hashtags_hashtag_id_fkey"
+            columns: ["hashtag_id"]
+            isOneToOne: false
+            referencedRelation: "hashtags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_hashtags_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -179,6 +236,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_mentions: {
+        Row: {
+          created_at: string
+          id: string
+          mentioned_user_id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mentioned_user_id: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mentioned_user_id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_mentions_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
@@ -362,6 +448,14 @@ export type Database = {
       generate_otp: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      process_post_hashtags: {
+        Args: { post_id: string; content: string }
+        Returns: undefined
+      }
+      process_post_mentions: {
+        Args: { post_id: string; content: string }
+        Returns: undefined
       }
       send_otp_email: {
         Args: { user_email: string; otp_purpose: string }

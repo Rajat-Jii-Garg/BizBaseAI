@@ -31,10 +31,11 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
-import SmartPostComposer from '@/components/SmartPostComposer';
-import PostCard from '@/components/PostCard';
+import EnhancedPostComposer from '@/components/EnhancedPostComposer';
+import EnhancedPostCard from '@/components/EnhancedPostCard';
 import ConnectionsList from '@/components/ConnectionsList';
 import AINetworkingAssistant from '@/components/AINetworkingAssistant';
+import TrendingHashtags from '@/components/TrendingHashtags';
 import { usePosts } from '@/hooks/usePosts';
 import { useConnections } from '@/hooks/useConnections';
 import { useRealTimeEngagement } from '@/hooks/useRealTimeEngagement';
@@ -69,7 +70,7 @@ const Dashboard = () => {
     try {
       setLoadingPosts(true);
       
-      // Fetch all posts with user profiles and engagement data
+      // Fetch all posts with user profiles, engagement data, hashtags, and mentions
       const { data: posts, error } = await supabase
         .from('posts')
         .select(`
@@ -109,7 +110,7 @@ const Dashboard = () => {
     }
   };
 
-  // Real-time engagement hook - now fetchAllPosts is declared before use
+  // Real-time engagement hook
   useRealTimeEngagement(fetchAllPosts);
 
   useEffect(() => {
@@ -314,7 +315,7 @@ const Dashboard = () => {
 
             {/* Main Content Feed */}
             <div className="lg:col-span-6 space-y-6">
-              <SmartPostComposer onCreatePost={handleCreatePost} />
+              <EnhancedPostComposer onCreatePost={handleCreatePost} />
 
               <div className="space-y-6">
                 {loadingPosts ? (
@@ -348,7 +349,7 @@ const Dashboard = () => {
                   </Card>
                 ) : (
                   allPosts.map((post) => (
-                    <PostCard
+                    <EnhancedPostCard
                       key={post.id}
                       post={post}
                       onEngagementUpdate={fetchAllPosts}
@@ -361,6 +362,8 @@ const Dashboard = () => {
             {/* Right Sidebar - Connections & Insights */}
             <div className="lg:col-span-3 space-y-6">
               <AINetworkingAssistant onSuggestConnection={handleSuggestConnection} />
+
+              <TrendingHashtags />
 
               {connectionsLoading ? (
                 <Card className="bg-white shadow-lg border-0">
@@ -377,7 +380,6 @@ const Dashboard = () => {
                 />
               )}
 
-              {/* Industry Insights */}
               <Card className="bg-white shadow-lg border-0">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
