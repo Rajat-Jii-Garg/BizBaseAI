@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -26,7 +26,10 @@ import {
   ExternalLink,
   FileText,
   Coins,
-  GraduationCap
+  GraduationCap,
+  MessageCircle,
+  UserPlus,
+  UserCheck
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,10 +39,12 @@ import ProfileEditor from '@/components/ProfileEditor';
 import SkillEndorsements from '@/components/SkillEndorsements';
 
 const ProfilePage = () => {
+  const { userId } = useParams();
   const { user } = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(true);
   const [profile, setProfile] = useState({
     full_name: '',
     email: '',
@@ -68,23 +73,24 @@ const ProfilePage = () => {
   });
 
   useEffect(() => {
-    if (user) {
-      fetchProfile();
+    const profileId = userId || user?.id;
+    if (profileId) {
+      setIsOwnProfile(!userId || userId === user?.id);
+      fetchProfile(profileId);
     }
-  }, [user]);
+  }, [userId, user]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = async (profileId: string) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user?.id)
+        .eq('id', profileId)
         .single();
 
       if (error) throw error;
 
       if (data) {
-        // Helper function to safely convert Json to string array
         const safeJsonToStringArray = (jsonData: any): string[] => {
           if (!jsonData) return [];
           if (Array.isArray(jsonData)) {
@@ -131,7 +137,7 @@ const ProfilePage = () => {
   };
 
   const handleSaveProfile = async () => {
-    await fetchProfile();
+    await fetchProfile(user?.id || '');
     setIsEditing(false);
     toast({
       title: "Profile Updated",
@@ -139,7 +145,7 @@ const ProfilePage = () => {
     });
   };
 
-  if (isEditing) {
+  if (isEditing && isOwnProfile) {
     return (
       <DashboardLayout>
         <div className="max-w-4xl mx-auto p-6">
@@ -160,6 +166,15 @@ const ProfilePage = () => {
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-xl overflow-hidden">
           <div className="relative">
             <div className="h-32 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"></div>
+            {isOwnProfile && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute top-4 right-4 text-white hover:bg-white/20"
+              >
+                <Camera className="w-4 h-4" />
+              </Button>
+            )}
           </div>
           
           <CardContent className="p-8 -mt-16 relative">
@@ -223,13 +238,26 @@ const ProfilePage = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  <Button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Button>
+                  {isOwnProfile ? (
+                    <Button
+                      onClick={() => setIsEditing(true)}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Button>
+                  ) : (
+                    <>
+                      <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        Connect
+                      </Button>
+                      <Button variant="outline">
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Message
+                      </Button>
+                    </>
+                  )}
                   
                   {profile.resume_url && (
                     <Button variant="outline" asChild>
@@ -262,7 +290,7 @@ const ProfilePage = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="w-5 h-5 text-blue-600" />
-                  About Me
+                  About {isOwnProfile ? 'Me' : profile.full_name?.split(' ')[0]}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -273,15 +301,22 @@ const ProfilePage = () => {
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p>Add a bio to tell others about yourself and your professional journey.</p>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setIsEditing(true)}
-                      className="mt-3"
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Add Bio
-                    </Button>
+                    <p>
+                      {isOwnProfile 
+                        ? "Add a bio to tell others about yourself and your professional journey."
+                        : "This user hasn't added a bio yet."
+                      }
+                    </p>
+                    {isOwnProfile && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsEditing(true)}
+                        className="mt-3"
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Add Bio
+                      </Button>
+                    )}
                   </div>
                 )}
               </CardContent>
@@ -304,9 +339,9 @@ const ProfilePage = () => {
 
             {/* Skills & Endorsements Section */}
             <SkillEndorsements 
-              profileId={user?.id || ''}
+              profileId={userId || user?.id || ''}
               skills={profile.skills}
-              isOwnProfile={true}
+              isOwnProfile={isOwnProfile}
             />
 
             {/* Social Links */}
@@ -367,7 +402,9 @@ const ProfilePage = () => {
                   <div className="text-4xl font-bold text-purple-600 mb-2">
                     {profile.profile_completion_score}/100
                   </div>
-                  <p className="text-sm text-gray-600">Complete your profile to reach 100!</p>
+                  <p className="text-sm text-gray-600">
+                    {isOwnProfile ? 'Complete your profile to reach 100!' : 'Profile completion level'}
+                  </p>
                 </div>
                 <Progress 
                   value={profile.profile_completion_score} 
@@ -409,7 +446,9 @@ const ProfilePage = () => {
                   <div className="text-4xl font-bold text-orange-600 mb-2">
                     {profile.personal_branding_score}/100
                   </div>
-                  <p className="text-sm text-gray-600">Build your personal brand</p>
+                  <p className="text-sm text-gray-600">
+                    {isOwnProfile ? 'Build your personal brand' : 'Personal branding strength'}
+                  </p>
                 </div>
                 <Progress 
                   value={profile.personal_branding_score} 
@@ -431,7 +470,9 @@ const ProfilePage = () => {
                   <div className="text-4xl font-bold text-yellow-600 mb-2">
                     {profile.bizcoins}
                   </div>
-                  <p className="text-sm text-gray-600">Earn coins by engaging with the community</p>
+                  <p className="text-sm text-gray-600">
+                    {isOwnProfile ? 'Earn coins by engaging with the community' : 'Community engagement level'}
+                  </p>
                 </div>
               </CardContent>
             </Card>
