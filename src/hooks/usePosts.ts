@@ -17,6 +17,8 @@ export interface Post {
   profiles?: {
     full_name: string;
     avatar_url?: string;
+    current_position?: string;
+    company_name?: string;
   };
   user_has_liked?: boolean;
 }
