@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Image, Video, FileText, Loader2, Hash, AtSign, X, Camera } from 'lucide-react';
+import { Video, Loader2, Hash, AtSign, X, Camera } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -37,7 +37,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
-  const audioInputRef = useRef<HTMLInputElement>(null);
+  
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -141,21 +141,17 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   };
 
   // Handle media upload
-  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' | 'audio') => {
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const file = e.target.files?.[0];
     if (file) {
       setMediaFile(file);
       setMediaType(type);
       
-      if (type === 'image' || type === 'video') {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setMediaPreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        setMediaPreview(file.name);
-      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setMediaPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -166,7 +162,6 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
     setMediaType(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (videoInputRef.current) videoInputRef.current.value = '';
-    if (audioInputRef.current) audioInputRef.current.value = '';
   };
 
   // Upload media to Supabase Storage
@@ -241,7 +236,6 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
       setMediaType(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (videoInputRef.current) videoInputRef.current.value = '';
-      if (audioInputRef.current) audioInputRef.current.value = '';
       
       toast({
         title: "Success",
@@ -346,17 +340,6 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
                 className="max-w-full h-auto rounded-lg border border-gray-200"
               />
             )}
-            {mediaType === 'audio' && (
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200 flex items-center space-x-3">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Video className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="font-medium text-purple-900">Audio File</p>
-                  <p className="text-sm text-purple-700">{mediaPreview}</p>
-                </div>
-              </div>
-            )}
             <Button
               variant="destructive"
               size="sm"
@@ -387,8 +370,8 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
           </div>
         )}
         
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <input
               ref={fileInputRef}
               type="file"
@@ -403,13 +386,6 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
               onChange={(e) => handleMediaUpload(e, 'video')}
               className="hidden"
             />
-            <input
-              ref={audioInputRef}
-              type="file"
-              accept="audio/*"
-              onChange={(e) => handleMediaUpload(e, 'audio')}
-              className="hidden"
-            />
             <Button 
               variant="ghost" 
               size="sm" 
@@ -417,7 +393,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
               onClick={() => fileInputRef.current?.click()}
             >
               <Camera className="w-5 h-5 mr-2" />
-              <span className="text-sm font-medium">Photo</span>
+              <span className="hidden sm:inline text-sm font-medium">Photo</span>
             </Button>
             <Button 
               variant="ghost" 
@@ -426,20 +402,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
               onClick={() => videoInputRef.current?.click()}
             >
               <Video className="w-5 h-5 mr-2" />
-              <span className="text-sm font-medium">Video</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-orange-600 hover:bg-orange-50 h-10 px-4"
-              onClick={() => audioInputRef.current?.click()}
-            >
-              <Video className="w-5 h-5 mr-2" />
-              <span className="text-sm font-medium">Audio</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="text-purple-600 hover:bg-purple-50 h-10 px-4">
-              <FileText className="w-5 h-5 mr-2" />
-              <span className="text-sm font-medium">Article</span>
+              <span className="hidden sm:inline text-sm font-medium">Video</span>
             </Button>
           </div>
           
@@ -447,7 +410,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
             onClick={handleSubmit}
             disabled={(!content.trim() && !mediaFile) || loading}
             size="sm"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50 h-10 px-6 font-medium"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50 h-10 px-6 font-medium w-full sm:w-auto"
           >
             {loading ? (
               <>
