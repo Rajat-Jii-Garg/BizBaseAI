@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
+import PublicProfile from "./pages/PublicProfile";
 import Feed from "./pages/Feed";
 import Network from "./pages/Network";
 import Analytics from "./pages/Analytics";
@@ -41,6 +42,11 @@ const App = () => (
             <Route path="/profile" element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/user-profile" element={
+              <ProtectedRoute>
+                <PublicProfile />
               </ProtectedRoute>
             } />
             <Route path="/feed" element={

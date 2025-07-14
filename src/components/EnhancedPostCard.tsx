@@ -74,7 +74,7 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
     : post.content;
 
   const handleProfileClick = () => {
-    navigate(`/profile?user=${post.user_id}`);
+    navigate(`/user-profile?user=${post.user_id}`);
   };
 
   return (

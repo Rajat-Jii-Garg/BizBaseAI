@@ -18,14 +18,15 @@ interface User {
 }
 
 interface EnhancedPostComposerProps {
-  onCreatePost: (content: string, imageUrl?: string) => Promise<void>;
+  onCreatePost: (content: string, mediaUrl?: string, mediaType?: 'image' | 'video' | 'audio' | 'article') => Promise<void>;
 }
 
 const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePost }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<'image' | 'video' | 'audio' | 'article' | null>(null);
   const [showMentions, setShowMentions] = useState(false);
   const [showHashtags, setShowHashtags] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
@@ -35,6 +36,8 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   const [cursorPosition, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -137,30 +140,37 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
     textareaRef.current?.focus();
   };
 
-  // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle media upload
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' | 'audio') => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      setMediaFile(file);
+      setMediaType(type);
+      
+      if (type === 'image' || type === 'video') {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setMediaPreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setMediaPreview(file.name);
+      }
     }
   };
 
-  // Remove image
-  const removeImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  // Remove media
+  const removeMedia = () => {
+    setMediaFile(null);
+    setMediaPreview(null);
+    setMediaType(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (videoInputRef.current) videoInputRef.current.value = '';
+    if (audioInputRef.current) audioInputRef.current.value = '';
   };
 
-  // Upload image to Supabase Storage
-  const uploadImage = async (file: File): Promise<string | null> => {
+  // Upload media to Supabase Storage
+  const uploadMedia = async (file: File, type: string): Promise<string | null> => {
     if (!user) return null;
     
     try {
@@ -168,7 +178,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
       const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `posts/${fileName}`;
 
-      console.log('Uploading image to:', filePath);
+      console.log('Uploading media to:', filePath);
 
       const { error: uploadError } = await supabase.storage
         .from('posts')
@@ -183,13 +193,13 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
         .from('posts')
         .getPublicUrl(filePath);
 
-      console.log('Image uploaded successfully, public URL:', publicUrl);
+      console.log('Media uploaded successfully, public URL:', publicUrl);
       return publicUrl;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error uploading media:', error);
       toast({
         title: "Upload Error",
-        description: "Failed to upload image. Please try again.",
+        description: `Failed to upload ${type}. Please try again.`,
         variant: "destructive"
       });
       return null;
@@ -198,10 +208,10 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
 
   // Handle submit
   const handleSubmit = async () => {
-    if (!content.trim() && !imageFile) {
+    if (!content.trim() && !mediaFile) {
       toast({
         title: "Error",
-        description: "Please add some content or an image to your post.",
+        description: "Please add some content or media to your post.",
         variant: "destructive"
       });
       return;
@@ -209,28 +219,29 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
 
     setLoading(true);
     try {
-      let imageUrl = null;
-      if (imageFile) {
-        console.log('Uploading image...');
-        imageUrl = await uploadImage(imageFile);
-        if (!imageUrl) {
+      let mediaUrl = null;
+      if (mediaFile && mediaType) {
+        console.log('Uploading media...');
+        mediaUrl = await uploadMedia(mediaFile, mediaType);
+        if (!mediaUrl) {
           setLoading(false);
           return;
         }
       }
 
-      console.log('Creating post with content:', content, 'imageUrl:', imageUrl);
+      console.log('Creating post with content:', content, 'mediaUrl:', mediaUrl, 'mediaType:', mediaType);
       
       // Call parent callback to create post
-      await onCreatePost(content.trim(), imageUrl || undefined);
+      await onCreatePost(content.trim(), mediaUrl || undefined, mediaType || undefined);
       
       // Reset form
       setContent('');
-      setImageFile(null);
-      setImagePreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      setMediaFile(null);
+      setMediaPreview(null);
+      setMediaType(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (videoInputRef.current) videoInputRef.current.value = '';
+      if (audioInputRef.current) audioInputRef.current.value = '';
       
       toast({
         title: "Success",
@@ -318,19 +329,39 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
           </div>
         </div>
 
-        {/* Image Preview */}
-        {imagePreview && (
+        {/* Media Preview */}
+        {mediaPreview && (
           <div className="mb-4 relative">
-            <img 
-              src={imagePreview} 
-              alt="Preview" 
-              className="max-w-full h-auto rounded-lg border border-gray-200"
-            />
+            {mediaType === 'image' && (
+              <img 
+                src={mediaPreview} 
+                alt="Preview" 
+                className="max-w-full h-auto rounded-lg border border-gray-200"
+              />
+            )}
+            {mediaType === 'video' && (
+              <video 
+                src={mediaPreview} 
+                controls
+                className="max-w-full h-auto rounded-lg border border-gray-200"
+              />
+            )}
+            {mediaType === 'audio' && (
+              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200 flex items-center space-x-3">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Video className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-purple-900">Audio File</p>
+                  <p className="text-sm text-purple-700">{mediaPreview}</p>
+                </div>
+              </div>
+            )}
             <Button
               variant="destructive"
               size="sm"
               className="absolute top-2 right-2 h-8 w-8 p-0"
-              onClick={removeImage}
+              onClick={removeMedia}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -362,7 +393,21 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
               ref={fileInputRef}
               type="file"
               accept="image/*"
-              onChange={handleImageUpload}
+              onChange={(e) => handleMediaUpload(e, 'image')}
+              className="hidden"
+            />
+            <input
+              ref={videoInputRef}
+              type="file"
+              accept="video/*"
+              onChange={(e) => handleMediaUpload(e, 'video')}
+              className="hidden"
+            />
+            <input
+              ref={audioInputRef}
+              type="file"
+              accept="audio/*"
+              onChange={(e) => handleMediaUpload(e, 'audio')}
               className="hidden"
             />
             <Button 
@@ -374,9 +419,23 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
               <Camera className="w-5 h-5 mr-2" />
               <span className="text-sm font-medium">Photo</span>
             </Button>
-            <Button variant="ghost" size="sm" className="text-green-600 hover:bg-green-50 h-10 px-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-green-600 hover:bg-green-50 h-10 px-4"
+              onClick={() => videoInputRef.current?.click()}
+            >
               <Video className="w-5 h-5 mr-2" />
               <span className="text-sm font-medium">Video</span>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-orange-600 hover:bg-orange-50 h-10 px-4"
+              onClick={() => audioInputRef.current?.click()}
+            >
+              <Video className="w-5 h-5 mr-2" />
+              <span className="text-sm font-medium">Audio</span>
             </Button>
             <Button variant="ghost" size="sm" className="text-purple-600 hover:bg-purple-50 h-10 px-4">
               <FileText className="w-5 h-5 mr-2" />
@@ -386,7 +445,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
           
           <Button 
             onClick={handleSubmit}
-            disabled={(!content.trim() && !imageFile) || loading}
+            disabled={(!content.trim() && !mediaFile) || loading}
             size="sm"
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50 h-10 px-6 font-medium"
           >

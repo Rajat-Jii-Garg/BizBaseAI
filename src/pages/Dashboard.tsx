@@ -162,10 +162,10 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  const handleCreatePost = async (content: string, imageUrl?: string) => {
-    console.log('Dashboard: Creating post with content:', content, 'imageUrl:', imageUrl);
+  const handleCreatePost = async (content: string, mediaUrl?: string, mediaType?: 'image' | 'video' | 'audio' | 'article') => {
+    console.log('Dashboard: Creating post with content:', content, 'mediaUrl:', mediaUrl);
     try {
-      await createPost(content, imageUrl);
+      await createPost(content, mediaUrl);
       await fetchAllPosts(); // Refresh all posts after creation
     } catch (error) {
       console.error('Dashboard: Error creating post:', error);
@@ -268,13 +268,19 @@ const Dashboard = () => {
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
                 <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600"></div>
                 <CardContent className="p-6 text-center relative">
-                  <Avatar className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl">
+                  <Avatar 
+                    className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
+                    onClick={() => navigate('/profile')}
+                  >
                     <AvatarImage src={user?.user_metadata?.avatar_url} />
                     <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold text-xl">
                       {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <h3 className="font-bold text-gray-900 mb-1 text-lg">
+                  <h3 
+                    className="font-bold text-gray-900 mb-1 text-lg cursor-pointer hover:text-blue-600 transition-colors"
+                    onClick={() => navigate('/profile')}
+                  >
                     {user?.user_metadata?.full_name || 'Professional User'}
                   </h3>
                   <p className="text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
@@ -299,7 +305,7 @@ const Dashboard = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full"
-                    onClick={handleViewProfile}
+                    onClick={() => navigate('/profile')}
                   >
                     <User className="w-4 h-4 mr-2" />
                     Customize Profile
