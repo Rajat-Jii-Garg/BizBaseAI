@@ -121,14 +121,43 @@ export const usePostEngagement = () => {
 
     setLoading(true);
     try {
-      await supabase
+      // Check if already shared
+      const { data: existingShare } = await supabase
+        .from('post_shares')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (existingShare) {
+        toast({
+          title: "Already Shared",
+          description: "You have already shared this post"
+        });
+        return;
+      }
+
+      // Add share record
+      const { error } = await supabase
         .from('post_shares')
         .insert({ post_id: postId, user_id: user.id });
 
-      toast({
-        title: "Post Shared",
-        description: "Post has been shared to your network"
-      });
+      if (error) throw error;
+
+      // Copy to clipboard
+      const postUrl = `${window.location.origin}/post/${postId}`;
+      try {
+        await navigator.clipboard.writeText(postUrl);
+        toast({
+          title: "Post Shared",
+          description: "Post link copied to clipboard and shared to your network"
+        });
+      } catch (clipboardError) {
+        toast({
+          title: "Post Shared",
+          description: "Post has been shared to your network"
+        });
+      }
     } catch (error: any) {
       console.error('Error sharing post:', error);
       toast({
