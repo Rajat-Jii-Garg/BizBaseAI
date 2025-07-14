@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MoreHorizontal, CheckCircle, Hash, AtSign } from 'lucide-react';
 import { Post } from '@/hooks/usePosts';
 import PostEngagementActions from './PostEngagementActions';
+import CommentsSection from './CommentsSection';
 import { useNavigate } from 'react-router-dom';
 
 interface EnhancedPostCardProps {
@@ -173,6 +174,13 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
           sharesCount={post.shares_count || 0}
           userHasLiked={post.user_has_liked || false}
           onEngagementUpdate={onEngagementUpdate}
+        />
+
+        {/* Comments Section */}
+        <CommentsSection
+          postId={post.id}
+          commentsCount={post.comments_count || 0}
+          onCommentUpdate={onEngagementUpdate}
         />
       </CardContent>
     </Card>

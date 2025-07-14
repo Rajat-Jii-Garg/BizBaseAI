@@ -21,7 +21,11 @@ import {
   Settings, 
   HelpCircle,
   Brain,
-  Briefcase
+  Briefcase,
+  MessageCircle,
+  Bell,
+  Search,
+  Rss
 } from 'lucide-react';
 
 interface AppSidebarProps {
@@ -30,14 +34,12 @@ interface AppSidebarProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'CRM', href: '/crm', icon: Users },
-  { name: 'Projects', href: '/projects', icon: Briefcase },
-  { name: 'Finance', href: '/finance', icon: DollarSign },
-  { name: 'HR Management', href: '/hr', icon: Building2 },
-  { name: 'AI Assistant', href: '/ai-assistant', icon: Brain },
-  { name: 'Analytics', href: '#', icon: BarChart3 },
+  { name: 'Feed', href: '/feed', icon: Rss },
+  { name: 'Network', href: '/network', icon: Users },
+  { name: 'Messages', href: '/messages', icon: MessageCircle },
+  { name: 'Notifications', href: '/notifications', icon: Bell },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
-  { name: 'Help', href: '/faq', icon: HelpCircle },
 ];
 
 const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed = false }) => {
