@@ -45,6 +45,8 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(true);
+  const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
   const [profile, setProfile] = useState({
     full_name: '',
     email: '',
@@ -77,6 +79,7 @@ const ProfilePage = () => {
     if (profileId) {
       setIsOwnProfile(!userId || userId === user?.id);
       fetchProfile(profileId);
+      fetchUserPosts(profileId);
     }
   }, [userId, user]);
 
@@ -133,6 +136,31 @@ const ProfilePage = () => {
         description: "Failed to load profile data. Please refresh the page.",
         variant: "destructive"
       });
+    }
+  };
+
+  const fetchUserPosts = async (profileId: string) => {
+    try {
+      setLoadingPosts(true);
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          profiles!posts_user_id_fkey (
+            full_name,
+            avatar_url,
+            current_position
+          )
+        `)
+        .eq('user_id', profileId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setUserPosts(data || []);
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    } finally {
+      setLoadingPosts(false);
     }
   };
 
@@ -486,8 +514,8 @@ const ProfilePage = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Profile Views</span>
-                  <span className="font-bold text-blue-600">1,247</span>
+                  <span className="text-sm text-gray-600">Posts</span>
+                  <span className="font-bold text-blue-600">{userPosts.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Skills Listed</span>
@@ -507,6 +535,61 @@ const ProfilePage = () => {
             </Card>
           </div>
         </div>
+
+        {/* User Posts Section */}
+        <Card className="bg-white shadow-lg border-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-blue-600" />
+              {isOwnProfile ? 'My Posts' : `${profile.full_name?.split(' ')[0]}'s Posts`}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loadingPosts ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-gray-500 mt-2">Loading posts...</p>
+              </div>
+            ) : userPosts.length > 0 ? (
+              <div className="space-y-4">
+                {userPosts.map((post) => (
+                  <div key={post.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div className="mb-3">
+                      <p className="text-gray-800 leading-relaxed">{post.content}</p>
+                    </div>
+                    {post.image_url && (
+                      <div className="mb-3">
+                        <img 
+                          src={post.image_url} 
+                          alt="Post image" 
+                          className="rounded-lg max-h-64 w-auto"
+                        />
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center gap-4">
+                        <span>{post.likes_count || 0} likes</span>
+                        <span>{post.comments_count || 0} comments</span>
+                        <span>{post.shares_count || 0} shares</span>
+                      </div>
+                      <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>
+                  {isOwnProfile 
+                    ? "You haven't posted anything yet. Share your first post!"
+                    : "This user hasn't posted anything yet."
+                  }
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

@@ -4,7 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MoreHorizontal, CheckCircle, Hash, AtSign } from 'lucide-react';
+import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Post } from '@/hooks/usePosts';
 import PostEngagementActions from './PostEngagementActions';
 import CommentsSection from './CommentsSection';
@@ -111,9 +112,36 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
-            <MoreHorizontal className="w-5 h-5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
+                <MoreHorizontal className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Post
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Copy className="w-4 h-4 mr-2" />
+                Copy Link
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Bookmark className="w-4 h-4 mr-2" />
+                Save Post
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-red-600">
+                <Flag className="w-4 h-4 mr-2" />
+                Report Post
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Post
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Post Content */}
