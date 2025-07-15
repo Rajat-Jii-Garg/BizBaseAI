@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -25,7 +26,8 @@ import {
   MessageCircle,
   Bell,
   Search,
-  Rss
+  Rss,
+  UserCheck
 } from 'lucide-react';
 
 interface AppSidebarProps {
@@ -36,6 +38,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Feed', href: '/feed', icon: Rss },
   { name: 'Network', href: '/network', icon: Users },
+  { name: 'Connections', href: '/connections', icon: UserCheck },
   { name: 'Messages', href: '/messages', icon: MessageCircle },
   { name: 'Notifications', href: '/notifications', icon: Bell },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
@@ -60,10 +63,10 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed = false }) => {
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <a href={item.href} className="flex items-center space-x-3">
+                    <Link to={item.href} className="flex items-center space-x-3">
                       <item.icon className="w-5 h-5" />
                       <span>{item.name}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

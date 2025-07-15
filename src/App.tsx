@@ -18,6 +18,7 @@ import Network from "./pages/Network";
 import Analytics from "./pages/Analytics";
 import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
+import Connections from "./pages/Connections";
 import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
@@ -72,6 +73,11 @@ const App = () => (
             <Route path="/notifications" element={
               <ProtectedRoute>
                 <Notifications />
+              </ProtectedRoute>
+            } />
+            <Route path="/connections" element={
+              <ProtectedRoute>
+                <Connections />
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
