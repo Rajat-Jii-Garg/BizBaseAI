@@ -1,442 +1,308 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Calendar, 
   Clock, 
   MapPin, 
   Users, 
-  Plus, 
-  Search,
+  Plus,
   Filter,
-  Video,
-  Star,
-  Share2,
-  Bookmark,
+  Search,
   ExternalLink,
+  BookmarkPlus,
+  Share2,
+  Video,
   Globe,
-  Building2,
-  Ticket,
-  Eye,
-  Heart,
-  MessageSquare,
+  Briefcase,
   TrendingUp,
-  Award,
-  Briefcase
+  Star
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const Events = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedTab, setSelectedTab] = useState('discover');
 
+  // Mock events data - replace with Supabase integration
   const events = [
     {
       id: 1,
-      title: "Global Business Leaders Summit 2025",
-      description: "Join industry leaders for insights on business transformation, innovation strategies, and networking opportunities.",
-      date: "March 15, 2025",
-      time: "9:00 AM - 6:00 PM",
-      location: "New York Convention Center",
-      type: "In-Person",
-      category: "Conference",
-      attendees: 2500,
-      price: "$299",
-      isPaid: true,
-      isBookmarked: false,
-      rating: 4.8,
-      organizer: "Business Excellence Network",
-      image: "/api/placeholder/300/200",
-      tags: ["Leadership", "Innovation", "Networking"],
-      status: "upcoming"
+      title: "AI in Business 2024: Future Trends",
+      description: "Explore how AI is transforming business operations and discover the latest trends in artificial intelligence.",
+      date: "2024-02-15",
+      time: "14:00",
+      location: "Virtual Event",
+      type: "webinar",
+      attendees: 1247,
+      price: "Free",
+      category: "Technology",
+      organizer: {
+        name: "TechForward",
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"
+      },
+      tags: ["AI", "Business", "Innovation"],
+      featured: true
     },
     {
       id: 2,
-      title: "AI & Future of Work Webinar",
-      description: "Explore how artificial intelligence is reshaping the workplace and learn strategies for adaptation.",
-      date: "February 28, 2025",
-      time: "2:00 PM - 4:00 PM",
-      location: "Virtual Event",
-      type: "Online",
-      category: "Webinar",
-      attendees: 850,
-      price: "Free",
-      isPaid: false,
-      isBookmarked: true,
-      rating: 4.6,
-      organizer: "Tech Innovation Hub",
-      image: "/api/placeholder/300/200",
-      tags: ["AI", "Technology", "Future of Work"],
-      status: "upcoming"
+      title: "Networking Mixer: Startup Founders",
+      description: "Connect with fellow entrepreneurs and startup founders in this exclusive networking event.",
+      date: "2024-02-18",
+      time: "18:30",
+      location: "Innovation Hub, NYC",
+      type: "networking",
+      attendees: 85,
+      price: "$25",
+      category: "Networking",
+      organizer: {
+        name: "Startup Network",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
+      },
+      tags: ["Networking", "Startups", "Entrepreneurship"]
     },
     {
       id: 3,
-      title: "Sustainable Finance Forum",
-      description: "Discussing sustainable investment strategies and ESG compliance in modern finance.",
-      date: "March 8, 2025",
-      time: "10:30 AM - 5:00 PM",
-      location: "Chicago Business Center",
-      type: "Hybrid",
-      category: "Forum",
-      attendees: 420,
-      price: "$150",
-      isPaid: true,
-      isBookmarked: false,
-      rating: 4.7,
-      organizer: "Green Finance Association",
-      image: "/api/placeholder/300/200",
-      tags: ["Finance", "Sustainability", "ESG"],
-      status: "upcoming"
+      title: "Digital Marketing Masterclass",
+      description: "Learn advanced digital marketing strategies from industry experts.",
+      date: "2024-02-20",
+      time: "10:00",
+      location: "Virtual Event",
+      type: "workshop",
+      attendees: 356,
+      price: "$49",
+      category: "Marketing",
+      organizer: {
+        name: "Marketing Pro",
+        avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150"
+      },
+      tags: ["Marketing", "Digital", "Strategy"]
     },
     {
       id: 4,
-      title: "Digital Marketing Masterclass",
-      description: "Master the latest digital marketing trends and strategies from industry experts.",
-      date: "January 20, 2025",
-      time: "1:00 PM - 6:00 PM",
-      location: "Los Angeles Marketing Hub",
-      type: "In-Person",
-      category: "Workshop",
-      attendees: 180,
-      price: "$199",
-      isPaid: true,
-      isBookmarked: true,
-      rating: 4.9,
-      organizer: "Digital Growth Academy",
-      image: "/api/placeholder/300/200",
-      tags: ["Marketing", "Digital", "Strategy"],
-      status: "past"
+      title: "Investment Strategies Workshop",
+      description: "Learn from successful investors about portfolio management and investment strategies.",
+      date: "2024-02-22",
+      time: "15:00",
+      location: "Financial District, London",
+      type: "workshop",
+      attendees: 127,
+      price: "$75",
+      category: "Finance",
+      organizer: {
+        name: "InvestWise",
+        avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150"
+      },
+      tags: ["Investment", "Finance", "Strategy"]
     }
   ];
 
-  const myEvents = [
-    {
-      id: 5,
-      title: "Startup Pitch Competition",
-      description: "Present your startup idea to investors and industry experts.",
-      date: "April 5, 2025",
-      time: "6:00 PM - 9:00 PM",
-      location: "Silicon Valley Innovation Center",
-      type: "In-Person",
-      category: "Competition",
-      attendees: 300,
-      price: "$50",
-      isPaid: true,
-      isBookmarked: false,
-      rating: 4.5,
-      organizer: "Startup Valley",
-      image: "/api/placeholder/300/200",
-      tags: ["Startup", "Investment", "Pitching"],
-      status: "registered"
-    }
+  const categories = ['all', 'Technology', 'Networking', 'Marketing', 'Finance', 'Leadership'];
+  const eventTypes = [
+    { id: 'webinar', label: 'Webinars', icon: Video },
+    { id: 'networking', label: 'Networking', icon: Users },
+    { id: 'workshop', label: 'Workshops', icon: Briefcase },
+    { id: 'conference', label: 'Conferences', icon: Globe }
   ];
 
-  const filteredEvents = events.filter(event =>
-    event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    event.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredEvents = events.filter(event => {
+    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
-  const getEventsByTab = () => {
-    switch (activeTab) {
-      case 'upcoming':
-        return filteredEvents.filter(event => event.status === 'upcoming');
-      case 'past':
-        return filteredEvents.filter(event => event.status === 'past');
-      case 'my-events':
-        return myEvents;
-      default:
-        return filteredEvents;
-    }
+  const handleJoinEvent = (eventId: number) => {
+    toast({
+      title: "Event Joined!",
+      description: "You've successfully registered for this event. Check your email for details."
+    });
+  };
+
+  const handleBookmarkEvent = (eventId: number) => {
+    toast({
+      title: "Event Bookmarked",
+      description: "Event saved to your bookmarks."
+    });
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 rounded-2xl p-8 text-white">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2 flex items-center">
-                <Calendar className="w-8 h-8 mr-3" />
-                Professional Events
-              </h1>
-              <p className="text-purple-100">Discover and attend events to grow your professional network</p>
-            </div>
-            <div className="flex items-center space-x-4 mt-4 md:mt-0">
-              <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Event
-              </Button>
-            </div>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Calendar className="w-8 h-8 text-blue-600" />
+              Professional Events
+            </h1>
+            <p className="text-gray-600 mt-2">Discover networking events, workshops, and conferences to advance your career</p>
           </div>
-
-          {/* Search Bar */}
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search events by name, category, or description..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/20 border-white/30 text-white placeholder-white/70 rounded-full focus:bg-white/30"
-            />
-          </div>
+          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Event
+          </Button>
         </div>
 
-        {/* Event Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Upcoming Events</p>
-                  <p className="text-2xl font-bold text-blue-600">12</p>
-                </div>
-                <Calendar className="w-8 h-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Events Attended</p>
-                  <p className="text-2xl font-bold text-green-600">8</p>
-                </div>
-                <Ticket className="w-8 h-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Bookmarked</p>
-                  <p className="text-2xl font-bold text-purple-600">5</p>
-                </div>
-                <Bookmark className="w-8 h-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Networking Score</p>
-                  <p className="text-2xl font-bold text-orange-600">9.2</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Tabs */}
+        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+          {['discover', 'my-events', 'bookmarked'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setSelectedTab(tab)}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+                selectedTab === tab
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {tab === 'discover' && 'Discover Events'}
+              {tab === 'my-events' && 'My Events'}
+              {tab === 'bookmarked' && 'Bookmarked'}
+            </button>
+          ))}
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-            <TabsTrigger value="past">Past Events</TabsTrigger>
-            <TabsTrigger value="my-events">My Events</TabsTrigger>
-            <TabsTrigger value="bookmarked">Bookmarked</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="upcoming" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {getEventsByTab().map((event) => (
-                <Card key={event.id} className="bg-white/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all">
-                  <div className="relative">
-                    <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg"></div>
-                    <div className="absolute top-4 right-4 flex space-x-2">
-                      <Badge className={`${event.type === 'Online' ? 'bg-green-500' : event.type === 'Hybrid' ? 'bg-orange-500' : 'bg-blue-500'} text-white`}>
-                        {event.type}
-                      </Badge>
-                      <Button variant="ghost" size="icon" className="bg-white/20 hover:bg-white/30 text-white">
-                        <Bookmark className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <div className="absolute bottom-4 left-4">
-                      <Badge className="bg-white/90 text-gray-900">
-                        {event.category}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <CardContent className="p-6">
-                    <div className="mb-4">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
-                      <p className="text-gray-600 text-sm line-clamp-2">{event.description}</p>
-                    </div>
-
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-                        {event.date}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Clock className="w-4 h-4 mr-2 text-green-500" />
-                        {event.time}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 mr-2 text-red-500" />
-                        {event.location}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Users className="w-4 h-4 mr-2 text-purple-500" />
-                        {event.attendees} attendees
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                        {event.rating} rating
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {event.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-lg font-bold text-green-600">{event.price}</span>
-                        {event.isPaid && (
-                          <Badge variant="outline" className="text-xs">
-                            Paid
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Details
-                        </Button>
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                          <Ticket className="w-4 h-4 mr-2" />
-                          Register
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="past" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {getEventsByTab().map((event) => (
-                <Card key={event.id} className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900">{event.title}</h3>
-                        <p className="text-sm text-gray-600">{event.date}</p>
-                      </div>
-                      <Badge className="bg-gray-100 text-gray-600">
-                        Attended
-                      </Badge>
-                    </div>
-                    <p className="text-gray-600 text-sm mb-4">{event.description}</p>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline">
-                        <Star className="w-4 h-4 mr-2" />
-                        Rate Event
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Share
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="my-events" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {getEventsByTab().map((event) => (
-                <Card key={event.id} className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900">{event.title}</h3>
-                        <p className="text-sm text-gray-600">{event.date}</p>
-                      </div>
-                      <Badge className="bg-green-100 text-green-600">
-                        Registered
-                      </Badge>
-                    </div>
-                    <p className="text-gray-600 text-sm mb-4">{event.description}</p>
-                    <div className="flex space-x-2">
-                      <Button size="sm">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Add to Calendar
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Share
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="bookmarked" className="space-y-6">
-            <div className="text-center py-12">
-              <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Bookmarked Events</h3>
-              <p className="text-gray-600">Bookmark events you're interested in to find them easily later.</p>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        {/* Featured Events */}
-        <Card className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border-0 shadow-xl">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <Award className="w-12 h-12 mx-auto mb-4 text-white/90" />
-              <h2 className="text-2xl font-bold mb-3">Featured Professional Events</h2>
-              <p className="text-white/90 mb-6">
-                Don't miss these exclusive networking and learning opportunities
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button 
-                  variant="secondary"
-                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
+        {/* Search and Filters */}
+        <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
+          <CardContent className="p-6">
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search events, topics, or organizers..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex gap-2">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="border rounded-lg px-3 py-2 bg-white"
                 >
-                  <Globe className="w-4 h-4 mr-2" />
-                  Global Summit
-                </Button>
-                
-                <Button 
-                  variant="secondary"
-                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
-                >
-                  <Video className="w-4 h-4 mr-2" />
-                  Virtual Conferences
-                </Button>
-
-                <Button 
-                  variant="secondary"
-                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
-                >
-                  <Briefcase className="w-4 h-4 mr-2" />
-                  Industry Meetups
+                  {categories.map(category => (
+                    <option key={category} value={category}>
+                      {category === 'all' ? 'All Categories' : category}
+                    </option>
+                  ))}
+                </select>
+                <Button variant="outline">
+                  <Filter className="w-4 h-4 mr-2" />
+                  More Filters
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Events List */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {filteredEvents.map((event) => (
+            <Card key={event.id} className={`hover:shadow-lg transition-shadow ${event.featured ? 'ring-2 ring-yellow-200' : ''}`}>
+              {event.featured && (
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-1 text-xs font-bold">
+                  ⭐ FEATURED EVENT
+                </div>
+              )}
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={event.organizer.avatar} />
+                      <AvatarFallback>{event.organizer.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-900 line-clamp-2">
+                        {event.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">by {event.organizer.name}</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleBookmarkEvent(event.id)}
+                  >
+                    <BookmarkPlus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <p className="text-gray-700 mb-4 line-clamp-2">{event.description}</p>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Calendar className="w-4 h-4" />
+                    <span>{new Date(event.date).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="w-4 h-4" />
+                    <span>{event.time}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MapPin className="w-4 h-4" />
+                    <span>{event.location}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Users className="w-4 h-4" />
+                    <span>{event.attendees} attending</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {event.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-lg text-green-600">{event.price}</span>
+                    <Badge variant="outline">{event.category}</Badge>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm">
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => handleJoinEvent(event.id)}
+                    >
+                      {event.price === 'Free' ? 'Join Event' : 'Register'}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredEvents.length === 0 && (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Events Found</h3>
+              <p className="text-gray-600">Try adjusting your search terms or browse different categories.</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DashboardLayout>
   );

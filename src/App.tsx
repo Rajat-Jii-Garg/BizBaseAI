@@ -20,6 +20,10 @@ import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import Connections from "./pages/Connections";
 import Settings from "./pages/Settings";
+import Events from "./pages/Events";
+import Insights from "./pages/Insights";
+import AIAssistant from "./pages/AIAssistant";
+import BusinessSetup from "./pages/BusinessSetup";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +85,63 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="/events" element={
+              <ProtectedRoute>
+                <Events />
+              </ProtectedRoute>
+            } />
+            <Route path="/insights" element={
+              <ProtectedRoute>
+                <Insights />
+              </ProtectedRoute>
+            } />
+            <Route path="/ai-assistant" element={
+              <ProtectedRoute>
+                <AIAssistant />
+              </ProtectedRoute>
+            } />
+            <Route path="/business-setup" element={
+              <ProtectedRoute>
+                <BusinessSetup />
+              </ProtectedRoute>
+            } />
+            
+            {/* Dashboard nested routes */}
+            <Route path="/dashboard/connections" element={
+              <ProtectedRoute>
+                <Connections />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/messages" element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/notifications" element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/events" element={
+              <ProtectedRoute>
+                <Events />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/insights" element={
+              <ProtectedRoute>
+                <Insights />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/ai-assistant" element={
+              <ProtectedRoute>
+                <AIAssistant />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/settings" element={
               <ProtectedRoute>
                 <Settings />
               </ProtectedRoute>
