@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, Menu } from 'lucide-react';
+import { Search, Menu, Bell, MessageCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import UserProfileDropdown from "./UserProfileDropdown";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import NotificationsCenter from "./NotificationsCenter";
 import ThemeSwitcher from "./ThemeSwitcher";
 import GlobalSearchModal from "./GlobalSearchModal";
@@ -22,6 +22,7 @@ const breadcrumbsMap: Record<string, string> = {
 
 const DashboardHeader = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const segments = location.pathname.split("/").filter(Boolean);
 
   // Global search modal
@@ -44,17 +45,10 @@ const DashboardHeader = () => {
             <Menu className="w-5 h-5" />
           </Button>
           <div className="relative hidden md:block">
-            <button
-              className="absolute left-3 top-2 h-8 rounded hover:bg-gray-100 px-1 transition"
-              title="Search (Ctrl+K)"
-              onClick={() => setSearchOpen(true)}
-              type="button"
-            >
-              <Search className="h-4 w-4 text-gray-400" />
-            </button>
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Search users, posts, hashtags..."
-              className="pl-10 w-64 bg-gray-50 border-gray-200 text-gray-700 placeholder:text-gray-500"
+              placeholder="Search people, posts, events, companies..."
+              className="pl-10 w-80 bg-background border-border focus:ring-2 focus:ring-primary/20 focus:border-primary"
               onFocus={() => setSearchOpen(true)}
               readOnly
             />
@@ -85,7 +79,23 @@ const DashboardHeader = () => {
         </div>
         <div className="flex items-center space-x-2">
           <ThemeSwitcher />
-          <NotificationsCenter />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/notifications')}
+            className="relative"
+            aria-label="Notifications"
+          >
+            <Bell className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/messages')}
+            aria-label="Messages"
+          >
+            <MessageCircle className="w-5 h-5" />
+          </Button>
           <UserProfileDropdown />
         </div>
       </div>

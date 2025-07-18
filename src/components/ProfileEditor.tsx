@@ -20,7 +20,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     bio: profile?.bio || '',
@@ -29,6 +31,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
     location: profile?.location || '',
     website: profile?.website || '',
     linkedin_url: profile?.linkedin_url || '',
+    banner_url: profile?.banner_url || '',
   });
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +90,51 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
     }
   };
 
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploadingBanner(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/banner.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile with new banner URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ banner_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "Profile banner updated successfully!"
+      });
+
+      onUpdate();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to upload banner: " + error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -129,6 +177,40 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Profile Banner Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Profile Banner</h3>
+            <div className="relative h-32 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg overflow-hidden">
+              {profile?.banner_url && (
+                <img 
+                  src={profile.banner_url} 
+                  alt="Profile Banner" 
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <Button
+                type="button"
+                size="sm"
+                className="absolute top-2 right-2"
+                onClick={() => bannerInputRef.current?.click()}
+                disabled={uploadingBanner}
+              >
+                {uploadingBanner ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Camera className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <input
+              ref={bannerInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleBannerUpload}
+              className="hidden"
+            />
+          </div>
+
           {/* Avatar Upload Section */}
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
