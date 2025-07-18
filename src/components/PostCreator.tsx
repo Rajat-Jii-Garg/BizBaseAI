@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Image, Video, FileText, Loader2 } from 'lucide-react';
+import { Image, Video, FileText, Loader2, Hash, AtSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface PostCreatorProps {
   onCreatePost: (content: string, imageUrl?: string) => Promise<void>;
@@ -14,7 +15,11 @@ interface PostCreatorProps {
 const PostCreator: React.FC<PostCreatorProps> = ({ onCreatePost }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showMentions, setShowMentions] = useState(false);
+  const [showHashtags, setShowHashtags] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = async () => {
     if (!content.trim()) return;
@@ -28,11 +33,47 @@ const PostCreator: React.FC<PostCreatorProps> = ({ onCreatePost }) => {
     }
   };
 
+  const insertMention = (mention: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newContent = content.substring(0, start) + `@${mention} ` + content.substring(end);
+    setContent(newContent);
+    
+    // Focus back to textarea
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + mention.length + 2, start + mention.length + 2);
+    }, 0);
+  };
+
+  const insertHashtag = (hashtag: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newContent = content.substring(0, start) + `#${hashtag} ` + content.substring(end);
+    setContent(newContent);
+    
+    // Focus back to textarea
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + hashtag.length + 2, start + hashtag.length + 2);
+    }, 0);
+  };
+
+  const handleAvatarClick = () => {
+    navigate('/profile');
+  };
+
   return (
     <Card className="bg-white shadow-sm border border-gray-200">
       <CardContent className="p-4">
         <div className="flex items-start space-x-3 mb-3">
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all" onClick={handleAvatarClick}>
             <AvatarImage src={user?.user_metadata?.avatar_url} />
             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
               {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
@@ -40,9 +81,10 @@ const PostCreator: React.FC<PostCreatorProps> = ({ onCreatePost }) => {
           </Avatar>
           <div className="flex-1">
             <Textarea
+              ref={textareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Share your professional thoughts..."
+              placeholder="Share your professional thoughts... Use @ to mention people and # for hashtags"
               className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none min-h-[80px] text-sm"
             />
           </div>
@@ -58,9 +100,23 @@ const PostCreator: React.FC<PostCreatorProps> = ({ onCreatePost }) => {
               <Video className="w-4 h-4 mr-1" />
               <span className="text-xs">Video</span>
             </Button>
-            <Button variant="ghost" size="sm" className="text-purple-600 hover:bg-purple-50 h-8 px-2">
-              <FileText className="w-4 h-4 mr-1" />
-              <span className="text-xs">Article</span>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-orange-600 hover:bg-orange-50 h-8 px-2"
+              onClick={() => insertHashtag('trending')}
+            >
+              <Hash className="w-4 h-4 mr-1" />
+              <span className="text-xs">Tag</span>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-purple-600 hover:bg-purple-50 h-8 px-2"
+              onClick={() => insertMention('someone')}
+            >
+              <AtSign className="w-4 h-4 mr-1" />
+              <span className="text-xs">Mention</span>
             </Button>
           </div>
           <Button 

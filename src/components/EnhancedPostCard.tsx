@@ -4,12 +4,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2, X, Save } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Post } from '@/hooks/usePosts';
 import PostEngagementActions from './PostEngagementActions';
 import CommentsSection from './CommentsSection';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EnhancedPostCardProps {
   post: Post & {
@@ -17,11 +22,18 @@ interface EnhancedPostCardProps {
     mentions?: { mentioned_user_id: string; profiles: { full_name: string } }[];
   };
   onEngagementUpdate: () => void;
+  onEdit?: (postId: string, newContent: string) => Promise<void>;
+  onDelete?: (postId: string) => Promise<void>;
 }
 
-const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementUpdate }) => {
+const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [showFullContent, setShowFullContent] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -79,6 +91,55 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
     navigate(`/user-profile?user=${post.user_id}`);
   };
 
+  const handleEdit = async () => {
+    if (!onEdit || !editContent.trim()) return;
+    
+    try {
+      await onEdit(post.id, editContent);
+      setIsEditDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Post updated successfully!"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update post",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete) return;
+    
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      try {
+        await onDelete(post.id);
+        toast({
+          title: "Success",
+          description: "Post deleted successfully!"
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete post",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
+    toast({
+      title: "Success",
+      description: "Post link copied to clipboard!"
+    });
+  };
+
+  const isOwnPost = user?.id === post.user_id;
+
   return (
     <Card className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300 overflow-hidden">
       <CardContent className="p-6">
@@ -118,12 +179,21 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
                 <MoreHorizontal className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Post
-              </DropdownMenuItem>
-              <DropdownMenuItem>
+            <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
+              {isOwnPost && (
+                <>
+                  <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Post
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Post
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              <DropdownMenuItem onClick={handleCopyLink}>
                 <Copy className="w-4 h-4 mr-2" />
                 Copy Link
               </DropdownMenuItem>
@@ -131,15 +201,15 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
                 <Bookmark className="w-4 h-4 mr-2" />
                 Save Post
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
-                <Flag className="w-4 h-4 mr-2" />
-                Report Post
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Post
-              </DropdownMenuItem>
+              {!isOwnPost && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600">
+                    <Flag className="w-4 h-4 mr-2" />
+                    Report Post
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -211,6 +281,32 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
           onCommentUpdate={onEngagementUpdate}
         />
       </CardContent>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Edit Post</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              placeholder="What's on your mind?"
+              className="min-h-[120px]"
+            />
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleEdit} disabled={!editContent.trim()}>
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

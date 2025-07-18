@@ -238,10 +238,67 @@ export const usePosts = () => {
     }
   }, [user]);
 
+  const editPost = async (postId: string, newContent: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to edit posts",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .update({ 
+          content: newContent,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', postId)
+        .eq('user_id', user.id); // Ensure user can only edit their own posts
+
+      if (error) throw error;
+
+      await fetchPosts();
+    } catch (error: any) {
+      console.error('Error editing post:', error);
+      throw error;
+    }
+  };
+
+  const deletePost = async (postId: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete posts",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        .eq('user_id', user.id); // Ensure user can only delete their own posts
+
+      if (error) throw error;
+
+      await fetchPosts();
+    } catch (error: any) {
+      console.error('Error deleting post:', error);
+      throw error;
+    }
+  };
+
   return {
     posts,
     loading,
     createPost,
+    editPost,
+    deletePost,
     toggleLike,
     sharePost,
     refreshPosts: fetchPosts

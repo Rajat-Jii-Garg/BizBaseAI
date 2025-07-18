@@ -60,6 +60,8 @@ const Dashboard = () => {
     posts: userPosts, 
     loading: userPostsLoading, 
     createPost, 
+    editPost,
+    deletePost,
     refreshPosts 
   } = usePosts();
   
@@ -556,6 +558,8 @@ const Dashboard = () => {
                       key={post.id}
                       post={post}
                       onEngagementUpdate={fetchAllPosts}
+                      onEdit={editPost}
+                      onDelete={deletePost}
                     />
                   ))
                 )}
