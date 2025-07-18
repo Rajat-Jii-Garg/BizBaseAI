@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,11 +11,11 @@ import {
   Search, 
   MessageSquare, 
   UserMinus,
-  Mail,
-  Phone,
+  UserPlus,
   MapPin,
   Briefcase,
-  Loader2
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,17 +25,21 @@ import { useToast } from '@/hooks/use-toast';
 const Connections = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [connections, setConnections] = useState<any[]>([]);
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchConnections();
       fetchPendingRequests();
       fetchSentRequests();
+      fetchSuggestions();
     }
   }, [user]);
 
@@ -111,6 +116,122 @@ const Connections = () => {
     }
   };
 
+  const fetchSuggestions = async () => {
+    if (!user) return;
+    
+    setSuggestionsLoading(true);
+    try {
+      // Get connected user IDs and pending request IDs
+      const { data: existingConnections } = await supabase
+        .from('connections')
+        .select('requester_id, addressee_id')
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+
+      const connectedUserIds = new Set();
+      existingConnections?.forEach(conn => {
+        connectedUserIds.add(conn.requester_id);
+        connectedUserIds.add(conn.addressee_id);
+      });
+
+      // Get random users that are not connected
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .not('id', 'eq', user.id)
+        .not('id', 'in', `(${Array.from(connectedUserIds).join(',') || 'null'})`)
+        .limit(6);
+
+      if (error) throw error;
+      setSuggestions(profiles || []);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    } finally {
+      setSuggestionsLoading(false);
+    }
+  };
+
+  const handleSendConnectionRequest = async (profileId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .insert([{
+          requester_id: user.id,
+          addressee_id: profileId,
+          status: 'pending'
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Connection Request Sent",
+        description: "Your connection request has been sent successfully."
+      });
+
+      fetchSuggestions(); // Refresh suggestions
+      fetchSentRequests(); // Refresh sent requests
+    } catch (error) {
+      console.error('Error sending connection request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send connection request",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAcceptRequest = async (requestId: string) => {
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .update({ status: 'accepted' })
+        .eq('id', requestId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Connection Accepted",
+        description: "You have successfully accepted the connection request."
+      });
+
+      fetchConnections();
+      fetchPendingRequests();
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to accept connection request",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRejectRequest = async (requestId: string) => {
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .update({ status: 'rejected' })
+        .eq('id', requestId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Connection Rejected",
+        description: "You have rejected the connection request."
+      });
+
+      fetchPendingRequests();
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reject connection request",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDisconnect = async (connectionId: string) => {
     if (!confirm('Are you sure you want to remove this connection?')) return;
 
@@ -128,6 +249,7 @@ const Connections = () => {
       });
       
       fetchConnections();
+      fetchSuggestions(); // Refresh suggestions
     } catch (error) {
       console.error('Error removing connection:', error);
       toast({
@@ -144,24 +266,99 @@ const Connections = () => {
     conn.profile?.current_position?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const SuggestionsSection = () => (
+    <Card className="mt-6">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">People You May Know</CardTitle>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={fetchSuggestions}
+            disabled={suggestionsLoading}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${suggestionsLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {suggestionsLoading ? (
+          <div className="text-center py-8">
+            <Loader2 className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
+            <p className="text-gray-600">Loading suggestions...</p>
+          </div>
+        ) : suggestions.length === 0 ? (
+          <div className="text-center py-8">
+            <Users className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <p className="text-gray-600">No suggestions available at the moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {suggestions.map((profile) => (
+              <Card key={profile.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3 mb-3">
+                    <Avatar 
+                      className="h-12 w-12 cursor-pointer" 
+                      onClick={() => navigate(`/profile/${profile.id}`)}
+                    >
+                      <AvatarImage src={profile.avatar_url} />
+                      <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                        {profile.full_name?.charAt(0) || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <h4 
+                        className="font-semibold text-sm cursor-pointer hover:text-primary"
+                        onClick={() => navigate(`/profile/${profile.id}`)}
+                      >
+                        {profile.full_name}
+                      </h4>
+                      {profile.current_position && (
+                        <p className="text-xs text-gray-600 flex items-center gap-1">
+                          <Briefcase className="w-3 h-3" />
+                          {profile.current_position}
+                        </p>
+                      )}
+                      {profile.location && (
+                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {profile.location}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => handleSendConnectionRequest(profile.id)}
+                    >
+                      <UserPlus className="w-3 h-3 mr-1" />
+                      Connect
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => navigate(`/messages`)}
+                    >
+                      <MessageSquare className="w-3 h-3 mr-1" />
+                      Message
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto p-6 space-y-6">
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-6 h-6 text-blue-600" />
-              My Connections
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span>{connections.length} connections</span>
-              <span>{pendingRequests.length} pending requests</span>
-              <span>{sentRequests.length} sent requests</span>
-            </div>
-          </CardContent>
-        </Card>
 
         <Tabs defaultValue="connections" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
@@ -209,14 +406,20 @@ const Connections = () => {
                       <Card key={connection.id} className="hover:shadow-lg transition-shadow">
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4 mb-4">
-                            <Avatar className="h-16 w-16">
+                            <Avatar 
+                              className="h-16 w-16 cursor-pointer" 
+                              onClick={() => navigate(`/profile/${connection.profile?.id}`)}
+                            >
                               <AvatarImage src={connection.profile?.avatar_url} />
                               <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
                                 {connection.profile?.full_name?.charAt(0) || 'U'}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
-                              <h3 className="font-semibold text-lg text-gray-900">
+                              <h3 
+                                className="font-semibold text-lg text-gray-900 cursor-pointer hover:text-primary"
+                                onClick={() => navigate(`/profile/${connection.profile?.id}`)}
+                              >
                                 {connection.profile?.full_name}
                               </h3>
                               {connection.profile?.current_position && (
@@ -240,7 +443,12 @@ const Connections = () => {
                           </div>
 
                           <div className="flex gap-2">
-                            <Button size="sm" variant="outline" className="flex-1">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="flex-1"
+                              onClick={() => navigate('/messages')}
+                            >
                               <MessageSquare className="w-4 h-4 mr-2" />
                               Message
                             </Button>
@@ -258,6 +466,7 @@ const Connections = () => {
                     ))}
                   </div>
                 )}
+                <SuggestionsSection />
               </CardContent>
             </Card>
           </TabsContent>
@@ -279,24 +488,40 @@ const Connections = () => {
                     {pendingRequests.map((request) => (
                       <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12">
+                          <Avatar 
+                            className="h-12 w-12 cursor-pointer" 
+                            onClick={() => navigate(`/profile/${request.profiles?.id}`)}
+                          >
                             <AvatarImage src={request.profiles?.avatar_url} />
                             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
                               {request.profiles?.full_name?.charAt(0) || 'U'}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <h4 className="font-semibold">{request.profiles?.full_name}</h4>
+                            <h4 
+                              className="font-semibold cursor-pointer hover:text-primary"
+                              onClick={() => navigate(`/profile/${request.profiles?.id}`)}
+                            >
+                              {request.profiles?.full_name}
+                            </h4>
                             <p className="text-sm text-gray-600">
                               {request.profiles?.current_position} at {request.profiles?.company_name}
                             </p>
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                          <Button 
+                            size="sm" 
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => handleAcceptRequest(request.id)}
+                          >
                             Accept
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleRejectRequest(request.id)}
+                          >
                             Decline
                           </Button>
                         </div>
@@ -304,6 +529,7 @@ const Connections = () => {
                     ))}
                   </div>
                 )}
+                <SuggestionsSection />
               </CardContent>
             </Card>
           </TabsContent>
@@ -325,14 +551,22 @@ const Connections = () => {
                     {sentRequests.map((request) => (
                       <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12">
+                          <Avatar 
+                            className="h-12 w-12 cursor-pointer" 
+                            onClick={() => navigate(`/profile/${request.profiles?.id}`)}
+                          >
                             <AvatarImage src={request.profiles?.avatar_url} />
                             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
                               {request.profiles?.full_name?.charAt(0) || 'U'}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <h4 className="font-semibold">{request.profiles?.full_name}</h4>
+                            <h4 
+                              className="font-semibold cursor-pointer hover:text-primary"
+                              onClick={() => navigate(`/profile/${request.profiles?.id}`)}
+                            >
+                              {request.profiles?.full_name}
+                            </h4>
                             <p className="text-sm text-gray-600">
                               {request.profiles?.current_position} at {request.profiles?.company_name}
                             </p>
@@ -343,6 +577,7 @@ const Connections = () => {
                     ))}
                   </div>
                 )}
+                <SuggestionsSection />
               </CardContent>
             </Card>
           </TabsContent>
