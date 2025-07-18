@@ -53,8 +53,8 @@ const DashboardHeader = () => {
               <Search className="h-4 w-4 text-gray-400" />
             </button>
             <Input
-              placeholder="Search anything... (Ctrl+K)"
-              className="pl-10 w-64 bg-gray-50 border-gray-200"
+              placeholder="Search users, posts, hashtags..."
+              className="pl-10 w-64 bg-gray-50 border-gray-200 text-gray-700 placeholder:text-gray-500"
               onFocus={() => setSearchOpen(true)}
               readOnly
             />

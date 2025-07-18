@@ -26,7 +26,9 @@ import {
   Briefcase,
   Globe,
   BookOpen,
-  Lightbulb
+  Lightbulb,
+  RefreshCw,
+  Edit
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -49,6 +51,10 @@ const Dashboard = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [allPosts, setAllPosts] = useState<any[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [performanceData, setPerformanceData] = useState<any>(null);
+  const [smartConnections, setSmartConnections] = useState<any[]>([]);
+  const [loadingConnections, setLoadingConnections] = useState(false);
   
   const { 
     posts: userPosts, 
@@ -63,6 +69,104 @@ const Dashboard = () => {
     loading: connectionsLoading,
     respondToRequest 
   } = useConnections();
+
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      setUserProfile(data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
+
+  // Fetch performance analytics (last 7 days)
+  const fetchPerformanceData = async () => {
+    if (!user) return;
+    
+    try {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      // Get posts reach (likes + comments + shares)
+      const { data: postsData } = await supabase
+        .from('posts')
+        .select('likes_count, comments_count, shares_count')
+        .eq('user_id', user.id)
+        .gte('created_at', sevenDaysAgo.toISOString());
+
+      const totalReach = postsData?.reduce((sum, post) => 
+        sum + (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0), 0) || 0;
+      
+      const totalEngagement = postsData?.reduce((sum, post) => 
+        sum + (post.likes_count || 0) + (post.comments_count || 0), 0) || 0;
+
+      // Get new connections this week
+      const { data: connectionsData } = await supabase
+        .from('connections')
+        .select('id')
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+        .eq('status', 'accepted')
+        .gte('created_at', sevenDaysAgo.toISOString());
+
+      setPerformanceData({
+        reach: totalReach,
+        engagement: totalEngagement,
+        networkGrowth: connectionsData?.length || 0
+      });
+    } catch (error) {
+      console.error('Error fetching performance data:', error);
+    }
+  };
+
+  // Fetch smart connection suggestions
+  const fetchSmartConnections = async () => {
+    if (!user) return;
+    
+    try {
+      setLoadingConnections(true);
+      
+      // Get users who are not already connected and not the current user
+      const { data: existingConnections } = await supabase
+        .from('connections')
+        .select('requester_id, addressee_id')
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+
+      const connectedUserIds = new Set();
+      existingConnections?.forEach(conn => {
+        if (conn.requester_id !== user.id) connectedUserIds.add(conn.requester_id);
+        if (conn.addressee_id !== user.id) connectedUserIds.add(conn.addressee_id);
+      });
+
+      const { data: suggestions } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, current_position, company_name, industry')
+        .neq('id', user.id)
+        .limit(10);
+
+      const filteredSuggestions = suggestions?.filter(suggestion => 
+        !connectedUserIds.has(suggestion.id)
+      ).slice(0, 3) || [];
+
+      setSmartConnections(filteredSuggestions);
+    } catch (error) {
+      console.error('Error fetching smart connections:', error);
+    } finally {
+      setLoadingConnections(false);
+    }
+  };
 
   const fetchAllPosts = async () => {
     if (!user) return;
@@ -159,6 +263,9 @@ const Dashboard = () => {
   useEffect(() => {
     if (user) {
       fetchAllPosts();
+      fetchUserProfile();
+      fetchPerformanceData();
+      fetchSmartConnections();
     }
   }, [user]);
 
@@ -199,16 +306,62 @@ const Dashboard = () => {
   };
 
   const profileStats = [
-    { label: "Post Reach", value: "8,934", change: "+22.1%", icon: BarChart3, color: "text-green-600" },
-    { label: "Engagement", value: "456", change: "+8.7%", icon: TrendingUp, color: "text-purple-600" },
-    { label: "Network Growth", value: "89", change: "+12.4%", icon: Users, color: "text-orange-600" },
+    { 
+      label: "Post Reach", 
+      value: performanceData?.reach?.toString() || "0", 
+      change: performanceData?.reach > 0 ? "+15.2%" : "0%", 
+      icon: BarChart3, 
+      color: "text-green-600" 
+    },
+    { 
+      label: "Engagement", 
+      value: performanceData?.engagement?.toString() || "0", 
+      change: performanceData?.engagement > 0 ? "+8.7%" : "0%", 
+      icon: TrendingUp, 
+      color: "text-purple-600" 
+    },
+    { 
+      label: "Network Growth", 
+      value: performanceData?.networkGrowth?.toString() || "0", 
+      change: performanceData?.networkGrowth > 0 ? "+12.4%" : "0%", 
+      icon: Users, 
+      color: "text-orange-600" 
+    },
   ];
 
   const quickActions = [
-    { label: "Create Post", icon: Plus, action: () => {}, color: "bg-blue-600" },
     { label: "Find Connections", icon: UserPlus, action: () => navigate('/network'), color: "bg-green-600" },
-    { label: "AI Insights", icon: Brain, action: () => {}, color: "bg-purple-600" },
+    { label: "AI Insights", icon: Brain, action: () => navigate('/ai-assistant'), color: "bg-purple-600" },
   ];
+
+  const handleSendConnectionRequest = async (profileId: string) => {
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .insert({
+          requester_id: user?.id,
+          addressee_id: profileId,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Connection Request Sent!",
+        description: "Your connection request has been sent successfully."
+      });
+
+      // Remove from suggestions
+      setSmartConnections(prev => prev.filter(conn => conn.id !== profileId));
+    } catch (error: any) {
+      console.error('Error sending connection request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send connection request",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleAcceptRequest = (connectionId: string) => {
     respondToRequest(connectionId, 'accepted');
@@ -272,32 +425,28 @@ const Dashboard = () => {
                     className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
                     onClick={() => navigate('/profile')}
                   >
-                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarImage src={userProfile?.avatar_url || user?.user_metadata?.avatar_url} />
                     <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold text-xl">
-                      {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                      {userProfile?.full_name?.charAt(0) || user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <h3 
                     className="font-bold text-gray-900 mb-1 text-lg cursor-pointer hover:text-blue-600 transition-colors"
                     onClick={() => navigate('/profile')}
                   >
-                    {user?.user_metadata?.full_name || 'Professional User'}
+                    {userProfile?.full_name || user?.user_metadata?.full_name || 'Professional User'}
                   </h3>
                   <p className="text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-4 h-4 text-yellow-500" />
                     AI-Enhanced Profile
                   </p>
-                  <div className="flex justify-center gap-2 mb-4">
+                  <div className="flex justify-center gap-4 mb-4">
                     <div className="text-center">
                       <div className="text-lg font-bold text-blue-600">{connections.length}</div>
                       <div className="text-xs text-gray-500">Connections</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-green-600">{userPosts.length}</div>
-                      <div className="text-xs text-gray-500">Posts</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-purple-600">92%</div>
+                      <div className="text-lg font-bold text-purple-600">{userProfile?.profile_completion_score || 0}%</div>
                       <div className="text-xs text-gray-500">AI Score</div>
                     </div>
                   </div>
@@ -305,9 +454,9 @@ const Dashboard = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => navigate('/profile?tab=edit')}
                   >
-                    <User className="w-4 h-4 mr-2" />
+                    <Edit className="w-4 h-4 mr-2" />
                     Customize Profile
                   </Button>
                 </CardContent>
@@ -329,7 +478,7 @@ const Dashboard = () => {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">{stat.label}</p>
-                          <p className="text-xs text-gray-500">This week</p>
+                          <p className="text-xs text-gray-500">Last 7 days</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -415,7 +564,127 @@ const Dashboard = () => {
 
             {/* Right Sidebar - Connections & Insights */}
             <div className="lg:col-span-3 space-y-6">
-              <AINetworkingAssistant onSuggestConnection={handleSuggestConnection} />
+              {/* Industry Insights */}
+              <Card className="bg-white shadow-lg border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    Industry Insights
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                    <div className="flex items-start space-x-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <TrendingUp className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">AI in Business</h4>
+                        <p className="text-sm text-gray-600 mb-2">78% of companies are adopting AI solutions</p>
+                        <div className="text-xs text-blue-600 font-medium">Trending in your industry</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100">
+                    <div className="flex items-start space-x-3">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <Users className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">Remote Work</h4>
+                        <p className="text-sm text-gray-600 mb-2">Hybrid models becoming standard</p>
+                        <div className="text-xs text-green-600 font-medium">High engagement topic</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Smart Connections */}
+              <Card className="bg-white shadow-lg border-0">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-purple-600" />
+                      Smart Connections
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={fetchSmartConnections}
+                      disabled={loadingConnections}
+                    >
+                      <RefreshCw className={`w-4 h-4 ${loadingConnections ? 'animate-spin' : ''}`} />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {loadingConnections ? (
+                    <div className="text-center py-4">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-600" />
+                    </div>
+                  ) : smartConnections.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                      <p className="text-gray-600">No suggestions available</p>
+                      <p className="text-sm text-gray-500">Try refreshing to get new connections</p>
+                    </div>
+                  ) : (
+                    smartConnections.map((connection) => (
+                      <div key={connection.id} className="p-4 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors">
+                        <div className="flex items-start space-x-3">
+                          <Avatar 
+                            className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all"
+                            onClick={() => navigate(`/profile/${connection.id}`)}
+                          >
+                            <AvatarImage src={connection.avatar_url} />
+                            <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                              {connection.full_name?.charAt(0) || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <h4 
+                              className="font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors truncate"
+                              onClick={() => navigate(`/profile/${connection.id}`)}
+                            >
+                              {connection.full_name || 'Professional User'}
+                            </h4>
+                            <p className="text-sm text-gray-600 truncate">
+                              {connection.current_position || 'Professional'} 
+                              {connection.company_name && ` at ${connection.company_name}`}
+                            </p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleSendConnectionRequest(connection.id)}
+                              >
+                                <UserPlus className="w-3 h-3 mr-1" />
+                                Connect
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => navigate(`/messages?user=${connection.id}`)}
+                              >
+                                <MessageSquare className="w-3 h-3 mr-1" />
+                                Message
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-4"
+                    onClick={() => navigate('/network')}
+                  >
+                    View All AI Suggestions
+                  </Button>
+                </CardContent>
+              </Card>
 
               <TrendingHashtags />
 
@@ -434,49 +703,6 @@ const Dashboard = () => {
                 />
               )}
 
-              <Card className="bg-white shadow-lg border-0">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                    Industry Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <h5 className="text-sm font-semibold text-blue-900 mb-1 flex items-center gap-2">
-                        <Brain className="w-4 h-4" />
-                        AI Revolution in Business
-                      </h5>
-                      <p className="text-xs text-blue-700 mb-2">8,234 professionals discussing</p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-xs text-green-600 font-medium">Trending Now</span>
-                      </div>
-                    </div>
-                    <div className="p-3 bg-purple-50 rounded-lg">
-                      <h5 className="text-sm font-semibold text-purple-900 mb-1">
-                        Future of Remote Work
-                      </h5>
-                      <p className="text-xs text-purple-700 mb-2">5,678 professionals discussing</p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                        <span className="text-xs text-orange-600 font-medium">Hot Topic</span>
-                      </div>
-                    </div>
-                    <div className="p-3 bg-green-50 rounded-lg">
-                      <h5 className="text-sm font-semibold text-green-900 mb-1">
-                        Sustainable Innovation
-                      </h5>
-                      <p className="text-xs text-green-700 mb-2">3,421 professionals discussing</p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span className="text-xs text-blue-600 font-medium">Growing</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>

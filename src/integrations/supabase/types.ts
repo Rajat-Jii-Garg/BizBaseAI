@@ -65,6 +65,27 @@ export type Database = {
         }
         Relationships: []
       }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       hashtags: {
         Row: {
           created_at: string
@@ -110,6 +131,42 @@ export type Database = {
           read?: boolean
           receiver_id?: string
           sender_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          read: boolean
+          related_id: string | null
+          related_user_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          related_id?: string | null
+          related_user_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          related_id?: string | null
+          related_user_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -352,6 +409,8 @@ export type Database = {
           email: string | null
           email_verified: boolean | null
           experience_years: number | null
+          followers_count: number | null
+          following_count: number | null
           full_name: string | null
           github_url: string | null
           id: string
@@ -361,6 +420,7 @@ export type Database = {
           personal_branding_score: number | null
           phone: string | null
           portfolio_url: string | null
+          posts_count: number | null
           profile_completed: boolean | null
           profile_completion_score: number | null
           resume_url: string | null
@@ -384,6 +444,8 @@ export type Database = {
           email?: string | null
           email_verified?: boolean | null
           experience_years?: number | null
+          followers_count?: number | null
+          following_count?: number | null
           full_name?: string | null
           github_url?: string | null
           id: string
@@ -393,6 +455,7 @@ export type Database = {
           personal_branding_score?: number | null
           phone?: string | null
           portfolio_url?: string | null
+          posts_count?: number | null
           profile_completed?: boolean | null
           profile_completion_score?: number | null
           resume_url?: string | null
@@ -416,6 +479,8 @@ export type Database = {
           email?: string | null
           email_verified?: boolean | null
           experience_years?: number | null
+          followers_count?: number | null
+          following_count?: number | null
           full_name?: string | null
           github_url?: string | null
           id?: string
@@ -425,6 +490,7 @@ export type Database = {
           personal_branding_score?: number | null
           phone?: string | null
           portfolio_url?: string | null
+          posts_count?: number | null
           profile_completed?: boolean | null
           profile_completion_score?: number | null
           resume_url?: string | null
