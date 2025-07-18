@@ -333,7 +333,7 @@ const Dashboard = () => {
 
   const quickActions = [
     { label: "Find Connections", icon: UserPlus, action: () => navigate('/network'), color: "bg-green-600" },
-    { label: "AI Insights", icon: Brain, action: () => navigate('/ai-assistant'), color: "bg-purple-600" },
+    { label: "AI Insights", icon: Brain, action: () => navigate('/insights'), color: "bg-purple-600" },
   ];
 
   const handleSendConnectionRequest = async (profileId: string) => {

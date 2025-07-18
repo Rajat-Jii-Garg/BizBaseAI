@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -41,6 +41,7 @@ const navigation = [
   { name: 'Connections', href: '/connections', icon: UserCheck },
   { name: 'Messages', href: '/messages', icon: MessageCircle },
   { name: 'Notifications', href: '/notifications', icon: Bell },
+  { name: 'Insights', href: '/insights', icon: Brain },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
@@ -63,10 +64,15 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed = false }) => {
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <Link to={item.href} className="flex items-center space-x-3">
+                    <NavLink 
+                      to={item.href} 
+                      className={({ isActive }) => 
+                        `flex items-center space-x-3 ${isActive ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted/50'}`
+                      }
+                    >
                       <item.icon className="w-5 h-5" />
                       <span>{item.name}</span>
-                    </Link>
+                    </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

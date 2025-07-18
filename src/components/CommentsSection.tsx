@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -27,6 +28,7 @@ interface CommentsSectionProps {
 
 const CommentsSection: React.FC<CommentsSectionProps> = ({ postId, commentsCount, onCommentUpdate }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
@@ -138,7 +140,10 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId, commentsCount
             {comments.map((comment) => (
               <Card key={comment.id} className="p-3">
                 <div className="flex items-start gap-3">
-                  <Avatar className="h-8 w-8">
+                  <Avatar 
+                    className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all"
+                    onClick={() => navigate(`/profile/${comment.user_id}`)}
+                  >
                     <AvatarImage src={comment.profiles?.avatar_url} />
                     <AvatarFallback className="text-xs">
                       {comment.profiles?.full_name?.charAt(0) || 'U'}
@@ -146,7 +151,10 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId, commentsCount
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <p className="font-medium text-sm">
+                      <p 
+                        className="font-medium text-sm cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => navigate(`/profile/${comment.user_id}`)}
+                      >
                         {comment.profiles?.full_name || 'User'}
                       </p>
                       <div className="flex items-center gap-2">
