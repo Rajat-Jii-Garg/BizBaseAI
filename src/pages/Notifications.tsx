@@ -29,6 +29,27 @@ const Notifications = () => {
     if (user) {
       fetchNotifications();
       fetchConnectionRequests();
+      
+      // Set up real-time notifications
+      const channel = supabase
+        .channel('notifications_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => {
+            fetchNotifications();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
 
@@ -36,43 +57,43 @@ const Notifications = () => {
     if (!user) return;
 
     try {
-      // Simulate notifications data
-      const mockNotifications = [
-        {
-          id: '1',
-          type: 'like',
-          message: 'John Doe liked your post',
-          time: '2 hours ago',
-          read: false,
-          avatar: '',
-          user_name: 'John Doe'
-        },
-        {
-          id: '2',
-          type: 'comment',
-          message: 'Sarah Wilson commented on your post',
-          time: '5 hours ago',
-          read: false,
-          avatar: '',
-          user_name: 'Sarah Wilson'
-        },
-        {
-          id: '3',
-          type: 'share',
-          message: 'Mike Johnson shared your post',
-          time: '1 day ago',
-          read: true,
-          avatar: '',
-          user_name: 'Mike Johnson'
-        }
-      ];
-      
-      setNotifications(mockNotifications);
+      // Get real notifications from database
+      const { data: notifications, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      // Format notifications with time formatting
+      const formattedNotifications = (notifications || []).map(notification => ({
+        ...notification,
+        time: formatNotificationTime(notification.created_at),
+        user_name: notification.related_user_id ? 'Someone' : 'System'
+      }));
+
+      setNotifications(formattedNotifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);
+      // Fallback to some basic notifications for now
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatNotificationTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    return date.toLocaleDateString();
   };
 
   const fetchConnectionRequests = async () => {

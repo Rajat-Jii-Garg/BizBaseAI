@@ -74,17 +74,44 @@ const Messages = () => {
 
       if (profilesError) throw profilesError;
 
-      // Create conversations list
-      const conversationsList = profiles?.map(profile => ({
-        id: profile.id,
-        name: profile.full_name || 'Unknown User',
-        avatar: profile.avatar_url,
-        lastMessage: 'Start a conversation...',
-        isOnline: Math.random() > 0.5, // Simulate online status
-        unreadCount: 0
-      })) || [];
+      // Get latest messages for each conversation
+      const conversationsWithMessages = await Promise.all(
+        (profiles || []).map(async (profile) => {
+          const { data: latestMessage } = await supabase
+            .from('messages')
+            .select('content, created_at, read')
+            .or(`and(sender_id.eq.${user.id},receiver_id.eq.${profile.id}),and(sender_id.eq.${profile.id},receiver_id.eq.${user.id})`)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
 
-      setConversations(conversationsList);
+          const { data: unreadMessages } = await supabase
+            .from('messages')
+            .select('id')
+            .eq('sender_id', profile.id)
+            .eq('receiver_id', user.id)
+            .eq('read', false);
+
+          return {
+            id: profile.id,
+            name: profile.full_name || 'Unknown User',
+            avatar: profile.avatar_url,
+            lastMessage: latestMessage?.content || 'Start a conversation...',
+            lastMessageTime: latestMessage?.created_at,
+            isOnline: Math.random() > 0.5, // Simulate online status
+            unreadCount: unreadMessages?.length || 0
+          };
+        })
+      );
+
+      // Sort by latest message time
+      conversationsWithMessages.sort((a, b) => {
+        if (!a.lastMessageTime) return 1;
+        if (!b.lastMessageTime) return -1;
+        return new Date(b.lastMessageTime).getTime() - new Date(a.lastMessageTime).getTime();
+      });
+
+      setConversations(conversationsWithMessages);
     } catch (error) {
       console.error('Error fetching conversations:', error);
       toast({

@@ -19,11 +19,16 @@ import {
   Globe,
   Briefcase,
   TrendingUp,
-  Star
+  Star,
+  Bookmark,
+  BookmarkCheck,
+  RefreshCw
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import CreateEventModal from '@/components/CreateEventModal';
 
 const Events = () => {
   const { user } = useAuth();
@@ -31,79 +36,133 @@ const Events = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTab, setSelectedTab] = useState('discover');
+  const [events, setEvents] = useState<any[]>([]);
+  const [myEvents, setMyEvents] = useState<any[]>([]);
+  const [savedEvents, setSavedEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  // Mock events data - replace with Supabase integration
-  const events = [
-    {
-      id: 1,
-      title: "AI in Business 2024: Future Trends",
-      description: "Explore how AI is transforming business operations and discover the latest trends in artificial intelligence.",
-      date: "2024-02-15",
-      time: "14:00",
-      location: "Virtual Event",
-      type: "webinar",
-      attendees: 1247,
-      price: "Free",
-      category: "Technology",
-      organizer: {
-        name: "TechForward",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"
-      },
-      tags: ["AI", "Business", "Innovation"],
-      featured: true
-    },
-    {
-      id: 2,
-      title: "Networking Mixer: Startup Founders",
-      description: "Connect with fellow entrepreneurs and startup founders in this exclusive networking event.",
-      date: "2024-02-18",
-      time: "18:30",
-      location: "Innovation Hub, NYC",
-      type: "networking",
-      attendees: 85,
-      price: "$25",
-      category: "Networking",
-      organizer: {
-        name: "Startup Network",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
-      },
-      tags: ["Networking", "Startups", "Entrepreneurship"]
-    },
-    {
-      id: 3,
-      title: "Digital Marketing Masterclass",
-      description: "Learn advanced digital marketing strategies from industry experts.",
-      date: "2024-02-20",
-      time: "10:00",
-      location: "Virtual Event",
-      type: "workshop",
-      attendees: 356,
-      price: "$49",
-      category: "Marketing",
-      organizer: {
-        name: "Marketing Pro",
-        avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150"
-      },
-      tags: ["Marketing", "Digital", "Strategy"]
-    },
-    {
-      id: 4,
-      title: "Investment Strategies Workshop",
-      description: "Learn from successful investors about portfolio management and investment strategies.",
-      date: "2024-02-22",
-      time: "15:00",
-      location: "Financial District, London",
-      type: "workshop",
-      attendees: 127,
-      price: "$75",
-      category: "Finance",
-      organizer: {
-        name: "InvestWise",
-        avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150"
-      },
-      tags: ["Investment", "Finance", "Strategy"]
+  useEffect(() => {
+    if (user) {
+      fetchEvents();
     }
-  ];
+  }, [user, selectedTab]);
+
+  const fetchEvents = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      if (selectedTab === 'discover') {
+        // Fetch all events
+        const { data, error } = await supabase
+          .from('events')
+          .select(`
+            *,
+            event_attendees (
+              id
+            )
+          `)
+          .gte('date', new Date().toISOString().split('T')[0])
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        // Get profiles separately to avoid foreign key issues
+        const userIds = [...new Set(data?.map(event => event.user_id))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url')
+          .in('id', userIds);
+
+        const eventsWithAttendees = data?.map(event => {
+          const profile = profiles?.find(p => p.id === event.user_id);
+          return {
+            ...event,
+            attendees: event.event_attendees?.length || 0,
+            organizer: {
+              name: profile?.full_name || 'Unknown',
+              avatar: profile?.avatar_url || ''
+            }
+          };
+        }) || [];
+        
+        setEvents(eventsWithAttendees);
+      } else if (selectedTab === 'my-events') {
+        // Fetch user's events
+        const { data, error } = await supabase
+          .from('events')
+          .select(`
+            *,
+            event_attendees (
+              id
+            )
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        const userEvents = data?.map(event => ({
+          ...event,
+          attendees: event.event_attendees?.length || 0,
+          organizer: {
+            name: 'You',
+            avatar: ''
+          }
+        })) || [];
+        
+        setMyEvents(userEvents);
+      } else if (selectedTab === 'saved-events') {
+        // Fetch saved events
+        const { data, error } = await supabase
+          .from('saved_events')
+          .select(`
+            *,
+            events (
+              *,
+              event_attendees (
+                id
+              )
+            )
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        // Get profiles for saved events
+        const eventUserIds = [...new Set(data?.map(saved => saved.events?.user_id).filter(Boolean))];
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url')
+          .in('id', eventUserIds);
+
+        const userSavedEvents = data?.map(saved => {
+          const profile = profiles?.find(p => p.id === saved.events?.user_id);
+          return {
+            ...saved.events,
+            attendees: saved.events?.event_attendees?.length || 0,
+            organizer: {
+              name: profile?.full_name || 'Unknown',
+              avatar: profile?.avatar_url || ''
+            }
+          };
+        }) || [];
+        
+        setSavedEvents(userSavedEvents);
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load events",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const categories = ['all', 'Technology', 'Networking', 'Marketing', 'Finance', 'Leadership'];
   const eventTypes = [
@@ -113,25 +172,121 @@ const Events = () => {
     { id: 'conference', label: 'Conferences', icon: Globe }
   ];
 
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
+  const getCurrentEvents = () => {
+    if (selectedTab === 'discover') return events;
+    if (selectedTab === 'my-events') return myEvents;
+    if (selectedTab === 'saved-events') return savedEvents;
+    return [];
+  };
+
+  const filteredEvents = getCurrentEvents().filter(event => {
+    const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const handleJoinEvent = (eventId: number) => {
-    toast({
-      title: "Event Joined!",
-      description: "You've successfully registered for this event. Check your email for details."
-    });
+  const handleJoinEvent = async (eventId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('event_attendees')
+        .insert({
+          event_id: eventId,
+          user_id: user.id
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Event Joined!",
+        description: "You've successfully registered for this event."
+      });
+      
+      fetchEvents(); // Refresh to update attendee count
+    } catch (error: any) {
+      if (error.code === '23505') {
+        toast({
+          title: "Already Registered",
+          description: "You're already registered for this event.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to register for event",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
-  const handleBookmarkEvent = (eventId: number) => {
-    toast({
-      title: "Event Bookmarked",
-      description: "Event saved to your bookmarks."
-    });
+  const handleSaveEvent = async (eventId: string) => {
+    if (!user) return;
+
+    try {
+      // Check if already saved
+      const { data: existing } = await supabase
+        .from('saved_events')
+        .select('id')
+        .eq('event_id', eventId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (existing) {
+        // Remove from saved
+        const { error } = await supabase
+          .from('saved_events')
+          .delete()
+          .eq('event_id', eventId)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Event Removed",
+          description: "Event removed from saved events."
+        });
+      } else {
+        // Add to saved
+        const { error } = await supabase
+          .from('saved_events')
+          .insert({
+            event_id: eventId,
+            user_id: user.id
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Event Saved",
+          description: "Event saved to your collection."
+        });
+      }
+      
+      fetchEvents(); // Refresh data
+    } catch (error) {
+      console.error('Error saving event:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save event",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const checkIfSaved = async (eventId: string) => {
+    if (!user) return false;
+    
+    const { data } = await supabase
+      .from('saved_events')
+      .select('id')
+      .eq('event_id', eventId)
+      .eq('user_id', user.id)
+      .single();
+    
+    return !!data;
   };
 
   return (
@@ -146,15 +301,28 @@ const Events = () => {
             </h1>
             <p className="text-gray-600 mt-2">Discover networking events, workshops, and conferences to advance your career</p>
           </div>
-          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Event
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => fetchEvents()}
+              disabled={loading}
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Button 
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              onClick={() => setIsCreateModalOpen(true)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Event
+            </Button>
+          </div>
         </div>
 
         {/* Tabs */}
         <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-          {['discover', 'my-events', 'bookmarked'].map((tab) => (
+        {['discover', 'my-events', 'saved-events'].map((tab) => (
             <button
               key={tab}
               onClick={() => setSelectedTab(tab)}
@@ -166,7 +334,7 @@ const Events = () => {
             >
               {tab === 'discover' && 'Discover Events'}
               {tab === 'my-events' && 'My Events'}
-              {tab === 'bookmarked' && 'Bookmarked'}
+              {tab === 'saved-events' && 'Saved Events'}
             </button>
           ))}
         </div>
@@ -206,93 +374,100 @@ const Events = () => {
         </Card>
 
         {/* Events List */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredEvents.map((event) => (
-            <Card key={event.id} className={`hover:shadow-lg transition-shadow ${event.featured ? 'ring-2 ring-yellow-200' : ''}`}>
-              {event.featured && (
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-1 text-xs font-bold">
-                  ⭐ FEATURED EVENT
-                </div>
-              )}
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={event.organizer.avatar} />
-                      <AvatarFallback>{event.organizer.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-900 line-clamp-2">
-                        {event.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">by {event.organizer.name}</p>
+        {loading ? (
+          <div className="text-center py-12">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <p className="text-gray-600">Loading events...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredEvents.map((event) => (
+              <Card key={event.id} className={`hover:shadow-lg transition-shadow ${event.featured ? 'ring-2 ring-yellow-200' : ''}`}>
+                {event.featured && (
+                  <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-1 text-xs font-bold">
+                    ⭐ FEATURED EVENT
+                  </div>
+                )}
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={event.organizer?.avatar} />
+                        <AvatarFallback>{event.organizer?.name?.charAt(0) || 'E'}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-900 line-clamp-2">
+                          {event.title}
+                        </h3>
+                        <p className="text-sm text-gray-600">by {event.organizer?.name || 'Unknown'}</p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleSaveEvent(event.id)}
+                    >
+                      <Bookmark className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <p className="text-gray-700 mb-4 line-clamp-2">{event.description}</p>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Calendar className="w-4 h-4" />
+                      <span>{new Date(event.date).toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Clock className="w-4 h-4" />
+                      <span>{event.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <MapPin className="w-4 h-4" />
+                      <span>{event.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Users className="w-4 h-4" />
+                      <span>{event.attendees} attending</span>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleBookmarkEvent(event.id)}
-                  >
-                    <BookmarkPlus className="w-4 h-4" />
-                  </Button>
-                </div>
 
-                <p className="text-gray-700 mb-4 line-clamp-2">{event.description}</p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {(event.tags || []).map((tag: string, index: number) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
 
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar className="w-4 h-4" />
-                    <span>{new Date(event.date).toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-lg text-green-600">{event.price}</span>
+                      <Badge variant="outline">{event.category}</Badge>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700"
+                        onClick={() => handleJoinEvent(event.id)}
+                      >
+                        {event.price === 'Free' ? 'Join Event' : 'Register'}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Clock className="w-4 h-4" />
-                    <span>{event.time}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    <span>{event.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Users className="w-4 h-4" />
-                    <span>{event.attendees} attending</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {event.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-lg text-green-600">{event.price}</span>
-                    <Badge variant="outline">{event.category}</Badge>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      <Share2 className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      size="sm"
-                      className="bg-blue-600 hover:bg-blue-700"
-                      onClick={() => handleJoinEvent(event.id)}
-                    >
-                      {event.price === 'Free' ? 'Join Event' : 'Register'}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {filteredEvents.length === 0 && (
           <Card>
@@ -303,6 +478,12 @@ const Events = () => {
             </CardContent>
           </Card>
         )}
+
+        <CreateEventModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onEventCreated={fetchEvents}
+        />
       </div>
     </DashboardLayout>
   );
