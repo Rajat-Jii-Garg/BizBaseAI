@@ -629,6 +629,17 @@ export type Database = {
         Args: { profile_id: string }
         Returns: number
       }
+      create_notification: {
+        Args: {
+          recipient_id: string
+          notification_type: string
+          notification_title: string
+          notification_content: string
+          related_post_id?: string
+          related_user_id?: string
+        }
+        Returns: string
+      }
       generate_otp: {
         Args: Record<PropertyKey, never>
         Returns: string

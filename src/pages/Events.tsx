@@ -54,17 +54,19 @@ const Events = () => {
     setLoading(true);
     try {
       if (selectedTab === 'discover') {
-        // Fetch all events
+        // Fetch all upcoming events (exclude past events)
+        const today = new Date().toISOString().split('T')[0];
         const { data, error } = await supabase
           .from('events')
           .select(`
             *,
             event_attendees (
-              id
+              id,
+              user_id
             )
           `)
-          .gte('date', new Date().toISOString().split('T')[0])
-          .order('created_at', { ascending: false });
+          .gte('date', today)
+          .order('date', { ascending: true });
 
         if (error) throw error;
         
@@ -75,11 +77,23 @@ const Events = () => {
           .select('id, full_name, avatar_url')
           .in('id', userIds);
 
+        // Get user's saved events to mark them
+        const { data: userSavedEvents } = await supabase
+          .from('saved_events')
+          .select('event_id')
+          .eq('user_id', user.id);
+
+        const savedEventIds = new Set(userSavedEvents?.map(se => se.event_id) || []);
+
         const eventsWithAttendees = data?.map(event => {
           const profile = profiles?.find(p => p.id === event.user_id);
+          const isUserAttending = event.event_attendees?.some((ea: any) => ea.user_id === user.id);
+          
           return {
             ...event,
             attendees: event.event_attendees?.length || 0,
+            isUserAttending,
+            isSaved: savedEventIds.has(event.id),
             organizer: {
               name: profile?.full_name || 'Unknown',
               avatar: profile?.avatar_url || ''
@@ -89,23 +103,26 @@ const Events = () => {
         
         setEvents(eventsWithAttendees);
       } else if (selectedTab === 'my-events') {
-        // Fetch user's events
+        // Fetch all user's events (including past events for history)
         const { data, error } = await supabase
           .from('events')
           .select(`
             *,
             event_attendees (
-              id
+              id,
+              user_id
             )
           `)
           .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+          .order('date', { ascending: false });
 
         if (error) throw error;
         
         const userEvents = data?.map(event => ({
           ...event,
           attendees: event.event_attendees?.length || 0,
+          isUserAttending: true, // User is always attending their own events
+          canEdit: true, // User can edit their own events
           organizer: {
             name: 'You',
             avatar: ''
@@ -140,15 +157,19 @@ const Events = () => {
 
         const userSavedEvents = data?.map(saved => {
           const profile = profiles?.find(p => p.id === saved.events?.user_id);
+          const isUserAttending = saved.events?.event_attendees?.some((ea: any) => ea.user_id === user.id);
+          
           return {
             ...saved.events,
             attendees: saved.events?.event_attendees?.length || 0,
+            isUserAttending,
+            isSaved: true, // Always true for saved events
             organizer: {
               name: profile?.full_name || 'Unknown',
               avatar: profile?.avatar_url || ''
             }
           };
-        }) || [];
+        }).filter(event => event.date >= new Date().toISOString().split('T')[0]) || []; // Only show upcoming saved events
         
         setSavedEvents(userSavedEvents);
       }
@@ -276,17 +297,32 @@ const Events = () => {
     }
   };
 
-  const checkIfSaved = async (eventId: string) => {
-    if (!user) return false;
-    
-    const { data } = await supabase
-      .from('saved_events')
-      .select('id')
-      .eq('event_id', eventId)
-      .eq('user_id', user.id)
-      .single();
-    
-    return !!data;
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', eventId)
+        .eq('user_id', user.id); // Ensure user can only delete their own events
+
+      if (error) throw error;
+
+      toast({
+        title: "Event Deleted",
+        description: "Event has been successfully deleted."
+      });
+      
+      fetchEvents();
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete event",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -406,8 +442,9 @@ const Events = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleSaveEvent(event.id)}
+                      className={event.isSaved ? 'text-blue-600' : 'text-gray-400'}
                     >
-                      <Bookmark className="w-4 h-4" />
+                      {event.isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                     </Button>
                   </div>
 
@@ -454,13 +491,33 @@ const Events = () => {
                       <Button variant="outline" size="sm">
                         <Share2 className="w-4 h-4" />
                       </Button>
-                      <Button 
-                        size="sm"
-                        className="bg-blue-600 hover:bg-blue-700"
-                        onClick={() => handleJoinEvent(event.id)}
-                      >
-                        {event.price === 'Free' ? 'Join Event' : 'Register'}
-                      </Button>
+                      {event.canEdit ? (
+                        <>
+                          <Button 
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteEvent(event.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            Delete
+                          </Button>
+                          <Button 
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            Edit Event
+                          </Button>
+                        </>
+                      ) : (
+                        <Button 
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700"
+                          onClick={() => handleJoinEvent(event.id)}
+                          disabled={event.isUserAttending}
+                        >
+                          {event.isUserAttending ? 'Registered' : (event.price === 'Free' ? 'Join Event' : 'Register')}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>

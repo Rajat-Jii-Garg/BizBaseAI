@@ -79,15 +79,7 @@ const DashboardHeader = () => {
         </div>
         <div className="flex items-center space-x-2">
           <ThemeSwitcher />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/notifications')}
-            className="relative"
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5" />
-          </Button>
+          <NotificationsCenter />
           <Button
             variant="ghost"
             size="sm"
