@@ -98,9 +98,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error };
       }
 
+      // Send welcome email after successful signup
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-welcome-email', {
+          body: {
+            email: email,
+            fullName: fullName
+          }
+        });
+        
+        if (emailError) {
+          console.error('Welcome email error:', emailError);
+        } else {
+          console.log('Welcome email sent successfully');
+        }
+      } catch (emailError) {
+        console.error('Failed to send welcome email:', emailError);
+      }
+
       toast({
         title: "Account Created Successfully!",
-        description: "Welcome to BizBase. You're now signed in.",
+        description: "Welcome to BizBase! Check your email for a welcome message.",
       });
       
       return { error: null };
@@ -192,17 +210,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       console.log('OTP Response:', data);
 
-      // Show OTP in console and toast for testing
-      if (data?.otp) {
-        console.log(`🔑 TESTING OTP for ${email}: ${data.otp}`);
-        toast({
-          title: "OTP Sent!",
-          description: data.message || `Verification code sent to ${email}`,
-          duration: 5000,
-        });
-      }
-
-      return { error: null, otp: data?.otp };
+      return { error: null };
     } catch (error: any) {
       console.error('Send OTP error:', error);
       toast({

@@ -99,8 +99,7 @@ const handler = async (req: Request): Promise<Response> => {
         return new Response(
           JSON.stringify({ 
             success: true, 
-            message: "OTP sent successfully to your email",
-            otp: otpCode // For testing - remove in production
+            message: "OTP sent successfully to your email"
           }), 
           {
             status: 200,
@@ -117,7 +116,6 @@ const handler = async (req: Request): Promise<Response> => {
           JSON.stringify({ 
             success: true, 
             message: "OTP generated (email service unavailable)",
-            otp: otpCode,
             note: "Check console for OTP - email service needs configuration"
           }), 
           {
@@ -135,9 +133,7 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: "OTP sent successfully",
-          otp: otpCode,
-          emailPreview: `Your verification code is: ${otpCode}`
+          message: "OTP sent successfully"
         }), 
         {
           status: 200,
