@@ -485,6 +485,7 @@ export type Database = {
           achievements: Json | null
           actively_looking_for_work: boolean | null
           avatar_url: string | null
+          banner_url: string | null
           bio: string | null
           bizcoins: number | null
           business_type: string | null
@@ -520,6 +521,7 @@ export type Database = {
           achievements?: Json | null
           actively_looking_for_work?: boolean | null
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           bizcoins?: number | null
           business_type?: string | null
@@ -555,6 +557,7 @@ export type Database = {
           achievements?: Json | null
           actively_looking_for_work?: boolean | null
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           bizcoins?: number | null
           business_type?: string | null
