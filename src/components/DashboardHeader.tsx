@@ -47,7 +47,7 @@ const DashboardHeader = () => {
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Search people, posts, events, companies..."
+              placeholder="Search professionals, companies, events..."
               className="pl-10 w-80 bg-background border-border focus:ring-2 focus:ring-primary/20 focus:border-primary"
               onFocus={() => setSearchOpen(true)}
               readOnly

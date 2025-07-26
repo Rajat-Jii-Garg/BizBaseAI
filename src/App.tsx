@@ -49,26 +49,6 @@ const App = () => (
                 <ProfilePage />
               </ProtectedRoute>
             } />
-            <Route path="/user-profile" element={
-              <ProtectedRoute>
-                <PublicProfile />
-              </ProtectedRoute>
-            } />
-            <Route path="/feed" element={
-              <ProtectedRoute>
-                <Feed />
-              </ProtectedRoute>
-            } />
-            <Route path="/network" element={
-              <ProtectedRoute>
-                <Network />
-              </ProtectedRoute>
-            } />
-            <Route path="/analytics" element={
-              <ProtectedRoute>
-                <Analytics />
-              </ProtectedRoute>
-            } />
             <Route path="/messages" element={
               <ProtectedRoute>
                 <Messages />
@@ -107,43 +87,6 @@ const App = () => (
             <Route path="/business-setup" element={
               <ProtectedRoute>
                 <BusinessSetup />
-              </ProtectedRoute>
-            } />
-            
-            {/* Dashboard nested routes */}
-            <Route path="/dashboard/connections" element={
-              <ProtectedRoute>
-                <Connections />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/messages" element={
-              <ProtectedRoute>
-                <Messages />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/notifications" element={
-              <ProtectedRoute>
-                <Notifications />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/events" element={
-              <ProtectedRoute>
-                <Events />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/insights" element={
-              <ProtectedRoute>
-                <Insights />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/ai-assistant" element={
-              <ProtectedRoute>
-                <AIAssistant />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/settings" element={
-              <ProtectedRoute>
-                <Settings />
               </ProtectedRoute>
             } />
           </Routes>

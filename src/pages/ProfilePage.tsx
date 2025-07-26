@@ -54,6 +54,7 @@ const ProfilePage = () => {
     company_name: '',
     business_type: '',
     avatar_url: '',
+    banner_url: '',
     bio: '',
     location: '',
     website: '',
@@ -109,6 +110,7 @@ const ProfilePage = () => {
           company_name: data.company_name || '',
           business_type: data.business_type || '',
           avatar_url: data.avatar_url || '',
+          banner_url: data.banner_url || '',
           bio: data.bio || '',
           location: data.location || '',
           website: data.website || '',
@@ -192,12 +194,21 @@ const ProfilePage = () => {
         {/* Enhanced Profile Header */}
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-0 shadow-xl overflow-hidden">
           <div className="relative">
-            <div className="h-32 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"></div>
+            <div className="h-32 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 relative overflow-hidden">
+              {profile.banner_url && (
+                <img 
+                  src={profile.banner_url} 
+                  alt="Profile Banner" 
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
             {isOwnProfile && (
               <Button 
                 variant="ghost" 
                 size="icon" 
                 className="absolute top-4 right-4 text-white hover:bg-white/20"
+                onClick={() => setIsEditing(true)}
               >
                 <Camera className="w-4 h-4" />
               </Button>
