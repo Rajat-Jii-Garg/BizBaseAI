@@ -35,7 +35,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw otpError;
     }
 
-    console.log(`OTP generated for ${email}: ${otpCode}`);
+    console.log(`OTP generated for ${email}`);
 
     // Check if we have Resend API key to send actual emails
     const resendApiKey = Deno.env.get("RESEND_API_KEY");

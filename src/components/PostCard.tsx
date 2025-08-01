@@ -38,7 +38,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onEngagementUpdate }) => {
             <div>
               <div className="flex items-center space-x-1">
                 <h4 className="font-semibold text-gray-900 text-sm">
-                  {post.profiles?.full_name || 'Professional User'}
+                  {post.profiles?.full_name || 'Unknown User'}
                 </h4>
                 <CheckCircle className="w-4 h-4 text-blue-500" />
               </div>

@@ -660,6 +660,10 @@ export type Database = {
         Args: { user_email: string; provided_otp: string; otp_purpose: string }
         Returns: boolean
       }
+      verify_otp_email: {
+        Args: { user_email: string; provided_otp: string; otp_purpose: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
