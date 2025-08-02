@@ -79,14 +79,13 @@ const DashboardHeader = () => {
         </div>
         <div className="flex items-center space-x-2">
           <ThemeSwitcher />
-          <NotificationsCenter />
           <Button
-            variant="ghost"
+            variant="default"
             size="sm"
-            onClick={() => navigate('/messages')}
-            aria-label="Messages"
+            onClick={() => navigate('/jobs')}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 font-medium"
           >
-            <MessageCircle className="w-5 h-5" />
+            Jobs
           </Button>
           <UserProfileDropdown />
         </div>
