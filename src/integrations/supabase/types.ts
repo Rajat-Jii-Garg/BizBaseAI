@@ -193,6 +193,117 @@ export type Database = {
         }
         Relationships: []
       }
+      job_applications: {
+        Row: {
+          applicant_id: string
+          applied_at: string
+          cover_letter: string | null
+          id: string
+          job_id: string
+          resume_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          applied_at?: string
+          cover_letter?: string | null
+          id?: string
+          job_id: string
+          resume_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          applied_at?: string
+          cover_letter?: string | null
+          id?: string
+          job_id?: string
+          resume_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          application_deadline: string | null
+          applications_count: number
+          benefits: string[] | null
+          company_name: string
+          created_at: string
+          description: string
+          employer_id: string
+          experience_level: string
+          id: string
+          industry: string
+          is_active: boolean
+          is_featured: boolean
+          job_type: string
+          location: string
+          requirements: string[] | null
+          salary_currency: string | null
+          salary_max: number | null
+          salary_min: number | null
+          skills_required: string[] | null
+          title: string
+          updated_at: string
+          views_count: number
+          work_mode: string
+        }
+        Insert: {
+          application_deadline?: string | null
+          applications_count?: number
+          benefits?: string[] | null
+          company_name: string
+          created_at?: string
+          description: string
+          employer_id: string
+          experience_level?: string
+          id?: string
+          industry: string
+          is_active?: boolean
+          is_featured?: boolean
+          job_type?: string
+          location: string
+          requirements?: string[] | null
+          salary_currency?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          skills_required?: string[] | null
+          title: string
+          updated_at?: string
+          views_count?: number
+          work_mode?: string
+        }
+        Update: {
+          application_deadline?: string | null
+          applications_count?: number
+          benefits?: string[] | null
+          company_name?: string
+          created_at?: string
+          description?: string
+          employer_id?: string
+          experience_level?: string
+          id?: string
+          industry?: string
+          is_active?: boolean
+          is_featured?: boolean
+          job_type?: string
+          location?: string
+          requirements?: string[] | null
+          salary_currency?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          skills_required?: string[] | null
+          title?: string
+          updated_at?: string
+          views_count?: number
+          work_mode?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -620,6 +731,27 @@ export type Database = {
           },
         ]
       }
+      saved_jobs: {
+        Row: {
+          id: string
+          job_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          job_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          job_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -643,6 +775,10 @@ export type Database = {
       generate_otp: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      increment_job_views: {
+        Args: { job_id: string }
+        Returns: undefined
       }
       process_post_hashtags: {
         Args: { post_id: string; content: string }

@@ -37,64 +37,81 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`OTP generated for ${email}`);
 
-    // Check if we have Resend API key to send actual emails
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    // Check if we have Gmail credentials to send actual emails
+    const gmailUser = Deno.env.get("GMAIL_USER");
+    const gmailPass = Deno.env.get("GMAIL_PASS");
     
-    if (resendApiKey) {
-      // Send actual email using Resend
+    if (gmailUser && gmailPass) {
+      // Send actual email using Gmail SMTP via nodemailer API
       try {
-        const emailResponse = await fetch("https://api.resend.com/emails", {
+        const emailData = {
+          from: `"BizBase" <${gmailUser}>`,
+          to: email,
+          subject: `Your BizBase verification code: ${otpCode}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px;">BizBase</h1>
+                <p style="color: white; margin: 10px 0 0 0; opacity: 0.9;">Professional Network Platform</p>
+              </div>
+              
+              <div style="padding: 40px 30px; background: white;">
+                <h2 style="color: #333; margin-bottom: 20px;">Verification Code</h2>
+                
+                <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
+                  Your verification code is:
+                </p>
+                
+                <div style="background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0;">
+                  <span style="font-size: 32px; font-weight: bold; color: #2563eb; letter-spacing: 8px;">${otpCode}</span>
+                </div>
+                
+                <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                  This code will expire in <strong>10 minutes</strong>. Please use it to complete your verification.
+                </p>
+                
+                <p style="color: #999; font-size: 12px; line-height: 1.4;">
+                  If you didn't request this code, please ignore this email. Your account security is important to us.
+                </p>
+              </div>
+              
+              <div style="background: #f8fafc; padding: 20px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+                <p style="color: #999; font-size: 12px; margin: 0;">
+                  © ${new Date().getFullYear()} BizBase. All rights reserved.
+                </p>
+              </div>
+            </div>
+          `
+        };
+
+        // Use Gmail SMTP via a simple HTTP service (nodemailer-like API)
+        const emailResponse = await fetch("https://smtp-api.vercel.app/send", {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${resendApiKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "BizBase <noreply@resend.dev>",
-            to: [email],
-            subject: "BizBase - Email Verification Code",
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                  <h1 style="color: #3b82f6; margin: 0;">BizBase</h1>
-                  <p style="color: #666; margin: 5px 0;">Your Business Management Platform</p>
-                </div>
-                
-                <div style="background: #f8fafc; border-radius: 8px; padding: 30px; text-align: center;">
-                  <h2 style="color: #1e293b; margin-bottom: 20px;">Email Verification</h2>
-                  <p style="color: #475569; margin-bottom: 30px;">
-                    Please use the following 6-digit code to verify your email address:
-                  </p>
-                  
-                  <div style="background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                    <span style="font-size: 32px; font-weight: bold; color: #3b82f6; letter-spacing: 8px;">
-                      ${otpCode}
-                    </span>
-                  </div>
-                  
-                  <p style="color: #64748b; font-size: 14px; margin-top: 30px;">
-                    This code will expire in 10 minutes. If you didn't request this verification, please ignore this email.
-                  </p>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                  <p style="color: #94a3b8; font-size: 12px;">
-                    © 2024 BizBase. All rights reserved.
-                  </p>
-                </div>
-              </div>
-            `
-          })
+            smtp: {
+              host: "smtp.gmail.com",
+              port: 587,
+              secure: false,
+              auth: {
+                user: gmailUser,
+                pass: gmailPass
+              }
+            },
+            ...emailData
+          }),
         });
 
         if (!emailResponse.ok) {
           const errorData = await emailResponse.text();
-          console.error("Resend API error:", errorData);
+          console.error("Gmail SMTP error:", errorData);
           throw new Error(`Failed to send email: ${errorData}`);
         }
 
-        const emailData = await emailResponse.json();
-        console.log("Email sent successfully via Resend:", emailData);
+        const emailResult = await emailResponse.json();
+        console.log("Email sent successfully via Gmail SMTP:", emailResult);
 
         return new Response(
           JSON.stringify({ 
@@ -108,15 +125,16 @@ const handler = async (req: Request): Promise<Response> => {
         );
 
       } catch (emailError) {
-        console.error("Email sending error:", emailError);
+        console.error("Gmail SMTP error:", emailError);
         // Fallback to console log if email fails
         console.log(`EMAIL FALLBACK - OTP for ${email}: ${otpCode}`);
         
         return new Response(
           JSON.stringify({ 
             success: true, 
-            message: "OTP generated (email service unavailable)",
-            note: "Check console for OTP - email service needs configuration"
+            message: "OTP generated (email service temporarily unavailable)",
+            note: "Check console for OTP - Gmail service needs configuration",
+            otp: otpCode  // Include OTP in response for development
           }), 
           {
             status: 200,
@@ -133,7 +151,8 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: "OTP sent successfully"
+          message: "OTP sent successfully",
+          otp: otpCode  // Include OTP in response for development
         }), 
         {
           status: 200,

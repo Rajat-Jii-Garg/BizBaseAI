@@ -24,6 +24,7 @@ import Events from "./pages/Events";
 import Insights from "./pages/Insights";
 import AIAssistant from "./pages/AIAssistant";
 import BusinessSetup from "./pages/BusinessSetup";
+import Jobs from "./pages/Jobs";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,11 @@ const App = () => (
             <Route path="/business-setup" element={
               <ProtectedRoute>
                 <BusinessSetup />
+              </ProtectedRoute>
+            } />
+            <Route path="/jobs" element={
+              <ProtectedRoute>
+                <Jobs />
               </ProtectedRoute>
             } />
           </Routes>
