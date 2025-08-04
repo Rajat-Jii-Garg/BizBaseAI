@@ -11,12 +11,21 @@ import GlobalSearchModal from "./GlobalSearchModal";
 
 const breadcrumbsMap: Record<string, string> = {
   "/dashboard": "Dashboard",
-  "/dashboard/crm": "CRM",
+  "/dashboard/crm": "CRM", 
   "/dashboard/projects": "Projects",
   "/dashboard/hr": "HR",
   "/dashboard/finance": "Finance",
   "/dashboard/ai-assistant": "AI Assistant",
   "/dashboard/settings": "Settings",
+  "/dashboard/business-setup": "Business Setup",
+  "/jobs": "Jobs",
+  "/notifications": "Notifications",
+  "/connections": "Connections",
+  "/events": "Events",
+  "/insights": "Insights",
+  "/ai-assistant": "AI Assistant",
+  "/business-setup": "Business Setup",
+  "/settings": "Settings",
   "/faq": "FAQ & Support",
 };
 
@@ -77,15 +86,15 @@ const DashboardHeader = () => {
             </ol>
           </nav>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <ThemeSwitcher />
           <Button
             variant="default"
-            size="sm"
+            size="default"
             onClick={() => navigate('/jobs')}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 font-medium"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 px-6 py-2.5 font-semibold rounded-lg shadow-md transition-all duration-200 hover:shadow-lg"
           >
-            Jobs
+            💼 Jobs
           </Button>
           <UserProfileDropdown />
         </div>

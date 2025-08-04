@@ -25,6 +25,10 @@ import Insights from "./pages/Insights";
 import AIAssistant from "./pages/AIAssistant";
 import BusinessSetup from "./pages/BusinessSetup";
 import Jobs from "./pages/Jobs";
+import CRM from "./pages/CRM";
+import Projects from "./pages/Projects";
+import HR from "./pages/HR";
+import Finance from "./pages/Finance";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +97,36 @@ const App = () => (
             <Route path="/jobs" element={
               <ProtectedRoute>
                 <Jobs />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/crm" element={
+              <ProtectedRoute>
+                <CRM />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/projects" element={
+              <ProtectedRoute>
+                <Projects />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/hr" element={
+              <ProtectedRoute>
+                <HR />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/finance" element={
+              <ProtectedRoute>
+                <Finance />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/settings" element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/business-setup" element={
+              <ProtectedRoute>
+                <BusinessSetup />
               </ProtectedRoute>
             } />
           </Routes>
