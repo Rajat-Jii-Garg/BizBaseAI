@@ -9,27 +9,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
-interface Comment {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  profiles?: {
-    full_name: string;
-    avatar_url: string;
-  };
-}
-
-interface CommentsSectionProps {
-  postId: string;
-  commentsCount: number;
-  onCommentUpdate: () => void;
-}
-
-const CommentsSection: React.FC<CommentsSectionProps> = ({ postId, commentsCount, onCommentUpdate }) => {
+const CommentsSection = ({ postId, commentsCount, onCommentUpdate }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [showComments, setShowComments] = useState(false);

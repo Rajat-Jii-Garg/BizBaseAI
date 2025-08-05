@@ -1,23 +1,9 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-  signUp: (email: string, password: string, fullName: string, phone: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: any }>;
-  sendOTP: (email: string, purpose: string) => Promise<{ error: any; otp?: string }>;
-  verifyOTP: (email: string, otp: string, purpose: string) => Promise<{ error: any; success?: boolean }>;
-  completeSignup: (email: string, password: string, fullName: string, phone: string) => Promise<{ error: any }>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -27,9 +13,9 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -54,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, phone: string) => {
+  const signUp = async (email, password, fullName, phone) => {
     try {
       // Store signup data temporarily for OTP verification
       localStorage.setItem('pendingSignup', JSON.stringify({
@@ -66,13 +52,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       console.log('Signup data stored for OTP verification');
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Signup preparation error:', error);
       return { error };
     }
   };
 
-  const completeSignup = async (email: string, password: string, fullName: string, phone: string) => {
+  const completeSignup = async (email, password, fullName, phone) => {
     try {
       console.log('Creating user account after OTP verification...');
       
@@ -122,13 +108,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Complete signup error:', error);
       return { error };
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email, password) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -150,7 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       return { error };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login catch error:', error);
       return { error };
     }
@@ -163,7 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: 'Signed Out',
         description: 'Successfully signed out from BizBase.',
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Signout error:', error);
       toast({
         title: 'Error',
@@ -173,7 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const resetPassword = async (email: string) => {
+  const resetPassword = async (email) => {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
@@ -193,12 +179,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       return { error };
-    } catch (error: any) {
+    } catch (error) {
       return { error };
     }
   };
 
-  const sendOTP = async (email: string, purpose: string) => {
+  const sendOTP = async (email, purpose) => {
     try {
       const { data, error } = await supabase.functions.invoke('send-otp', {
         body: { email, purpose }
@@ -211,7 +197,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('OTP Response:', data);
 
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Send OTP error:', error);
       toast({
         title: "Error",
@@ -222,7 +208,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const verifyOTP = async (email: string, otp: string, purpose: string) => {
+  const verifyOTP = async (email, otp, purpose) => {
     try {
       const { data, error } = await supabase.functions.invoke('verify-otp', {
         body: { email, otp, purpose }
@@ -233,7 +219,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       return { error: null, success: data?.success };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Verify OTP error:', error);
       return { error, success: false };
     }

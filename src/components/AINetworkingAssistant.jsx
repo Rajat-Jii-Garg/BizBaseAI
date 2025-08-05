@@ -58,7 +58,7 @@ const AINetworkingAssistant = ({ onSuggestConnection }) => {
     "Share original content twice per week for best engagement"
   ];
 
-  const handleSmartIntro = (suggestion: any) => {
+  const handleSmartIntro = (suggestion) => {
     console.log(`Generating smart intro for ${suggestion.name}`);
   };
 

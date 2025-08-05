@@ -37,7 +37,7 @@ const steps = [
   }
 ];
 
-const getAnim = (index: number) => {
+const getAnim = (index) => {
   if (index % 2 === 0) return 'animate-slide-in-right';
   return 'animate-slide-in-left';
 };

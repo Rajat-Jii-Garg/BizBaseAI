@@ -4,14 +4,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, Settings, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-const UserProfileDropdown: React.FC = () => {
+const UserProfileDropdown = () => {
   const [open, setOpen] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = React.useRef(null);
   const { user, signOut } = useAuth();
 
   React.useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    const handler = (e) => {
+      if (!ref.current?.contains(e.target)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -22,7 +22,7 @@ const UserProfileDropdown: React.FC = () => {
     setOpen(false);
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name) => {
     return name
       .split(' ')
       .map(word => word[0])

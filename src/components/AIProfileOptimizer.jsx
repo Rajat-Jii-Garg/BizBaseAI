@@ -17,12 +17,7 @@ import {
   Bot
 } from 'lucide-react';
 
-interface AIProfileOptimizerProps {
-  profile: any;
-  onOptimize: (suggestions: any) => void;
-}
-
-const AIProfileOptimizer: React.FC<AIProfileOptimizerProps> = ({ profile, onOptimize }) => {
+const AIProfileOptimizer = ({ profile, onOptimize }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [profileScore, setProfileScore] = useState(72);
   const [suggestions] = useState([

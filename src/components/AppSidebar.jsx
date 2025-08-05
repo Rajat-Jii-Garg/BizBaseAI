@@ -30,10 +30,6 @@ import {
   UserCheck
 } from 'lucide-react';
 
-interface AppSidebarProps {
-  isCollapsed?: boolean;
-}
-
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Feed', href: '/feed', icon: Rss },
@@ -46,7 +42,7 @@ const navigation = [
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
-const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed = false }) => {
+const AppSidebar = ({ isCollapsed = false }) => {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">

@@ -22,7 +22,7 @@ interface Notification {
   };
 }
 
-const NotificationsCenter: React.FC = () => {
+const NotificationsCenter = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -87,7 +87,7 @@ const NotificationsCenter: React.FC = () => {
         ?.map(n => n.related_user_id)
         .filter(Boolean) || [];
 
-      let relatedUsers: any[] = [];
+      let relatedUsers = [];
       if (userIds.length > 0) {
         const { data: usersData } = await supabase
           .from('profiles')

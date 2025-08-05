@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Hash, TrendingUp, Loader2 } from 'lucide-react';
 import { useHashtags } from '@/hooks/useHashtags';
 
-const TrendingHashtags: React.FC = () => {
+const TrendingHashtags = () => {
   const { hashtags, loading } = useHashtags();
 
   if (loading) {

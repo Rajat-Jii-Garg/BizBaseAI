@@ -47,7 +47,7 @@ const NetworkingCard: React.FC<NetworkingCardProps> = ({
       });
       
       onConnect?.();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending connection request:', error);
       toast({
         title: "Error",
@@ -118,7 +118,7 @@ const NetworkingCard: React.FC<NetworkingCardProps> = ({
             
             {profile.skills && profile.skills.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
-                {profile.skills.slice(0, 3).map((skill: string, index: number) => (
+                {profile.skills.slice(0, 3).map((skill, index) => (
                   <Badge key={index} variant="outline" className="text-xs">
                     {skill}
                   </Badge>

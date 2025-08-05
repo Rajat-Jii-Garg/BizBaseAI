@@ -14,7 +14,7 @@ const Login = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '', rememberMe: false });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState({});
   
   const navigate = useNavigate();
   const { signIn, user } = useAuth();
@@ -26,19 +26,19 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  const validateEmail = (email: string) => {
+  const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
   const clearErrors = () => setErrors({});
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     clearErrors();
     setLoading(true);
     
-    const newErrors: { [key: string]: string } = {};
+    const newErrors = {};
     
     if (!loginData.email) {
       newErrors.email = 'Email is required';

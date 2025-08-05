@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Sun, Moon } from "lucide-react";
 
-const ThemeSwitcher: React.FC = () => {
+const ThemeSwitcher = () => {
   const [dark, setDark] = React.useState(() => {
     return document.documentElement.classList.contains("dark");
   });

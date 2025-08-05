@@ -72,17 +72,17 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose }) 
     }
   };
 
-  const handleUserClick = (userId: string) => {
+  const handleUserClick = (userId) => {
     navigate(`/user-profile?user=${userId}`);
     onClose();
   };
 
-  const handlePostClick = (postId: string) => {
+  const handlePostClick = (postId) => {
     navigate(`/dashboard`); // Navigate to feed and scroll to post
     onClose();
   };
 
-  const handleHashtagClick = (hashtag: string) => {
+  const handleHashtagClick = (hashtag) => {
     navigate(`/dashboard?hashtag=${hashtag}`);
     onClose();
   };
@@ -131,7 +131,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose }) 
                     People
                   </h3>
                   <div className="space-y-2">
-                    {searchResults.users.map((user: any) => (
+                    {searchResults.users.map((user) => (
                       <div
                         key={user.id}
                         onClick={() => handleUserClick(user.id)}
@@ -161,7 +161,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose }) 
                     Posts
                   </h3>
                   <div className="space-y-2">
-                    {searchResults.posts.map((post: any) => (
+                    {searchResults.posts.map((post) => (
                       <div
                         key={post.id}
                         onClick={() => handlePostClick(post.id)}
@@ -197,7 +197,7 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose }) 
                     Hashtags
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {searchResults.hashtags.map((hashtag: any) => (
+                    {searchResults.hashtags.map((hashtag) => (
                       <Badge
                         key={hashtag.name}
                         variant="secondary"

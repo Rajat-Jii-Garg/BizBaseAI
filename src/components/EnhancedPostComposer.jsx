@@ -10,39 +10,28 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface User {
-  id: string;
-  full_name: string;
-  avatar_url?: string;
-  email: string;
-}
-
-interface EnhancedPostComposerProps {
-  onCreatePost: (content: string, mediaUrl?: string, mediaType?: 'image' | 'video' | 'audio' | 'article') => Promise<void>;
-}
-
-const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePost }) => {
+const EnhancedPostComposer = ({ onCreatePost }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const [mediaFile, setMediaFile] = useState<File | null>(null);
-  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
-  const [mediaType, setMediaType] = useState<'image' | 'video' | 'audio' | 'article' | null>(null);
+  const [mediaFile, setMediaFile] = useState(null);
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const [mediaType, setMediaType] = useState(null);
   const [showMentions, setShowMentions] = useState(false);
   const [showHashtags, setShowHashtags] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
   const [hashtagQuery, setHashtagQuery] = useState('');
-  const [users, setUsers] = useState<User[]>([]);
-  const [hashtags, setHashtags] = useState<string[]>([]);
+  const [users, setUsers] = useState([]);
+  const [hashtags, setHashtags] = useState([]);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const videoInputRef = useRef(null);
   
   const { user } = useAuth();
   const { toast } = useToast();
 
   // Search users for mentions
-  const searchUsers = async (query: string) => {
+  const searchUsers = async (query) => {
     if (!query) return;
     
     try {
@@ -60,7 +49,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   };
 
   // Search hashtags
-  const searchHashtags = async (query: string) => {
+  const searchHashtags = async (query) => {
     if (!query) return;
     
     try {
@@ -79,7 +68,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   };
 
   // Handle text change and detect mentions/hashtags
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextChange = (e) => {
     const text = e.target.value;
     const position = e.target.selectionStart;
     setContent(text);
@@ -117,7 +106,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   };
 
   // Insert mention
-  const insertMention = (selectedUser: User) => {
+  const insertMention = (selectedUser) => {
     const beforeCursor = content.substring(0, cursorPosition);
     const afterCursor = content.substring(cursorPosition);
     const beforeMention = beforeCursor.replace(/@\w*$/, '');
@@ -129,7 +118,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   };
 
   // Insert hashtag
-  const insertHashtag = (selectedHashtag: string) => {
+  const insertHashtag = (selectedHashtag) => {
     const beforeCursor = content.substring(0, cursorPosition);
     const afterCursor = content.substring(cursorPosition);
     const beforeHashtag = beforeCursor.replace(/#\w*$/, '');
@@ -141,7 +130,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   };
 
   // Handle media upload
-  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
+  const handleMediaUpload = (e, type) => {
     const file = e.target.files?.[0];
     if (file) {
       setMediaFile(file);
@@ -149,7 +138,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
       
       const reader = new FileReader();
       reader.onload = (e) => {
-        setMediaPreview(e.target?.result as string);
+        setMediaPreview(e.target.result);
       };
       reader.readAsDataURL(file);
     }
@@ -165,7 +154,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   };
 
   // Upload media to Supabase Storage
-  const uploadMedia = async (file: File, type: string): Promise<string | null> => {
+  const uploadMedia = async (file, type) => {
     if (!user) return null;
     
     try {
@@ -241,7 +230,7 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
         title: "Success",
         description: "Post created successfully!"
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error in handleSubmit:', error);
       toast({
         title: "Error",
@@ -254,12 +243,12 @@ const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({ onCreatePos
   };
 
   // Extract hashtags and mentions for preview
-  const extractHashtags = (text: string) => {
+  const extractHashtags = (text) => {
     const matches = text.match(/#[\w]+/g);
     return matches || [];
   };
 
-  const extractMentions = (text: string) => {
+  const extractMentions = (text) => {
     const matches = text.match(/@[\w\s]+/g);
     return matches || [];
   };
