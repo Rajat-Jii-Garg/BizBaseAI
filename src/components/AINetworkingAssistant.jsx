@@ -16,11 +16,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-interface AINetworkingAssistantProps {
-  onSuggestConnection: (profileId: string) => void;
-}
-
-const AINetworkingAssistant: React.FC<AINetworkingAssistantProps> = ({ onSuggestConnection }) => {
+const AINetworkingAssistant = ({ onSuggestConnection }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [smartSuggestions] = useState([
     {

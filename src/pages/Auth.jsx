@@ -54,7 +54,7 @@ const Auth = () => {
     }
   }, [user, navigate]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     setError('');
@@ -98,7 +98,7 @@ const Auth = () => {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -139,7 +139,7 @@ const Auth = () => {
           setSuccess('Account created successfully! Please verify your email with the OTP sent to your inbox.');
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Auth error:', error);
       setError('Something went wrong. Please try again.');
     } finally {
