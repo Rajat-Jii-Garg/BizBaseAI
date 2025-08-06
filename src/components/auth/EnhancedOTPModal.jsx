@@ -3,20 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Shield, Mail, CheckCircle, X, ArrowLeft, Loader2, Copy, Eye } from 'lucide-react';
+import { Shield, Mail, CheckCircle, X, ArrowLeft, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-interface EnhancedOTPModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onVerified: () => void;
-  email: string;
-  purpose: 'signup' | 'login' | 'reset';
-}
-
-const EnhancedOTPModal: React.FC<EnhancedOTPModalProps> = ({
+const EnhancedOTPModal = ({
   isOpen,
   onClose,
   onVerified,
@@ -29,7 +21,6 @@ const EnhancedOTPModal: React.FC<EnhancedOTPModalProps> = ({
   const [timeLeft, setTimeLeft] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [verified, setVerified] = useState(false);
-  
   
   const { toast } = useToast();
   const { sendOTP, verifyOTP, completeSignup } = useAuth();
@@ -151,7 +142,6 @@ const EnhancedOTPModal: React.FC<EnhancedOTPModalProps> = ({
     setResendLoading(false);
   };
 
-
   if (!isOpen) return null;
 
   if (verified) {
@@ -212,7 +202,6 @@ const EnhancedOTPModal: React.FC<EnhancedOTPModalProps> = ({
         </CardHeader>
         
         <CardContent className="space-y-6">
-
           <div className="space-y-4">
             <div className="flex justify-center">
               <InputOTP

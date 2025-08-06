@@ -25,7 +25,7 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showOTPModal, setShowOTPModal] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState({});
   
   const navigate = useNavigate();
   const { signUp, user } = useAuth();
@@ -38,29 +38,29 @@ const Signup = () => {
     }
   }, [user, navigate]);
 
-  const validateEmail = (email: string) => {
+  const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const validatePhone = (phone: string) => {
+  const validatePhone = (phone) => {
     const phoneRegex = /^[+]?[\d\s\-\(\)]{10,}$/;
     return phoneRegex.test(phone);
   };
 
-  const validatePassword = (password: string) => {
+  const validatePassword = (password) => {
     return password.length >= 8;
   };
 
   const clearErrors = () => setErrors({});
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     clearErrors();
     setLoading(true);
     
     // Validation
-    const newErrors: { [key: string]: string } = {};
+    const newErrors = {};
     
     if (!signupData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
@@ -160,7 +160,7 @@ const Signup = () => {
         navigate('/dashboard');
       }, 1000);
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('Signup completion error:', error);
       toast({
         title: "Error",

@@ -9,7 +9,7 @@ export const usePostEngagement = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const toggleLike = async (postId: string) => {
+  const toggleLike = async (postId) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -52,7 +52,7 @@ export const usePostEngagement = () => {
           description: "You've liked this post"
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error toggling like:', error);
       toast({
         title: "Error",
@@ -64,7 +64,7 @@ export const usePostEngagement = () => {
     }
   };
 
-  const addComment = async (postId: string, content: string) => {
+  const addComment = async (postId, content) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -97,7 +97,7 @@ export const usePostEngagement = () => {
         title: "Comment Added",
         description: "Your comment has been posted"
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error adding comment:', error);
       toast({
         title: "Error",
@@ -109,7 +109,7 @@ export const usePostEngagement = () => {
     }
   };
 
-  const sharePost = async (postId: string) => {
+  const sharePost = async (postId) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -158,7 +158,7 @@ export const usePostEngagement = () => {
           description: "Post has been shared to your network"
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sharing post:', error);
       toast({
         title: "Error",

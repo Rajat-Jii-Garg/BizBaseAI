@@ -4,26 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-export interface Connection {
-  id: string;
-  requester_id: string;
-  addressee_id: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  created_at: string;
-  updated_at: string;
-  requester_profile?: {
-    full_name: string;
-    avatar_url?: string;
-  };
-  addressee_profile?: {
-    full_name: string;
-    avatar_url?: string;
-  };
-}
-
 export const useConnections = () => {
-  const [connections, setConnections] = useState<Connection[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<Connection[]>([]);
+  const [connections, setConnections] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -41,7 +24,7 @@ export const useConnections = () => {
       if (error) throw error;
 
       // Get unique user IDs to fetch profiles
-      const userIds = new Set<string>();
+      const userIds = new Set();
       connectionsData?.forEach(conn => {
         userIds.add(conn.requester_id);
         userIds.add(conn.addressee_id);
@@ -62,7 +45,7 @@ export const useConnections = () => {
       // Combine connections with profile data
       const connectionsWithProfiles = connectionsData?.map(conn => ({
         ...conn,
-        status: conn.status as 'pending' | 'accepted' | 'rejected',
+        status: conn.status,
         requester_profile: profilesMap.get(conn.requester_id) || { full_name: 'Unknown User' },
         addressee_profile: profilesMap.get(conn.addressee_id) || { full_name: 'Unknown User' }
       })) || [];
@@ -74,7 +57,7 @@ export const useConnections = () => {
 
       setConnections(accepted);
       setPendingRequests(pending);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching connections:', error);
       toast({
         title: "Error",
@@ -86,7 +69,7 @@ export const useConnections = () => {
     }
   };
 
-  const sendConnectionRequest = async (addresseeId: string) => {
+  const sendConnectionRequest = async (addresseeId) => {
     if (!user) return;
 
     try {
@@ -108,7 +91,7 @@ export const useConnections = () => {
       });
 
       fetchConnections();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending connection request:', error);
       toast({
         title: "Error",
@@ -118,7 +101,7 @@ export const useConnections = () => {
     }
   };
 
-  const respondToRequest = async (connectionId: string, status: 'accepted' | 'rejected') => {
+  const respondToRequest = async (connectionId, status) => {
     try {
       const { error } = await supabase
         .from('connections')
@@ -133,7 +116,7 @@ export const useConnections = () => {
       });
 
       fetchConnections();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error responding to request:', error);
       toast({
         title: "Error",
