@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 const Feed = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const Feed = () => {
 
       const processedPosts = posts?.map(post => ({
         ...post,
-        user_has_liked: post.post_likes?.some((like: any) => like.user_id === user.id) || false
+        user_has_liked: post.post_likes?.some((like) => like.user_id === user.id) || false
       })) || [];
 
       setPosts(processedPosts);
