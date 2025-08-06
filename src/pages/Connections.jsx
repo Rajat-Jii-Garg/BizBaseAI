@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,10 +28,10 @@ const Connections = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [connections, setConnections] = useState<any[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
-  const [sentRequests, setSentRequests] = useState<any[]>([]);
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [connections, setConnections] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
@@ -150,7 +151,7 @@ const Connections = () => {
     }
   };
 
-  const handleSendConnectionRequest = async (profileId: string) => {
+  const handleSendConnectionRequest = async (profileId) => {
     if (!user) return;
 
     try {
@@ -181,7 +182,7 @@ const Connections = () => {
     }
   };
 
-  const handleAcceptRequest = async (requestId: string) => {
+  const handleAcceptRequest = async (requestId) => {
     try {
       const { error } = await supabase
         .from('connections')
@@ -207,7 +208,7 @@ const Connections = () => {
     }
   };
 
-  const handleRejectRequest = async (requestId: string) => {
+  const handleRejectRequest = async (requestId) => {
     try {
       const { error } = await supabase
         .from('connections')
@@ -232,7 +233,7 @@ const Connections = () => {
     }
   };
 
-  const handleDisconnect = async (connectionId: string) => {
+  const handleDisconnect = async (connectionId) => {
     if (!confirm('Are you sure you want to remove this connection?')) return;
 
     try {

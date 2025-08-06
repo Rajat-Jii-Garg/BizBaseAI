@@ -41,11 +41,7 @@ import {
   Sparkles
 } from 'lucide-react';
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const DashboardLayout = ({ children }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,7 +53,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     navigate('/');
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
   };
@@ -76,7 +72,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     { icon: Brain, label: 'AI Assistant', path: '/dashboard/ai-assistant' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path) => location.pathname === path;
 
   return (
     <div className="min-h-screen bg-gray-50">

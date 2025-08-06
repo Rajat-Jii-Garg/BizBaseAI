@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,50 +13,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 
-interface Job {
-  id: string;
-  title: string;
-  company_name: string;
-  location: string;
-  job_type: string;
-  work_mode: string;
-  experience_level: string;
-  industry: string;
-  description: string;
-  requirements: string[];
-  skills_required: string[];
-  salary_min: number;
-  salary_max: number;
-  salary_currency: string;
-  benefits: string[];
-  views_count: number;
-  applications_count: number;
-  created_at: string;
-  is_featured: boolean;
-}
-
-interface JobApplication {
-  job_id: string;
-  cover_letter: string;
-  resume_url?: string;
-}
-
-interface JobRecommendation {
-  job_id: string;
-  match_score: number;
-  reasons: string[];
-  growth_potential: string;
-  job: Job;
-}
-
 const Jobs = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
-  const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set());
-  const [recommendations, setRecommendations] = useState<JobRecommendation[]>([]);
+  const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
+  const [savedJobs, setSavedJobs] = useState(new Set());
+  const [appliedJobs, setAppliedJobs] = useState(new Set());
+  const [recommendations, setRecommendations] = useState([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -64,7 +29,7 @@ const Jobs = () => {
   const [selectedJobType, setSelectedJobType] = useState('');
   const [selectedWorkMode, setSelectedWorkMode] = useState('');
   const [selectedExperience, setSelectedExperience] = useState('');
-  const [applicationData, setApplicationData] = useState<JobApplication>({
+  const [applicationData, setApplicationData] = useState({
     job_id: '',
     cover_letter: '',
     resume_url: ''
@@ -183,7 +148,7 @@ const Jobs = () => {
     setFilteredJobs(filtered);
   };
 
-  const handleSaveJob = async (jobId: string) => {
+  const handleSaveJob = async (jobId) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -238,7 +203,7 @@ const Jobs = () => {
     }
   };
 
-  const handleApplyJob = async (jobId: string) => {
+  const handleApplyJob = async (jobId) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -283,7 +248,7 @@ const Jobs = () => {
     }
   };
 
-  const incrementJobViews = async (jobId: string) => {
+  const incrementJobViews = async (jobId) => {
     try {
       const { error } = await supabase.rpc('increment_job_views', { job_id: jobId });
       if (error) throw error;
@@ -292,15 +257,15 @@ const Jobs = () => {
     }
   };
 
-  const formatSalary = (min: number, max: number, currency: string) => {
-    const formatNumber = (num: number) => {
+  const formatSalary = (min, max, currency) => {
+    const formatNumber = (num) => {
       return new Intl.NumberFormat('en-US').format(num);
     };
     return `${currency} ${formatNumber(min)} - ${formatNumber(max)}`;
   };
 
-  const getUniqueValues = (key: keyof Job) => {
-    return [...new Set(jobs.map(job => job[key] as string))].filter(Boolean);
+  const getUniqueValues = (key) => {
+    return [...new Set(jobs.map(job => job[key]))].filter(Boolean);
   };
 
   if (loading) {

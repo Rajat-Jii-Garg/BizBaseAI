@@ -25,10 +25,10 @@ const Network = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
-  const [professionals, setProfessionals] = useState<any[]>([]);
+  const [professionals, setProfessionals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [connectionRequests, setConnectionRequests] = useState<Set<string>>(new Set());
-  const [existingConnections, setExistingConnections] = useState<Set<string>>(new Set());
+  const [connectionRequests, setConnectionRequests] = useState(new Set());
+  const [existingConnections, setExistingConnections] = useState(new Set());
 
   useEffect(() => {
     if (user) {
@@ -48,8 +48,8 @@ const Network = () => {
 
       if (error) throw error;
 
-      const connectedIds = new Set<string>();
-      const pendingIds = new Set<string>();
+      const connectedIds = new Set();
+      const pendingIds = new Set();
 
       connections?.forEach(conn => {
         const otherId = conn.requester_id === user.id ? conn.addressee_id : conn.requester_id;
@@ -92,7 +92,7 @@ const Network = () => {
     }
   };
 
-  const sendConnectionRequest = async (profileId: string) => {
+  const sendConnectionRequest = async (profileId) => {
     if (!user) return;
 
     try {
@@ -111,7 +111,7 @@ const Network = () => {
         title: "Connection Request Sent!",
         description: "Your connection request has been sent successfully!"
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending connection request:', error);
       if (error.code === '23505') {
         toast({
@@ -136,7 +136,7 @@ const Network = () => {
     prof.industry?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getConnectionStatus = (profileId: string) => {
+  const getConnectionStatus = (profileId) => {
     if (existingConnections.has(profileId)) return 'connected';
     if (connectionRequests.has(profileId)) return 'pending';
     return 'none';

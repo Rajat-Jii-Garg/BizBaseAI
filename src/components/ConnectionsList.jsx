@@ -6,29 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Users, UserPlus, Check, X } from 'lucide-react';
 
-interface Connection {
-  id: string;
-  requester_id: string;
-  addressee_id: string;
-  status: string;
-  requester_profile?: {
-    full_name: string;
-    avatar_url?: string;
-  };
-  addressee_profile?: {
-    full_name: string;
-    avatar_url?: string;
-  };
-}
-
-interface ConnectionsListProps {
-  connections: Connection[];
-  pendingRequests: Connection[];
-  onAcceptRequest: (connectionId: string) => void;
-  onRejectRequest: (connectionId: string) => void;
-}
-
-const ConnectionsList: React.FC<ConnectionsListProps> = ({
+const ConnectionsList = ({
   connections,
   pendingRequests,
   onAcceptRequest,
