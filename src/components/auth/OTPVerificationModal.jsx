@@ -7,15 +7,7 @@ import { Shield, Mail, Phone, CheckCircle, X, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
-interface OTPVerificationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  purpose: 'signup' | 'forgot';
-  email?: string;
-  phone?: string;
-}
-
-const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
+const OTPVerificationModal = ({
   isOpen,
   onClose,
   purpose,

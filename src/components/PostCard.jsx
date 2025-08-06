@@ -4,16 +4,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MoreHorizontal, CheckCircle } from 'lucide-react';
-import { Post } from '@/hooks/usePosts';
 import PostEngagementActions from './PostEngagementActions';
 
-interface PostCardProps {
-  post: Post;
-  onEngagementUpdate: () => void;
-}
-
-const PostCard: React.FC<PostCardProps> = ({ post, onEngagementUpdate }) => {
-  const formatTimeAgo = (dateString: string) => {
+const PostCard = ({ post, onEngagementUpdate }) => {
+  const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));

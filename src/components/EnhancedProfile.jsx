@@ -24,11 +24,7 @@ import {
   Crown
 } from 'lucide-react';
 
-interface EnhancedProfileProps {
-  profile: any;
-}
-
-const EnhancedProfile: React.FC<EnhancedProfileProps> = ({ profile }) => {
+const EnhancedProfile = ({ profile }) => {
   const [profileScore] = useState(85);
   const [skillProgress] = useState([
     { skill: 'Leadership', progress: 90, trending: true },

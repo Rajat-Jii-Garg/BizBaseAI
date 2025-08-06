@@ -3,15 +3,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface Hashtag {
-  id: string;
-  name: string;
-  usage_count: number;
-  created_at: string;
-}
-
 export const useHashtags = () => {
-  const [hashtags, setHashtags] = useState<Hashtag[]>([]);
+  const [hashtags, setHashtags] = useState([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -26,7 +19,7 @@ export const useHashtags = () => {
 
       if (error) throw error;
       setHashtags(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching hashtags:', error);
       toast({
         title: "Error",
@@ -38,7 +31,7 @@ export const useHashtags = () => {
     }
   };
 
-  const searchHashtags = async (query: string) => {
+  const searchHashtags = async (query) => {
     try {
       const { data, error } = await supabase
         .from('hashtags')
@@ -49,7 +42,7 @@ export const useHashtags = () => {
 
       if (error) throw error;
       return data || [];
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error searching hashtags:', error);
       toast({
         title: "Error",
@@ -60,7 +53,7 @@ export const useHashtags = () => {
     }
   };
 
-  const getPostsByHashtag = async (hashtagName: string) => {
+  const getPostsByHashtag = async (hashtagName) => {
     try {
       const { data, error } = await supabase
         .from('post_hashtags')
@@ -81,7 +74,7 @@ export const useHashtags = () => {
 
       if (error) throw error;
       return data || [];
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching posts by hashtag:', error);
       toast({
         title: "Error",

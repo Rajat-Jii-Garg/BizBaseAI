@@ -1,29 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-export interface Post {
-  id: string;
-  user_id: string;
-  content: string;
-  image_url?: string;
-  created_at: string;
-  updated_at: string;
-  likes_count: number;
-  comments_count: number;
-  shares_count: number;
-  profiles?: {
-    full_name: string;
-    avatar_url?: string;
-    current_position?: string;
-    company_name?: string;
-  };
-  user_has_liked?: boolean;
-}
-
 export const usePosts = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -69,13 +51,13 @@ export const usePosts = () => {
       // Create profiles map
       const profilesMap = new Map();
       if (profilesData) {
-        profilesData.forEach((profile: any) => {
+        profilesData.forEach((profile) => {
           profilesMap.set(profile.id, profile);
         });
       }
 
       // Check likes for current user
-      let likedPostIds = new Set<string>();
+      let likedPostIds = new Set();
       if (user) {
         const postIds = postsData.map(post => post.id);
         const { data: likes } = await supabase
@@ -104,7 +86,7 @@ export const usePosts = () => {
 
       console.log('Final enriched posts:', enrichedPosts);
       setPosts(enrichedPosts);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error in fetchPosts:', error);
       toast({
         title: "Error",
@@ -116,7 +98,7 @@ export const usePosts = () => {
     }
   };
 
-  const createPost = async (content: string, imageUrl?: string) => {
+  const createPost = async (content, imageUrl, mediaType) => {
     if (!user) {
       toast({
         title: "Error",
@@ -150,7 +132,7 @@ export const usePosts = () => {
 
       // Refresh posts
       await fetchPosts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating post:', error);
       toast({
         title: "Error",
@@ -160,7 +142,7 @@ export const usePosts = () => {
     }
   };
 
-  const toggleLike = async (postId: string) => {
+  const toggleLike = async (postId) => {
     if (!user) return;
 
     try {
@@ -191,7 +173,7 @@ export const usePosts = () => {
       }
 
       await fetchPosts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error toggling like:', error);
       toast({
         title: "Error",
@@ -201,7 +183,7 @@ export const usePosts = () => {
     }
   };
 
-  const sharePost = async (postId: string) => {
+  const sharePost = async (postId) => {
     if (!user) return;
 
     try {
@@ -222,7 +204,7 @@ export const usePosts = () => {
       });
 
       await fetchPosts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sharing post:', error);
       toast({
         title: "Error",
@@ -238,7 +220,7 @@ export const usePosts = () => {
     }
   }, [user]);
 
-  const editPost = async (postId: string, newContent: string) => {
+  const editPost = async (postId, newContent) => {
     if (!user) {
       toast({
         title: "Error",
@@ -261,13 +243,13 @@ export const usePosts = () => {
       if (error) throw error;
 
       await fetchPosts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error editing post:', error);
       throw error;
     }
   };
 
-  const deletePost = async (postId: string) => {
+  const deletePost = async (postId) => {
     if (!user) {
       toast({
         title: "Error",
@@ -287,7 +269,7 @@ export const usePosts = () => {
       if (error) throw error;
 
       await fetchPosts();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting post:', error);
       throw error;
     }
