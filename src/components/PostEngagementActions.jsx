@@ -5,16 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Heart, MessageCircle, Share2, Send } from 'lucide-react';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 
-interface PostEngagementActionsProps {
-  postId: string;
-  likesCount: number;
-  commentsCount: number;
-  sharesCount: number;
-  userHasLiked: boolean;
-  onEngagementUpdate: () => void;
-}
-
-const PostEngagementActions: React.FC<PostEngagementActionsProps> = ({
+const PostEngagementActions = ({
   postId,
   likesCount,
   commentsCount,

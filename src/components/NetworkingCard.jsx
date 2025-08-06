@@ -9,13 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-interface NetworkingCardProps {
-  profile: any;
-  connectionStatus?: 'none' | 'pending' | 'connected';
-  onConnect?: () => void;
-}
-
-const NetworkingCard: React.FC<NetworkingCardProps> = ({ 
+const NetworkingCard = ({ 
   profile, 
   connectionStatus = 'none',
   onConnect 
