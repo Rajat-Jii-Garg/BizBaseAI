@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,11 +50,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showWelcome, setShowWelcome] = useState(true);
-  const [allPosts, setAllPosts] = useState<any[]>([]);
+  const [allPosts, setAllPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [performanceData, setPerformanceData] = useState<any>(null);
-  const [smartConnections, setSmartConnections] = useState<any[]>([]);
+  const [userProfile, setUserProfile] = useState(null);
+  const [performanceData, setPerformanceData] = useState(null);
+  const [smartConnections, setSmartConnections] = useState([]);
   const [loadingConnections, setLoadingConnections] = useState(false);
   
   const { 
@@ -218,7 +219,7 @@ const Dashboard = () => {
       });
 
       // Check likes for current user
-      let likedPostIds = new Set<string>();
+      let likedPostIds = new Set();
       if (user) {
         const postIds = postsData.map(post => post.id);
         const { data: likes } = await supabase
@@ -271,7 +272,7 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  const handleCreatePost = async (content: string, mediaUrl?: string, mediaType?: 'image' | 'video' | 'audio' | 'article') => {
+  const handleCreatePost = async (content, mediaUrl, mediaType) => {
     console.log('Dashboard: Creating post with content:', content, 'mediaUrl:', mediaUrl);
     try {
       await createPost(content, mediaUrl);
@@ -281,7 +282,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleSuggestConnection = async (profileId: string) => {
+  const handleSuggestConnection = async (profileId) => {
     try {
       const { error } = await supabase
         .from('connections')
@@ -297,7 +298,7 @@ const Dashboard = () => {
         title: "Connection Request Sent!",
         description: "Your connection request has been sent successfully."
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending connection request:', error);
       toast({
         title: "Error",
@@ -336,7 +337,7 @@ const Dashboard = () => {
     { label: "AI Insights", icon: Brain, action: () => navigate('/insights'), color: "bg-purple-600" },
   ];
 
-  const handleSendConnectionRequest = async (profileId: string) => {
+  const handleSendConnectionRequest = async (profileId) => {
     try {
       const { error } = await supabase
         .from('connections')
@@ -355,7 +356,7 @@ const Dashboard = () => {
 
       // Remove from suggestions
       setSmartConnections(prev => prev.filter(conn => conn.id !== profileId));
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending connection request:', error);
       toast({
         title: "Error",
@@ -365,11 +366,11 @@ const Dashboard = () => {
     }
   };
 
-  const handleAcceptRequest = (connectionId: string) => {
+  const handleAcceptRequest = (connectionId) => {
     respondToRequest(connectionId, 'accepted');
   };
 
-  const handleRejectRequest = (connectionId: string) => {
+  const handleRejectRequest = (connectionId) => {
     respondToRequest(connectionId, 'rejected');  
   };
 
