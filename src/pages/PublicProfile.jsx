@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -26,35 +27,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-interface Profile {
-  id: string;
-  full_name: string;
-  email: string;
-  avatar_url?: string;
-  bio?: string;
-  location?: string;
-  current_position?: string;
-  company_name?: string;
-  industry?: string;
-  website?: string;
-  linkedin_url?: string;
-  twitter_url?: string;
-  github_url?: string;
-  phone?: string;
-  skills?: any;
-  achievements?: any;
-  experience_years?: number;
-  created_at: string;
-}
-
-const PublicProfile: React.FC = () => {
+const PublicProfile = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [connectionStatus, setConnectionStatus] = useState<'none' | 'pending' | 'connected' | 'sent'>('none');
+  const [connectionStatus, setConnectionStatus] = useState('none');
 
   const userId = searchParams.get('user');
 
