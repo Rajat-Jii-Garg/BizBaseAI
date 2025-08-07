@@ -16,17 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-interface EnhancedPostCardProps {
-  post: Post & {
-    hashtags?: { name: string }[];
-    mentions?: { mentioned_user_id: string; profiles: { full_name: string } }[];
-  };
-  onEngagementUpdate: () => void;
-  onEdit?: (postId: string, newContent: string) => Promise<void>;
-  onDelete?: (postId: string) => Promise<void>;
-}
-
-const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
+const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -35,7 +25,7 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
   const [editContent, setEditContent] = useState(post.content);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  const formatTimeAgo = (dateString: string) => {
+  const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
@@ -46,19 +36,19 @@ const EnhancedPostCard: React.FC<EnhancedPostCardProps> = ({ post, onEngagementU
   };
 
   // Extract hashtags from content
-  const extractHashtags = (content: string) => {
+  const extractHashtags = (content) => {
     const matches = content.match(/#[\w]+/g);
     return matches || [];
   };
 
   // Extract mentions from content
-  const extractMentions = (content: string) => {
+  const extractMentions = (content) => {
     const matches = content.match(/@[\w\s]+/g);
     return matches || [];
   };
 
   // Render content with highlighted hashtags and mentions
-  const renderContent = (content: string) => {
+  const renderContent = (content) => {
     if (!content) return null;
 
     // Split content and highlight hashtags and mentions

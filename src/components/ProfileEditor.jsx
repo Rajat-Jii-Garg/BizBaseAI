@@ -10,19 +10,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface ProfileEditorProps {
-  profile: any;
-  onUpdate: () => void;
-}
-
-const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
+const ProfileEditor = ({ profile, onUpdate }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef(null);
+  const bannerInputRef = useRef(null);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     bio: profile?.bio || '',
@@ -34,7 +29,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
     banner_url: profile?.banner_url || '',
   });
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
@@ -78,7 +73,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
       });
 
       onUpdate();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error uploading avatar:', error);
       toast({
         title: "Error",
@@ -90,7 +85,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
     }
   };
 
-  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
@@ -124,7 +119,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
       });
 
       onUpdate();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to upload banner: " + error.message,
@@ -135,7 +130,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
 
@@ -154,7 +149,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
       });
 
       onUpdate();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating profile:', error);
       toast({
         title: "Error",
@@ -166,7 +161,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ profile, onUpdate }) => {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

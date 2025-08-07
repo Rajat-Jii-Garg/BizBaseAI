@@ -7,34 +7,20 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-interface Notification {
-  id: string;
-  type: string;
-  title: string;
-  content: string | null;
-  read: boolean;
-  created_at: string;
-  related_user_id?: string;
-  related_id?: string;
-  related_user?: {
-    full_name?: string;
-    avatar_url?: string;
-  };
-}
 
 const NotificationsCenter = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef(null);
 
   useEffect(() => {
     if (!open) return;
-    const onClick = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    const onClick = (e) => {
+      if (!ref.current?.contains(e.target)) setOpen(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
@@ -117,7 +103,7 @@ const NotificationsCenter = () => {
     }
   };
 
-  const markAsRead = async (notificationId: string) => {
+  const markAsRead = async (notificationId) => {
     try {
       const { error } = await supabase
         .from('notifications')
@@ -158,7 +144,7 @@ const NotificationsCenter = () => {
     }
   };
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type) => {
     switch (type) {
       case 'like':
         return <Heart className="w-4 h-4 text-red-500" />;
@@ -175,7 +161,7 @@ const NotificationsCenter = () => {
     }
   };
 
-  const getTimeAgo = (dateString: string) => {
+  const getTimeAgo = (dateString) => {
     const now = new Date();
     const date = new Date(dateString);
     const diffInMs = now.getTime() - date.getTime();

@@ -9,12 +9,7 @@ import { Search, User, FileText, Hash, MessageCircle, TrendingUp } from 'lucide-
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
-interface GlobalSearchModalProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ open, onClose }) => {
+const GlobalSearchModal = ({ open, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState({
     users: [],

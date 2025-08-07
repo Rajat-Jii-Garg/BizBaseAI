@@ -21,9 +21,9 @@ import { useToast } from '@/hooks/use-toast';
 const Notifications = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [connectionRequests, setConnectionRequests] = useState<any[]>([]);
+  const [connectionRequests, setConnectionRequests] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -84,7 +84,7 @@ const Notifications = () => {
     }
   };
 
-  const formatNotificationTime = (dateString: string) => {
+  const formatNotificationTime = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
@@ -122,7 +122,7 @@ const Notifications = () => {
     }
   };
 
-  const handleConnectionRequest = async (requestId: string, action: 'accept' | 'reject') => {
+  const handleConnectionRequest = async (requestId, action) => {
     try {
       const { error } = await supabase
         .from('connections')
@@ -150,7 +150,7 @@ const Notifications = () => {
     }
   };
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type) => {
     switch (type) {
       case 'like':
         return <Heart className="w-4 h-4 text-red-500" />;

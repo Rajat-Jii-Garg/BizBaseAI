@@ -10,13 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface CreateEventModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onEventCreated: () => void;
-}
-
-const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onClose, onEventCreated }) => {
+const CreateEventModal = ({ isOpen, onClose, onEventCreated }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -31,13 +25,13 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onClose, on
     price: 'Free',
     max_attendees: 100
   });
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
 
   const categories = ['Technology', 'Networking', 'Marketing', 'Finance', 'Leadership', 'Design', 'Business'];
   const eventTypes = ['workshop', 'webinar', 'networking', 'conference', 'seminar'];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -49,11 +43,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onClose, on
     }
   };
 
-  const removeTag = (tagToRemove: string) => {
+  const removeTag = (tagToRemove) => {
     setTags(prev => prev.filter(tag => tag !== tagToRemove));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
 

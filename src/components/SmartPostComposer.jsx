@@ -15,24 +15,20 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface SmartPostComposerProps {
-  onCreatePost: (content: string, mediaUrl?: string, mediaType?: string) => Promise<void>;
-}
-
-const SmartPostComposer: React.FC<SmartPostComposerProps> = ({ onCreatePost }) => {
+const SmartPostComposer = ({ onCreatePost }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const [mediaFile, setMediaFile] = useState<File | null>(null);
-  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [mediaFile, setMediaFile] = useState(null);
+  const [mediaPreview, setMediaPreview] = useState(null);
   const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = (file) => {
     setMediaFile(file);
     const reader = new FileReader();
     reader.onload = (e) => {
-      setMediaPreview(e.target?.result as string);
+      setMediaPreview(e.target?.result);
     };
     reader.readAsDataURL(file);
   };

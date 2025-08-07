@@ -8,18 +8,14 @@ import { Image, Video, FileText, Loader2, Hash, AtSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-interface PostCreatorProps {
-  onCreatePost: (content: string, imageUrl?: string) => Promise<void>;
-}
-
-const PostCreator: React.FC<PostCreatorProps> = ({ onCreatePost }) => {
+const PostCreator = ({ onCreatePost }) => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [showMentions, setShowMentions] = useState(false);
   const [showHashtags, setShowHashtags] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef(null);
 
   const handleSubmit = async () => {
     if (!content.trim()) return;
@@ -33,7 +29,7 @@ const PostCreator: React.FC<PostCreatorProps> = ({ onCreatePost }) => {
     }
   };
 
-  const insertMention = (mention: string) => {
+  const insertMention = (mention) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
@@ -49,7 +45,7 @@ const PostCreator: React.FC<PostCreatorProps> = ({ onCreatePost }) => {
     }, 0);
   };
 
-  const insertHashtag = (hashtag: string) => {
+  const insertHashtag = (hashtag) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 

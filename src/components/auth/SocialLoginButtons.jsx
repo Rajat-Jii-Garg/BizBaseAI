@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 const SocialLoginButtons = () => {
-  const [loading, setLoading] = useState<string | null>(null);
+  const [loading, setLoading] = useState(null);
   const { toast } = useToast();
 
   const handleGoogleLogin = async () => {

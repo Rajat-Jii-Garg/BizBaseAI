@@ -9,29 +9,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface SkillEndorsementsProps {
-  profileId: string;
-  skills: string[];
-  isOwnProfile: boolean;
-}
-
-interface Endorsement {
-  id: string;
-  skill: string;
-  endorser_id: string;
-  endorser_name: string;
-  endorser_avatar?: string;
-  created_at: string;
-}
-
-const SkillEndorsements: React.FC<SkillEndorsementsProps> = ({ 
+const SkillEndorsements = ({ 
   profileId, 
   skills, 
   isOwnProfile 
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [endorsements, setEndorsements] = useState<Endorsement[]>([]);
+  const [endorsements, setEndorsements] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -65,7 +50,7 @@ const SkillEndorsements: React.FC<SkillEndorsementsProps> = ({
     }
   };
 
-  const handleEndorse = async (skill: string) => {
+  const handleEndorse = async (skill) => {
     if (!user || isOwnProfile) return;
     
     setLoading(true);
@@ -119,11 +104,11 @@ const SkillEndorsements: React.FC<SkillEndorsementsProps> = ({
     }
   };
 
-  const getSkillEndorsements = (skill: string) => {
+  const getSkillEndorsements = (skill) => {
     return endorsements.filter(e => e.skill === skill);
   };
 
-  const isEndorsedByUser = (skill: string) => {
+  const isEndorsedByUser = (skill) => {
     return endorsements.some(e => e.skill === skill && e.endorser_id === user?.id);
   };
 
