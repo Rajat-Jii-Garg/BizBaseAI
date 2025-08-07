@@ -65,7 +65,7 @@ const Settings = () => {
     theme: 'light'
   });
 
-  const handleSettingChange = (key: string, value: any) => {
+  const handleSettingChange = (key, value) => {
     setSettings(prev => ({
       ...prev,
       [key]: value
