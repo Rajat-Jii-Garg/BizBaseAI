@@ -9,7 +9,7 @@ import NotificationsCenter from "./NotificationsCenter";
 import ThemeSwitcher from "./ThemeSwitcher";
 import GlobalSearchModal from "./GlobalSearchModal";
 
-const breadcrumbsMap = {
+const breadcrumbsMap: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/dashboard/crm": "CRM", 
   "/dashboard/projects": "Projects",
@@ -37,7 +37,7 @@ const DashboardHeader = () => {
   // Global search modal
   const [searchOpen, setSearchOpen] = React.useState(false);
   React.useEffect(() => {
-    const handleCombo = (e) => {
+    const handleCombo = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         setSearchOpen(true);
       }
