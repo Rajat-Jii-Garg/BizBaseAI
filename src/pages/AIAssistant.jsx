@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Brain, 
-  MessageSquare, 
-  Zap, 
-  Star,
-  TrendingUp,
-  Users,
-  Send,
-  Bot,
-  Sparkles,
-  User
-} from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Bot,
+  Brain,
+  MessageSquare,
+  Send,
+  Sparkles,
+  Star,
+  TrendingUp,
+  User,
+  Users,
+  Zap
+} from 'lucide-react';
+import { useState } from 'react';
 
 const AIAssistant = () => {
   const { user } = useAuth();
@@ -34,7 +34,7 @@ const AIAssistant = () => {
       color: "bg-blue-500"
     },
     {
-      title: "Profile Optimizer", 
+      title: "Profile Optimizer",
       description: "Improve your profile",
       icon: Star,
       color: "bg-purple-500"
@@ -101,7 +101,7 @@ const AIAssistant = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();

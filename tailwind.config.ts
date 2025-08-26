@@ -1,5 +1,6 @@
 
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -39,10 +40,10 @@ export default {
 				accentBlue: "#2bb6fc",
 				// Add soft mint, blue, etc.
 				mint: "#e3f9f6",
-				card: {
-					DEFAULT: "#ffffff",
-					background: "#f5f6fa",
-				},
+				// card: {
+					// DEFAULT: "#ffffff"
+					// background: "#f5f6fa",
+				// },
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -116,5 +117,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

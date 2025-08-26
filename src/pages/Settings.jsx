@@ -1,29 +1,27 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import DashboardLayout from '@/components/DashboardLayout';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Settings as SettingsIcon, 
-  User, 
-  Bell, 
-  Shield, 
-  CreditCard, 
-  Smartphone,
-  Mail,
-  Globe,
-  Eye,
-  Lock,
-  Trash2,
-  Upload
-} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import DashboardLayout from '@/components/DashboardLayout';
+import {
+  Bell,
+  Eye,
+  Lock,
+  Mail,
+  Settings as SettingsIcon,
+  Shield,
+  Smartphone,
+  Trash2,
+  Upload,
+  User
+} from 'lucide-react';
+import { useState } from 'react';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
@@ -335,7 +333,7 @@ const Settings = () => {
                         <div key={item.key} className="flex items-center justify-between">
                           <Label>{item.label}</Label>
                           <Switch
-                            checked={settings[item.key as keyof typeof settings] as boolean}
+                            checked={settings[item.key]}
                             onCheckedChange={(checked) => handleSettingChange(item.key, checked)}
                           />
                         </div>

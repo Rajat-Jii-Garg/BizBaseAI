@@ -1,54 +1,46 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Building2, 
-  MapPin, 
-  Calendar,
-  Users,
-  Briefcase,
-  Plus,
-  Settings,
-  Bell,
-  MessageSquare,
-  TrendingUp,
-  Star,
-  BookOpen,
-  Award,
-  Globe,
-  Eye,
-  Heart,
-  Share2,
-  Send,
-  Camera,
-  Edit,
-  Network,
-  Zap,
-  Target,
-  Rocket,
-  Crown,
-  Trophy,
-  CheckCircle,
-  ArrowUp,
-  ChevronRight,
-  Brain,
-  Home,
-  Coffee,
-  Video
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedProfile from '@/components/EnhancedProfile';
-import SmartNetworking from '@/components/SmartNetworking';
 import ProfessionalTools from '@/components/ProfessionalTools';
+import SmartNetworking from '@/components/SmartNetworking';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  ArrowUp,
+  Award,
+  BookOpen,
+  Briefcase,
+  Camera,
+  CheckCircle,
+  ChevronRight,
+  Crown,
+  Edit,
+  Globe,
+  Heart,
+  Home,
+  MapPin,
+  MessageSquare,
+  Network,
+  Plus,
+  Rocket,
+  Settings,
+  Share2,
+  Star,
+  Target,
+  TrendingUp,
+  Trophy,
+  Users,
+  Zap
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileDashboard = () => {
   const { user, signOut } = useAuth();
@@ -74,7 +66,7 @@ const ProfileDashboard = () => {
 
       if (error) throw error;
       setProfile(data);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching profile:', error);
       toast({
         title: 'Error',

@@ -2,13 +2,13 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  Eye, 
-  Heart, 
-  MessageSquare, 
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  Eye,
+  Heart,
+  MessageSquare,
   Share2,
   Target,
   Award,

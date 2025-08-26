@@ -1,34 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Users, 
-  Plus,
-  Filter,
-  Search,
-  ExternalLink,
-  BookmarkPlus,
-  Share2,
-  Video,
-  Globe,
-  Briefcase,
-  TrendingUp,
-  Star,
-  Bookmark,
-  BookmarkCheck,
-  RefreshCw
-} from 'lucide-react';
+import CreateEventModal from '@/components/CreateEventModal';
 import DashboardLayout from '@/components/DashboardLayout';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import CreateEventModal from '@/components/CreateEventModal';
+import {
+  Bookmark,
+  BookmarkCheck,
+  Briefcase,
+  Calendar,
+  Clock,
+  Filter,
+  Globe,
+  MapPin,
+  Plus,
+  RefreshCw,
+  Search,
+  Share2,
+  Users,
+  Video
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const Events = () => {
   const { user } = useAuth();
@@ -36,9 +32,9 @@ const Events = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTab, setSelectedTab] = useState('discover');
-  const [events, setEvents] = useState<any[]>([]);
-  const [myEvents, setMyEvents] = useState<any[]>([]);
-  const [savedEvents, setSavedEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState([]);
+  const [myEvents, setMyEvents] = useState([]);
+  const [savedEvents, setSavedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -87,7 +83,7 @@ const Events = () => {
 
         const eventsWithAttendees = data?.map(event => {
           const profile = profiles?.find(p => p.id === event.user_id);
-          const isUserAttending = event.event_attendees?.some((ea: any) => ea.user_id === user.id);
+          const isUserAttending = event.event_attendees?.some(ea => ea.user_id === user.id);
           
           return {
             ...event,
@@ -157,7 +153,7 @@ const Events = () => {
 
         const userSavedEvents = data?.map(saved => {
           const profile = profiles?.find(p => p.id === saved.events?.user_id);
-          const isUserAttending = saved.events?.event_attendees?.some((ea: any) => ea.user_id === user.id);
+          const isUserAttending = saved.events?.event_attendees?.some(ea => ea.user_id === user.id);
           
           return {
             ...saved.events,
@@ -202,12 +198,12 @@ const Events = () => {
 
   const filteredEvents = getCurrentEvents().filter(event => {
     const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.description?.toLowerCase().includes(searchTerm.toLowerCase());
+                        event.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const handleJoinEvent = async (eventId: string) => {
+  const handleJoinEvent = async (event_id) => {
     if (!user) return;
 
     try {
@@ -226,7 +222,7 @@ const Events = () => {
       });
       
       fetchEvents(); // Refresh to update attendee count
-    } catch (error: any) {
+    } catch (error) {
       if (error.code === '23505') {
         toast({
           title: "Already Registered",
@@ -243,7 +239,7 @@ const Events = () => {
     }
   };
 
-  const handleSaveEvent = async (eventId: string) => {
+  const handleSaveEvent = async (eventId) => {
     if (!user) return;
 
     try {
@@ -297,7 +293,7 @@ const Events = () => {
     }
   };
 
-  const handleDeleteEvent = async (eventId: string) => {
+  const handleDeleteEvent = async (eventId) => {
     if (!user) return;
 
     try {
@@ -338,7 +334,7 @@ const Events = () => {
             <p className="text-gray-600 mt-2">Discover networking events, workshops, and conferences to advance your career</p>
           </div>
           <div className="flex gap-2">
-            <Button 
+            <Button
               variant="outline"
               onClick={() => fetchEvents()}
               disabled={loading}
@@ -346,7 +342,7 @@ const Events = () => {
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button 
+            <Button
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               onClick={() => setIsCreateModalOpen(true)}
             >
@@ -475,7 +471,7 @@ const Events = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {(event.tags || []).map((tag: string, index: number) => (
+                    {(event.tags || []).map((tag, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
                         {tag}
                       </Badge>

@@ -1,33 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { 
-  TrendingUp, 
-  TrendingDown,
-  BarChart3, 
-  Eye, 
-  Users, 
-  MessageSquare,
-  Share2,
-  Calendar,
-  Target,
-  Award,
-  Zap,
-  Brain,
-  Lightbulb,
-  Star,
-  ArrowUpRight,
-  ArrowDownRight,
-  Activity,
-  Globe,
-  Clock,
-  Filter
-} from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  Brain,
+  Clock,
+  Eye,
+  Filter,
+  Globe,
+  Lightbulb,
+  MessageSquare,
+  Star,
+  Target,
+  TrendingUp,
+  Users
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const Insights = () => {
   const { user } = useAuth();
@@ -140,7 +133,7 @@ const Insights = () => {
     }
   ];
 
-  const getChangeIcon = (trend: string) => {
+  const getChangeIcon = (trend) => {
     return trend === 'up' ? (
       <ArrowUpRight className="w-4 h-4 text-green-600" />
     ) : (
@@ -148,7 +141,7 @@ const Insights = () => {
     );
   };
 
-  const getChangeColor = (trend: string) => {
+  const getChangeColor = (trend) => {
     return trend === 'up' ? 'text-green-600' : 'text-red-600';
   };
 

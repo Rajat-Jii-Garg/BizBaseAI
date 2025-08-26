@@ -66,7 +66,7 @@ const BusinessSetup = () => {
     'Other'
   ];
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value

@@ -39,8 +39,8 @@ const SkillEndorsements = ({
         id: item.id,
         skill: item.skill,
         endorser_id: item.endorser_id,
-        endorser_name: (item.endorser as any)?.full_name || 'Unknown User',
-        endorser_avatar: (item.endorser as any)?.avatar_url,
+        endorser_name: item.endorser?.full_name || 'Unknown User',
+        endorser_avatar: item.endorser?.avatar_url,
         created_at: item.created_at
       })) || [];
 

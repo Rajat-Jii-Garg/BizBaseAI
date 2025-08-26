@@ -1,23 +1,22 @@
-import React from "react";
 import AppSidebar from "@/components/AppSidebar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { 
-  PlusCircle, 
-  Calendar, 
-  Clock, 
-  Users, 
-  CheckCircle2, 
-  AlertCircle, 
-  MoreHorizontal,
-  Search,
-  Filter,
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertCircle,
+  Archive,
   ArrowUpRight,
-  Archive
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Filter,
+  MoreHorizontal,
+  PlusCircle,
+  Search,
+  Users
 } from "lucide-react";
 
 const Projects = () => {
@@ -92,7 +91,7 @@ const Projects = () => {
     }
   ];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case "Completed": return "bg-green-500";
       case "In Progress": return "bg-blue-500";
@@ -102,7 +101,7 @@ const Projects = () => {
     }
   };
 
-  const getStatusTextColor = (status: string) => {
+  const getStatusTextColor = (status) => {
     switch (status) {
       case "Completed": return "text-green-500";
       case "In Progress": return "text-blue-500";

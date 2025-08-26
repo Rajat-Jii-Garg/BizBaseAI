@@ -15,7 +15,7 @@ const CRM = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [leads, setLeads] = useState<any[]>([]);
+  const [leads, setLeads] = useState([]);
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -27,7 +27,7 @@ const CRM = () => {
     }, 1000);
   }, []);
 
-  function getStageColor(stage: string) {
+  function getStageColor(stage) {
     switch (stage) {
       case 'New': return 'bg-blue-100 text-blue-800';
       case 'In Progress': return 'bg-yellow-100 text-yellow-800';
@@ -36,12 +36,12 @@ const CRM = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   }
-  function getScoreColor(score: number) {
+  function getScoreColor(score) {
     if (score >= 90) return 'text-green-600';
     if (score >= 70) return 'text-yellow-600';
     return 'text-red-600';
   }
-  function handleAddLead(e: React.FormEvent) {
+  function handleAddLead(e) {
     e.preventDefault();
     setModalOpen(false);
     toast({title: "Lead Added", description: "This is dummy, non-persistent."});

@@ -1,15 +1,13 @@
-
-import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, Menu, Bell, MessageCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import UserProfileDropdown from "./UserProfileDropdown";
+import { Menu, Search } from 'lucide-react';
+import React from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import NotificationsCenter from "./NotificationsCenter";
-import ThemeSwitcher from "./ThemeSwitcher";
 import GlobalSearchModal from "./GlobalSearchModal";
+import ThemeSwitcher from "./ThemeSwitcher";
+import UserProfileDropdown from "./UserProfileDropdown";
 
-const breadcrumbsMap: Record<string, string> = {
+const breadcrumbsMap = {
   "/dashboard": "Dashboard",
   "/dashboard/crm": "CRM", 
   "/dashboard/projects": "Projects",
@@ -37,7 +35,7 @@ const DashboardHeader = () => {
   // Global search modal
   const [searchOpen, setSearchOpen] = React.useState(false);
   React.useEffect(() => {
-    const handleCombo = (e: KeyboardEvent) => {
+    const handleCombo = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         setSearchOpen(true);
       }
