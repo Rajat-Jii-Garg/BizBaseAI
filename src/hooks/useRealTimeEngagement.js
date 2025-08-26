@@ -1,8 +1,8 @@
 
-import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useEffect } from 'react';
 
-export const useRealTimeEngagement = (onUpdate: () => void) => {
+export const useRealTimeEngagement = (onUpdate) => {
   useEffect(() => {
     // Subscribe to real-time changes for posts engagement
     const likesChannel = supabase
