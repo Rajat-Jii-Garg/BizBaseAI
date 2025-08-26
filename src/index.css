@@ -68,15 +68,15 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   body {
-    background: linear-gradient(135deg, 
-      #fefefe 0%, 
-      #f8fafc 20%, 
-      #f1f5f9 40%, 
-      #e2e8f0 60%, 
+    background: linear-gradient(135deg,
+      #fefefe 0%,
+      #f8fafc 20%,
+      #f1f5f9 40%,
+      #e2e8f0 60%,
       #f0f9ff 80%,
       #fefefe 100%
     );
@@ -89,11 +89,11 @@
 
 /* Enhanced animations */
 @keyframes fade-in {
-  from { 
-    opacity: 0; 
+  from {
+    opacity: 0;
     transform: translateY(20px);
   }
-  to { 
+  to {
     opacity: 1; 
     transform: translateY(0);
   }
