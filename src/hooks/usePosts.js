@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Post } from '@/hooks/usePosts';
 
 export const usePosts = () => {
   const [posts, setPosts] = useState([]);
