@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2, X, Save } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Post } from '@/hooks/usePosts';
+// import { Post } from '@/hooks/usePosts';
 import PostEngagementActions from './PostEngagementActions';
 import CommentsSection from './CommentsSection';
 import { useNavigate } from 'react-router-dom';
