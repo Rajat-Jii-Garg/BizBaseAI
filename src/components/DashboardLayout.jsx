@@ -141,6 +141,7 @@ const DashboardLayout = ({ children }) => {
                 variant="ghost"
                 size="icon"
                 className="relative hover:bg-gray-100 rounded-xl"
+                onClick={() => navigate('/notifications')}
               >
                 <Bell className="w-5 h-5 text-gray-600" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs flex items-center justify-center">
@@ -153,6 +154,7 @@ const DashboardLayout = ({ children }) => {
                 variant="ghost"
                 size="icon"
                 className="relative hover:bg-gray-100 rounded-xl"
+                onClick={() => navigate('/messages')}
               >
                 <MessageSquare className="w-5 h-5 text-gray-600" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full text-xs flex items-center justify-center">
