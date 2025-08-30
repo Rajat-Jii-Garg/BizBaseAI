@@ -9,7 +9,7 @@ import UserProfileDropdown from "./UserProfileDropdown";
 
 const breadcrumbsMap = {
   "/dashboard": "Dashboard",
-  "/dashboard/crm": "CRM", 
+  "/dashboard/crm": "CRM",
   "/dashboard/projects": "Projects",
   "/dashboard/hr": "HR",
   "/dashboard/finance": "Finance",

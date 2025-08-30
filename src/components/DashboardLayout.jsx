@@ -64,12 +64,12 @@ const DashboardLayout = ({ children }) => {
 
   const menuItems = [
     { icon: Home, label: 'Home', path: '/dashboard', isActive: true },
-    { icon: Users, label: 'My Network', path: '/dashboard/connections' },
-    { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
-    { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
-    { icon: Calendar, label: 'Events', path: '/dashboard/events' },
-    { icon: TrendingUp, label: 'Insights', path: '/dashboard/insights' },
-    { icon: Brain, label: 'AI Assistant', path: '/dashboard/ai-assistant' },
+    { icon: Users, label: 'My Network', path: '/connections' },
+    { icon: MessageSquare, label: 'Messages', path: '/messages' },
+    { icon: Bell, label: 'Notifications', path: '/notifications' },
+    { icon: Calendar, label: 'Events', path: '/events' },
+    { icon: TrendingUp, label: 'Insights', path: '/insights' },
+    { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
   ];
 
   const isActive = (path) => location.pathname === path;
