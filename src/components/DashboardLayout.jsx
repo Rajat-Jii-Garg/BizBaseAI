@@ -65,8 +65,8 @@ const DashboardLayout = ({ children }) => {
   const menuItems = [
     { icon: Home, label: 'Home', path: '/dashboard', isActive: true },
     { icon: Users, label: 'My Network', path: '/connections' },
-    { icon: MessageSquare, label: 'Messages', path: '/messages' },
-    { icon: Bell, label: 'Notifications', path: '/notifications' },
+    { icon: Users, label: 'Communities', path: '/communities' },
+  { icon: Briefcase, label: 'Jobs', path: '/jobs' },
     { icon: Calendar, label: 'Events', path: '/events' },
     { icon: TrendingUp, label: 'Insights', path: '/insights' },
     { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
