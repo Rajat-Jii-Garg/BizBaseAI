@@ -131,6 +131,22 @@ export const usePosts = () => {
 
       console.log('Post created successfully:', data);
 
+      // Process hashtags from the post content
+      if (data && content) {
+        try {
+          const { error: hashtagError } = await supabase.rpc('process_post_hashtags', {
+            post_id: data.id,
+            content: content
+          });
+          
+          if (hashtagError) {
+            console.error('Error processing hashtags:', hashtagError);
+          }
+        } catch (hashtagError) {
+          console.error('Error calling hashtag function:', hashtagError);
+        }
+      }
+
       // Refresh posts
       await fetchPosts();
     } catch (error) {
@@ -242,6 +258,22 @@ export const usePosts = () => {
         .eq('user_id', user.id); // Ensure user can only edit their own posts
 
       if (error) throw error;
+
+      // Process hashtags if content was updated
+      if (newContent) {
+        try {
+          const { error: hashtagError } = await supabase.rpc('process_post_hashtags', {
+            post_id: postId,
+            content: newContent
+          });
+          
+          if (hashtagError) {
+            console.error('Error processing hashtags:', hashtagError);
+          }
+        } catch (hashtagError) {
+          console.error('Error calling hashtag function:', hashtagError);
+        }
+      }
 
       await fetchPosts();
     } catch (error) {
