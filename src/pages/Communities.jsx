@@ -25,7 +25,7 @@ import {
   Target,
   Coffee,
   Code,
-  PaintBrush,
+  Palette,
   Music
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -78,7 +78,7 @@ const Communities = () => {
       isPrivate: false,
       tags: ["design", "ui", "ux", "creative"],
       activity: "Very Active",
-      icon: PaintBrush
+      icon: Palette
     },
     {
       id: 4,
