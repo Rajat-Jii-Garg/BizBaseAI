@@ -42,112 +42,116 @@ const Communities = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('discover');
 
-  // Mock data for communities - in real app this would come from database
-  const mockCommunities = [
-    {
-      id: 1,
-      name: "Tech Entrepreneurs",
-      description: "Network of technology entrepreneurs and startup founders",
-      members: 15420,
-      category: "Technology",
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400",
-      isPrivate: false,
-      tags: ["startup", "technology", "entrepreneurship"],
-      activity: "Very Active",
-      icon: Code
-    },
-    {
-      id: 2,
-      name: "Digital Marketing Pros",
-      description: "Marketing professionals sharing strategies and insights",
-      members: 8934,
-      category: "Marketing",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400",
-      isPrivate: false,
-      tags: ["marketing", "digital", "growth"],
-      activity: "Active",
-      icon: TrendingUp
-    },
-    {
-      id: 3,
-      name: "UX/UI Designers Hub",
-      description: "Creative space for designers to share work and get feedback",
-      members: 12156,
-      category: "Design",
-      image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400",
-      isPrivate: false,
-      tags: ["design", "ui", "ux", "creative"],
-      activity: "Very Active",
-      icon: Palette
-    },
-    {
-      id: 4,
-      name: "Remote Work Masters",
-      description: "Tips and best practices for remote and hybrid work",
-      members: 6721,
-      category: "Professional",
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400",
-      isPrivate: false,
-      tags: ["remote", "productivity", "work-life"],
-      activity: "Active",
-      icon: Coffee
-    },
-    {
-      id: 5,
-      name: "AI & Machine Learning",
-      description: "Discussing AI trends, research, and practical applications",
-      members: 18932,
-      category: "Technology",
-      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400",
-      isPrivate: false,
-      tags: ["ai", "ml", "data science"],
-      activity: "Very Active",
-      icon: Zap
-    },
-    {
-      id: 6,
-      name: "Business Leadership",
-      description: "Executive leadership strategies and management insights",
-      members: 4521,
-      category: "Leadership",
-      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400",
-      isPrivate: true,
-      tags: ["leadership", "management", "strategy"],
-      activity: "Moderate",
-      icon: Crown
-    }
-  ];
-
   useEffect(() => {
-    setLoading(true);
-    // Simulate loading
-    setTimeout(() => {
-      setCommunities(mockCommunities);
-      setJoinedCommunities([1, 3]); // User has joined communities 1 and 3
-      setLoading(false);
-    }, 1000);
-  }, []);
+    fetchCommunities();
+    if (user) {
+      fetchJoinedCommunities();
+    }
+  }, [user]);
 
-  const handleJoinCommunity = (communityId) => {
-    setJoinedCommunities(prev => [...prev, communityId]);
-    toast({
-      title: "Joined Community!",
-      description: "You're now a member of this community."
-    });
+  const fetchCommunities = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('communities')
+        .select('*')
+        .order('members_count', { ascending: false });
+
+      if (error) throw error;
+      setCommunities(data || []);
+    } catch (error) {
+      console.error('Error fetching communities:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch communities",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleLeaveCommunity = (communityId) => {
-    setJoinedCommunities(prev => prev.filter(id => id !== communityId));
-    toast({
-      title: "Left Community",
-      description: "You've left this community."
-    });
+  const fetchJoinedCommunities = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('community_members')
+        .select('community_id')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setJoinedCommunities(data?.map(item => item.community_id) || []);
+    } catch (error) {
+      console.error('Error fetching joined communities:', error);
+    }
+  };
+
+  const handleJoinCommunity = async (communityId) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please login to join communities",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('community_members')
+        .insert({
+          community_id: communityId,
+          user_id: user.id
+        });
+
+      if (error) throw error;
+      
+      setJoinedCommunities(prev => [...prev, communityId]);
+      toast({
+        title: "Joined Community!",
+        description: "You're now a member of this community."
+      });
+    } catch (error) {
+      console.error('Error joining community:', error);
+      toast({
+        title: "Error",
+        description: "Failed to join community",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleLeaveCommunity = async (communityId) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('community_members')
+        .delete()
+        .eq('community_id', communityId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      
+      setJoinedCommunities(prev => prev.filter(id => id !== communityId));
+      toast({
+        title: "Left Community",
+        description: "You've left this community."
+      });
+    } catch (error) {
+      console.error('Error leaving community:', error);
+      toast({
+        title: "Error",
+        description: "Failed to leave community",
+        variant: "destructive"
+      });
+    }
   };
 
   const filteredCommunities = communities.filter(community =>
     community.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    community.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    community.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    community.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (community.tags && community.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
   const myCommunitiesData = communities.filter(community => 
@@ -156,113 +160,140 @@ const Communities = () => {
 
   const getActivityColor = (activity) => {
     switch (activity) {
-      case 'Very Active': return 'text-green-600 bg-green-100';
-      case 'Active': return 'text-blue-600 bg-blue-100';
-      case 'Moderate': return 'text-yellow-600 bg-yellow-100';
+      case 'very_active': return 'text-green-600 bg-green-100';
+      case 'active': return 'text-blue-600 bg-blue-100';
+      case 'moderate': return 'text-yellow-600 bg-yellow-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
 
-  const CommunityCard = ({ community, isJoined = false }) => (
-    <Card key={community.id} className="hover:shadow-xl transition-all duration-300 border-0 bg-white overflow-hidden">
-      <div className="relative">
-        <div 
-          className="h-32 bg-gradient-to-r from-blue-500 to-purple-600"
-          style={{
-            backgroundImage: `url(${community.image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
-          <div className="absolute inset-0 bg-black/40"></div>
-          <div className="absolute top-4 left-4 flex items-center gap-2">
-            {community.isPrivate ? (
-              <Badge className="bg-red-500 text-white">
-                <Lock className="w-3 h-3 mr-1" />
-                Private
-              </Badge>
-            ) : (
-              <Badge className="bg-green-500 text-white">
-                <Globe className="w-3 h-3 mr-1" />
-                Public
-              </Badge>
-            )}
-          </div>
-          <div className="absolute top-4 right-4">
-            <div className="p-2 bg-white/20 backdrop-blur-sm rounded-full">
-              <community.icon className="w-5 h-5 text-white" />
+  const getActivityLabel = (activity) => {
+    switch (activity) {
+      case 'very_active': return 'Very Active';
+      case 'active': return 'Active';
+      case 'moderate': return 'Moderate';
+      default: return 'Quiet';
+    }
+  };
+
+  const getCategoryIcon = (category) => {
+    switch (category.toLowerCase()) {
+      case 'technology': return Code;
+      case 'marketing': return TrendingUp;
+      case 'design': return Palette;
+      case 'business': return Briefcase;
+      case 'education': return BookOpen;
+      case 'leadership': return Crown;
+      default: return Users;
+    }
+  };
+
+  const CommunityCard = ({ community, isJoined = false }) => {
+    const CategoryIcon = getCategoryIcon(community.category);
+    
+    return (
+      <Card key={community.id} className="hover:shadow-xl transition-all duration-300 border-0 bg-white overflow-hidden">
+        <div className="relative">
+          <div 
+            className="h-32 bg-gradient-to-r from-blue-500 to-purple-600"
+            style={{
+              backgroundImage: community.image_url ? `url(${community.image_url})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-black/40"></div>
+            <div className="absolute top-4 left-4 flex items-center gap-2">
+              {community.is_private ? (
+                <Badge className="bg-red-500 text-white">
+                  <Lock className="w-3 h-3 mr-1" />
+                  Private
+                </Badge>
+              ) : (
+                <Badge className="bg-green-500 text-white">
+                  <Globe className="w-3 h-3 mr-1" />
+                  Public
+                </Badge>
+              )}
+            </div>
+            <div className="absolute top-4 right-4">
+              <div className="p-2 bg-white/20 backdrop-blur-sm rounded-full">
+                <CategoryIcon className="w-5 h-5 text-white" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-1">{community.name}</h3>
-            <Badge variant="outline" className="text-xs">
-              {community.category}
+        
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-1">{community.name}</h3>
+              <Badge variant="outline" className="text-xs">
+                {community.category}
+              </Badge>
+            </div>
+            <Badge className={`text-xs ${getActivityColor(community.activity_level)}`}>
+              {getActivityLabel(community.activity_level)}
             </Badge>
           </div>
-          <Badge className={`text-xs ${getActivityColor(community.activity)}`}>
-            {community.activity}
-          </Badge>
-        </div>
-        
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-          {community.description}
-        </p>
-        
-        <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            {community.members.toLocaleString()} members
+          
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+            {community.description}
+          </p>
+          
+          <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
+            <div className="flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              {community.members_count?.toLocaleString() || 0} members
+            </div>
+            <div className="flex items-center gap-1">
+              <MessageSquare className="w-4 h-4" />
+              {getActivityLabel(community.activity_level)}
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <MessageSquare className="w-4 h-4" />
-            Active
-          </div>
-        </div>
-        
-        <div className="flex flex-wrap gap-1 mb-4">
-          {community.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs">
-              <Hash className="w-3 h-3 mr-1" />
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        
-        <div className="flex gap-2">
-          {isJoined ? (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleLeaveCommunity(community.id)}
-                className="flex-1"
-              >
-                Leave
-              </Button>
-              <Button size="sm" className="flex-1">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Open
-              </Button>
-            </>
-          ) : (
-            <Button
-              onClick={() => handleJoinCommunity(community.id)}
-              size="sm"
-              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Join Community
-            </Button>
+          
+          {community.tags && community.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-4">
+              {community.tags.map((tag, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  <Hash className="w-3 h-3 mr-1" />
+                  {tag}
+                </Badge>
+              ))}
+            </div>
           )}
-        </div>
-      </CardContent>
-    </Card>
-  );
+          
+          <div className="flex gap-2">
+            {isJoined ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleLeaveCommunity(community.id)}
+                  className="flex-1"
+                >
+                  Leave
+                </Button>
+                <Button size="sm" className="flex-1">
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Open
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={() => handleJoinCommunity(community.id)}
+                size="sm"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Join Community
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <DashboardLayout>
@@ -379,7 +410,7 @@ const Communities = () => {
             <TabsContent value="trending">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {communities
-                  .filter(c => c.activity === 'Very Active')
+                  .filter(c => c.activity_level === 'very_active')
                   .map((community) => (
                     <CommunityCard 
                       key={community.id} 

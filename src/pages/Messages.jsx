@@ -49,8 +49,8 @@ const Messages = () => {
         .from('conversations')
         .select(`
           *,
-          profiles!conversations_participant1_id_fkey(full_name, avatar_url),
-          profiles!conversations_participant2_id_fkey(full_name, avatar_url)
+          participant1:profiles!conversations_participant1_id_fkey(id, full_name, avatar_url),
+          participant2:profiles!conversations_participant2_id_fkey(id, full_name, avatar_url)
         `)
         .or(`participant1_id.eq.${user.id},participant2_id.eq.${user.id}`)
         .order('updated_at', { ascending: false });
@@ -122,8 +122,8 @@ const Messages = () => {
 
   const getOtherParticipant = (conversation) => {
     return conversation.participant1_id === user.id 
-      ? conversation.profiles 
-      : conversation.profiles;
+      ? conversation.participant2 
+      : conversation.participant1;
   };
 
   const filteredConversations = conversations.filter(conv => {
