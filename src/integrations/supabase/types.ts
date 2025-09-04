@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -301,6 +301,42 @@ export type Database = {
           updated_at?: string
           views_count?: number
           work_mode?: string
+        }
+        Relationships: []
+      }
+      LEADS: {
+        Row: {
+          ai_summary: string | null
+          audience: string | null
+          business: string | null
+          created_at: string
+          email: string | null
+          id: string
+          leads_csv: string | null
+          name: string | null
+          website: string | null
+        }
+        Insert: {
+          ai_summary?: string | null
+          audience?: string | null
+          business?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          leads_csv?: string | null
+          name?: string | null
+          website?: string | null
+        }
+        Update: {
+          ai_summary?: string | null
+          audience?: string | null
+          business?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          leads_csv?: string | null
+          name?: string | null
+          website?: string | null
         }
         Relationships: []
       }
@@ -763,10 +799,10 @@ export type Database = {
       }
       create_notification: {
         Args: {
-          recipient_id: string
-          notification_type: string
-          notification_title: string
           notification_content: string
+          notification_title: string
+          notification_type: string
+          recipient_id: string
           related_post_id?: string
           related_user_id?: string
         }
@@ -781,23 +817,23 @@ export type Database = {
         Returns: undefined
       }
       process_post_hashtags: {
-        Args: { post_id: string; content: string }
+        Args: { content: string; post_id: string }
         Returns: undefined
       }
       process_post_mentions: {
-        Args: { post_id: string; content: string }
+        Args: { content: string; post_id: string }
         Returns: undefined
       }
       send_otp_email: {
-        Args: { user_email: string; otp_purpose: string }
+        Args: { otp_purpose: string; user_email: string }
         Returns: string
       }
       verify_otp: {
-        Args: { user_email: string; provided_otp: string; otp_purpose: string }
+        Args: { otp_purpose: string; provided_otp: string; user_email: string }
         Returns: boolean
       }
       verify_otp_email: {
-        Args: { user_email: string; provided_otp: string; otp_purpose: string }
+        Args: { otp_purpose: string; provided_otp: string; user_email: string }
         Returns: boolean
       }
     }
