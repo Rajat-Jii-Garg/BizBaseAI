@@ -7,11 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MapPin, Clock, DollarSign, Building, Users, Search, Filter, Bookmark, BookmarkCheck, Brain, Target } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Building, Users, Search, Filter, Bookmark, BookmarkCheck, Brain, Target, Plus, Eye, Briefcase, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/DashboardLayout';
+import CreateJobModal from '@/components/CreateJobModal';
 
 const Jobs = () => {
   const { user } = useAuth();
@@ -283,8 +284,47 @@ const Jobs = () => {
       <div className="space-y-6">
         {/* Header */}
         <div className="bg-white rounded-lg border p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Find Your Dream Job</h1>
-          <p className="text-gray-600">Discover opportunities that match your skills and career goals</p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Jobs Portal</h1>
+              <p className="text-gray-600">Discover opportunities that match your skills and career goals</p>
+            </div>
+            <div className="flex gap-3">
+              <CreateJobModal onJobCreated={fetchJobs} />
+            </div>
+          </div>
+          
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-blue-600" />
+                <span className="text-sm font-medium text-blue-900">Total Jobs</span>
+              </div>
+              <p className="text-2xl font-bold text-blue-600 mt-1">{jobs.length}</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-green-600" />
+                <span className="text-sm font-medium text-green-900">Active Employers</span>
+              </div>
+              <p className="text-2xl font-bold text-green-600 mt-1">{[...new Set(jobs.map(job => job.company_name))].length}</p>
+            </div>
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-yellow-600" />
+                <span className="text-sm font-medium text-yellow-900">Remote Jobs</span>
+              </div>
+              <p className="text-2xl font-bold text-yellow-600 mt-1">{jobs.filter(job => job.work_mode === 'remote').length}</p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Bookmark className="h-5 w-5 text-purple-600" />
+                <span className="text-sm font-medium text-purple-900">Saved Jobs</span>
+              </div>
+              <p className="text-2xl font-bold text-purple-600 mt-1">{savedJobs.size}</p>
+            </div>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -455,6 +495,14 @@ const Jobs = () => {
                         <Clock className="h-4 w-4" />
                         <span>{new Date(job.created_at).toLocaleDateString()}</span>
                       </div>
+                      <div className="flex items-center gap-1">
+                        <Eye className="h-4 w-4" />
+                        <span>{job.views_count} views</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        <span>{job.applications_count} applications</span>
+                      </div>
                     </div>
                     <p className="text-gray-700 mb-4 line-clamp-2">{job.description}</p>
                     
@@ -478,18 +526,39 @@ const Jobs = () => {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      {job.salary_min && job.salary_max && (
-                        <div className="flex items-center gap-1">
-                          <DollarSign className="h-4 w-4" />
-                          <span>{formatSalary(job.salary_min, job.salary_max, job.salary_currency)}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        <span>{job.applications_count} applicants</span>
+                    {job.salary_min && job.salary_max && (
+                      <div className="flex items-center gap-1 text-green-600 font-medium mb-4">
+                        <DollarSign className="h-4 w-4" />
+                        <span>
+                          {formatSalary(job.salary_min, job.salary_max, job.salary_currency)} per year
+                        </span>
                       </div>
-                    </div>
+                    )}
+
+                    {job.benefits && job.benefits.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-900 mb-2">Benefits:</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {job.benefits.slice(0, 3).map((benefit, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {benefit}
+                            </Badge>
+                          ))}
+                          {job.benefits.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{job.benefits.length - 3} more
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {job.application_deadline && (
+                      <div className="text-sm text-red-600 mb-4">
+                        <Calendar className="h-4 w-4 inline mr-1" />
+                        Apply by: {new Date(job.application_deadline).toLocaleDateString()}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex flex-col gap-2 ml-4">
