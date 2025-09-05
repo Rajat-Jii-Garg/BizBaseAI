@@ -341,7 +341,7 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
         )}
 
         {/* Content Preview */}
-        {content && (
+        {/* {content && (
           <div className="mb-4 p-3 bg-blue-50 rounded-lg">
             <h4 className="text-sm font-medium text-blue-900 mb-2">Preview:</h4>
             <div className="flex flex-wrap gap-2 mb-2">
@@ -357,7 +357,7 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
               ))}
             </div>
           </div>
-        )}
+        )} */}
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-2 sm:space-x-3">
