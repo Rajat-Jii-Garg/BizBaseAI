@@ -32,6 +32,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import CreateCommunityModal from '@/components/CreateCommunityModal';
 
 const Communities = () => {
   const { user } = useAuth();
@@ -309,10 +310,7 @@ const Communities = () => {
                 </h1>
                 <p className="text-gray-600">Connect with like-minded professionals and grow your network</p>
               </div>
-              <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Community
-              </Button>
+              <CreateCommunityModal onCommunityCreated={fetchCommunities} />
             </div>
           </div>
 
@@ -334,24 +332,18 @@ const Communities = () => {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-white shadow-lg border-0 p-1 rounded-xl">
+            <TabsList className="grid w-full grid-cols-2 bg-white shadow-lg border-0 p-1 rounded-xl">
               <TabsTrigger 
                 value="discover" 
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
               >
-                Discover
+                Communities
               </TabsTrigger>
               <TabsTrigger 
                 value="my-communities"
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
               >
-                My Communities
-              </TabsTrigger>
-              <TabsTrigger 
-                value="trending"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
-              >
-                Trending
+                Manage Communities
               </TabsTrigger>
             </TabsList>
 
@@ -407,20 +399,6 @@ const Communities = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="trending">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {communities
-                  .filter(c => c.activity_level === 'very_active')
-                  .map((community) => (
-                    <CommunityCard 
-                      key={community.id} 
-                      community={community} 
-                      isJoined={joinedCommunities.includes(community.id)}
-                    />
-                  ))
-                }
-              </div>
-            </TabsContent>
           </Tabs>
         </div>
       </div>
