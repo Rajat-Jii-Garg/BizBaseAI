@@ -8,13 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Plus, 
-  X, 
-  Globe, 
-  Lock, 
-  Users, 
-  Shield, 
+import {
+  Plus,
+  X,
+  Globe,
+  Lock,
+  Users,
+  Shield,
   AlertCircle,
   Hash,
   Upload
