@@ -40,6 +40,9 @@ import {
   Brain,
   Sparkles
 } from 'lucide-react';
+import NotificationButton from './NotificationButton';
+import MessagesButton from './MessagesButton';
+import SearchBar from './SearchBar';
 
 const DashboardLayout = ({ children }) => {
   const { user, signOut } = useAuth();
@@ -100,25 +103,7 @@ const DashboardLayout = ({ children }) => {
 
             {/* Enhanced Search Bar */}
             <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-              <form onSubmit={handleSearch} className="relative w-full">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  type="text"
-                  placeholder="Search professionals, companies, jobs, insights..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-2xl bg-gray-50/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base hover:border-blue-300"
-                />
-                <Button 
-                  type="submit" 
-                  size="sm" 
-                  className="absolute right-2 top-1.5 bottom-1.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl px-6 shadow-md"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              </form>
+              <SearchBar />
             </div>
 
             {/* Right Section */}
@@ -137,30 +122,10 @@ const DashboardLayout = ({ children }) => {
               </div>
 
               {/* Notifications */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative hover:bg-gray-100 rounded-xl"
-                onClick={() => navigate('/notifications')}
-              >
-                <Bell className="w-5 h-5 text-gray-600" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs flex items-center justify-center">
-                  <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-                </span>
-              </Button>
+              <NotificationButton />
 
               {/* Messages */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative hover:bg-gray-100 rounded-xl"
-                onClick={() => navigate('/messages')}
-              >
-                <MessageSquare className="w-5 h-5 text-gray-600" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full text-xs flex items-center justify-center">
-                  <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-                </span>
-              </Button>
+              <MessagesButton />
 
               {/* Profile Dropdown */}
               <DropdownMenu>

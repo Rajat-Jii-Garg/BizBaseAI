@@ -7,13 +7,90 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      communities: {
+        Row: {
+          activity_level: string | null
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_private: boolean | null
+          members_count: number | null
+          name: string
+          tags: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_level?: string | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_private?: boolean | null
+          members_count?: number | null
+          name: string
+          tags?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_level?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_private?: boolean | null
+          members_count?: number | null
+          name?: string
+          tags?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_members: {
+        Row: {
+          community_id: string
+          id: string
+          joined_at: string | null
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          community_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          community_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_members_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       connections: {
         Row: {
           addressee_id: string
@@ -38,6 +115,30 @@ export type Database = {
           requester_id?: string
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          participant1_id: string
+          participant2_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          participant1_id: string
+          participant2_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          participant1_id?: string
+          participant2_id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -304,9 +405,46 @@ export type Database = {
         }
         Relationships: []
       }
+      LEADS: {
+        Row: {
+          ai_summary: string | null
+          audience: string | null
+          business: string | null
+          created_at: string
+          email: string | null
+          id: string
+          leads_csv: string | null
+          name: string | null
+          website: string | null
+        }
+        Insert: {
+          ai_summary?: string | null
+          audience?: string | null
+          business?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          leads_csv?: string | null
+          name?: string | null
+          website?: string | null
+        }
+        Update: {
+          ai_summary?: string | null
+          audience?: string | null
+          business?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          leads_csv?: string | null
+          name?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
+          conversation_id: string | null
           created_at: string
           id: string
           read: boolean
@@ -315,6 +453,7 @@ export type Database = {
         }
         Insert: {
           content: string
+          conversation_id?: string | null
           created_at?: string
           id?: string
           read?: boolean
@@ -323,13 +462,22 @@ export type Database = {
         }
         Update: {
           content?: string
+          conversation_id?: string | null
           created_at?: string
           id?: string
           read?: boolean
           receiver_id?: string
           sender_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -763,10 +911,10 @@ export type Database = {
       }
       create_notification: {
         Args: {
-          recipient_id: string
-          notification_type: string
-          notification_title: string
           notification_content: string
+          notification_title: string
+          notification_type: string
+          recipient_id: string
           related_post_id?: string
           related_user_id?: string
         }
@@ -781,23 +929,23 @@ export type Database = {
         Returns: undefined
       }
       process_post_hashtags: {
-        Args: { post_id: string; content: string }
+        Args: { content: string; post_id: string }
         Returns: undefined
       }
       process_post_mentions: {
-        Args: { post_id: string; content: string }
+        Args: { content: string; post_id: string }
         Returns: undefined
       }
       send_otp_email: {
-        Args: { user_email: string; otp_purpose: string }
+        Args: { otp_purpose: string; user_email: string }
         Returns: string
       }
       verify_otp: {
-        Args: { user_email: string; provided_otp: string; otp_purpose: string }
+        Args: { otp_purpose: string; provided_otp: string; user_email: string }
         Returns: boolean
       }
       verify_otp_email: {
-        Args: { user_email: string; provided_otp: string; otp_purpose: string }
+        Args: { otp_purpose: string; provided_otp: string; user_email: string }
         Returns: boolean
       }
     }

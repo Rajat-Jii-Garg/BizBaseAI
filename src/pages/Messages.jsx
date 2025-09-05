@@ -19,6 +19,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import DashboardLayout from '@/components/DashboardLayout';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -48,8 +49,8 @@ const Messages = () => {
         .from('conversations')
         .select(`
           *,
-          profiles!conversations_participant1_id_fkey(full_name, avatar_url),
-          profiles!conversations_participant2_id_fkey(full_name, avatar_url)
+          participant1:profiles!conversations_participant1_id_fkey(id, full_name, avatar_url),
+          participant2:profiles!conversations_participant2_id_fkey(id, full_name, avatar_url)
         `)
         .or(`participant1_id.eq.${user.id},participant2_id.eq.${user.id}`)
         .order('updated_at', { ascending: false });
@@ -121,8 +122,8 @@ const Messages = () => {
 
   const getOtherParticipant = (conversation) => {
     return conversation.participant1_id === user.id 
-      ? conversation.profiles 
-      : conversation.profiles;
+      ? conversation.participant2 
+      : conversation.participant1;
   };
 
   const filteredConversations = conversations.filter(conv => {
@@ -132,173 +133,197 @@ const Messages = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Conversations Sidebar */}
-      <div className="w-80 border-r bg-card">
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-semibold mb-4">Messages</h2>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search conversations..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
+    <DashboardLayout>
+      <div className="h-full flex bg-background">
+        {/* Conversations Sidebar */}
+        <Card className="w-80 h-full rounded-none border-r border-l-0 border-t-0 border-b-0 card-professional">
+          <CardHeader className="p-6 border-b">
+            <CardTitle className="text-xl font-semibold gradient-text-primary">Messages</CardTitle>
+            <div className="relative mt-4">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search conversations..."
+                className="pl-10 input-focus"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </CardHeader>
 
-        <ScrollArea className="h-full">
-          <div className="p-2">
-            {filteredConversations.map((conversation) => {
-              const otherParticipant = getOtherParticipant(conversation);
-              return (
-                <div
-                  key={conversation.id}
-                  className={`p-3 rounded-lg cursor-pointer hover:bg-accent transition-colors ${
-                    selectedConversation?.id === conversation.id ? 'bg-accent' : ''
-                  }`}
-                  onClick={() => setSelectedConversation(conversation)}
-                >
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarImage src={otherParticipant?.avatar_url} />
-                      <AvatarFallback>
-                        {otherParticipant?.full_name?.charAt(0) || 'U'}
+          <ScrollArea className="flex-1">
+            <div className="p-2">
+              {filteredConversations.map((conversation) => {
+                const otherParticipant = getOtherParticipant(conversation);
+                return (
+                  <div
+                    key={conversation.id}
+                    className={`p-4 rounded-xl cursor-pointer hover-lift transition-all duration-300 m-2 ${
+                      selectedConversation?.id === conversation.id 
+                        ? 'bg-primary/10 border border-primary/20' 
+                        : 'hover:bg-accent/50'
+                    }`}
+                    onClick={() => setSelectedConversation(conversation)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={otherParticipant?.avatar_url} />
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                          {otherParticipant?.full_name?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold truncate text-foreground">
+                          {otherParticipant?.full_name || 'Unknown User'}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          Last message preview...
+                        </p>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        2:30 PM
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {filteredConversations.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <MessageCircle className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">No conversations found</p>
+                  <p className="text-sm">Start a new conversation</p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </Card>
+
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {selectedConversation ? (
+            <>
+              {/* Chat Header */}
+              <Card className="rounded-none border-l-0 border-r-0 border-t-0 card-professional">
+                <div className="p-6 flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {getOtherParticipant(selectedConversation)?.full_name?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">
-                        {otherParticipant?.full_name || 'Unknown User'}
+                    <div>
+                      <h3 className="font-bold text-lg text-foreground">
+                        {getOtherParticipant(selectedConversation)?.full_name || 'Unknown User'}
+                      </h3>
+                      <p className="text-sm text-muted-foreground flex items-center">
+                        <span className="h-2 w-2 bg-green-500 rounded-full mr-2"></span>
+                        Online
                       </p>
-                      <p className="text-sm text-muted-foreground truncate">
-                        Last message preview...
-                      </p>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      2:30 PM
                     </div>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="ghost" size="sm" className="hover-lift">
+                      <Phone className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="hover-lift">
+                      <Video className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="hover-lift">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              );
-            })}
+              </Card>
 
-            {filteredConversations.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <MessageCircle className="h-12 w-12 mx-auto mb-4" />
-                <p>No conversations found</p>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
-        {selectedConversation ? (
-          <>
-            {/* Chat Header */}
-            <div className="p-4 border-b bg-card flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Avatar>
-                  <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />
-                  <AvatarFallback>
-                    {getOtherParticipant(selectedConversation)?.full_name?.charAt(0) || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold">
-                    {getOtherParticipant(selectedConversation)?.full_name || 'Unknown User'}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">Online</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm">
-                  <Phone className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Video className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${
-                      message.sender_id === user.id ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
+              {/* Messages */}
+              <ScrollArea className="flex-1 p-6 bg-muted/20">
+                <div className="space-y-6 max-w-4xl mx-auto">
+                  {messages.map((message) => (
                     <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.sender_id === user.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted'
+                      key={message.id}
+                      className={`flex ${
+                        message.sender_id === user.id ? 'justify-end' : 'justify-start'
                       }`}
                     >
-                      <p>{message.content}</p>
-                      <p className="text-xs opacity-70 mt-1">
-                        {new Date(message.created_at).toLocaleTimeString()}
-                      </p>
+                      <div
+                        className={`max-w-md px-4 py-3 rounded-2xl shadow-sm hover-lift ${
+                          message.sender_id === user.id
+                            ? 'bg-primary text-primary-foreground ml-12'
+                            : 'bg-card border mr-12'
+                        }`}
+                      >
+                        <p className="text-sm leading-relaxed">{message.content}</p>
+                        <p className={`text-xs mt-2 ${
+                          message.sender_id === user.id 
+                            ? 'text-primary-foreground/70' 
+                            : 'text-muted-foreground'
+                        }`}>
+                          {new Date(message.created_at).toLocaleTimeString()}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
+                  ))}
+                </div>
+              </ScrollArea>
 
-            {/* Message Input */}
-            <div className="p-4 border-t bg-card">
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm">
-                  <Paperclip className="h-4 w-4" />
-                </Button>
-                <Input
-                  placeholder="Type a message..."
-                  className="flex-1"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      sendMessage();
-                    }
-                  }}
-                />
-                <Button variant="ghost" size="sm">
-                  <Smile className="h-4 w-4" />
-                </Button>
-                <Button onClick={sendMessage} disabled={!newMessage.trim()}>
-                  <Send className="h-4 w-4" />
-                </Button>
+              {/* Message Input */}
+              <Card className="rounded-none border-l-0 border-r-0 border-b-0 card-professional">
+                <div className="p-6">
+                  <div className="flex items-center space-x-3 bg-muted/50 rounded-2xl p-3">
+                    <Button variant="ghost" size="sm" className="hover-lift">
+                      <Paperclip className="h-5 w-5" />
+                    </Button>
+                    <Input
+                      placeholder="Type your message..."
+                      className="flex-1 border-0 bg-transparent focus-visible:ring-0 text-base"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          sendMessage();
+                        }
+                      }}
+                    />
+                    <Button variant="ghost" size="sm" className="hover-lift">
+                      <Smile className="h-5 w-5" />
+                    </Button>
+                    <Button 
+                      onClick={sendMessage} 
+                      disabled={!newMessage.trim()}
+                      className="btn-professional px-6"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center animate-fade-in">
+                <div className="mb-6 relative">
+                  <MessageCircle className="h-24 w-24 mx-auto text-muted-foreground/30 animate-float" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3 gradient-text-primary">Select a conversation</h3>
+                <p className="text-muted-foreground text-lg">
+                  Choose a conversation from the sidebar to start messaging
+                </p>
               </div>
             </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">Select a conversation</h3>
-              <p className="text-muted-foreground">
-                Choose a conversation from the sidebar to start messaging
-              </p>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

@@ -267,7 +267,10 @@ const Notifications = () => {
                       <div className="flex items-center gap-2 mb-1">
                         {getNotificationIcon(notification.type)}
                         <p className="text-sm font-medium text-gray-900">
-                          {notification.message}
+                          {notification.title}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          {notification.content}
                         </p>
                         {!notification.read && (
                           <Badge variant="secondary" className="text-xs">

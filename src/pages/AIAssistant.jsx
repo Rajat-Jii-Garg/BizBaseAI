@@ -64,7 +64,7 @@ const AIAssistant = () => {
     setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
 
     try {
-      const response = await fetch('/functions/v1/ai-chat', {
+      const response = await fetch('https://ahdtenixvhgncwaglxui.supabase.co/functions/v1/ai-chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
