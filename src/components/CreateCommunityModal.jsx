@@ -126,10 +126,13 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Create community insert error:', error);
+        throw error;
+      }
 
       // Automatically join the creator as a member with admin role
-      await supabase
+      const { data: memberData, error: memberError } = await supabase
         .from('community_members')
         .insert({
           community_id: data.id,
@@ -137,9 +140,16 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
           role: 'admin'
         });
 
+      if (memberError) {
+        // rollback: remove created community to avoid orphan if membership fails
+        console.error('Community created but adding member failed:', memberError);
+        await supabase.from('communities').delete().eq('id', community.data.id);
+        throw memberError;
+      }
+
       toast({
         title: "Community Created!",
-        description: `"${formData.name}" has been created successfully.`
+        description: `"${formData.name}" has been created successfully. You are the admin`
       });
 
       // Reset form
@@ -153,7 +163,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
         tags: [],
         rules: ''
       });
-
+      setNewTag('');
       setOpen(false);
       
       if (onCommunityCreated) {
@@ -319,8 +329,8 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                   {formData.tags.map((tag, index) => (
                     <Badge key={index} variant="secondary" className="flex items-center gap-1">
                       {tag}
-                      <X 
-                        className="w-3 h-3 cursor-pointer hover:text-red-500" 
+                      <X
+                        className="w-3 h-3 cursor-pointer hover:text-red-500"
                         onClick={() => handleRemoveTag(tag)}
                       />
                     </Badge>
@@ -350,16 +360,16 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
 
           {/* Submit Button */}
           <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => setOpen(false)}
               disabled={loading}
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={loading}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
