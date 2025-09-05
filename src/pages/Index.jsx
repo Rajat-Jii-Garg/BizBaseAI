@@ -21,7 +21,7 @@ const Index = () => {
       <Benefits />
       <HowItWorks />
       <Testimonials />
-      <PricingSection />
+      {/* <PricingSection /> */}
       <CallToAction />
       
       {/* Quick Auth Links Section */}
