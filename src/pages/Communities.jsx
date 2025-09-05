@@ -5,10 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Users, 
-  Search, 
-  Plus, 
+import {
+  Users,
+  Search,
+  Plus,
   Star,
   MapPin,
   Calendar,
@@ -51,6 +51,7 @@ const Communities = () => {
   }, [user]);
 
   const fetchCommunities = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('communities')
@@ -63,7 +64,7 @@ const Communities = () => {
       console.error('Error fetching communities:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch communities",
+        description: error?.message || "Failed to fetch communities",
         variant: "destructive"
       });
     } finally {
@@ -91,7 +92,7 @@ const Communities = () => {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please login to join communities",
+        description: "Please login to join community",
         variant: "destructive"
       });
       return;
@@ -102,12 +103,17 @@ const Communities = () => {
         .from('community_members')
         .insert({
           community_id: communityId,
-          user_id: user.id
+          user_id: user.id,
+          role: 'member'
         });
 
       if (error) throw error;
       
       setJoinedCommunities(prev => [...prev, communityId]);
+
+      // optimistic UI update for members_count
+      setCommunities(prev => prev.map(c => c.id === communityId ? { ...c, members_count: (c.members_count || 0) + 1 } : c));
+
       toast({
         title: "Joined Community!",
         description: "You're now a member of this community."
@@ -116,7 +122,7 @@ const Communities = () => {
       console.error('Error joining community:', error);
       toast({
         title: "Error",
-        description: "Failed to join community",
+        description: error?.message || "Failed to join community",
         variant: "destructive"
       });
     }
@@ -135,6 +141,10 @@ const Communities = () => {
       if (error) throw error;
       
       setJoinedCommunities(prev => prev.filter(id => id !== communityId));
+
+      // optimistic UI update
+      setCommunities(prev => prev.map(c => c.id === communityId ? { ...c, members_count: Math.max((c.members_count || 1) - 1, 0) } : c));
+
       toast({
         title: "Left Community",
         description: "You've left this community."
@@ -143,7 +153,7 @@ const Communities = () => {
       console.error('Error leaving community:', error);
       toast({
         title: "Error",
-        description: "Failed to leave community",
+        description: error?.message || "Failed to leave community",
         variant: "destructive"
       });
     }
@@ -155,9 +165,7 @@ const Communities = () => {
     (community.tags && community.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
-  const myCommunitiesData = communities.filter(community => 
-    joinedCommunities.includes(community.id)
-  );
+  const myCommunitiesData = communities.filter(community => joinedCommunities.includes(community.id));
 
   const getActivityColor = (activity) => {
     switch (activity) {
@@ -178,6 +186,7 @@ const Communities = () => {
   };
 
   const getCategoryIcon = (category) => {
+    if (!category) return Users;
     switch (category.toLowerCase()) {
       case 'technology': return Code;
       case 'marketing': return TrendingUp;
@@ -190,12 +199,12 @@ const Communities = () => {
   };
 
   const CommunityCard = ({ community, isJoined = false }) => {
-    const CategoryIcon = getCategoryIcon(community.category);
+    const CategoryIcon = getCategoryIcon(community.category || '');
     
     return (
       <Card key={community.id} className="hover:shadow-xl transition-all duration-300 border-0 bg-white overflow-hidden">
         <div className="relative">
-          <div 
+          <div
             className="h-32 bg-gradient-to-r from-blue-500 to-purple-600"
             style={{
               backgroundImage: community.image_url ? `url(${community.image_url})` : undefined,
@@ -229,28 +238,16 @@ const Communities = () => {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-xl font-bold text-gray-900 mb-1">{community.name}</h3>
-              <Badge variant="outline" className="text-xs">
-                {community.category}
-              </Badge>
+              <Badge variant="outline" className="text-xs"> {community.category} </Badge>
             </div>
-            <Badge className={`text-xs ${getActivityColor(community.activity_level)}`}>
-              {getActivityLabel(community.activity_level)}
-            </Badge>
+            <Badge className={`text-xs ${getActivityColor(community.activity_level)}`}> {getActivityLabel(community.activity_level)} </Badge>
           </div>
-          
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-            {community.description}
-          </p>
-          
+
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2"> {community.description} </p>
+
           <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
-            <div className="flex items-center gap-1">
-              <Users className="w-4 h-4" />
-              {community.members_count?.toLocaleString() || 0} members
-            </div>
-            <div className="flex items-center gap-1">
-              <MessageSquare className="w-4 h-4" />
-              {getActivityLabel(community.activity_level)}
-            </div>
+            <div className="flex items-center gap-1"> <Users className="w-4 h-4" /> {community.members_count?.toLocaleString() || 0} members</div>
+            <div className="flex items-center gap-1"><MessageSquare className="w-4 h-4" />{getActivityLabel(community.activity_level)}</div>
           </div>
           
           {community.tags && community.tags.length > 0 && (
@@ -267,28 +264,11 @@ const Communities = () => {
           <div className="flex gap-2">
             {isJoined ? (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleLeaveCommunity(community.id)}
-                  className="flex-1"
-                >
-                  Leave
-                </Button>
-                <Button size="sm" className="flex-1">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Open
-                </Button>
+                <Button variant="outline" size="sm" onClick={() => handleLeaveCommunity(community.id)} className="flex-1"> Leave </Button>
+                <Button size="sm" className="flex-1"> <MessageSquare className="w-4 h-4 mr-2" />Open</Button>
               </>
             ) : (
-              <Button
-                onClick={() => handleJoinCommunity(community.id)}
-                size="sm"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Join Community
-              </Button>
+              <Button onClick={() => handleJoinCommunity(community.id)} size="sm" className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"><Plus className="w-4 h-4 mr-2" />Join Community</Button>
             )}
           </div>
         </CardContent>
@@ -310,7 +290,7 @@ const Communities = () => {
                 </h1>
                 <p className="text-gray-600">Connect with like-minded professionals and grow your network</p>
               </div>
-              <CreateCommunityModal onCommunityCreated={fetchCommunities} />
+              <CreateCommunityModal onCommunityCreated={() => { fetchCommunities(); fetchJoinedCommunities(); }} />
             </div>
           </div>
 
@@ -333,13 +313,13 @@ const Communities = () => {
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 bg-white shadow-lg border-0 p-1 rounded-xl">
-              <TabsTrigger 
-                value="discover" 
+              <TabsTrigger
+                value="discover"
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
               >
                 Communities
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="my-communities"
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
               >
@@ -362,9 +342,9 @@ const Communities = () => {
                   ))
                 ) : (
                   filteredCommunities.map((community) => (
-                    <CommunityCard 
-                      key={community.id} 
-                      community={community} 
+                    <CommunityCard
+                      key={community.id}
+                      community={community}
                       isJoined={joinedCommunities.includes(community.id)}
                     />
                   ))
@@ -389,16 +369,15 @@ const Communities = () => {
                   </div>
                 ) : (
                   myCommunitiesData.map((community) => (
-                    <CommunityCard 
-                      key={community.id} 
-                      community={community} 
+                    <CommunityCard
+                      key={community.id}
+                      community={community}
                       isJoined={true}
                     />
                   ))
                 )}
               </div>
             </TabsContent>
-
           </Tabs>
         </div>
       </div>
