@@ -343,7 +343,7 @@ const Communities = () => {
                 value="my-communities"
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
               >
-                Manage Communities
+                My Communities
               </TabsTrigger>
             </TabsList>
 
