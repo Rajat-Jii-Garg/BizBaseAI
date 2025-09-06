@@ -222,13 +222,14 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Description *</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Describe what your community is about..."
                   rows={3}
+                  required
                 />
               </div>
 
