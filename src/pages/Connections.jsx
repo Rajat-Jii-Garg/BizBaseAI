@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +15,10 @@ import {
   MapPin,
   Briefcase,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Check,
+  X,
+  UserCheck
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,6 +36,8 @@ const Connections = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('suggestions');
+  const [requestsSubTab, setRequestsSubTab] = useState('received');
 
   useEffect(() => {
     if (user) {
@@ -122,6 +126,13 @@ const Connections = () => {
     
     setSuggestionsLoading(true);
     try {
+      // Get user's profile to match by industry
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('industry')
+        .eq('id', user.id)
+        .single();
+
       // Get connected user IDs and pending request IDs
       const { data: existingConnections } = await supabase
         .from('connections')
@@ -134,21 +145,46 @@ const Connections = () => {
         connectedUserIds.add(conn.addressee_id);
       });
 
-      // Get random users that are not connected
-      const { data: profiles, error } = await supabase
+      // Get suggestions: prioritize same industry, then random
+      let query = supabase
         .from('profiles')
         .select('*')
         .not('id', 'eq', user.id)
-        .not('id', 'in', `(${Array.from(connectedUserIds).join(',') || 'null'})`)
-        .limit(6);
+        .not('full_name', 'is', null);
+
+      if (Array.from(connectedUserIds).length > 0) {
+        query = query.not('id', 'in', `(${Array.from(connectedUserIds).join(',')})`);
+      }
+
+      const { data: allProfiles, error } = await query.limit(20);
 
       if (error) throw error;
-      setSuggestions(profiles || []);
+
+      // Prioritize profiles from same industry
+      const sameIndustry = allProfiles?.filter(p => 
+        userProfile?.industry && p.industry === userProfile.industry
+      ) || [];
+      
+      const otherProfiles = allProfiles?.filter(p => 
+        !userProfile?.industry || p.industry !== userProfile.industry
+      ) || [];
+
+      // Mix both arrays and take first 8
+      const mixedSuggestions = [...sameIndustry, ...otherProfiles].slice(0, 8);
+      setSuggestions(mixedSuggestions);
     } catch (error) {
       console.error('Error fetching suggestions:', error);
     } finally {
       setSuggestionsLoading(false);
     }
+  };
+
+  const removeSuggestion = (profileId) => {
+    setSuggestions(prev => prev.filter(s => s.id !== profileId));
+    toast({
+      title: "Suggestion Removed",
+      description: "This profile has been removed from your suggestions."
+    });
   };
 
   const handleSendConnectionRequest = async (profileId) => {
@@ -170,8 +206,9 @@ const Connections = () => {
         description: "Your connection request has been sent successfully."
       });
 
-      fetchSuggestions(); // Refresh suggestions
-      fetchSentRequests(); // Refresh sent requests
+      // Remove from suggestions and refresh sent requests
+      removeSuggestion(profileId);
+      fetchSentRequests();
     } catch (error) {
       console.error('Error sending connection request:', error);
       toast({
@@ -267,124 +304,161 @@ const Connections = () => {
     conn.profile?.current_position?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const SuggestionsSection = () => (
-    <Card className="mt-6">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">People You May Know</CardTitle>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={fetchSuggestions}
-            disabled={suggestionsLoading}
-          >
-            <RefreshCw className={`w-4 h-4 mr-2 ${suggestionsLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {suggestionsLoading ? (
-          <div className="text-center py-8">
-            <Loader2 className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-            <p className="text-gray-600">Loading suggestions...</p>
+  const SuggestionsTab = () => (
+    <div className="space-y-6">
+      <Card className="glass border-0 shadow-lg">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl gradient-text-primary">People You May Know</CardTitle>
+              <p className="text-muted-foreground text-sm mt-1">
+                Discover professionals in your industry and expand your network
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={fetchSuggestions}
+              disabled={suggestionsLoading}
+              className="hover-lift"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${suggestionsLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
           </div>
-        ) : suggestions.length === 0 ? (
-          <div className="text-center py-8">
-            <Users className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-600">No suggestions available at the moment.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {suggestions.map((profile) => (
-              <Card key={profile.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-3 mb-3">
-                    <Avatar 
-                      className="h-12 w-12 cursor-pointer" 
-                      onClick={() => navigate(`/profile/${profile.id}`)}
-                    >
-                      <AvatarImage src={profile.avatar_url} />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
-                        {profile.full_name?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
+        </CardHeader>
+        <CardContent>
+          {suggestionsLoading ? (
+            <div className="text-center py-12">
+              <Loader2 className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+              <p className="text-muted-foreground">Finding perfect connections for you...</p>
+            </div>
+          ) : suggestions.length === 0 ? (
+            <div className="text-center py-12">
+              <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+              <h3 className="text-lg font-semibold mb-2">No Suggestions Available</h3>
+              <p className="text-muted-foreground">Check back later for new networking opportunities.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {suggestions.map((profile) => (
+                <Card key={profile.id} className="card-professional hover-lift group">
+                  <CardContent className="p-6">
+                    <div className="text-center mb-4">
+                      <Avatar 
+                        className="h-16 w-16 mx-auto mb-3 cursor-pointer ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all" 
+                        onClick={() => navigate(`/profile/${profile.id}`)}
+                      >
+                        <AvatarImage src={profile.avatar_url} />
+                        <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
+                          {profile.full_name?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
                       <h4 
-                        className="font-semibold text-sm cursor-pointer hover:text-primary"
+                        className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors line-clamp-1"
                         onClick={() => navigate(`/profile/${profile.id}`)}
                       >
                         {profile.full_name}
                       </h4>
                       {profile.current_position && (
-                        <p className="text-xs text-gray-600 flex items-center gap-1">
+                        <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-1">
                           <Briefcase className="w-3 h-3" />
                           {profile.current_position}
                         </p>
                       )}
+                      {profile.industry && (
+                        <Badge variant="secondary" className="mt-2 text-xs">
+                          {profile.industry}
+                        </Badge>
+                      )}
                       {profile.location && (
-                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-2">
                           <MapPin className="w-3 h-3" />
                           {profile.location}
                         </p>
                       )}
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      className="flex-1"
-                      onClick={() => handleSendConnectionRequest(profile.id)}
-                    >
-                      <UserPlus className="w-3 h-3 mr-1" />
-                      Connect
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => navigate(`/messages`)}
-                    >
-                      <MessageSquare className="w-3 h-3 mr-1" />
-                      Message
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        className="flex-1 btn-professional"
+                        onClick={() => handleSendConnectionRequest(profile.id)}
+                      >
+                        <UserPlus className="w-3 h-3 mr-1" />
+                        Connect
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => removeSuggestion(profile.id)}
+                        className="hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold gradient-text-primary mb-2">My Network</h1>
+          <p className="text-muted-foreground text-lg">Build meaningful professional connections</p>
+        </div>
 
-        <Tabs defaultValue="connections" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="connections">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg">
+            <TabsTrigger 
+              value="suggestions" 
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Suggestions
+            </TabsTrigger>
+            <TabsTrigger 
+              value="connections" 
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <UserCheck className="w-4 h-4 mr-2" />
               My Connections ({connections.length})
             </TabsTrigger>
-            <TabsTrigger value="pending">
-              Requests ({pendingRequests.length})
-            </TabsTrigger>
-            <TabsTrigger value="sent">
-              Sent ({sentRequests.length})
+            <TabsTrigger 
+              value="requests" 
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Requests ({pendingRequests.length + sentRequests.length})
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="connections">
-            <Card>
-              <CardHeader>
-                <div className="flex gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <TabsContent value="suggestions" className="animate-fade-in">
+            <SuggestionsTab />
+          </TabsContent>
+
+          <TabsContent value="connections" className="animate-fade-in">
+            <Card className="glass border-0 shadow-lg">
+              <CardHeader className="pb-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-xl gradient-text-primary mb-2">My Professional Network</CardTitle>
+                    <p className="text-muted-foreground text-sm">Manage your professional connections</p>
+                  </div>
+                  <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       placeholder="Search your connections..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 input-focus"
                     />
                   </div>
                 </div>
@@ -392,23 +466,29 @@ const Connections = () => {
               <CardContent>
                 {loading ? (
                   <div className="text-center py-12">
-                    <Loader2 className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-                    <p className="text-gray-600">Loading connections...</p>
+                    <Loader2 className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+                    <p className="text-muted-foreground">Loading your network...</p>
                   </div>
                 ) : filteredConnections.length === 0 ? (
                   <div className="text-center py-12">
-                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Connections Found</h3>
-                    <p className="text-gray-600">Start connecting with professionals to grow your network.</p>
+                    <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                    <h3 className="text-xl font-semibold mb-2">No connections yet</h3>
+                    <p className="text-muted-foreground mb-4">Start building your professional network today!</p>
+                    <Button 
+                      onClick={() => setActiveTab('suggestions')}
+                      className="btn-professional"
+                    >
+                      Explore Connections
+                    </Button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredConnections.map((connection) => (
-                      <Card key={connection.id} className="hover:shadow-lg transition-shadow">
+                      <Card key={connection.id} className="card-professional hover-lift group">
                         <CardContent className="p-6">
-                          <div className="flex items-start gap-4 mb-4">
+                          <div className="text-center mb-4">
                             <Avatar 
-                              className="h-16 w-16 cursor-pointer" 
+                              className="h-16 w-16 mx-auto mb-3 cursor-pointer ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all" 
                               onClick={() => navigate(`/profile/${connection.profile?.id}`)}
                             >
                               <AvatarImage src={connection.profile?.avatar_url} />
@@ -416,31 +496,30 @@ const Connections = () => {
                                 {connection.profile?.full_name?.charAt(0) || 'U'}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="flex-1">
-                              <h3 
-                                className="font-semibold text-lg text-gray-900 cursor-pointer hover:text-primary"
-                                onClick={() => navigate(`/profile/${connection.profile?.id}`)}
-                              >
-                                {connection.profile?.full_name}
-                              </h3>
-                              {connection.profile?.current_position && (
-                                <p className="text-sm text-gray-600 flex items-center gap-1">
-                                  <Briefcase className="w-3 h-3" />
-                                  {connection.profile.current_position}
-                                </p>
-                              )}
-                              {connection.profile?.company_name && (
-                                <p className="text-sm text-gray-500">
-                                  at {connection.profile.company_name}
-                                </p>
-                              )}
-                              {connection.profile?.location && (
-                                <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                                  <MapPin className="w-3 h-3" />
-                                  {connection.profile.location}
-                                </p>
-                              )}
-                            </div>
+                            <h3 
+                              className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors line-clamp-1"
+                              onClick={() => navigate(`/profile/${connection.profile?.id}`)}
+                            >
+                              {connection.profile?.full_name}
+                            </h3>
+                            {connection.profile?.current_position && (
+                              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                                <Briefcase className="w-3 h-3" />
+                                {connection.profile.current_position}
+                              </p>
+                            )}
+                            {connection.profile?.company_name && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                at {connection.profile.company_name}
+                              </p>
+                            )}
+                            {connection.profile?.location && (
+                              <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-2">
+                                <MapPin className="w-3 h-3" />
+                                {connection.profile.location}
+                              </p>
+                            )}
+                            <Badge variant="secondary" className="mt-2">Connected</Badge>
                           </div>
 
                           <div className="flex gap-2">
@@ -457,7 +536,7 @@ const Connections = () => {
                               size="sm" 
                               variant="outline"
                               onClick={() => handleDisconnect(connection.id)}
-                              className="text-red-600 hover:text-red-700"
+                              className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                             >
                               <UserMinus className="w-4 h-4" />
                             </Button>
@@ -467,118 +546,159 @@ const Connections = () => {
                     ))}
                   </div>
                 )}
-                <SuggestionsSection />
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="pending">
-            <Card>
-              <CardHeader>
-                <CardTitle>Pending Connection Requests</CardTitle>
+          <TabsContent value="requests" className="animate-fade-in">
+            <Card className="glass border-0 shadow-lg">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl gradient-text-primary">Connection Requests</CardTitle>
+                <Tabs value={requestsSubTab} onValueChange={setRequestsSubTab} className="mt-4">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="received">
+                      Received ({pendingRequests.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="sent">
+                      Sent ({sentRequests.length})
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </CardHeader>
               <CardContent>
-                {pendingRequests.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Pending Requests</h3>
-                    <p className="text-gray-600">You don't have any pending connection requests.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {pendingRequests.map((request) => (
-                      <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <Avatar 
-                            className="h-12 w-12 cursor-pointer" 
-                            onClick={() => navigate(`/profile/${request.profiles?.id}`)}
-                          >
-                            <AvatarImage src={request.profiles?.avatar_url} />
-                            <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
-                              {request.profiles?.full_name?.charAt(0) || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <h4 
-                              className="font-semibold cursor-pointer hover:text-primary"
-                              onClick={() => navigate(`/profile/${request.profiles?.id}`)}
-                            >
-                              {request.profiles?.full_name}
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              {request.profiles?.current_position} at {request.profiles?.company_name}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() => handleAcceptRequest(request.id)}
-                          >
-                            Accept
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleRejectRequest(request.id)}
-                          >
-                            Decline
-                          </Button>
-                        </div>
+                <Tabs value={requestsSubTab} onValueChange={setRequestsSubTab}>
+                  <TabsContent value="received">
+                    {pendingRequests.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                        <h3 className="text-xl font-semibold mb-2">No Active Requests</h3>
+                        <p className="text-muted-foreground mb-4">You don't have any pending connection requests.</p>
+                        <Button 
+                          onClick={() => setActiveTab('suggestions')}
+                          className="btn-professional"
+                        >
+                          Explore Connections
+                        </Button>
                       </div>
-                    ))}
-                  </div>
-                )}
-                <SuggestionsSection />
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {pendingRequests.map((request) => (
+                          <Card key={request.id} className="card-professional hover-lift group">
+                            <CardContent className="p-6">
+                              <div className="text-center mb-4">
+                                <Avatar 
+                                  className="h-16 w-16 mx-auto mb-3 cursor-pointer ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all" 
+                                  onClick={() => navigate(`/profile/${request.profiles?.id}`)}
+                                >
+                                  <AvatarImage src={request.profiles?.avatar_url} />
+                                  <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
+                                    {request.profiles?.full_name?.charAt(0) || 'U'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <h3 
+                                  className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors line-clamp-1"
+                                  onClick={() => navigate(`/profile/${request.profiles?.id}`)}
+                                >
+                                  {request.profiles?.full_name}
+                                </h3>
+                                {request.profiles?.current_position && (
+                                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                                    <Briefcase className="w-3 h-3" />
+                                    {request.profiles.current_position}
+                                  </p>
+                                )}
+                                {request.profiles?.location && (
+                                  <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-2">
+                                    <MapPin className="w-3 h-3" />
+                                    {request.profiles.location}
+                                  </p>
+                                )}
+                                <Badge variant="outline" className="mt-2">Wants to connect</Badge>
+                              </div>
 
-          <TabsContent value="sent">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sent Requests</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {sentRequests.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Sent Requests</h3>
-                    <p className="text-gray-600">You haven't sent any connection requests yet.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {sentRequests.map((request) => (
-                      <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <Avatar 
-                            className="h-12 w-12 cursor-pointer" 
-                            onClick={() => navigate(`/profile/${request.profiles?.id}`)}
-                          >
-                            <AvatarImage src={request.profiles?.avatar_url} />
-                            <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
-                              {request.profiles?.full_name?.charAt(0) || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <h4 
-                              className="font-semibold cursor-pointer hover:text-primary"
-                              onClick={() => navigate(`/profile/${request.profiles?.id}`)}
-                            >
-                              {request.profiles?.full_name}
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              {request.profiles?.current_position} at {request.profiles?.company_name}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge variant="outline">Pending</Badge>
+                              <div className="flex gap-2">
+                                <Button 
+                                  size="sm" 
+                                  className="flex-1 bg-green-600 hover:bg-green-700"
+                                  onClick={() => handleAcceptRequest(request.id)}
+                                >
+                                  <Check className="w-4 h-4 mr-1" />
+                                  Accept
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleRejectRequest(request.id)}
+                                  className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                                >
+                                  <X className="w-4 h-4 mr-1" />
+                                  Decline
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
-                <SuggestionsSection />
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="sent">
+                    {sentRequests.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                        <h3 className="text-xl font-semibold mb-2">No Sent Requests</h3>
+                        <p className="text-muted-foreground mb-4">You haven't sent any connection requests yet.</p>
+                        <Button 
+                          onClick={() => setActiveTab('suggestions')}
+                          className="btn-professional"
+                        >
+                          Find People to Connect
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {sentRequests.map((request) => (
+                          <Card key={request.id} className="card-professional">
+                            <CardContent className="p-6">
+                              <div className="text-center">
+                                <Avatar 
+                                  className="h-16 w-16 mx-auto mb-3 cursor-pointer ring-2 ring-primary/20" 
+                                  onClick={() => navigate(`/profile/${request.profiles?.id}`)}
+                                >
+                                  <AvatarImage src={request.profiles?.avatar_url} />
+                                  <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
+                                    {request.profiles?.full_name?.charAt(0) || 'U'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <h3 
+                                  className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors line-clamp-1"
+                                  onClick={() => navigate(`/profile/${request.profiles?.id}`)}
+                                >
+                                  {request.profiles?.full_name}
+                                </h3>
+                                {request.profiles?.current_position && (
+                                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                                    <Briefcase className="w-3 h-3" />
+                                    {request.profiles.current_position}
+                                  </p>
+                                )}
+                                {request.profiles?.location && (
+                                  <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-2">
+                                    <MapPin className="w-3 h-3" />
+                                    {request.profiles.location}
+                                  </p>
+                                )}
+                                <Badge variant="outline" className="mt-3 bg-yellow-50 text-yellow-700 border-yellow-200">
+                                  Request Sent
+                                </Badge>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </TabsContent>
