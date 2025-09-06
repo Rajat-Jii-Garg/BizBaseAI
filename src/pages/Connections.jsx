@@ -320,7 +320,7 @@ const Connections = () => {
               size="sm" 
               onClick={fetchSuggestions}
               disabled={suggestionsLoading}
-              className="hover-lift"
+              className="hover:bg-gray-100 transition-colors duration-200"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${suggestionsLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -419,7 +419,7 @@ const Connections = () => {
           <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg p-1 space-x-1">
             <TabsTrigger 
               value="suggestions" 
-              className="className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
               <Users className="w-4 h-4 mr-2" />
               Suggestions
