@@ -107,9 +107,11 @@ const Testimonials = () => {
             <p className="text-xl mb-8 opacity-90">
               Join thousands of entrepreneurs who transformed their dreams into business empires with BizBase
             </p>
+            <Link to="/Login">
             <button className="bg-white text-orange-600 px-12 py-6 rounded-2xl font-black text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
               Start Your Empire Today
             </button>
+            </Link>
           </div>
         </div>
       </div>
