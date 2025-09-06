@@ -304,7 +304,7 @@ const Communities = () => {
                   placeholder="Search communities, topics, or interests..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 pr-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0"
+                  className="pl-12 pr-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             </CardContent>

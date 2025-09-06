@@ -218,6 +218,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Enter community name"
                   required
+                  className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
 
@@ -230,6 +231,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                   placeholder="Describe what your community is about..."
                   rows={3}
                   required
+                  className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
 
@@ -257,6 +259,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                   onChange={(e) => handleInputChange('image_url', e.target.value)}
                   placeholder="https://example.com/image.jpg"
                   type="url"
+                  className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             </CardContent>
@@ -320,6 +323,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                   onChange={(e) => setNewTag(e.target.value)}
                   placeholder="Add tags (e.g., javascript, startup, networking)"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                  className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
                 <Button type="button" onClick={handleAddTag} variant="outline" size="sm">
                   <Plus className="w-4 h-4" />
@@ -357,6 +361,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                 placeholder="Set community rules and guidelines for members..."
                 rows={5}
                 required
+                className="focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </CardContent>
           </Card>
