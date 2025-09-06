@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen pt-16 pb-12 overflow-hidden">
+    <section className="relative min-h-screen pt-28 pb-12 overflow-hidden">
       {/* Advanced Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/80 to-indigo-50/60">
         {/* Floating geometric shapes */}
