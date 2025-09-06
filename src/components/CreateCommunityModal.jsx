@@ -355,6 +355,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                 onChange={(e) => handleInputChange('rules', e.target.value)}
                 placeholder="Set community rules and guidelines for members..."
                 rows={5}
+                required
               />
             </CardContent>
           </Card>
