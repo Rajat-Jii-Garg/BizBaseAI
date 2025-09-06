@@ -1,8 +1,8 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Zap, Target, TrendingUp, Shield, Globe, Crown, Rocket, Star, CheckCircle, Users, Building2, DollarSign, BarChart3, Brain, Lightbulb, Play } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
