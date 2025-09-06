@@ -38,22 +38,22 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4 text-white">Product</h3>
+            <h3 className="font-semibold mb-4 text-white">Product -</h3>
             <ul className="space-y-2 text-white/80 text-base">
-              <li><a href="#features" className="hover:text-white transition underline story-link">Features</a></li>
-              <li><a href="#solutions" className="hover:text-white transition underline story-link">Solutions</a></li>
-              <li><a href="#" className="hover:text-white transition underline story-link">Pricing</a></li>
-              <li><a href="#" className="hover:text-white transition underline story-link">Integrations</a></li>
+              <li><a href="#features" className="hover:text-white transition story-link">Features</a></li>
+              <li><a href="#solutions" className="hover:text-white transition story-link">Solutions</a></li>
+              <li><a href="#" className="hover:text-white transition story-link">Pricing</a></li>
+              <li><a href="#" className="hover:text-white transition story-link">Integrations</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4 text-white">Company</h3>
+            <h3 className="font-semibold mb-4 text-white">Company -</h3>
             <ul className="space-y-2 text-white/80 text-base">
-              <li><a href="#" className="hover:text-white transition underline story-link">About</a></li>
-              <li><a href="#contact" className="hover:text-white transition underline story-link">Contact</a></li>
-              <li><a href="#" className="hover:text-white transition underline story-link">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition underline story-link">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-white transition story-link">About</a></li>
+              <li><a href="#" className="hover:text-white transition story-link">Contact</a></li>
+              <li><a href="#" className="hover:text-white transition story-link">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-white transition story-link">Terms of Service</a></li>
             </ul>
           </div>
         </div>
@@ -61,7 +61,7 @@ const Footer = () => {
         <div className="border-t border-[#25619c] mt-12 pt-8 text-center text-white/70">
           <p className="text-sm md:text-base">
             &copy; 2024 <span className="text-[#75eccc] font-semibold">BizBase</span>. All rights reserved.
-            <span className="ml-2">Built with <span className="text-pink-400">❤️</span> for modern business.</span>
+            <span className="ml-2">Built for professionals & modern business.</span>
           </p>
         </div>
       </div>
