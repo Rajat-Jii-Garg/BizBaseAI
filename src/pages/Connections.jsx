@@ -416,7 +416,7 @@ const Connections = () => {
         </div> */}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg">
+          <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg p-1 space-x-1">
             <TabsTrigger 
               value="suggestions" 
               className="className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
