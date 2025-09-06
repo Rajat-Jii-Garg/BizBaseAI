@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Search, 
-  Users, 
-  UserPlus, 
+import {
+  Search,
+  Users,
+  UserPlus,
   MessageSquare, 
   Filter,
   MapPin,
@@ -76,7 +76,7 @@ const Network = () => {
         .from('profiles')
         .select('*')
         .neq('id', user.id)
-        .not('full_name', 'is', null);
+        .not('full_name', 'eq', null);
 
       if (error) throw error;
       setProfessionals(profiles || []);
@@ -129,12 +129,20 @@ const Network = () => {
     }
   };
 
+  // const filteredProfessionals = professionals.filter(prof =>
+  //   prof.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   prof.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   prof.current_position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   prof.industry?.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
+
   const filteredProfessionals = professionals.filter(prof =>
-    prof.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prof.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prof.current_position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prof.industry?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    (prof.full_name && prof.full_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (prof.company_name && prof.company_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (prof.current_position && prof.current_position.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (prof.industry && prof.industry.toLowerCase().includes(searchTerm.toLowerCase()))
+);
+
 
   const getConnectionStatus = (profileId) => {
     if (existingConnections.has(profileId)) return 'connected';
@@ -190,7 +198,7 @@ const Network = () => {
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4 mb-4">
                       <Avatar className="h-16 w-16">
-                        <AvatarImage src={professional.avatar_url} />
+                        <AvatarImage src={professional.avatar_url || ''} />
                         <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
                           {professional.full_name?.charAt(0) || 'U'}
                         </AvatarFallback>
