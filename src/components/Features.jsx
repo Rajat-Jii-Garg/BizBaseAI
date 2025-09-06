@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from "react-router-dom";
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   Users, 
@@ -170,14 +171,18 @@ const Features = () => {
               Join the exclusive club of entrepreneurs who use BizBase to build business empires and generate millions in revenue.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <button className="bg-white text-blue-600 px-12 py-6 rounded-2xl font-black text-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 flex items-center">
-                <Crown className="w-6 h-6 mr-3" />
-                Start Your Empire Now
-                <Rocket className="w-6 h-6 ml-3" />
-              </button>
-              <button className="border-2 border-white text-white px-12 py-6 rounded-2xl font-black text-xl hover:bg-white hover:text-blue-600 transition-all duration-300">
-                Watch Success Stories
-              </button>
+              <Link to="/login"></Link> 
+                <button className="bg-white text-blue-600 px-12 py-6 rounded-2xl font-black text-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 flex items-center">
+                  <Crown className="w-6 h-6 mr-3" />
+                  Start Your Empire Now
+                  <Rocket className="w-6 h-6 ml-3" />
+                </button>
+              </Link>
+              <Link to="/login">
+                <button className="border-2 border-white text-white px-12 py-6 rounded-2xl font-black text-xl hover:bg-white hover:text-blue-600 transition-all duration-300">
+                  Watch Success Stories
+                </button>
+              </Link>
             </div>
           </div>
         </div>
