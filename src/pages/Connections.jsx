@@ -410,30 +410,30 @@ const Connections = () => {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="text-center mb-8">
+        {/* <div className="text-center mb-8">
           <h1 className="text-3xl font-bold gradient-text-primary mb-2">My Network</h1>
           <p className="text-muted-foreground text-lg">Build meaningful professional connections</p>
-        </div>
+        </div> */}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg">
             <TabsTrigger 
               value="suggestions" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
               <Users className="w-4 h-4 mr-2" />
               Suggestions
             </TabsTrigger>
             <TabsTrigger 
               value="connections" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
               <UserCheck className="w-4 h-4 mr-2" />
               My Connections ({connections.length})
             </TabsTrigger>
             <TabsTrigger 
               value="requests" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
               <UserPlus className="w-4 h-4 mr-2" />
               Requests ({pendingRequests.length + sentRequests.length})
