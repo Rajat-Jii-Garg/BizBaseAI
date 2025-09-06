@@ -333,7 +333,7 @@ const Dashboard = () => {
   ];
 
   const quickActions = [
-    { label: "Find Connections", icon: UserPlus, action: () => navigate('/network'), color: "bg-green-600" },
+    { label: "Find Connections", icon: UserPlus, action: () => navigate('/connections'), color: "bg-green-600" },
     { label: "AI Insights", icon: Brain, action: () => navigate('/insights'), color: "bg-purple-600" },
   ];
 
@@ -371,7 +371,7 @@ const Dashboard = () => {
   };
 
   const handleRejectRequest = (connectionId) => {
-    respondToRequest(connectionId, 'rejected');  
+    respondToRequest(connectionId, 'rejected');
   };
 
   const handleViewProfile = () => {
@@ -681,10 +681,10 @@ const Dashboard = () => {
                       </div>
                     ))
                   )}
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full mt-4"
-                    onClick={() => navigate('/network')}
+                    onClick={() => navigate('/connections')}
                   >
                     View All AI Suggestions
                   </Button>
