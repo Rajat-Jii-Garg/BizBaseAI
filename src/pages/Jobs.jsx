@@ -126,7 +126,7 @@ const Jobs = () => {
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.skills_required.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+        job.skills_required?.some(skill => skill?.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
@@ -424,7 +424,7 @@ const Jobs = () => {
               </div>
             ) : recommendations.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recommendations.slice(0, 4).map((rec) => (
+                {recommendations.slice(0, 4).map((rec) => rec.job ? (
                   <Card key={rec.job_id} className="border-l-4 border-l-blue-500">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
@@ -448,7 +448,7 @@ const Jobs = () => {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                ) : null )}
               </div>
             ) : (
               <div className="text-center py-8">
@@ -514,11 +514,12 @@ const Jobs = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-4">
-                      {job.skills_required.slice(0, 5).map((skill, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
+                      {Array.isArray(job.skills_required) &&
+                        {job.skills_required.slice(0, 5).map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}}
                       {job.skills_required.length > 5 && (
                         <Badge variant="secondary" className="text-xs">
                           +{job.skills_required.length - 5} more
@@ -539,11 +540,12 @@ const Jobs = () => {
                       <div className="mb-4">
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Benefits:</h4>
                         <div className="flex flex-wrap gap-1">
-                          {job.benefits.slice(0, 3).map((benefit, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {benefit}
-                            </Badge>
-                          ))}
+                          {Array.isArray(job.benefits) &&
+                            {job.benefits.slice(0, 3).map((benefit, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {benefit}
+                              </Badge>
+                          ))}}
                           {job.benefits.length > 3 && (
                             <Badge variant="outline" className="text-xs">
                               +{job.benefits.length - 3} more
