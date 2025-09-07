@@ -129,19 +129,19 @@ const Jobs = () => {
       );
     }
 
-    if (selectedIndustry) {
+    if (selectedIndustry && selectedIndustry !== "all-industries") {
       filtered = filtered.filter(job => job.industry === selectedIndustry);
     }
 
-    if (selectedJobType) {
+    if (selectedJobType && selectedJobType !== "all-types") {
       filtered = filtered.filter(job => job.job_type === selectedJobType);
     }
 
-    if (selectedWorkMode) {
+    if (selectedWorkMode && selectedWorkMode !== "all-modes") {
       filtered = filtered.filter(job => job.work_mode === selectedWorkMode);
     }
 
-    if (selectedExperience) {
+    if (selectedExperience && selectedExperience !== "all-levels") {
       filtered = filtered.filter(job => job.experience_level === selectedExperience);
     }
 
@@ -373,7 +373,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Work Mode" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Modes</SelectItem>
+                  <SelectItem value="all-modes">All Modes</SelectItem>
                   {getUniqueValues('work_mode').map(mode => (
                     <SelectItem key={mode} value={mode}>
                       {mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
