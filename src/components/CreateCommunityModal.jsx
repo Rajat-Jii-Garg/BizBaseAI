@@ -144,7 +144,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
       if (memberError) {
         // rollback: remove created community to avoid orphan if membership fails
         console.error('Community created but adding member failed:', memberError);
-        await supabase.from('communities').delete().eq('id', community.data.id);
+        await supabase.from('communities').delete().eq('id', data.id);
         throw memberError;
       }
 

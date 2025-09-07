@@ -33,9 +33,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import CreateCommunityModal from '@/components/CreateCommunityModal';
+import { useNavigate } from 'react-router-dom';
 
 const Communities = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [communities, setCommunities] = useState([]);
@@ -265,10 +267,13 @@ const Communities = () => {
             {isJoined ? (
               <>
                 <Button variant="outline" size="sm" onClick={() => handleLeaveCommunity(community.id)} className="flex-1"> Leave </Button>
-                <Button size="sm" className="flex-1"> <MessageSquare className="w-4 h-4 mr-2" />Open</Button>
+                <Button size="sm" className="flex-1" onClick={() => navigate(`/communities/${community.id}`)}> <MessageSquare className="w-4 h-4 mr-2" />Open</Button>
               </>
             ) : (
-              <Button onClick={() => handleJoinCommunity(community.id)} size="sm" className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"><Plus className="w-4 h-4 mr-2" />Join Community</Button>
+              <>
+                <Button onClick={() => handleJoinCommunity(community.id)} size="sm" className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"><Plus className="w-4 h-4 mr-2" />Join Community</Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => navigate(`/communities/${community.id}`)}>View</Button>
+              </>
             )}
           </div>
         </CardContent>

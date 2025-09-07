@@ -20,6 +20,7 @@ import Messages from "./pages/Messages";
 import Notifications from "./pages/Notifications";
 import Connections from "./pages/Connections";
 import Communities from "./pages/Communities";
+import Community from "./pages/Community";
 import Settings from "./pages/Settings";
 import Events from "./pages/Events";
 import Insights from "./pages/Insights";
@@ -79,6 +80,11 @@ const App = () => (
             <Route path="/communities" element={
               <ProtectedRoute>
                 <Communities />
+              </ProtectedRoute>
+            } />
+            <Route path="/communities/:id" element={
+              <ProtectedRoute>
+                <Community />
               </ProtectedRoute>
             } />
             <Route path="/settings" element={

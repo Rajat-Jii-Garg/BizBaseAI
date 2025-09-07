@@ -25,6 +25,7 @@ export type Database = {
           is_private: boolean | null
           members_count: number | null
           name: string
+          rules: string | null
           tags: Json | null
           updated_at: string | null
           user_id: string
@@ -39,6 +40,7 @@ export type Database = {
           is_private?: boolean | null
           members_count?: number | null
           name: string
+          rules?: string | null
           tags?: Json | null
           updated_at?: string | null
           user_id: string
@@ -53,6 +55,7 @@ export type Database = {
           is_private?: boolean | null
           members_count?: number | null
           name?: string
+          rules?: string | null
           tags?: Json | null
           updated_at?: string | null
           user_id?: string
