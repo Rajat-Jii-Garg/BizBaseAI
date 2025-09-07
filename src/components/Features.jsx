@@ -171,7 +171,7 @@ const Features = () => {
               Join the exclusive club of entrepreneurs who use BizBase to build business empires and generate millions in revenue.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link to="/login"></Link> 
+              <Link to="/login">
                 <button className="bg-white text-blue-600 px-12 py-6 rounded-2xl font-black text-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 flex items-center">
                   <Crown className="w-6 h-6 mr-3" />
                   Start Your Empire Now
