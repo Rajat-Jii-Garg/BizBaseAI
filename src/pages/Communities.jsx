@@ -272,7 +272,7 @@ const Communities = () => {
             ) : (
               <>
                 <Button onClick={() => handleJoinCommunity(community.id)} size="sm" className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"><Plus className="w-4 h-4 mr-2" />Join Community</Button>
-                <Button variant="outline" size="sm" className="flex-1" onClick={() => navigate(`/communities/${community.id}`)}>View</Button>
+                <Button size="sm" className="flex-1" onClick={() => navigate(`/communities/${community.id}`)}>View</Button>
               </>
             )}
           </div>
