@@ -23,34 +23,14 @@ const AIAssistant = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [message, setMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
+  const [chatHistory, setChatHistory] = useState([]); // ✅ fixed (no TS)
   const [isLoading, setIsLoading] = useState(false);
 
   const aiTools = [
-    {
-      title: "Content Generator",
-      description: "Get AI-powered post ideas",
-      icon: MessageSquare,
-      color: "bg-blue-500"
-    },
-    {
-      title: "Profile Optimizer",
-      description: "Improve your profile",
-      icon: Star,
-      color: "bg-purple-500"
-    },
-    {
-      title: "Networking Strategy",
-      description: "Get networking advice",
-      icon: Users,
-      color: "bg-green-500"
-    },
-    {
-      title: "Career Insights",
-      description: "Career guidance",
-      icon: TrendingUp,
-      color: "bg-orange-500"
-    }
+    { title: "Content Generator", description: "Get AI-powered post ideas", icon: MessageSquare, color: "bg-blue-500" },
+    { title: "Profile Optimizer", description: "Improve your profile", icon: Star, color: "bg-purple-500" },
+    { title: "Networking Strategy", description: "Get networking advice", icon: Users, color: "bg-green-500" },
+    { title: "Career Insights", description: "Career guidance", icon: TrendingUp, color: "bg-orange-500" }
   ];
 
   const sendMessage = async () => {
@@ -60,29 +40,29 @@ const AIAssistant = () => {
     setMessage('');
     setIsLoading(true);
 
-    // Add user message to chat
     setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
 
     try {
-      const response = await fetch('https://ahdtenixvhgncwaglxui.supabase.co/functions/v1/ai-chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage,
-          context: `User: ${user?.email || 'Anonymous'}, Professional networking platform user`
-        }),
-      });
+      const response = await fetch(
+        'https://ahdtenixvhgncwaglxui.supabase.co/functions/v1/ai-chat',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: userMessage,
+            context: `User: ${user?.email || 'Anonymous'}, Professional networking platform user`
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to get AI response');
       }
 
       const data = await response.json();
-      
-      // Add AI response to chat
-      setChatHistory(prev => [...prev, { role: 'assistant', content: data.response }]);
+      const aiResponse = data?.response || "Sorry, I couldn’t process that. Try again!";
+
+      setChatHistory(prev => [...prev, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -90,18 +70,16 @@ const AIAssistant = () => {
         description: "Failed to send message. Please try again.",
         variant: "destructive"
       });
-      
-      // Add error message to chat
-      setChatHistory(prev => [...prev, { 
-        role: 'assistant', 
-        content: "I apologize, but I'm having trouble responding right now. Please try again in a moment." 
-      }]);
+      setChatHistory(prev => [
+        ...prev,
+        { role: 'assistant', content: "I’m having trouble responding right now. Please try again later." }
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -130,10 +108,7 @@ const AIAssistant = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {aiTools.map((tool, index) => (
-                  <div
-                    key={index}
-                    className="p-4 rounded-lg border hover:shadow-md transition-all cursor-pointer"
-                  >
+                  <div key={index} className="p-4 rounded-lg border hover:shadow-md transition-all cursor-pointer">
                     <div className="flex items-start gap-3">
                       <div className={`p-2 rounded-lg ${tool.color} text-white`}>
                         <tool.icon className="w-4 h-4" />
@@ -161,7 +136,7 @@ const AIAssistant = () => {
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              
+
               <CardContent className="flex-1 overflow-y-auto p-4">
                 {chatHistory.length === 0 ? (
                   <div className="flex-1 flex items-center justify-center">
@@ -176,17 +151,13 @@ const AIAssistant = () => {
                     {chatHistory.map((msg, index) => (
                       <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-xs lg:max-w-md p-3 rounded-lg ${
-                          msg.role === 'user' 
-                            ? 'bg-blue-600 text-white' 
+                          msg.role === 'user'
+                            ? 'bg-blue-600 text-white'
                             : 'bg-gray-100 text-gray-900'
                         }`}>
                           <div className="flex items-start gap-2">
-                            {msg.role === 'assistant' && (
-                              <Bot className="w-4 h-4 mt-1 text-blue-600" />
-                            )}
-                            {msg.role === 'user' && (
-                              <User className="w-4 h-4 mt-1 text-blue-100" />
-                            )}
+                            {msg.role === 'assistant' && <Bot className="w-4 h-4 mt-1 text-blue-600" />}
+                            {msg.role === 'user' && <User className="w-4 h-4 mt-1 text-blue-100" />}
                             <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                           </div>
                         </div>
@@ -199,8 +170,8 @@ const AIAssistant = () => {
                             <Bot className="w-4 h-4 text-blue-600" />
                             <div className="flex space-x-1">
                               <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                             </div>
                           </div>
                         </div>
@@ -216,11 +187,11 @@ const AIAssistant = () => {
                     placeholder="Ask me anything about your professional growth..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown} // ✅ fixed
                     disabled={isLoading}
                     className="flex-1"
                   />
-                  <Button 
+                  <Button
                     onClick={sendMessage}
                     disabled={!message.trim() || isLoading}
                     className="bg-gradient-to-r from-purple-600 to-blue-600"
