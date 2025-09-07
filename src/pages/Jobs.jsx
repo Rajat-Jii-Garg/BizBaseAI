@@ -347,7 +347,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Industry" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Industries</SelectItem>
+                  <SelectItem value="all-industries">All Industries</SelectItem>
                   {getUniqueValues('industry').map(industry => (
                     <SelectItem key={industry} value={industry}>{industry}</SelectItem>
                   ))}
