@@ -359,7 +359,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all-types">All Types</SelectItem>
                   {getUniqueValues('job_type').map(type => (
                     <SelectItem key={type} value={type}>
                       {type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
@@ -387,7 +387,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Experience Level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Levels</SelectItem>
+                  <SelectItem value="all-levels">All Levels</SelectItem>
                   {getUniqueValues('experience_level').map(level => (
                     <SelectItem key={level} value={level}>
                       {level.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
