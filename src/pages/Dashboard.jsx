@@ -569,41 +569,6 @@ const Dashboard = () => {
 
             {/* Right Sidebar - Connections & Insights */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Industry Insights */}
-              <Card className="bg-white shadow-lg border-0">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                    Industry Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
-                    <div className="flex items-start space-x-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <TrendingUp className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-1">AI in Business</h4>
-                        <p className="text-sm text-gray-600 mb-2">78% of companies are adopting AI solutions</p>
-                        <div className="text-xs text-blue-600 font-medium">Trending in your industry</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100">
-                    <div className="flex items-start space-x-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Users className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-1">Remote Work</h4>
-                        <p className="text-sm text-gray-600 mb-2">Hybrid models becoming standard</p>
-                        <div className="text-xs text-green-600 font-medium">High engagement topic</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* Smart Connections */}
               <Card className="bg-white shadow-lg border-0">
@@ -686,8 +651,44 @@ const Dashboard = () => {
                     className="w-full mt-4"
                     onClick={() => navigate('/connections')}
                   >
-                    View All AI Suggestions
+                    View More Recommendations
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* Industry Insights */}
+              <Card className="bg-white shadow-lg border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    Industry Insights
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                    <div className="flex items-start space-x-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <TrendingUp className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">AI in Business</h4>
+                        <p className="text-sm text-gray-600 mb-2">78% of companies are adopting AI solutions</p>
+                        <div className="text-xs text-blue-600 font-medium">Trending in your industry</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100">
+                    <div className="flex items-start space-x-3">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <Users className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">Remote Work</h4>
+                        <p className="text-sm text-gray-600 mb-2">Hybrid models becoming standard</p>
+                        <div className="text-xs text-green-600 font-medium">High engagement topic</div>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
