@@ -44,7 +44,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ProfileDashboard = () => {
   const { user, signOut } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
   const navigate = useNavigate();

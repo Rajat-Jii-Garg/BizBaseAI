@@ -30,6 +30,11 @@ import CRM from "./pages/CRM";
 import Projects from "./pages/Projects";
 import HR from "./pages/HR";
 import Finance from "./pages/Finance";
+import NotFound from "./pages/NotFound";
+import Demo from "./pages/Demo";
+import Contact from "./pages/Contact";
+import FAQ from "./pages/FAQ";
+import ProfileDashboard from "./pages/ProfileDashboard";
 
 const queryClient = new QueryClient();
 
@@ -136,6 +141,15 @@ const App = () => (
                 <BusinessSetup />
               </ProtectedRoute>
             } />
+            <Route path="/demo" element={<Demo />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/profile-dashboard" element={
+              <ProtectedRoute>
+                <ProfileDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
