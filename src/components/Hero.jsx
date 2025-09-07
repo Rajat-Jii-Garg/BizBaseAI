@@ -23,8 +23,8 @@ const Hero = () => {
         </div>
         
         {/* Gradient orbs */}
-        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-gradient-conic from-blue-500/10 via-purple-500/10 to-teal-500/10 rounded-full blur-3xl animate-spin" style={{animationDuration: '20s'}} />
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-gradient-conic from-emerald-500/15 via-blue-500/15 to-purple-500/15 rounded-full blur-3xl animate-spin delay-500" style={{animationDuration: '25s'}} />
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-teal-500/10 rounded-full blur-3xl animate-spin" style={{animationDuration: '20s'}} />
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-gradient-to-r from-emerald-500/15 via-blue-500/15 to-purple-500/15 rounded-full blur-3xl animate-spin delay-500" style={{animationDuration: '25s'}} />
         
         {/* Floating particles */}
         {[...Array(12)].map((_, i) => (
