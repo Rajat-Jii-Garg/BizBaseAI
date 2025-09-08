@@ -47,7 +47,11 @@ const AIAssistant = () => {
         'https://ahdtenixvhgncwaglxui.supabase.co/functions/v1/ai-chat',
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+          },
           body: JSON.stringify({
             message: userMessage,
             context: `User: ${user?.email || 'Anonymous'}, Professional networking platform user`
@@ -65,14 +69,14 @@ const AIAssistant = () => {
       setChatHistory(prev => [...prev, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive"
-      });
+      // toast({
+      //   title: "Error",
+      //   description: "Failed to send message. Please try again.",
+      //   variant: "destructive"
+      // });
       setChatHistory(prev => [
         ...prev,
-        { role: 'assistant', content: "I’m having trouble responding right now. Please try again later." }
+        { role: 'assistant', content: error.message || "I’m having trouble responding right now. Please try again later." }
       ]);
     } finally {
       setIsLoading(false);
