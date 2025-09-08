@@ -17,13 +17,24 @@ serve(async (req) => {
   try {
     const { message, context } = await req.json();
 
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+    if (!message) {
+      return new Response(JSON.stringify({ error: 'Message is required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const systemPrompt = `You are a professional AI assistant specializing in career development, networking, and business growth. You help users improve their professional profiles, create engaging content, develop networking strategies, and advance their careers. Be helpful, concise, and actionable in your responses.
+    const systemPrompt = `You are BizBase AI, a professional AI assistant for a business networking platform. You help users with:
+- Professional networking advice
+- Career guidance and insights  
+- Content creation for professional posts
+- Business development strategies
+- Industry trends and analysis
+- Personal branding tips
 
-User context: ${context || 'Professional looking for career guidance'}`;
+Context: ${context || 'Professional networking platform user'}
+
+Provide helpful, professional, and actionable advice. Keep responses concise and relevant to professional growth.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -37,8 +48,8 @@ User context: ${context || 'Professional looking for career guidance'}`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
         ],
-        max_tokens: 500,
         temperature: 0.7,
+        max_tokens: 500,
       }),
     });
 
@@ -52,11 +63,10 @@ User context: ${context || 'Professional looking for career guidance'}`;
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error) {
     console.error('Error in ai-chat function:', error);
-    return new Response(JSON.stringify({ 
-      error: error.message || 'An error occurred processing your request' 
-    }), {
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

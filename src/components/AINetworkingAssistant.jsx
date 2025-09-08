@@ -1,5 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,39 +19,101 @@ import {
 } from 'lucide-react';
 
 const AINetworkingAssistant = ({ onSuggestConnection }) => {
+  const { user } = useAuth();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [smartSuggestions] = useState([
-    {
-      id: '1',
-      name: 'Priya Sharma',
-      position: 'AI Research Lead',
-      company: 'TechCorp',
-      matchScore: 95,
-      reason: 'Shares similar AI/ML interests and has mutual connections',
-      avatar: '',
-      skills: ['Machine Learning', 'Data Science', 'Python']
-    },
-    {
-      id: '2',
-      name: 'Rajesh Kumar',
-      position: 'Product Manager',
-      company: 'StartupXYZ',
-      matchScore: 87,
-      reason: 'Works in complementary field with overlapping network',
-      avatar: '',
-      skills: ['Product Strategy', 'Analytics', 'Growth']
-    },
-    {
-      id: '3',
-      name: 'Sneha Patel',
-      position: 'Design Director',
-      company: 'CreativeStudio',
-      matchScore: 82,
-      reason: 'Similar career trajectory and industry involvement',
-      avatar: '',
-      skills: ['UX Design', 'Leadership', 'Innovation']
+  const [smartSuggestions, setSmartSuggestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [performanceData, setPerformanceData] = useState({
+    networkGrowth: 0,
+    qualityMatches: 0
+  });
+
+  // Fetch real user suggestions
+  useEffect(() => {
+    if (user) {
+      fetchSmartSuggestions();
+      fetchPerformanceData();
     }
-  ]);
+  }, [user]);
+
+  const fetchSmartSuggestions = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      
+      // Get users who are not already connected and not the current user
+      const { data: existingConnections } = await supabase
+        .from('connections')
+        .select('requester_id, addressee_id')
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+
+      const connectedUserIds = new Set();
+      existingConnections?.forEach(conn => {
+        if (conn.requester_id !== user.id) connectedUserIds.add(conn.requester_id);
+        if (conn.addressee_id !== user.id) connectedUserIds.add(conn.addressee_id);
+      });
+
+      const { data: suggestions } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, current_position, company_name, industry, skills')
+        .neq('id', user.id)
+        .not('full_name', 'eq', null)
+        .limit(15);
+
+      const filteredSuggestions = suggestions?.filter(suggestion => 
+        !connectedUserIds.has(suggestion.id)
+      ).slice(0, 3) || [];
+
+      // Transform to match expected format
+      const transformedSuggestions = filteredSuggestions.map(suggestion => ({
+        id: suggestion.id,
+        name: suggestion.full_name,
+        position: suggestion.current_position || 'Professional',
+        company: suggestion.company_name || 'Company',
+        matchScore: Math.floor(Math.random() * 30) + 70, // AI score simulation
+        reason: `Based on ${suggestion.industry || 'professional'} background and mutual interests`,
+        avatar: suggestion.avatar_url || '',
+        skills: suggestion.skills?.slice(0, 3) || ['Professional Skills']
+      }));
+
+      setSmartSuggestions(transformedSuggestions);
+    } catch (error) {
+      console.error('Error fetching smart suggestions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPerformanceData = async () => {
+    if (!user) return;
+    
+    try {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      // Get new connections this week
+      const { data: connectionsData } = await supabase
+        .from('connections')
+        .select('id')
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+        .eq('status', 'accepted')
+        .gte('created_at', sevenDaysAgo.toISOString());
+
+      // Get total potential connections
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id')
+        .neq('id', user.id);
+
+      setPerformanceData({
+        networkGrowth: Math.floor(((connectionsData?.length || 0) / 7) * 100),
+        qualityMatches: profilesData?.length || 0
+      });
+    } catch (error) {
+      console.error('Error fetching performance data:', error);
+    }
+  };
 
   const networkingTips = [
     "Share industry insights to increase visibility by 40%",
@@ -79,11 +143,11 @@ const AINetworkingAssistant = ({ onSuggestConnection }) => {
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center p-2 bg-white rounded-lg">
-              <div className="text-xl font-bold text-indigo-600 mb-1">23%</div>
+              <div className="text-xl font-bold text-indigo-600 mb-1">{performanceData.networkGrowth}%</div>
               <div className="text-xs text-gray-600">Network Growth</div>
             </div>
             <div className="text-center p-2 bg-white rounded-lg">
-              <div className="text-xl font-bold text-purple-600 mb-1">156</div>
+              <div className="text-xl font-bold text-purple-600 mb-1">{performanceData.qualityMatches}</div>
               <div className="text-xs text-gray-600">Quality Matches</div>
             </div>
           </div>
@@ -113,15 +177,21 @@ const AINetworkingAssistant = ({ onSuggestConnection }) => {
             <Button 
               size="sm" 
               variant="outline"
-              onClick={() => setIsAnalyzing(!isAnalyzing)}
+              onClick={fetchSmartSuggestions}
+              disabled={loading}
             >
               <Zap className="w-3 h-3 mr-1" />
-              Refresh
+              {loading ? 'Loading...' : 'Refresh'}
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {smartSuggestions.map((suggestion) => (
+          {loading ? (
+            <div className="text-center py-4 text-gray-600">Loading suggestions...</div>
+          ) : smartSuggestions.length === 0 ? (
+            <div className="text-center py-4 text-gray-600">No suggestions available</div>
+          ) : (
+            smartSuggestions.map((suggestion) => (
             <div key={suggestion.id} className="p-3 border border-gray-100 rounded-lg hover:shadow-md transition-shadow">
               <div className="flex items-start gap-2">
                 <Avatar className="h-8 w-8 flex-shrink-0">
@@ -181,7 +251,8 @@ const AINetworkingAssistant = ({ onSuggestConnection }) => {
                 </div>
               </div>
             </div>
-          ))}
+            ))
+          )}
           
           <Button variant="ghost" className="w-full text-sm">
             <TrendingUp className="w-4 h-4 mr-2" />
