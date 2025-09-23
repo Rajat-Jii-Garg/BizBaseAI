@@ -3,11 +3,13 @@ import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, Settings, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const UserProfileDropdown = () => {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const handler = (e) => {
@@ -53,10 +55,10 @@ const UserProfileDropdown = () => {
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black/5 z-50 animate-fade-in">
-          <button className="flex w-full px-4 py-2 gap-2 hover:bg-gray-50 items-center text-sm" onClick={() => { setOpen(false); }}>
+          <button className="flex w-full px-4 py-2 gap-2 hover:bg-gray-50 items-center text-sm" onClick={() => { navigate('/user-profile'); setOpen(false); }}>
             <User className="w-4 h-4" /> Profile
           </button>
-          <button className="flex w-full px-4 py-2 gap-2 hover:bg-gray-50 items-center text-sm" onClick={() => { setOpen(false); }}>
+          <button className="flex w-full px-4 py-2 gap-2 hover:bg-gray-50 items-center text-sm" onClick={() => { navigate('/settings'); setOpen(false); }}>
             <Settings className="w-4 h-4" /> Settings
           </button>
           <div className="border-t mx-2 my-1"/>

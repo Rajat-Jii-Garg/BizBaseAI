@@ -21,6 +21,7 @@ import Notifications from "./pages/Notifications";
 import Connections from "./pages/Connections";
 import Communities from "./pages/Communities";
 import Community from "./pages/Community";
+import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
 import Events from "./pages/Events";
 import Insights from "./pages/Insights";
@@ -85,6 +86,11 @@ const App = () => (
             <Route path="/communities/:id" element={
               <ProtectedRoute>
                 <Community />
+              </ProtectedRoute>
+            } />
+            <Route path="/user-profile/:userId?" element={
+              <ProtectedRoute>
+                <UserProfile />
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
