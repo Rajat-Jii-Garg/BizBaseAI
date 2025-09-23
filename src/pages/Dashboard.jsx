@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
+import QuickProfileActions from '@/components/QuickProfileActions';
+
 import {
   BarChart3,
   Users,
