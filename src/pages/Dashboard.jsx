@@ -43,7 +43,7 @@ import { usePosts } from '@/hooks/usePosts';
 import { useConnections } from '@/hooks/useConnections';
 import { useRealTimeEngagement } from '@/hooks/useRealTimeEngagement';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import WelcomeFlow from '@/components/WelcomeFlow';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -380,8 +380,12 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
+      <WelcomeFlow />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Profile Completion Banner */}
+          <ProfileCompletionBanner />
+
           {/* Welcome Banner */}
           {showWelcome && (
             <Card className="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl overflow-hidden relative">
@@ -426,16 +430,21 @@ const Dashboard = () => {
                 <CardContent className="p-6 text-center relative">
                   <Avatar 
                     className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => navigate('/user-profile')}
                   >
-                    <AvatarImage src={userProfile?.avatar_url || user?.user_metadata?.avatar_url} />
-                    <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold text-xl">
-                      {userProfile?.full_name?.charAt(0) || user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                    </AvatarFallback>
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={userProfile?.avatar_url || user?.user_metadata?.avatar_url} />
+                      <AvatarFallback className="text-xs">
+                        {userProfile?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:inline text-sm font-medium">
+                      {userProfile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+                    </span>
                   </Avatar>
                   <h3 
                     className="font-bold text-gray-900 mb-1 text-lg cursor-pointer hover:text-blue-600 transition-colors"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => navigate('/user-profile')}
                   >
                     {userProfile?.full_name || user?.user_metadata?.full_name || 'Professional User'}
                   </h3>
@@ -457,10 +466,10 @@ const Dashboard = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full"
-                    onClick={() => navigate('/profile?tab=edit')}
+                    onClick={() => navigate('/user-profile')}
                   >
                     <Edit className="w-4 h-4 mr-2" />
-                    Customize Profile
+                    View Profile
                   </Button>
                 </CardContent>
               </Card>
@@ -712,7 +721,10 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </div>
+              <NetworkSuggestions limit={3} />
+
+              <QuickProfileActions />
+            </div>
     </DashboardLayout>
   );
 };

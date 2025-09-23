@@ -40,16 +40,24 @@ const UserProfile = () => {
 
   // Fetch all profile data
   useEffect(() => {
-    if (userId || user?.id) {
-      const profileId = userId || user?.id;
+    const currentUserId = userId || user?.id;
+    if (currentUserId) {
+      console.log('UserProfile: Current user ID:', currentUserId);
       setIsOwnProfile(!userId || userId === user?.id);
-      fetchProfileData(profileId);
+      fetchProfileData(currentUserId);
     }
   }, [userId, user]);
 
   const fetchProfileData = async (profileId) => {
     try {
       setLoading(true);
+      console.log('Fetching profile data for ID:', profileId);
+      
+      // Validate profileId
+      if (!profileId || profileId === ':userId' || profileId.includes(':')) {
+        console.error('Invalid profile ID:', profileId);
+        return;
+      }
       
       // Fetch profile
       const { data: profileData, error: profileError } = await supabase
@@ -58,11 +66,20 @@ const UserProfile = () => {
         .eq('id', profileId)
         .single();
 
-      if (profileError) throw profileError;
-      setProfile(profileData);
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        if (profileError.code === 'PGRST116') {
+          // No rows returned - user might not have a profile yet
+          setProfile(null);
+        } else {
+          throw profileError;
+        }
+      } else {
+        setProfile(profileData);
+      }
 
       // Track profile view if not own profile
-      if (!isOwnProfile && user?.id) {
+      if (!isOwnProfile && user?.id && user.id !== profileId) {
         await supabase
           .from('profile_views')
           .insert({
@@ -122,17 +139,31 @@ const UserProfile = () => {
       // Fetch posts
       const { data: postsData } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profiles:user_id (
-            full_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('user_id', profileId)
         .order('created_at', { ascending: false })
         .limit(10);
-      setPosts(postsData || []);
+      
+      // Get profiles for posts
+      if (postsData?.length > 0) {
+        const { data: postProfiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url')
+          .eq('id', profileId)
+          .single();
+        
+        const enrichedPosts = postsData.map(post => ({
+          ...post,
+          profiles: postProfiles || { 
+            full_name: 'Unknown User',
+            avatar_url: null
+          }
+        }));
+        
+        setPosts(enrichedPosts);
+      } else {
+        setPosts([]);
+      }
 
       // Count connections
       const { count } = await supabase
