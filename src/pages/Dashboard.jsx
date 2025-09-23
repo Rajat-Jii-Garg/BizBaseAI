@@ -46,6 +46,7 @@ import { useRealTimeEngagement } from '@/hooks/useRealTimeEngagement';
 import { supabase } from '@/integrations/supabase/client';
 import WelcomeFlow from '@/components/WelcomeFlow';
 import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
+import NetworkSuggestions from '@/components/NetworkSuggestions';
 
 const Dashboard = () => {
   const { user } = useAuth();
