@@ -117,40 +117,40 @@ const ProfileCompletionBanner = () => {
         title: "Complete Your Profile",
         message: "Get started by adding your basic information",
         icon: AlertCircle,
-        color: "text-red-600",
-        bgColor: "bg-red-50"
+        color: "text-destructive",
+        bgColor: "bg-destructive/10"
       };
     } else if (completionScore < 60) {
       return {
         title: "Boost Your Profile",
         message: "Add more details to improve your professional presence",
         icon: User,
-        color: "text-orange-600",
-        bgColor: "bg-orange-50"
+        color: "text-orange-600 dark:text-orange-400",
+        bgColor: "bg-orange-50 dark:bg-orange-950/20"
       };
     } else if (completionScore < 80) {
       return {
         title: "Almost There!",
         message: "Just a few more details to complete your profile",
         icon: Award,
-        color: "text-blue-600",
-        bgColor: "bg-blue-50"
+        color: "text-primary",
+        bgColor: "bg-primary/10"
       };
     } else {
       return {
         title: "Profile Complete!",
         message: "Your profile looks great. Keep it updated",
         icon: CheckCircle,
-        color: "text-green-600",
-        bgColor: "bg-green-50"
+        color: "text-green-600 dark:text-green-400",
+        bgColor: "bg-green-50 dark:bg-green-950/20"
       };
     }
   };
 
   if (loading) {
     return (
-      <Card className="mb-6 border-0 shadow-lg bg-gray-50">
-        <CardContent className="p-6 text-gray-500">Loading profile...</CardContent>
+      <Card className="mb-4 md:mb-6 border shadow-lg bg-muted/30">
+        <CardContent className="p-4 md:p-6 text-muted-foreground">Loading profile...</CardContent>
       </Card>
     );
   }
@@ -162,28 +162,29 @@ const ProfileCompletionBanner = () => {
   const { title, message, icon: Icon, color, bgColor } = getCompletionMessage();
 
   return (
-    <Card className={`mb-6 border-0 shadow-lg ${bgColor}`}>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className={`p-3 rounded-full ${bgColor}`}>
-              <Icon className={`w-6 h-6 ${color}`} />
+    <Card className={`mb-4 md:mb-6 border shadow-lg ${bgColor}`}>
+      <CardContent className="p-4 md:p-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start md:items-center space-x-3 md:space-x-4 flex-1">
+            <div className={`p-2 md:p-3 rounded-full ${bgColor} flex-shrink-0`}>
+              <Icon className={`w-5 h-5 md:w-6 md:h-6 ${color}`} />
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-gray-900 mb-1">{title}</h3>
-              <p className="text-gray-600 text-sm mb-3">{message}</p>
-              <div className="flex items-center space-x-3 mb-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-foreground mb-1 text-sm md:text-base">{title}</h3>
+              <p className="text-muted-foreground text-xs md:text-sm mb-2 md:mb-3">{message}</p>
+              <div className="flex items-center space-x-2 md:space-x-3 mb-2">
                 <Progress value={completionScore} className="flex-1 h-2" />
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-xs md:text-sm font-medium text-foreground whitespace-nowrap">
                   {completionScore}%
                 </span>
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 w-full md:w-auto">
             <Button
-              onClick={() => navigate('/user-profile')}
-              className="bg-primary hover:bg-primary/90"
+              onClick={() => navigate('/profile-dashboard')}
+              className="bg-primary hover:bg-primary/90 flex-1 md:flex-none text-sm"
+              size="sm"
             >
               Complete Profile
             </Button>
@@ -191,6 +192,7 @@ const ProfileCompletionBanner = () => {
               variant="ghost"
               size="icon"
               onClick={() => setShowBanner(false)}
+              className="flex-shrink-0"
             >
               <X className="w-4 h-4" />
             </Button>
