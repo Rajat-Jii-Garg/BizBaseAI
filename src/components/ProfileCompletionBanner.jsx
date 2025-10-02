@@ -29,10 +29,20 @@ const ProfileCompletionBanner = () => {
         .eq('id', user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
+      if (error) {
+        // Agar profile exist nahi karti to insert karo
+        if (error.message?.includes('No rows')) {
+          await createInitialProfile();
+        } else {
+          console.error('Error fetching profile:', error.message);
+        }
         return;
       }
+
+      // if (error && error.code !== 'PGRST116') {
+      //   console.error('Error fetching profile:', error);
+      //   return;
+      // }
 
       if (profileData) {
         setProfile(profileData);
@@ -137,7 +147,15 @@ const ProfileCompletionBanner = () => {
     }
   };
 
-  if (loading || !showBanner || completionScore >= 80) {
+  if (loading) {
+    return (
+      <Card className="mb-6 border-0 shadow-lg bg-gray-50">
+        <CardContent className="p-6 text-gray-500">Loading profile...</CardContent>
+      </Card>
+    );
+  }
+
+  if (!showBanner || completionScore >= 80) {
     return null;
   }
 
