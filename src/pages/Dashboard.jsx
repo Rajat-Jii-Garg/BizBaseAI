@@ -4,9 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
-import QuickProfileActions from '@/components/QuickProfileActions';
-
 import {
   BarChart3,
   Users,
@@ -438,15 +435,10 @@ const Dashboard = () => {
                     className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
                     onClick={() => navigate('/user-profile')}
                   >
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={userProfile?.avatar_url || user?.user_metadata?.avatar_url} />
-                      <AvatarFallback className="text-xs">
-                        {userProfile?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="hidden sm:inline text-sm font-medium">
-                      {userProfile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
-                    </span>
+                    <AvatarImage src={userProfile?.avatar_url || user?.user_metadata?.avatar_url} />
+                    <AvatarFallback className="text-lg">
+                      {userProfile?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
                   </Avatar>
                   <h3 
                     className="font-bold text-gray-900 mb-1 text-lg cursor-pointer hover:text-blue-600 transition-colors"
