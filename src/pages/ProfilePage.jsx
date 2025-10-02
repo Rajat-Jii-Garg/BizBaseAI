@@ -20,7 +20,8 @@ import {
   TwitterIcon,
   Star,
   BookOpen,
-  Award
+  Award,
+  Edit3
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -327,7 +328,8 @@ const ProfilePage = () => {
                   </>
                 )}
                 {isOwnProfile && (
-                  <Button variant="outline">
+                  <Button variant="outline" onClick={() => window.location.href = '/settings'}>
+                    <Edit3 className="w-4 h-4 mr-2" />
                     Edit Profile
                   </Button>
                 )}

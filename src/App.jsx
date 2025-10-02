@@ -12,7 +12,6 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
-import PublicProfile from "./pages/PublicProfile";
 import Feed from "./pages/Feed";
 import Network from "./pages/Network";
 import Analytics from "./pages/Analytics";
@@ -21,7 +20,6 @@ import Notifications from "./pages/Notifications";
 import Connections from "./pages/Connections";
 import Communities from "./pages/Communities";
 import Community from "./pages/Community";
-import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
 import Events from "./pages/Events";
 import Insights from "./pages/Insights";
@@ -58,7 +56,7 @@ const App = () => (
                 <Dashboard />
               </ProtectedRoute>
             } />
-            <Route path="/profile" element={
+            <Route path="/profile/:userId?" element={
               <ProtectedRoute>
                 <ProfilePage />
               </ProtectedRoute>
@@ -86,11 +84,6 @@ const App = () => (
             <Route path="/communities/:id" element={
               <ProtectedRoute>
                 <Community />
-              </ProtectedRoute>
-            } />
-            <Route path="/user-profile/:userId?" element={
-              <ProtectedRoute>
-                <UserProfile />
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
