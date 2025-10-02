@@ -116,21 +116,56 @@ const ProfileDashboard = () => {
   const fetchPosts = async () => {
     try {
       setPostsLoading(true);
-      const { data, error } = await supabase
+      
+      // Fetch posts
+      const { data: postsData, error: postsError } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profiles:user_id (
-            full_name,
-            avatar_url,
-            current_position
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPosts(data || []);
+      if (postsError) throw postsError;
+
+      if (!postsData || postsData.length === 0) {
+        setPosts([]);
+        setPostsLoading(false);
+        return;
+      }
+
+      // Fetch profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, current_position, company_name')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      }
+
+      // Get like status for current user
+      const postIds = postsData.map(post => post.id);
+      const { data: likes } = await supabase
+        .from('post_likes')
+        .select('post_id')
+        .eq('user_id', user.id)
+        .in('post_id', postIds);
+
+      const likedPostIds = new Set(likes?.map(like => like.post_id) || []);
+
+      // Combine data
+      const enrichedPosts = postsData.map(post => ({
+        ...post,
+        profiles: profileData || {
+          full_name: 'Professional User',
+          avatar_url: null,
+          current_position: null,
+          company_name: null
+        },
+        user_has_liked: likedPostIds.has(post.id)
+      }));
+
+      setPosts(enrichedPosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast({
