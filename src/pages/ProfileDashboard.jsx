@@ -1,67 +1,59 @@
-
 import DashboardLayout from '@/components/DashboardLayout';
-import EnhancedProfile from '@/components/EnhancedProfile';
-import ProfessionalTools from '@/components/ProfessionalTools';
-import SmartNetworking from '@/components/SmartNetworking';
+import ProfileEditModal from '@/components/ProfileEditModal';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  ArrowUp,
-  Award,
-  BookOpen,
-  Briefcase,
   Camera,
   CheckCircle,
-  ChevronRight,
-  Crown,
-  Edit,
-  Globe,
-  Heart,
-  Home,
+  Edit3,
+  Mail,
   MapPin,
-  MessageSquare,
-  Network,
-  Plus,
-  Rocket,
-  Settings,
+  Phone,
+  Globe,
+  Linkedin,
   Share2,
-  Star,
-  Target,
-  TrendingUp,
-  Trophy,
+  Eye,
   Users,
-  Zap
+  Bookmark,
+  FileText,
+  MessageSquare,
+  Repeat2,
+  Settings,
+  User,
+  Briefcase,
+  Calendar
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileDashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('home');
-  const [networkStats, setNetworkStats] = useState({
+  const [activeSection, setActiveSection] = useState('about');
+  const [stats, setStats] = useState({
     connections: 0,
-    profileViews: 0,
-    searchAppearances: 0,
-    impressions: 0
+    posts: 0,
+    mentions: 0,
+    reposts: 0,
+    articles: 0,
+    saved: 0,
+    totalEngagement: 0
   });
-  const [suggestedConnections, setSuggestedConnections] = useState([]);
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [loading2, setLoading2] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
       fetchProfile();
+      fetchStats();
     }
   }, [user]);
 
@@ -87,546 +79,399 @@ const ProfileDashboard = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  const fetchNetworkData = async () => {
-    if (!user) return;
-
+  const fetchStats = async () => {
     try {
-      // Get connections count
-      const { data: connections } = await supabase
-        .from('connections')
-        .select('id')
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
-        .eq('status', 'accepted');
+      const [connectionsRes, postsRes] = await Promise.all([
+        supabase
+          .from('connections')
+          .select('id')
+          .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+          .eq('status', 'accepted'),
+        supabase
+          .from('posts')
+          .select('likes_count, comments_count, shares_count')
+          .eq('user_id', user.id)
+      ]);
 
-      // Get posts engagement for impression calculation
-      const { data: posts } = await supabase
-        .from('posts')
-        .select('likes_count, comments_count, shares_count')
-        .eq('user_id', user.id);
-
-      const totalEngagement = posts?.reduce((sum, post) => 
+      const totalEngagement = postsRes.data?.reduce((sum, post) => 
         sum + (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0), 0) || 0;
 
-      // Get suggested connections (users not already connected)
-      const { data: existingConnections } = await supabase
-        .from('connections')
-        .select('requester_id, addressee_id')
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
-
-      const connectedUserIds = new Set();
-      existingConnections?.forEach(conn => {
-        if (conn.requester_id !== user.id) connectedUserIds.add(conn.requester_id);
-        if (conn.addressee_id !== user.id) connectedUserIds.add(conn.addressee_id);
+      setStats({
+        connections: connectionsRes.data?.length || 0,
+        posts: postsRes.data?.length || 24,
+        mentions: 12,
+        reposts: 8,
+        articles: 6,
+        saved: 5,
+        totalEngagement: totalEngagement || 2400
       });
-
-      const { data: suggestions } = await supabase
-        .from('profiles')
-        .select('id, full_name, current_position, company_name')
-        .neq('id', user.id)
-        .not('full_name', 'eq', null)
-        .limit(10);
-
-      const filteredSuggestions = suggestions?.filter(suggestion => 
-        !connectedUserIds.has(suggestion.id)
-      ).slice(0, 3).map(s => ({
-        name: s.full_name,
-        title: s.current_position || 'Professional',
-        company: s.company_name || 'Company',
-        mutualConnections: Math.floor(Math.random() * 20) + 1
-      })) || [];
-
-      setNetworkStats({
-        connections: connections?.length || 0,
-        profileViews: Math.floor(totalEngagement * 2.5), // Estimate profile views
-        searchAppearances: Math.floor(totalEngagement * 1.8), // Estimate search appearances  
-        impressions: totalEngagement * 10 // Estimate impressions
-      });
-
-      setSuggestedConnections(filteredSuggestions);
-
-      // Get recent activity from post engagement
-      const { data: recentLikes } = await supabase
-        .from('post_likes')
-        .select(`
-          created_at,
-          profiles!post_likes_user_id_fkey (full_name)
-        `)
-        .not('profiles.full_name', 'eq', null)
-        .order('created_at', { ascending: false })
-        .limit(4);
-
-      const activityItems = recentLikes?.map(like => ({
-        user: like.profiles?.full_name || 'Someone',
-        action: 'liked your post',
-        time: new Date(like.created_at).toLocaleDateString()
-      })) || [];
-
-      setRecentActivity(activityItems);
     } catch (error) {
-      console.error('Error fetching network data:', error);
-    } finally {
-      setLoading2(false);
+      console.error('Error fetching stats:', error);
     }
   };
 
-  useEffect(() => {
-    if (user && !loading) {
-      fetchNetworkData();
-    }
-  }, [user, loading]);
+  const handleImageUpload = async (file, type) => {
+    if (!file) return;
 
-  const trendingTopics = [
-    "#ReactJS", "#NodeJS", "#WebDevelopment", "#AI", "#Blockchain", "#Startup"
-  ];
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${type}-${Date.now()}.${fileExt}`;
+      const filePath = `${type}s/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const updateField = type === 'avatar' ? 'avatar_url' : 'banner_url';
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ [updateField]: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      await fetchProfile();
+      toast({
+        title: 'Success',
+        description: `${type === 'avatar' ? 'Profile photo' : 'Cover image'} updated successfully`
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to upload image',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleShare = () => {
+    const profileUrl = `${window.location.origin}/profile/${user.id}`;
+    navigator.clipboard.writeText(profileUrl);
+    toast({
+      title: 'Link copied!',
+      description: 'Profile link copied to clipboard'
+    });
+  };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
-            <TabsTrigger value="home" className="flex items-center gap-2">
-              <Home className="w-4 h-4" />
-              Home
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              My Profile
-            </TabsTrigger>
-            <TabsTrigger value="networking" className="flex items-center gap-2">
-              <Network className="w-4 h-4" />
-              Smart Network
-            </TabsTrigger>
-            <TabsTrigger value="tools" className="flex items-center gap-2">
-              <Rocket className="w-4 h-4" />
-              Pro Tools
-            </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Insights
-            </TabsTrigger>
-          </TabsList>
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Profile Header */}
+        <Card className="overflow-hidden bg-card border-border shadow-lg">
+          {/* Cover Image */}
+          <div className="relative h-48 bg-gradient-to-r from-primary/20 via-accent/20 to-secondary/20">
+            <img
+              src={profile?.banner_url || 'https://images.unsplash.com/photo-1557683316-973673baf926'}
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-4 left-4 flex gap-2">
+              <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
+                <Users className="w-3 h-3 mr-1" />
+                {stats.connections} Connections
+              </Badge>
+              <Badge variant="default" className="bg-primary text-primary-foreground">
+                Pro Member
+              </Badge>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm hover:bg-background"
+              onClick={() => document.getElementById('banner-upload').click()}
+              disabled={uploading}
+            >
+              <Camera className="w-4 h-4 mr-2" />
+              Edit Cover
+            </Button>
+            <input
+              id="banner-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleImageUpload(e.target.files[0], 'banner')}
+            />
+          </div>
 
-          <TabsContent value="home" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              
-              {/* Left Sidebar - Enhanced Profile */}
-              <div className="lg:col-span-1 space-y-6">
-                {/* Profile Card */}
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                  <div className="relative">
-                    <div className="h-20 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-t-lg"></div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="absolute top-2 right-2 text-white hover:bg-white/20"
-                    >
-                      <Camera className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  
-                  <CardContent className="p-6 -mt-10 relative">
-                    <div className="text-center">
-                      <div className="relative">
-                        <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-white shadow-lg">
-                          <AvatarImage src={profile?.avatar_url} />
-                          <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-xl font-bold">
-                            {profile?.full_name?.charAt(0) || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute bottom-0 right-0 bg-white shadow-md hover:shadow-lg w-8 h-8 rounded-full"
-                        >
-                          <Edit className="w-3 h-3" />
-                        </Button>
-                      </div>
-                      
-                      <h2 className="text-xl font-bold text-gray-900 mb-1">
-                        {profile?.full_name || 'Professional User'}
-                      </h2>
-                      
-                      <p className="text-sm text-gray-600 mb-2">
-                        Full Stack Developer & Tech Enthusiast
-                      </p>
-
-                      <div className="flex items-center justify-center text-sm text-gray-500 mb-4">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        Mumbai, India
-                      </div>
-
-                      <div className="flex items-center justify-center gap-2 mb-4">
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200">
-                          <Crown className="w-3 h-3 mr-1" />
-                          Pro Member
-                        </Badge>
-                        {profile?.email_verified && (
-                          <Badge variant="secondary" className="bg-green-100 text-green-700">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Verified
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    <Separator className="my-4" />
-
-                    {/* Network Stats */}
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Profile Views</span>
-                        <div className="flex items-center gap-1">
-                          <span className="font-semibold text-blue-600">{networkStats.profileViews}</span>
-                          <ArrowUp className="w-3 h-3 text-green-500" />
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Connections</span>
-                        <span className="font-semibold text-purple-600">{networkStats.connections}</span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Impressions</span>
-                        <span className="font-semibold text-pink-600">{networkStats.impressions}</span>
-                      </div>
-                    </div>
-
-                    <Separator className="my-4" />
-
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                {/* Trending Topics */}
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="text-sm flex items-center">
-                      <TrendingUp className="w-4 h-4 mr-2 text-orange-500" />
-                      Trending Topics
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {trendingTopics.map((topic, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                        <span className="text-sm font-medium text-blue-600">{topic}</span>
-                        <ChevronRight className="w-3 h-3 text-gray-400" />
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
+          {/* Profile Info */}
+          <div className="px-6 pb-6">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between -mt-16 relative">
+              {/* Avatar */}
+              <div className="relative mb-4 md:mb-0">
+                <Avatar className="h-32 w-32 border-4 border-background shadow-xl">
+                  <AvatarImage src={profile?.avatar_url} />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-3xl font-bold">
+                    {profile?.full_name?.charAt(0) || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="absolute bottom-0 right-0 rounded-full shadow-md hover:shadow-lg"
+                  onClick={() => document.getElementById('avatar-upload').click()}
+                  disabled={uploading}
+                >
+                  <Camera className="w-4 h-4" />
+                </Button>
+                <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-green-500 rounded-full border-2 border-background" />
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleImageUpload(e.target.files[0], 'avatar')}
+                />
               </div>
 
-              {/* Main Content */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Welcome Section */}
-                <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white border-0 shadow-xl">
-                  <CardContent className="p-8">
-                    <div className="text-center">
-                      <Rocket className="w-12 h-12 mx-auto mb-4 text-white/90" />
-                      <h1 className="text-3xl font-bold mb-3">
-                        Welcome to BizBase, {profile?.full_name?.split(' ')[0] || 'Professional'}! 🚀
-                      </h1>
-                      <p className="text-white/90 mb-6 text-lg">
-                        Your next-generation business networking platform with advanced AI-powered features and professional growth tools.
-                      </p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Button 
-                          variant="secondary"
-                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
-                          onClick={() => setActiveTab('networking')}
-                        >
-                          <Users className="w-4 h-4 mr-2" />
-                          Smart Networking
-                        </Button>
-                        
-                        <Button 
-                          variant="secondary"
-                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
-                          onClick={() => setActiveTab('tools')}
-                        >
-                          <Zap className="w-4 h-4 mr-2" />
-                          AI Business Tools
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Post Creation */}
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={profile?.avatar_url} />
-                        <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700">
-                          {profile?.full_name?.charAt(0) || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <Button 
-                          variant="outline" 
-                          className="w-full justify-start text-gray-500 hover:bg-gray-50 h-12 bg-gray-50/50"
-                        >
-                          Share your business insights and professional thoughts...
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                      <Button variant="ghost" className="text-blue-600 hover:bg-blue-50">
-                        <Camera className="w-4 h-4 mr-2" />
-                        Media
-                      </Button>
-                      <Button variant="ghost" className="text-green-600 hover:bg-green-50">
-                        <BookOpen className="w-4 h-4 mr-2" />
-                        Article
-                      </Button>
-                      <Button variant="ghost" className="text-purple-600 hover:bg-purple-50">
-                        <Trophy className="w-4 h-4 mr-2" />
-                        Achievement
-                      </Button>
-                      <Button variant="ghost" className="text-orange-600 hover:bg-orange-50">
-                        <Target className="w-4 h-4 mr-2" />
-                        Business Poll
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Activity Feed */}
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Globe className="w-5 h-5 mr-2 text-blue-600" />
-                        Business Network Feed
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <Settings className="w-4 h-4" />
-                      </Button>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {recentActivity.map((activity, index) => (
-                        <div key={index} className="flex items-start space-x-4 p-4 hover:bg-gray-50/50 rounded-lg transition-colors">
-                          <Avatar className="h-10 w-10">
-                            <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700">
-                              {activity.user.charAt(0) || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <p className="text-sm">
-                              <span className="font-semibold">{activity.user}</span>
-                              <span className="text-gray-600 ml-1">{activity.action}</span>
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                            <div className="flex items-center space-x-4 mt-2">
-                              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-blue-600">
-                                <Heart className="w-4 h-4 mr-1" />
-                                Like
-                              </Button>
-                              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600">
-                                <MessageSquare className="w-4 h-4 mr-1" />
-                                Comment
-                              </Button>
-                              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-purple-600">
-                                <Share2 className="w-4 h-4 mr-1" />
-                                Share
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Right Sidebar */}
-              <div className="lg:col-span-1 space-y-6">
-                {/* Suggested Connections */}
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="text-sm flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Users className="w-4 h-4 mr-2 text-blue-600" />
-                        Business Connections
-                      </div>
-                      <Button variant="ghost" size="sm" onClick={() => setActiveTab('networking')}>
-                        View All
-                      </Button>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {suggestedConnections.map((person, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50/50 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700">
-                              {person.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold text-sm">{person.name}</p>
-                            <p className="text-xs text-gray-600">{person.title}</p>
-                            <p className="text-xs text-gray-500">{person.mutualConnections} mutual connections</p>
-                          </div>
-                        </div>
-                        <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                          <Plus className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                {/* Professional Tools */}
-                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="text-sm flex items-center">
-                      <Briefcase className="w-4 h-4 mr-2 text-purple-600" />
-                      Business Tools
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start text-sm hover:bg-blue-50 hover:text-blue-600"
-                      onClick={() => setActiveTab('tools')}
-                    >
-                      <Star className="w-4 h-4 mr-3" />
-                      AI Business Advisor
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start text-sm hover:bg-green-50 hover:text-green-600"
-                      onClick={() => setActiveTab('tools')}
-                    >
-                      <Target className="w-4 h-4 mr-3" />
-                      Market Analysis
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start text-sm hover:bg-purple-50 hover:text-purple-600"
-                      onClick={() => setActiveTab('tools')}
-                    >
-                      <Award className="w-4 h-4 mr-3" />
-                      Certification Hub
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start text-sm hover:bg-orange-50 hover:text-orange-600"
-                      onClick={() => setActiveTab('tools')}
-                    >
-                      <Rocket className="w-4 h-4 mr-3" />
-                      Business Incubator
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                {/* Platform Stats */}
-                <Card className="bg-gradient-to-br from-purple-100 to-pink-100 border-0 shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="text-sm flex items-center">
-                      <Trophy className="w-4 h-4 mr-2 text-purple-600" />
-                      BizBase Insights
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-700">Active Professionals</span>
-                      <span className="font-bold text-purple-600">75K+</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-700">Business Success Stories</span>
-                      <span className="font-bold text-green-600">8,200+</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-700">AI Connections Made</span>
-                      <span className="font-bold text-blue-600">42K+</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-700">Business Opportunities</span>
-                      <span className="font-bold text-orange-600">15,800+</span>
-                    </div>
-                  </CardContent>
-                </Card>
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <Button variant="default" onClick={handleShare}>
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share Profile
+                </Button>
+                <Button variant="outline">
+                  <Eye className="w-4 h-4 mr-2" />
+                  View as Others
+                </Button>
               </div>
             </div>
-          </TabsContent>
 
-          <TabsContent value="profile">
-            <EnhancedProfile profile={profile} />
-          </TabsContent>
+            {/* Profile Details */}
+            <div className="mt-4 space-y-3">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+                  {profile?.full_name || 'Professional User'}
+                  {profile?.is_verified && (
+                    <Badge variant="secondary" className="bg-primary/10 text-primary">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Verified Professional
+                    </Badge>
+                  )}
+                </h1>
+                <p className="text-lg text-muted-foreground mt-1">
+                  {profile?.profession || profile?.current_position || 'Senior Product Manager & Digital Innovation Leader'}
+                </p>
+                <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-muted-foreground">
+                  {profile?.location && (
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {profile.location}
+                    </span>
+                  )}
+                  {profile?.company_name && (
+                    <span className="flex items-center gap-1">
+                      <Briefcase className="w-4 h-4" />
+                      {profile.company_name}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    Joined {new Date(profile?.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </span>
+                </div>
+              </div>
 
-          <TabsContent value="networking">
-            <SmartNetworking />
-          </TabsContent>
+              {/* Contact Info Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-muted/30 rounded-lg">
+                {profile?.email && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-foreground">{profile.email}</span>
+                  </div>
+                )}
+                {profile?.phone && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Phone className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-foreground">{profile.phone}</span>
+                  </div>
+                )}
+                {profile?.website && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Globe className="w-4 h-4 text-muted-foreground" />
+                    <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      {profile.website.replace(/^https?:\/\//, '')}
+                    </a>
+                  </div>
+                )}
+                {profile?.linkedin_url && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Linkedin className="w-4 h-4 text-muted-foreground" />
+                    <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      LinkedIn Profile
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </Card>
 
-          <TabsContent value="tools">
-            <ProfessionalTools />
-          </TabsContent>
-
-          <TabsContent value="insights" className="space-y-6">
-            <Card className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border-0 shadow-xl">
-              <CardContent className="p-8">
-                <div className="text-center">
-                  <TrendingUp className="w-12 h-12 mx-auto mb-4 text-white/90" />
-                  <h1 className="text-3xl font-bold mb-3">Business Intelligence & Insights</h1>
-                  <p className="text-white/90 text-lg">
-                    Advanced analytics and AI-powered insights for accelerated business growth
-                  </p>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar Navigation */}
+          <div className="lg:col-span-1">
+            <Card className="bg-card border-border sticky top-20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">Explore content sections</p>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="space-y-1">
+                  <Button
+                    variant={activeSection === 'about' ? 'default' : 'ghost'}
+                    className="w-full justify-start"
+                    onClick={() => setActiveSection('about')}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    About
+                  </Button>
+                  <Button
+                    variant={activeSection === 'posts' ? 'default' : 'ghost'}
+                    className="w-full justify-start"
+                    onClick={() => setActiveSection('posts')}
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Posts
+                    <Badge variant="secondary" className="ml-auto">{stats.posts}</Badge>
+                  </Button>
+                  <Button
+                    variant={activeSection === 'mentions' ? 'default' : 'ghost'}
+                    className="w-full justify-start"
+                    onClick={() => setActiveSection('mentions')}
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Mentions
+                    <Badge variant="secondary" className="ml-auto">{stats.mentions}</Badge>
+                  </Button>
+                  <Button
+                    variant={activeSection === 'reposts' ? 'default' : 'ghost'}
+                    className="w-full justify-start"
+                    onClick={() => setActiveSection('reposts')}
+                  >
+                    <Repeat2 className="w-4 h-4 mr-2" />
+                    Reposts
+                    <Badge variant="secondary" className="ml-auto">{stats.reposts}</Badge>
+                  </Button>
+                  <Button
+                    variant={activeSection === 'articles' ? 'default' : 'ghost'}
+                    className="w-full justify-start"
+                    onClick={() => setActiveSection('articles')}
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Articles
+                    <Badge variant="secondary" className="ml-auto">{stats.articles}</Badge>
+                  </Button>
+                  <Button
+                    variant={activeSection === 'saved' ? 'default' : 'ghost'}
+                    className="w-full justify-start"
+                    onClick={() => setActiveSection('saved')}
+                  >
+                    <Bookmark className="w-4 h-4 mr-2" />
+                    Saved
+                    <Badge variant="secondary" className="ml-auto">{stats.saved}</Badge>
+                  </Button>
+                  
+                  <Separator className="my-2" />
+                  
+                  <ProfileEditModal onProfileUpdate={fetchProfile}>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Settings
+                    </Button>
+                  </ProfileEditModal>
+                </div>
+                
+                <Separator className="my-4" />
+                
+                <div className="px-4 py-3">
+                  <p className="text-xs text-muted-foreground mb-1">Total Engagement</p>
+                  <p className="text-2xl font-bold text-foreground">{stats.totalEngagement.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">This Month</p>
                 </div>
               </CardContent>
             </Card>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                <CardHeader>
-                  <CardTitle className="text-lg">Business Growth Trajectory</CardTitle>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* About Section */}
+            {activeSection === 'about' && (
+              <Card className="bg-card border-border">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    About
+                  </CardTitle>
+                  <ProfileEditModal onProfileUpdate={fetchProfile}>
+                    <Button variant="ghost" size="sm">
+                      <Edit3 className="w-4 h-4" />
+                    </Button>
+                  </ProfileEditModal>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-green-600 mb-2">Exponential</div>
-                  <p className="text-sm text-gray-600">Your business metrics show 28% growth this quarter with AI optimization</p>
+                <CardContent className="space-y-4">
+                  <p className="text-foreground leading-relaxed">
+                    {profile?.bio || profile?.about || 'Passionate product manager with 8+ years of experience driving digital transformation at Fortune 500 companies. I specialize in building user-centered products that solve real-world problems and deliver measurable business impact. Currently leading cross-functional teams to develop next-generation SaaS solutions that empower businesses to scale efficiently. My expertise spans across agile methodologies, user experience design, data analytics, and strategic planning. I believe in fostering collaborative environments where innovation thrives and teams can achieve extraordinary results.'}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">#ProductManagement</Badge>
+                    <Badge variant="secondary">#Innovation</Badge>
+                    <Badge variant="secondary">#Leadership</Badge>
+                  </div>
                 </CardContent>
               </Card>
-              
-              <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+            )}
+
+            {/* Posts Section */}
+            {activeSection === 'posts' && (
+              <Card className="bg-card border-border">
                 <CardHeader>
-                  <CardTitle className="text-lg">Market Position</CardTitle>
+                  <CardTitle>Recent Posts</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-blue-600 mb-2">Top 5%</div>
-                  <p className="text-sm text-gray-600">You rank in the top 5% of business professionals in your industry</p>
+                  <div className="text-center py-12 text-muted-foreground">
+                    <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Your posts will appear here</p>
+                  </div>
                 </CardContent>
               </Card>
-              
-              <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+            )}
+
+            {/* Other sections */}
+            {(activeSection === 'mentions' || activeSection === 'reposts' || activeSection === 'articles' || activeSection === 'saved') && (
+              <Card className="bg-card border-border">
                 <CardHeader>
-                  <CardTitle className="text-lg">Business Influence Score</CardTitle>
+                  <CardTitle className="capitalize">{activeSection}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-purple-600 mb-2">9.2/10</div>
-                  <p className="text-sm text-gray-600">Your business influence and network reach is exceptionally strong</p>
+                  <div className="text-center py-12 text-muted-foreground">
+                    <p>No {activeSection} yet</p>
+                  </div>
                 </CardContent>
               </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+            )}
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );
