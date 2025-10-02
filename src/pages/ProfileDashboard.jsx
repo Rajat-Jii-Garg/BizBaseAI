@@ -37,6 +37,8 @@ const ProfileDashboard = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('about');
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(false);
   const [stats, setStats] = useState({
     connections: 0,
     posts: 0,
@@ -54,6 +56,7 @@ const ProfileDashboard = () => {
     if (user) {
       fetchProfile();
       fetchStats();
+      fetchPosts();
     }
   }, [user]);
 
@@ -98,15 +101,45 @@ const ProfileDashboard = () => {
 
       setStats({
         connections: connectionsRes.data?.length || 0,
-        posts: postsRes.data?.length || 24,
+        posts: postsRes.data?.length || 0,
         mentions: 12,
         reposts: 8,
         articles: 6,
         saved: 5,
-        totalEngagement: totalEngagement || 2400
+        totalEngagement: totalEngagement || 0
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
+    }
+  };
+
+  const fetchPosts = async () => {
+    try {
+      setPostsLoading(true);
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          profiles:user_id (
+            full_name,
+            avatar_url,
+            current_position
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPosts(data || []);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load posts',
+        variant: 'destructive'
+      });
+    } finally {
+      setPostsLoading(false);
     }
   };
 
@@ -446,13 +479,73 @@ const ProfileDashboard = () => {
             {activeSection === 'posts' && (
               <Card className="bg-card border-border">
                 <CardHeader className="px-4 md:px-6">
-                  <CardTitle className="text-base md:text-lg">Recent Posts</CardTitle>
+                  <CardTitle className="text-base md:text-lg">Recent Posts ({stats.posts})</CardTitle>
                 </CardHeader>
                 <CardContent className="px-4 md:px-6">
-                  <div className="text-center py-8 md:py-12 text-muted-foreground">
-                    <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 opacity-50" />
-                    <p className="text-sm md:text-base">Your posts will appear here</p>
-                  </div>
+                  {postsLoading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
+                    </div>
+                  ) : posts.length > 0 ? (
+                    <div className="space-y-4">
+                      {posts.map((post) => (
+                        <div key={post.id} className="border border-border rounded-lg p-4 space-y-3">
+                          <div className="flex items-start gap-3">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={post.profiles?.avatar_url || profile?.avatar_url} />
+                              <AvatarFallback className="bg-primary text-primary-foreground">
+                                {post.profiles?.full_name?.charAt(0) || 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-semibold text-sm">{post.profiles?.full_name || profile?.full_name}</h4>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(post.created_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">{post.profiles?.current_position || profile?.current_position}</p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-foreground whitespace-pre-wrap">{post.content}</p>
+                          {post.image_url && (
+                            <img 
+                              src={post.image_url} 
+                              alt="Post" 
+                              className="w-full rounded-lg max-h-96 object-cover"
+                            />
+                          )}
+                          <div className="flex items-center gap-6 pt-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <MessageSquare className="w-4 h-4" />
+                              {post.likes_count || 0}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageSquare className="w-4 h-4" />
+                              {post.comments_count || 0}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Repeat2 className="w-4 h-4" />
+                              {post.shares_count || 0}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 md:py-12 text-muted-foreground">
+                      <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-sm md:text-base">No posts yet</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-4"
+                        onClick={() => navigate('/feed')}
+                      >
+                        Create Your First Post
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
