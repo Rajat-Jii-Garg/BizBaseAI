@@ -173,14 +173,14 @@ const DashboardLayout = ({ children }) => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer p-3">
+                  <DropdownMenuItem onClick={() => navigate('/profileDashboard')} className="cursor-pointer p-3">
                     <User className="mr-3 h-4 w-4" />
                     <span>My Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Edit className="mr-3 h-4 w-4" />
                     <span>Edit Profile</span>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem className="cursor-pointer p-3">
                     <Briefcase className="mr-3 h-4 w-4" />
                     <span>Professional Tools</span>
