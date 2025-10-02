@@ -47,6 +47,15 @@ const ProfileDashboard = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
+  const [networkStats, setNetworkStats] = useState({
+    connections: 0,
+    profileViews: 0,
+    searchAppearances: 0,
+    impressions: 0
+  });
+  const [suggestedConnections, setSuggestedConnections] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [loading2, setLoading2] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -85,18 +94,6 @@ const ProfileDashboard = () => {
       </div>
     );
   }
-
-  // Real data for professional networking features
-  const [networkStats, setNetworkStats] = useState({
-    connections: 0,
-    profileViews: 0,
-    searchAppearances: 0,
-    impressions: 0
-  });
-
-  const [suggestedConnections, setSuggestedConnections] = useState([]);
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [loading2, setLoading2] = useState(true);
 
   const fetchNetworkData = async () => {
     if (!user) return;
@@ -428,7 +425,7 @@ const ProfileDashboard = () => {
                         <div key={index} className="flex items-start space-x-4 p-4 hover:bg-gray-50/50 rounded-lg transition-colors">
                           <Avatar className="h-10 w-10">
                             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700">
-                              {activity.user.charAt(0)}
+                              {activity.user.charAt(0) || 'U'}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
