@@ -47,6 +47,7 @@ import { supabase } from '@/integrations/supabase/client';
 import WelcomeFlow from '@/components/WelcomeFlow';
 import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
 import NetworkSuggestions from '@/components/NetworkSuggestions';
+import QuickProfileActions from '@/components/QuickProfileActions'
 
 const Dashboard = () => {
   const { user } = useAuth();
