@@ -185,7 +185,7 @@ const ProfileDashboard = () => {
       setUploading(true);
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${type}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
