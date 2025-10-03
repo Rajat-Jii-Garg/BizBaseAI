@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const UserProfileDropdown = () => {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -33,7 +33,8 @@ const UserProfileDropdown = () => {
       .slice(0, 2);
   };
 
-  const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+  const displayPosition = profile?.current_position || 'AI Enhanced';
   const displayEmail = user?.email || '';
 
   return (
@@ -44,10 +45,12 @@ const UserProfileDropdown = () => {
       >
         <div className="text-right mr-2 hidden md:block">
           <p className="text-sm font-medium text-gray-900">{displayName}</p>
-          <p className="text-xs text-gray-500">{displayEmail}</p>
+          <p className="text-xs text-gray-500">{displayPosition}</p>
+          {/* <p className="text-xs text-gray-500">{displayEmail}</p> */}
         </div>
         <Avatar>
-          <AvatarImage src={user?.user_metadata?.avatar_url} />
+          {/* <AvatarImage src={user?.user_metadata?.avatar_url} /> */}
+          <AvatarImage src={profile?.avatar_url} />
           <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
             {getInitials(displayName)}
           </AvatarFallback>
