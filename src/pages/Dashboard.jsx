@@ -430,7 +430,9 @@ const Dashboard = () => {
             {/* Left Sidebar - Profile & Stats */}
             <div className="lg:col-span-3 space-y-6">
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
-                <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+                <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600 bg-cover bg-center" 
+                     style={userProfile?.banner_url ? { backgroundImage: `url(${userProfile.banner_url})` } : {}}>
+                </div>
                 <CardContent className="p-6 text-center relative">
                   <Avatar 
                     className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
