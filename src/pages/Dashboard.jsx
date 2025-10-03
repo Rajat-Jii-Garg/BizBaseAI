@@ -465,7 +465,7 @@ const Dashboard = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full"
-                    onClick={() => navigate('/user-profile')}
+                    onClick={() => navigate('/profile-dashboard')}
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     View Profile
