@@ -379,7 +379,7 @@ const Dashboard = () => {
   };
 
   const handleViewProfile = () => {
-    navigate('/profile');
+    navigate('/profile-dashboard');
   };
 
   return (
@@ -443,7 +443,7 @@ const Dashboard = () => {
                   </Avatar>
                   <h3 
                     className="font-bold text-gray-900 mb-1 text-lg cursor-pointer hover:text-blue-600 transition-colors"
-                    onClick={() => navigate('/user-profile')}
+                    onClick={() => navigate('/profile-dashboard')}
                   >
                     {userProfile?.full_name || user?.user_metadata?.full_name || 'Professional User'}
                   </h3>
