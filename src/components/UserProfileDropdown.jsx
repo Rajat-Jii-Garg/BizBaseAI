@@ -46,10 +46,9 @@ const UserProfileDropdown = () => {
         <div className="text-right mr-2 hidden md:block">
           <p className="text-sm font-medium text-gray-900">{displayName}</p>
           <p className="text-xs text-gray-500">{displayPosition}</p>
-          {/* <p className="text-xs text-gray-500">{displayEmail}</p> */}
+          <p className="text-xs text-gray-500">{displayEmail}</p>
         </div>
         <Avatar>
-          {/* <AvatarImage src={user?.user_metadata?.avatar_url} /> */}
           <AvatarImage src={profile?.avatar_url} />
           <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
             {getInitials(displayName)}

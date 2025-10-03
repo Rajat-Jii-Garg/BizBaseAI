@@ -16,25 +16,64 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null); // <--- 1. NEW STATE
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+  // 2. NEW FUNCTION: Profile table से data fetch करने के लिए -------------------------------------------------------------------------
+  const fetchUserProfile = async (userId) => {
+    if (!userId) {
+      setProfile(null);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url, current_position')
+        .eq('id', userId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') { 
+        console.error('Error fetching profile:', error);
       }
-    );
+      
+      setProfile(data || null);
+    } catch (err) {
+      console.error('Catch error fetching profile:', err);
+      setProfile(null);
+    }
+  };
+  // END NEW FUNCTION ---------------------------------------------------------------------------------------------------------------
+
+  useEffect(() => {
+    const handleAuthChange = async (event, session) => {
+        const currentUser = session?.user ?? null;
+        setSession(session);
+        setUser(currentUser);
+        
+        if (currentUser) {
+            await fetchUserProfile(currentUser.id); // <--- Profile fetch करो
+        } else {
+            setProfile(null);
+        }
+        setLoading(false);
+    };
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthChange);
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+        const currentUser = session?.user ?? null;
+        setSession(session);
+        setUser(currentUser);
+        
+        if (currentUser) {
+            await fetchUserProfile(currentUser.id); // <--- Profile fetch करो
+        }
+        
+        setLoading(false);
     });
 
     return () => subscription.unsubscribe();
