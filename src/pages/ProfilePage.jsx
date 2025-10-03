@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,9 @@ import {
   Star,
   BookOpen,
   Award,
-  Edit3
+  Edit3,
+  Camera,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,11 +36,15 @@ const ProfilePage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { posts, refreshPosts } = usePosts();
+  const avatarInputRef = useRef(null);
+  const bannerInputRef = useRef(null);
   
   const [loading, setLoading] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(true);
   const [userPosts, setUserPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
   const [profile, setProfile] = useState({
     full_name: 'John Doe',
     email: 'john@example.com',
@@ -260,6 +266,106 @@ const ProfilePage = () => {
     }
   };
 
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploadingAvatar(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "Profile picture updated successfully!"
+      });
+
+      // Refresh profile
+      if (isOwnProfile) {
+        fetchCurrentUserProfile();
+      } else {
+        fetchUserProfile();
+      }
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload profile picture",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleBannerUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploadingBanner(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/banner.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ banner_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "Cover banner updated successfully!"
+      });
+
+      // Refresh profile
+      if (isOwnProfile) {
+        fetchCurrentUserProfile();
+      } else {
+        fetchUserProfile();
+      }
+    } catch (error) {
+      console.error('Error uploading banner:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload cover banner",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -277,14 +383,79 @@ const ProfilePage = () => {
         {/* Profile Header */}
         <Card className="mb-6">
           <div className="relative">
-            <div className="h-32 bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-lg"></div>
+            {/* Cover Banner */}
+            <div className="relative h-32 bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-lg overflow-hidden">
+              {profile?.banner_url && (
+                <img 
+                  src={profile.banner_url} 
+                  alt="Cover Banner" 
+                  className="w-full h-full object-cover"
+                />
+              )}
+              {isOwnProfile && (
+                <>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="absolute top-2 right-2 bg-white/90 hover:bg-white"
+                    onClick={() => bannerInputRef.current?.click()}
+                    disabled={uploadingBanner}
+                  >
+                    {uploadingBanner ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Camera className="h-4 w-4 mr-2" />
+                        Edit Cover
+                      </>
+                    )}
+                  </Button>
+                  <input
+                    ref={bannerInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBannerUpload}
+                    className="hidden"
+                  />
+                </>
+              )}
+            </div>
+
+            {/* Profile Avatar */}
             <div className="absolute -bottom-16 left-8">
-              <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
-                <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-2xl">
-                  {profile?.full_name?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
+                  <AvatarImage src={profile?.avatar_url} />
+                  <AvatarFallback className="text-2xl">
+                    {profile?.full_name?.charAt(0) || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                {isOwnProfile && (
+                  <>
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="absolute bottom-0 right-0 h-10 w-10 rounded-full p-0 bg-white hover:bg-gray-100 text-gray-900 border-2 border-white shadow-lg"
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={uploadingAvatar}
+                    >
+                      {uploadingAvatar ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Camera className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
           
