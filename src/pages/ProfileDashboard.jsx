@@ -526,7 +526,7 @@ const ProfileDashboard = () => {
                       {posts.map((post) => (
                         <div key={post.id} className="border border-border rounded-lg p-4 space-y-3">
                           <div className="flex items-start gap-3">
-                            <Avatar className="h-10 w-10">
+                            <Avatar className="h-10 w-10 cursor-pointer" onClick={() => navigate(`/public-profile/${post.user_id}`)}>
                               <AvatarImage src={post.profiles?.avatar_url || profile?.avatar_url} />
                               <AvatarFallback className="bg-primary text-primary-foreground">
                                 {post.profiles?.full_name?.charAt(0) || 'U'}
@@ -534,7 +534,7 @@ const ProfileDashboard = () => {
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                <h4 className="font-semibold text-sm">{post.profiles?.full_name || profile?.full_name}</h4>
+                                <h4 className="font-semibold text-sm cursor-pointer transition-colors" onClick={() => navigate(`/public-profile/${post.user_id}`)}>{post.profiles?.full_name || profile?.full_name}</h4>
                                 <span className="text-xs text-muted-foreground">
                                   {new Date(post.created_at).toLocaleDateString()}
                                 </span>
