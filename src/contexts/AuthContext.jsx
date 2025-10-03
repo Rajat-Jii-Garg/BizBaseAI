@@ -53,28 +53,34 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
         
         if (currentUser) {
-            await fetchUserProfile(currentUser.id); // <--- Profile fetch करो
+            await fetchUserProfile(currentUser.id);
         } else {
             setProfile(null);
         }
-        setLoading(false);
-    };
+        } catch (err) {
+            console.error("Auth change error:", err);
+        } finally {
+            setLoading(false);  // <-- always execute
+          }
+        };
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthChange);
 
     // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
         const currentUser = session?.user ?? null;
         setSession(session);
         setUser(currentUser);
         
         if (currentUser) {
-            await fetchUserProfile(currentUser.id); // <--- Profile fetch करो
+            await fetchUserProfile(currentUser.id);
         }
-        
-        setLoading(false);
-    });
+        }).catch(err => {
+            console.error("Session fetch error:", err);
+        }).finally(() => {
+            setLoading(false);
+        });
 
     return () => subscription.unsubscribe();
   }, []);
