@@ -720,10 +720,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-              <NetworkSuggestions limit={3} />
-
-              <QuickProfileActions />
-            </div>
+      </div>
     </DashboardLayout>
   );
 };
