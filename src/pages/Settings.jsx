@@ -29,13 +29,13 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   
   const [settings, setSettings] = useState({
-    // Profile Settings
-    full_name: user?.user_metadata?.full_name || '',
-    email: user?.email || '',
-    phone: '',
-    bio: '',
-    location: '',
-    website: '',
+    // // Profile Settings
+    // full_name: user?.user_metadata?.full_name || '',
+    // email: user?.email || '',
+    // phone: '',
+    // bio: '',
+    // location: '',
+    // website: '',
     
     // Privacy Settings
     profileVisibility: 'public',
@@ -120,10 +120,10 @@ const Settings = () => {
         {/* Settings Tabs */}
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
+            {/* <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="w-4 h-4" />
               Profile
-            </TabsTrigger>
+            </TabsTrigger> */}
             <TabsTrigger value="privacy" className="flex items-center gap-2">
               <Eye className="w-4 h-4" />
               Privacy
@@ -143,13 +143,12 @@ const Settings = () => {
           </TabsList>
 
           {/* Profile Settings */}
-          <TabsContent value="profile">
+          {/* <TabsContent value="profile">
             <Card className="bg-white shadow-lg border-0">
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Profile Picture */}
                 <div className="flex items-center space-x-6">
                   <Avatar className="h-20 w-20">
                     <AvatarImage src={user?.user_metadata?.avatar_url} />
@@ -166,10 +165,10 @@ const Settings = () => {
                       Recommended: Square image, at least 200x200px
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Basic Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="full_name">Full Name</Label>
                     <Input
@@ -213,14 +212,14 @@ const Settings = () => {
                       onChange={(e) => handleSettingChange('website', e.target.value)}
                     />
                   </div>
-                </div>
+                </div> */}
 
-                <Button onClick={handleSaveProfile} disabled={loading}>
+                {/* <Button onClick={handleSaveProfile} disabled={loading}>
                   Save Profile Changes
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
 
           {/* Privacy Settings */}
           <TabsContent value="privacy">

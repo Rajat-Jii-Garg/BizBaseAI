@@ -173,7 +173,7 @@ const DashboardLayout = ({ children }) => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/ProfileDashboard')} className="cursor-pointer p-3">
+                  <DropdownMenuItem onClick={() => navigate('/profile-dashboard')} className="cursor-pointer p-3">
                     <User className="mr-3 h-4 w-4" />
                     <span>My Profile</span>
                   </DropdownMenuItem>
@@ -181,34 +181,34 @@ const DashboardLayout = ({ children }) => {
                     <Edit className="mr-3 h-4 w-4" />
                     <span>Edit Profile</span>
                   </DropdownMenuItem> */}
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Briefcase className="mr-3 h-4 w-4" />
                     <span>Professional Tools</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  </DropdownMenuItem> */}
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Target className="mr-3 h-4 w-4" />
                     <span>Goals & Analytics</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  </DropdownMenuItem> */}
+                  <DropdownMenuItem onClick={() => navigate('/ai-assistant')} className="cursor-pointer p-3">
                     <Brain className="mr-3 h-4 w-4" />
                     <span>AI Assistant</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Star className="mr-3 h-4 w-4" />
                     <span>Premium Features</span>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer p-3">
                     <Settings className="mr-3 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
+                    <CreditCard className="mr-3 h-4 w-4" />
+                    <span>Billing & Plans</span>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem className="cursor-pointer p-3">
                     <Shield className="mr-3 h-4 w-4" />
                     <span>Privacy & Security</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
-                    <CreditCard className="mr-3 h-4 w-4" />
-                    <span>Billing & Plans</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer p-3">
                     <HelpCircle className="mr-3 h-4 w-4" />

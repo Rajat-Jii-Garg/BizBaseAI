@@ -464,7 +464,7 @@ const ProfileDashboard = () => {
                   <ProfileEditModal onProfileUpdate={fetchProfile}>
                     <Button variant="ghost" className="w-full justify-start text-sm">
                       <Settings className="w-4 h-4 mr-2" />
-                      Settings
+                      Edit Profile
                     </Button>
                   </ProfileEditModal>
                 </div>
