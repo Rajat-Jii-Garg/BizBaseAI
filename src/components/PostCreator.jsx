@@ -62,7 +62,7 @@ const PostCreator = ({ onCreatePost }) => {
   };
 
   const handleAvatarClick = () => {
-    navigate('/profile');
+    navigate('/profile-dashboard');
   };
 
   return (

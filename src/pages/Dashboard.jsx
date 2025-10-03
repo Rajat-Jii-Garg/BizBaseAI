@@ -434,7 +434,7 @@ const Dashboard = () => {
                 <CardContent className="p-6 text-center relative">
                   <Avatar 
                     className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
-                    onClick={() => navigate('/user-profile')}
+                    onClick={() => navigate('/profile-dashboard')}
                   >
                     <AvatarImage src={userProfile?.avatar_url || user?.user_metadata?.avatar_url} />
                     <AvatarFallback className="text-lg">
