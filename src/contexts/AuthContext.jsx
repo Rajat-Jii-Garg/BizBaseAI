@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
         .from('profiles')
         .select('full_name, avatar_url, current_position')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       
       if (error && error.code !== 'PGRST116') { 
         console.error('Error fetching profile:', error);
@@ -87,6 +87,14 @@ export const AuthProvider = ({ children }) => {
       });
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  // Failsafe: ensure loading doesn't get stuck
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setLoading(prev => (prev ? false : prev));
+    }, 2500);
+    return () => clearTimeout(t);
   }, []);
 
   const signUp = async (email, password, fullName, phone) => {
