@@ -8,12 +8,8 @@ import { Image, Video, FileText, Loader2, Hash, AtSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-const PostCreator = ({ onCreatePost }) => {
-  const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showMentions, setShowMentions] = useState(false);
-  const [showHashtags, setShowHashtags] = useState(false);
-  const { user } = useAuth();
+const PostCreator = ({ onCreate }) => {
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const textareaRef = useRef(null);
 
@@ -70,9 +66,9 @@ const PostCreator = ({ onCreatePost }) => {
       <CardContent className="p-4">
         <div className="flex items-start space-x-3 mb-3">
           <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all" onClick={handleAvatarClick}>
-            <AvatarImage src={user?.user_metadata?.avatar_url} />
+            <AvatarImage src={profile?.avatar_url} />
             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
-              {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+              {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">

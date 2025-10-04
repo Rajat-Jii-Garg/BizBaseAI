@@ -27,7 +27,7 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
   const fileInputRef = useRef(null);
   const videoInputRef = useRef(null);
   
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
 
   // Search users for mentions
@@ -258,9 +258,9 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
       <CardContent className="p-6">
         <div className="flex items-start space-x-4 mb-4">
           <Avatar className="h-12 w-12 ring-2 ring-blue-100">
-            <AvatarImage src={user?.user_metadata?.avatar_url} />
+            <AvatarImage src={profile?.avatar_url} />
             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
-              {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+              {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 relative">

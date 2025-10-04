@@ -50,7 +50,7 @@ import NetworkSuggestions from '@/components/NetworkSuggestions';
 import QuickProfileActions from '@/components/QuickProfileActions'
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showWelcome, setShowWelcome] = useState(true);
@@ -413,7 +413,7 @@ const Dashboard = () => {
                     <div>
                       <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
                         <Sparkles className="w-6 h-6" />
-                        Welcome to BizBase AI, {user?.user_metadata?.full_name?.split(' ')[0] || 'Professional'}!
+                        Welcome to BizBase AI, {profile?.full_name?.split(' ')[0] || userProfile?.full_name?.split(' ')[0] || 'Professional'}!
                       </h2>
                       <p className="text-white/90 text-lg">
                         🚀 Experience next-generation professional networking with AI-powered insights
@@ -438,16 +438,16 @@ const Dashboard = () => {
                     className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
                     onClick={() => navigate('/profile-dashboard')}
                   >
-                    <AvatarImage src={userProfile?.avatar_url || user?.user_metadata?.avatar_url} />
+                    <AvatarImage src={profile?.avatar_url || userProfile?.avatar_url} />
                     <AvatarFallback className="text-lg">
-                      {userProfile?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
+                      {(profile?.full_name || userProfile?.full_name)?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <h3 
                     className="font-bold text-gray-900 mb-1 text-lg cursor-pointer hover:text-blue-600 transition-colors"
                     onClick={() => navigate('/profile-dashboard')}
                   >
-                    {userProfile?.full_name || user?.user_metadata?.full_name || 'Professional User'}
+                    {profile?.full_name || userProfile?.full_name || 'Professional User'}
                   </h3>
                   <p className="text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-4 h-4 text-yellow-500" />
