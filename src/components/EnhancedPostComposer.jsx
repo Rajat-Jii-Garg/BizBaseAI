@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Video, Loader2, Hash, AtSign, X, Camera } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,7 +27,7 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
   const fileInputRef = useRef(null);
   const videoInputRef = useRef(null);
   
-  const { user, profile } = useAuth();
+  const { profile, user } = useAuth();
   const { toast } = useToast();
 
   // Search users for mentions
@@ -253,12 +253,20 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
     return matches || [];
   };
 
+  if (loading) {
+    return <div>Loading profile...</div>;
+  }
+
   return (
     <Card className="bg-white shadow-lg border-0 overflow-hidden">
       <CardContent className="p-6">
         <div className="flex items-start space-x-4 mb-4">
           <Avatar className="h-12 w-12 ring-2 ring-blue-100">
+<<<<<<< HEAD
+            <AvatarImage src={profile?.avatar_url || "/default-avatar.png"} />
+=======
             <AvatarImage src={profile?.avatar_url} />
+>>>>>>> 239e8f1f82af9516bf557d47bbab17cb8b345b9c
             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
               {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
             </AvatarFallback>

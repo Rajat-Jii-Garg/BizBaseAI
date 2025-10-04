@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, avatar_url, current_position')
+        .select('id, full_name, avatar_url, current_position, email')
         .eq('id', userId)
         .maybeSingle();
       
@@ -38,7 +38,12 @@ export const AuthProvider = ({ children }) => {
         console.error('Error fetching profile:', error);
       }
       
-      setProfile(data || null);
+      setProfile(data || {
+        full_name: user?.user_metadata?.full_name || "",
+        avatar_url: user?.user_metadata?.avatar_url || "",
+        email: user?.email || "",
+        current_position: ""
+      });
     } catch (err) {
       console.error('Catch error fetching profile:', err);
       setProfile(null);
