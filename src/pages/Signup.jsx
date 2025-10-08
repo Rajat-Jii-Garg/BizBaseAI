@@ -172,7 +172,7 @@ const Signup = () => {
           {/* Signup Card */}
           <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
             <CardHeader className="space-y-1 pb-4">
-              <CardTitle className="text-center text-xl">Sign Up</CardTitle>
+              <CardTitle className="text-center text-xl">Register</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignup} className="space-y-6">
@@ -322,7 +322,7 @@ const Signup = () => {
                 <p className="text-sm text-gray-600">
                   Already have an account?{' '}
                   <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                    Sign in here
+                    Login here
                   </Link>
                 </p>
               </div>
