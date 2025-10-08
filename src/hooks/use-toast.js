@@ -1,5 +1,5 @@
 
-import * as React from "react"
+import { useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -125,9 +125,9 @@ function toast({ ...props }) {
 }
 
 function useToast() {
-  const [state, setState] = React.useState(memoryState)
+  const [state, setState] = useState(memoryState)
 
-  React.useEffect(() => {
+  useEffect(() => {
     listeners.push(setState)
     return () => {
       const index = listeners.indexOf(setState)
@@ -135,7 +135,7 @@ function useToast() {
         listeners.splice(index, 1)
       }
     }
-  }, [state])
+  }, [])
 
   return {
     ...state,
