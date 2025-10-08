@@ -89,7 +89,7 @@ const Login = () => {
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Login to your BizBase account</p>
+          <p className="text-gray-600">Sign in to your BizBase account</p>
         </div>
 
         {errors.general && (
@@ -100,7 +100,7 @@ const Login = () => {
 
         <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-center text-xl">LogIn</CardTitle>
+            <CardTitle className="text-center text-xl">Sign In</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-6">
@@ -180,7 +180,7 @@ const Login = () => {
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <span>Login</span>
+                    <span>Sign In</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 )}
@@ -191,7 +191,7 @@ const Login = () => {
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
                 <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                  Register here
+                  Sign up here
                 </Link>
               </p>
             </div>
