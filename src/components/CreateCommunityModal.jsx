@@ -99,10 +99,10 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
       return;
     }
 
-    if (!formData.name.trim() || !formData.category) {
+    if (!formData.name.trim() || !formData.category || !formData.rules.trim()) {
       toast({
         title: "Validation Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields.",
         variant: "destructive"
       });
       return;
@@ -121,6 +121,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
           activity_level: formData.activity_level,
           image_url: formData.image_url || null,
           tags: formData.tags,
+          rules: formData.rules.trim(),
           user_id: user.id
         })
         .select()
@@ -143,7 +144,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
       if (memberError) {
         // rollback: remove created community to avoid orphan if membership fails
         console.error('Community created but adding member failed:', memberError);
-        await supabase.from('communities').delete().eq('id', community.data.id);
+        await supabase.from('communities').delete().eq('id', data.id);
         throw memberError;
       }
 
@@ -217,17 +218,20 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Enter community name"
                   required
+                  className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Description *</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Describe what your community is about..."
                   rows={3}
+                  required
+                  className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
 
@@ -255,6 +259,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                   onChange={(e) => handleInputChange('image_url', e.target.value)}
                   placeholder="https://example.com/image.jpg"
                   type="url"
+                  className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             </CardContent>
@@ -318,6 +323,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                   onChange={(e) => setNewTag(e.target.value)}
                   placeholder="Add tags (e.g., javascript, startup, networking)"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                  className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
                 <Button type="button" onClick={handleAddTag} variant="outline" size="sm">
                   <Plus className="w-4 h-4" />
@@ -345,7 +351,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <AlertCircle className="w-5 h-5" />
-                Community Guidelines (Optional)
+                Community Guidelines *
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -353,7 +359,9 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
                 value={formData.rules}
                 onChange={(e) => handleInputChange('rules', e.target.value)}
                 placeholder="Set community rules and guidelines for members..."
-                rows={4}
+                rows={5}
+                required
+                className="focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </CardContent>
           </Card>

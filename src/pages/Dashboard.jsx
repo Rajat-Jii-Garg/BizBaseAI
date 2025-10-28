@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedPostComposer from '@/components/EnhancedPostComposer';
 import EnhancedPostCard from '@/components/EnhancedPostCard';
@@ -43,10 +44,13 @@ import { usePosts } from '@/hooks/usePosts';
 import { useConnections } from '@/hooks/useConnections';
 import { useRealTimeEngagement } from '@/hooks/useRealTimeEngagement';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import WelcomeFlow from '@/components/WelcomeFlow';
+import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
+import NetworkSuggestions from '@/components/NetworkSuggestions';
+import QuickProfileActions from '@/components/QuickProfileActions'
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showWelcome, setShowWelcome] = useState(true);
@@ -375,13 +379,17 @@ const Dashboard = () => {
   };
 
   const handleViewProfile = () => {
-    navigate('/profile');
+    navigate('/profile-dashboard');
   };
 
   return (
     <DashboardLayout>
+      <WelcomeFlow />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Profile Completion Banner */}
+          <ProfileCompletionBanner />
+
           {/* Welcome Banner */}
           {showWelcome && (
             <Card className="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl overflow-hidden relative">
@@ -405,7 +413,7 @@ const Dashboard = () => {
                     <div>
                       <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
                         <Sparkles className="w-6 h-6" />
-                        Welcome to BizBase AI, {user?.user_metadata?.full_name?.split(' ')[0] || 'Professional'}!
+                        Welcome to BizBase AI, {profile?.full_name?.split(' ')[0] || userProfile?.full_name?.split(' ')[0] || 'Professional'}!
                       </h2>
                       <p className="text-white/90 text-lg">
                         🚀 Experience next-generation professional networking with AI-powered insights
@@ -422,22 +430,24 @@ const Dashboard = () => {
             {/* Left Sidebar - Profile & Stats */}
             <div className="lg:col-span-3 space-y-6">
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
-                <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+                <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600 bg-cover bg-center" 
+                     style={userProfile?.banner_url ? { backgroundImage: `url(${userProfile.banner_url})` } : {}}>
+                </div>
                 <CardContent className="p-6 text-center relative">
                   <Avatar 
                     className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => navigate('/profile-dashboard')}
                   >
-                    <AvatarImage src={userProfile?.avatar_url || user?.user_metadata?.avatar_url} />
-                    <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold text-xl">
-                      {userProfile?.full_name?.charAt(0) || user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                    <AvatarImage src={profile?.avatar_url || userProfile?.avatar_url} />
+                    <AvatarFallback className="text-lg">
+                      {(profile?.full_name || userProfile?.full_name)?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <h3 
                     className="font-bold text-gray-900 mb-1 text-lg cursor-pointer hover:text-blue-600 transition-colors"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => navigate('/profile-dashboard')}
                   >
-                    {userProfile?.full_name || user?.user_metadata?.full_name || 'Professional User'}
+                    {profile?.full_name || userProfile?.full_name || 'Professional User'}
                   </h3>
                   <p className="text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-4 h-4 text-yellow-500" />
@@ -457,10 +467,10 @@ const Dashboard = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full"
-                    onClick={() => navigate('/profile?tab=edit')}
+                    onClick={() => navigate('/profile-dashboard')}
                   >
                     <Edit className="w-4 h-4 mr-2" />
-                    Customize Profile
+                    View Profile
                   </Button>
                 </CardContent>
               </Card>
@@ -569,41 +579,6 @@ const Dashboard = () => {
 
             {/* Right Sidebar - Connections & Insights */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Industry Insights */}
-              <Card className="bg-white shadow-lg border-0">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                    Industry Insights
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
-                    <div className="flex items-start space-x-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <TrendingUp className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-1">AI in Business</h4>
-                        <p className="text-sm text-gray-600 mb-2">78% of companies are adopting AI solutions</p>
-                        <div className="text-xs text-blue-600 font-medium">Trending in your industry</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100">
-                    <div className="flex items-start space-x-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Users className="w-4 h-4 text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-1">Remote Work</h4>
-                        <p className="text-sm text-gray-600 mb-2">Hybrid models becoming standard</p>
-                        <div className="text-xs text-green-600 font-medium">High engagement topic</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* Smart Connections */}
               <Card className="bg-white shadow-lg border-0">
@@ -686,8 +661,44 @@ const Dashboard = () => {
                     className="w-full mt-4"
                     onClick={() => navigate('/connections')}
                   >
-                    View All AI Suggestions
+                    View More Recommendations
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* Industry Insights */}
+              <Card className="bg-white shadow-lg border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    Industry Insights
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                    <div className="flex items-start space-x-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <TrendingUp className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">AI in Business</h4>
+                        <p className="text-sm text-gray-600 mb-2">78% of companies are adopting AI solutions</p>
+                        <div className="text-xs text-blue-600 font-medium">Trending in your industry</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100">
+                    <div className="flex items-start space-x-3">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <Users className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">Remote Work</h4>
+                        <p className="text-sm text-gray-600 mb-2">Hybrid models becoming standard</p>
+                        <div className="text-xs text-green-600 font-medium">High engagement topic</div>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 

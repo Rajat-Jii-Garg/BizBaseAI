@@ -7,8 +7,8 @@ import { Link } from 'react-router-dom';
 const CallToAction = () => {
   const benefits = [
     'No setup fees or hidden costs',
-    '14-day free trial',
-    'Cancel anytime',
+    'Get Rewards on spending times',
+    'Get success stories',
     'Full feature access',
     'Priority support'
   ];
@@ -40,7 +40,7 @@ const CallToAction = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <h3 className="text-3xl font-bold text-white mb-6">What you get:</h3>
+            <h3 className="text-3xl font-bold text-white mb-6">What you'll win:</h3>
             <div className="space-y-4">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center space-x-3">
@@ -50,13 +50,13 @@ const CallToAction = () => {
               ))}
             </div>
             
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mt-8">
+            {/* <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mt-8">
               <div className="text-center">
                 <div className="text-4xl font-bold text-white mb-2">$0</div>
                 <div className="text-blue-200 mb-4">for your first 14 days</div>
                 <div className="text-sm text-blue-300">Then starting from $29/month</div>
               </div>
-            </div>
+            </div> */}
           </div>
           
           <div className="text-center lg:text-left">
@@ -64,7 +64,7 @@ const CallToAction = () => {
               <div className="space-y-6">
                 <Link to="/signup">
                   <Button size="lg" className="w-full bg-white text-blue-600 hover:bg-blue-50 px-12 py-4 text-xl font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300">
-                    Start Free Trial
+                    Get Started Free
                     <ArrowRight className="w-6 h-6 ml-3" />
                   </Button>
                 </Link>
@@ -72,7 +72,7 @@ const CallToAction = () => {
                 <div className="text-center">
                   <div className="text-blue-200 text-sm mb-4">Or</div>
                   <Link to="/login">
-                    <Button size="lg" variant="outline" className="w-full border-2 border-white/30 text-white hover:bg-white/10 px-12 py-4 text-lg rounded-xl backdrop-blur-sm">
+                    <Button size="lg" className="w-full bg-white text-blue-600 hover:bg-blue-50 px-12 py-4 text-xl font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300">
                       Login to Dashboard
                     </Button>
                   </Link>
@@ -81,8 +81,8 @@ const CallToAction = () => {
             </div>
             
             <div className="text-center text-blue-200 text-sm">
-              <p>🔒 Your data is secure and encrypted</p>
-              <p>📧 No spam, we respect your privacy</p>
+              <p>🔒 Your data is secure and fully encrypted.</p>
+              <p>📧 No spam, we respect your privacy.</p>
             </div>
           </div>
         </div>
@@ -90,16 +90,16 @@ const CallToAction = () => {
         <div className="text-center mt-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">10K+</div>
-              <div className="text-blue-200 text-sm">Happy Customers</div>
+              <div className="text-3xl font-bold text-white mb-2">100K+</div>
+              <div className="text-blue-200 text-sm">Happy Users</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-white mb-2">99.9%</div>
               <div className="text-blue-200 text-sm">Uptime SLA</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">4.9/5</div>
-              <div className="text-blue-200 text-sm">Customer Rating</div>
+              <div className="text-3xl font-bold text-white mb-2">100%</div>
+              <div className="text-blue-200 text-sm">Success Ratings</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-white mb-2">24/7</div>

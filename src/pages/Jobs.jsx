@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -126,23 +125,23 @@ const Jobs = () => {
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.skills_required.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+        job.skills_required?.some(skill => skill?.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
-    if (selectedIndustry) {
+    if (selectedIndustry && selectedIndustry !== "all-industries") {
       filtered = filtered.filter(job => job.industry === selectedIndustry);
     }
 
-    if (selectedJobType) {
+    if (selectedJobType && selectedJobType !== "all-types") {
       filtered = filtered.filter(job => job.job_type === selectedJobType);
     }
 
-    if (selectedWorkMode) {
+    if (selectedWorkMode && selectedWorkMode !== "all-modes") {
       filtered = filtered.filter(job => job.work_mode === selectedWorkMode);
     }
 
-    if (selectedExperience) {
+    if (selectedExperience && selectedExperience !== "all-levels") {
       filtered = filtered.filter(job => job.experience_level === selectedExperience);
     }
 
@@ -348,7 +347,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Industry" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Industries</SelectItem>
+                  <SelectItem value="all-industries">All Industries</SelectItem>
                   {getUniqueValues('industry').map(industry => (
                     <SelectItem key={industry} value={industry}>{industry}</SelectItem>
                   ))}
@@ -360,7 +359,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all-types">All Types</SelectItem>
                   {getUniqueValues('job_type').map(type => (
                     <SelectItem key={type} value={type}>
                       {type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
@@ -374,7 +373,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Work Mode" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Modes</SelectItem>
+                  <SelectItem value="all-modes">All Modes</SelectItem>
                   {getUniqueValues('work_mode').map(mode => (
                     <SelectItem key={mode} value={mode}>
                       {mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
@@ -388,7 +387,7 @@ const Jobs = () => {
                   <SelectValue placeholder="Experience Level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Levels</SelectItem>
+                  <SelectItem value="all-levels">All Levels</SelectItem>
                   {getUniqueValues('experience_level').map(level => (
                     <SelectItem key={level} value={level}>
                       {level.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
@@ -424,7 +423,7 @@ const Jobs = () => {
               </div>
             ) : recommendations.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recommendations.slice(0, 4).map((rec) => (
+                {recommendations.slice(0, 4).map((rec) => rec.job ? (
                   <Card key={rec.job_id} className="border-l-4 border-l-blue-500">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
@@ -448,7 +447,7 @@ const Jobs = () => {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                ) : null )}
               </div>
             ) : (
               <div className="text-center py-8">
@@ -514,11 +513,13 @@ const Jobs = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-4">
-                      {job.skills_required.slice(0, 5).map((skill, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
+                      {Array.isArray(job.skills_required) &&
+                        job.skills_required.slice(0, 5).map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))
+                      }
                       {job.skills_required.length > 5 && (
                         <Badge variant="secondary" className="text-xs">
                           +{job.skills_required.length - 5} more
@@ -539,11 +540,13 @@ const Jobs = () => {
                       <div className="mb-4">
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Benefits:</h4>
                         <div className="flex flex-wrap gap-1">
-                          {job.benefits.slice(0, 3).map((benefit, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {benefit}
-                            </Badge>
-                          ))}
+                          {Array.isArray(job.benefits) &&
+                            job.benefits.slice(0, 3).map((benefit, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {benefit}
+                              </Badge>
+                            ))
+                          }
                           {job.benefits.length > 3 && (
                             <Badge variant="outline" className="text-xs">
                               +{job.benefits.length - 3} more

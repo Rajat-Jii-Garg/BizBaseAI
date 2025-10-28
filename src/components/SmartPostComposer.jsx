@@ -15,12 +15,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-const SmartPostComposer = ({ onCreatePost }) => {
-  const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [mediaFile, setMediaFile] = useState(null);
-  const [mediaPreview, setMediaPreview] = useState(null);
-  const { user } = useAuth();
+const SmartPostComposer = ({ onPostCreated }) => {
+  const { user, profile } = useAuth();
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
@@ -65,15 +61,15 @@ const SmartPostComposer = ({ onCreatePost }) => {
       <CardContent className="p-6">
         <div className="flex items-start space-x-4 mb-4">
           <Avatar className="h-12 w-12 ring-2 ring-blue-100">
-            <AvatarImage src={user?.user_metadata?.avatar_url} />
+            <AvatarImage src={profile?.avatar_url} />
             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
-              {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+              {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <span className="font-semibold text-gray-900">
-                {user?.user_metadata?.full_name || 'Professional User'}
+                {profile?.full_name || 'Professional User'}
               </span>
               <Badge variant="secondary" className="bg-green-100 text-green-700">
                 <Eye className="w-3 h-3 mr-1" />

@@ -19,11 +19,12 @@ import {
 import DashboardLayout from '@/components/DashboardLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Network = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [professionals, setProfessionals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -197,14 +198,20 @@ const Network = () => {
                 <Card key={professional.id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4 mb-4">
-                      <Avatar className="h-16 w-16">
+                      <Avatar 
+                        className="h-16 w-16 cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all"
+                        onClick={() => navigate(`/user-profile/${professional.id}`)}
+                      >
                         <AvatarImage src={professional.avatar_url || ''} />
                         <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
                           {professional.full_name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-gray-900">
+                        <h3 
+                          className="font-semibold text-lg text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                          onClick={() => navigate(`/user-profile/${professional.id}`)}
+                        >
                           {professional.full_name}
                         </h3>
                         {professional.current_position && (

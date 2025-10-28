@@ -45,7 +45,7 @@ import MessagesButton from './MessagesButton';
 import SearchBar from './SearchBar';
 
 const DashboardLayout = ({ children }) => {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -132,14 +132,14 @@ const DashboardLayout = ({ children }) => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-3 hover:bg-gray-50 px-3 py-2 rounded-xl border-2 border-transparent hover:border-gray-200">
                     <Avatar className="h-10 w-10 ring-2 ring-blue-200 shadow-lg">
-                      <AvatarImage src={user?.user_metadata?.avatar_url} />
+                      <AvatarImage src={profile?.avatar_url} />
                       <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold">
-                        {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                        {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="hidden md:block text-left">
                       <p className="text-sm font-semibold text-gray-900">
-                        {user?.user_metadata?.full_name || 'Professional User'}
+                        {profile?.full_name || 'Professional User'}
                       </p>
                       <p className="text-xs text-gray-500 flex items-center gap-1">
                         <Sparkles className="w-3 h-3" />
@@ -153,14 +153,14 @@ const DashboardLayout = ({ children }) => {
                   <DropdownMenuLabel className="font-normal p-4">
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={user?.user_metadata?.avatar_url} />
+                        <AvatarImage src={profile?.avatar_url} />
                         <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold">
-                          {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+                          {profile?.full_name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="text-sm font-semibold leading-none text-gray-900">
-                          {user?.user_metadata?.full_name || 'Professional User'}
+                          {profile?.full_name || 'Professional User'}
                         </p>
                         <p className="text-xs leading-none text-gray-500 mt-1 truncate">
                           {user?.email}
@@ -173,42 +173,42 @@ const DashboardLayout = ({ children }) => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer p-3">
+                  <DropdownMenuItem onClick={() => navigate('/profile-dashboard')} className="cursor-pointer p-3">
                     <User className="mr-3 h-4 w-4" />
                     <span>My Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Edit className="mr-3 h-4 w-4" />
                     <span>Edit Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  </DropdownMenuItem> */}
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Briefcase className="mr-3 h-4 w-4" />
                     <span>Professional Tools</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  </DropdownMenuItem> */}
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Target className="mr-3 h-4 w-4" />
                     <span>Goals & Analytics</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  </DropdownMenuItem> */}
+                  <DropdownMenuItem onClick={() => navigate('/ai-assistant')} className="cursor-pointer p-3">
                     <Brain className="mr-3 h-4 w-4" />
                     <span>AI Assistant</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Star className="mr-3 h-4 w-4" />
                     <span>Premium Features</span>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer p-3">
                     <Settings className="mr-3 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
+                  {/* <DropdownMenuItem className="cursor-pointer p-3">
+                    <CreditCard className="mr-3 h-4 w-4" />
+                    <span>Billing & Plans</span>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem className="cursor-pointer p-3">
                     <Shield className="mr-3 h-4 w-4" />
                     <span>Privacy & Security</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
-                    <CreditCard className="mr-3 h-4 w-4" />
-                    <span>Billing & Plans</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer p-3">
                     <HelpCircle className="mr-3 h-4 w-4" />

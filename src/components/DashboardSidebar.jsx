@@ -19,6 +19,7 @@ const DashboardSidebar = () => {
   
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Users, label: 'My Network', path: '/network' },
     { icon: Users, label: 'CRM', path: '/dashboard/crm' },
     { icon: Building2, label: 'Business Setup', path: '/dashboard/business-setup' },
     { icon: Settings, label: 'Settings', path: '/dashboard/settings' },

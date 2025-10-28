@@ -156,7 +156,19 @@ Only include jobs with match score >= 60. Limit to top 10 recommendations.
     });
 
     const aiResult = await response.json();
-    const aiRecommendations = JSON.parse(aiResult.choices[0].message.content);
+    
+    if (!aiResult.choices || !aiResult.choices[0] || !aiResult.choices[0].message) {
+      throw new Error('Invalid AI response format');
+    }
+    
+    let aiContent = aiResult.choices[0].message.content;
+    
+    // Clean up AI response if it contains markdown code blocks
+    if (aiContent.includes('```json')) {
+      aiContent = aiContent.replace(/```json\n?/g, '').replace(/\n?```/g, '');
+    }
+    
+    const aiRecommendations = JSON.parse(aiContent);
 
     // Enrich recommendations with full job details
     const enrichedRecommendations = aiRecommendations.recommendations.map((rec: any) => {

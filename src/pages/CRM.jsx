@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from '@/components/AppSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
@@ -10,22 +10,47 @@ import { Plus, Mail, Phone, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from '@/integrations/supabase/client';
 
 const CRM = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [leads, setLeads] = useState([]);
+  const [newLead, setNewLead] = useState({
+    name: '',
+    email: '',
+    business: '',
+    website: '',
+    audience: ''
+  });
   const { toast } = useToast();
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLoading(true);
-    setTimeout(() => {
-      // Simulate loaded data (empty for demonstration)
-      setLeads([]);
-      setLoading(false);
-    }, 1000);
+    fetchLeads();
   }, []);
+
+  const fetchLeads = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('LEADS')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setLeads(data || []);
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load leads",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   function getStageColor(stage) {
     switch (stage) {
@@ -41,27 +66,54 @@ const CRM = () => {
     if (score >= 70) return 'text-yellow-600';
     return 'text-red-600';
   }
-  function handleAddLead(e) {
-    e.preventDefault();
-    setModalOpen(false);
-    toast({title: "Lead Added", description: "This is dummy, non-persistent."});
-    setLeads(old => [...old, {
-      id: old.length + 1,
-      name: "New Company",
-      contact: "Jane Doe",
-      email: "jane@new.com",
-      phone: "+1 (555) 789-1234",
-      stage: "New",
-      score: 78,
-      value: "$20,000",
-      lastContact: "Just now"
-    }]);
-  }
+  const handleAddLead = async () => {
+    if (!newLead.name || !newLead.email) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in at least name and email",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('LEADS')
+        .insert([{
+          name: newLead.name,
+          email: newLead.email,
+          business: newLead.business,
+          website: newLead.website,
+          audience: newLead.audience
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setModalOpen(false);
+      toast({
+        title: "Lead Added",
+        description: "Lead has been successfully added to your CRM"
+      });
+      
+      setLeads(old => [data, ...old]);
+      setNewLead({ name: '', email: '', business: '', website: '', audience: '' });
+    } catch (error) {
+      console.error('Error adding lead:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to add lead",
+        variant: "destructive"
+      });
+    }
+  };
 
   const filteredLeads = leads.filter(
     lead =>
-      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.contact.toLowerCase().includes(searchTerm.toLowerCase())
+      lead.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.business?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -130,14 +182,12 @@ const CRM = () => {
                   <table className="min-w-full text-sm text-left">
                     <thead>
                       <tr className="text-xs text-gray-500 bg-gray-50">
-                        <th className="py-2 px-4">Company</th>
-                        <th className="py-2 px-4">Contact</th>
+                        <th className="py-2 px-4">Name</th>
                         <th className="py-2 px-4">Email</th>
-                        <th className="py-2 px-4">Phone</th>
-                        <th className="py-2 px-4">Stage</th>
-                        <th className="py-2 px-4">Score</th>
-                        <th className="py-2 px-4">Value</th>
-                        <th className="py-2 px-4">Last Contact</th>
+                        <th className="py-2 px-4">Business</th>
+                        <th className="py-2 px-4">Website</th>
+                        <th className="py-2 px-4">Target Audience</th>
+                        <th className="py-2 px-4">Created</th>
                         <th className="py-2 px-4"></th>
                       </tr>
                     </thead>
@@ -145,16 +195,11 @@ const CRM = () => {
                       {filteredLeads.map(lead => (
                         <tr key={lead.id} className="border-b hover:bg-gray-50 transition">
                           <td className="py-2 px-4 font-medium text-gray-900">{lead.name}</td>
-                          <td className="py-2 px-4">{lead.contact}</td>
                           <td className="py-2 px-4">{lead.email}</td>
-                          <td className="py-2 px-4">{lead.phone}</td>
-                          <td className="py-2 px-4"><Badge className={getStageColor(lead.stage)}>{lead.stage}</Badge></td>
-                          <td className="py-2 px-4 flex items-center gap-1">
-                            <Star className={`w-4 h-4 ${getScoreColor(lead.score)}`} />
-                            <span className={`font-medium ${getScoreColor(lead.score)}`}>{lead.score}</span>
-                          </td>
-                          <td className="py-2 px-4">{lead.value}</td>
-                          <td className="py-2 px-4">{lead.lastContact}</td>
+                          <td className="py-2 px-4">{lead.business || '-'}</td>
+                          <td className="py-2 px-4">{lead.website || '-'}</td>
+                          <td className="py-2 px-4">{lead.audience || '-'}</td>
+                          <td className="py-2 px-4">{lead.created_at ? new Date(lead.created_at).toLocaleDateString() : '-'}</td>
                           <td className="py-2 px-4"><Button size="sm" variant="outline">View Details</Button></td>
                         </tr>
                       ))}
@@ -170,11 +215,35 @@ const CRM = () => {
               <DialogHeader>
                 <DialogTitle>Add New Lead</DialogTitle>
               </DialogHeader>
-              <form className="space-y-4 mt-3" onSubmit={handleAddLead}>
-                <Input placeholder="Company Name" required />
-                <Input placeholder="Contact Name" required />
-                <Input placeholder="Email" type="email" required />
-                <Input placeholder="Phone" required />
+              <form className="space-y-4 mt-3" onSubmit={(e) => { e.preventDefault(); handleAddLead(); }}>
+                <Input 
+                  placeholder="Name/Company" 
+                  value={newLead.name}
+                  onChange={(e) => setNewLead({ ...newLead, name: e.target.value })}
+                  required 
+                />
+                <Input 
+                  placeholder="Email" 
+                  type="email"
+                  value={newLead.email}
+                  onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
+                  required 
+                />
+                <Input 
+                  placeholder="Business Type"
+                  value={newLead.business}
+                  onChange={(e) => setNewLead({ ...newLead, business: e.target.value })}
+                />
+                <Input 
+                  placeholder="Website"
+                  value={newLead.website}
+                  onChange={(e) => setNewLead({ ...newLead, website: e.target.value })}
+                />
+                <Input 
+                  placeholder="Target Audience"
+                  value={newLead.audience}
+                  onChange={(e) => setNewLead({ ...newLead, audience: e.target.value })}
+                />
                 <Button type="submit" className="w-full bg-blue-600 text-white">Save Lead</Button>
               </form>
             </DialogContent>

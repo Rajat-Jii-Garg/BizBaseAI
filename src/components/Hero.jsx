@@ -1,12 +1,12 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Zap, Target, TrendingUp, Shield, Globe, Crown, Rocket, Star, CheckCircle, Users, Building2, DollarSign, BarChart3, Brain, Lightbulb, Play } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen pt-16 pb-12 overflow-hidden">
+    <section className="relative min-h-screen pt-28 pb-12 overflow-hidden">
       {/* Advanced Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/80 to-indigo-50/60">
         {/* Floating geometric shapes */}
@@ -23,8 +23,8 @@ const Hero = () => {
         </div>
         
         {/* Gradient orbs */}
-        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-gradient-conic from-blue-500/10 via-purple-500/10 to-teal-500/10 rounded-full blur-3xl animate-spin" style={{animationDuration: '20s'}} />
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-gradient-conic from-emerald-500/15 via-blue-500/15 to-purple-500/15 rounded-full blur-3xl animate-spin delay-500" style={{animationDuration: '25s'}} />
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-teal-500/10 rounded-full blur-3xl animate-spin" style={{animationDuration: '20s'}} />
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-gradient-to-br from-emerald-500/15 via-blue-500/15 to-purple-500/15 rounded-full blur-3xl animate-spin delay-500" style={{animationDuration: '25s'}} />
         
         {/* Floating particles */}
         {[...Array(12)].map((_, i) => (
@@ -75,7 +75,7 @@ const Hero = () => {
 
           {/* Enhanced CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Link to="/signup">
+            <Link to="/login">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 hover:from-blue-700 hover:via-purple-700 hover:to-teal-700 text-white px-10 py-5 text-lg font-bold rounded-xl shadow-2xl transform hover:scale-105 transition-all duration-300 border-0 relative overflow-hidden group">
                 <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <Rocket className="w-5 h-5 mr-2" />
@@ -150,13 +150,13 @@ const Hero = () => {
                 color: 'from-purple-500 to-pink-500'
               }
             ].map((feature, index) => (
-              <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/40 hover:shadow-xl transform hover:-translate-y-3 transition-all duration-500 relative overflow-hidden">
-                <div className={`w-12 h-12 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-md`}>
-                  <feature.icon className="w-6 h-6 text-white" />
+              <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/40 hover:shadow-xl transform hover:-translate-y-3 transition-all duration-500 relative overflow-hidden text-center flex flex-col items-center justify-center">
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-md`}>
+                  <feature.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-lg md:text-xl font-black text-slate-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">{feature.title}</h3>
-                <p className="text-slate-600 leading-relaxed text-sm">{feature.desc}</p>
-                <div className={`w-16 h-1 bg-gradient-to-r ${feature.color} rounded-full mt-3 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`} />
+                <p className="text-slate-600 leading-relaxed text-sm max-w-xs mx-auto">{feature.desc}</p>
+                <div className={`w-16 h-1 bg-gradient-to-r ${feature.color} rounded-full mt-3 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}/>
               </div>
             ))}
           </div>
