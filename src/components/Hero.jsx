@@ -150,13 +150,13 @@ const Hero = () => {
                 color: 'from-purple-500 to-pink-500'
               }
             ].map((feature, index) => (
-              <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/40 hover:shadow-xl transform hover:-translate-y-3 transition-all duration-500 relative overflow-hidden">
-                <div className={`w-12 h-12 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-md`}>
-                  <feature.icon className="w-6 h-6 text-white" />
+              <div key={index} className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/40 hover:shadow-xl transform hover:-translate-y-3 transition-all duration-500 relative overflow-hidden text-center flex flex-col items-center justify-center">
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-md`}>
+                  <feature.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-lg md:text-xl font-black text-slate-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">{feature.title}</h3>
-                <p className="text-slate-600 leading-relaxed text-sm">{feature.desc}</p>
-                <div className={`w-16 h-1 bg-gradient-to-r ${feature.color} rounded-full mt-3 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`} />
+                <p className="text-slate-600 leading-relaxed text-sm max-w-xs mx-auto">{feature.desc}</p>
+                <div className={`w-16 h-1 bg-gradient-to-r ${feature.color} rounded-full mt-3 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}/>
               </div>
             ))}
           </div>
