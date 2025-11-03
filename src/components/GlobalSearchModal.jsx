@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, FileText, Hash, MessageCircle, TrendingUp } from 'lucide-react';
+import { Search, User, FileText, Hash, Users, Calendar, Briefcase } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,7 +14,10 @@ const GlobalSearchModal = ({ open, onClose }) => {
   const [searchResults, setSearchResults] = useState({
     users: [],
     posts: [],
-    hashtags: []
+    hashtags: [],
+    communities: [],
+    events: [],
+    jobs: []
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -23,7 +26,7 @@ const GlobalSearchModal = ({ open, onClose }) => {
     if (searchQuery.length > 2) {
       performSearch();
     } else {
-      setSearchResults({ users: [], posts: [], hashtags: [] });
+      setSearchResults({ users: [], posts: [], hashtags: [], communities: [], events: [], jobs: [] });
     }
   }, [searchQuery]);
 
@@ -35,7 +38,7 @@ const GlobalSearchModal = ({ open, onClose }) => {
       const { data: users } = await supabase
         .from('profiles')
         .select('id, full_name, current_position, avatar_url, company_name')
-        .ilike('full_name', `%${searchQuery}%`)
+        .or(`full_name.ilike.%${searchQuery}%,current_position.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%`)
         .limit(5);
 
       // Search posts
@@ -55,10 +58,35 @@ const GlobalSearchModal = ({ open, onClose }) => {
         .ilike('name', `%${searchQuery}%`)
         .limit(5);
 
+      // Search communities
+      const { data: communities } = await supabase
+        .from('communities')
+        .select('id, name, description, category, members_count, image_url')
+        .or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,category.ilike.%${searchQuery}%`)
+        .limit(5);
+
+      // Search events
+      const { data: events } = await supabase
+        .from('events')
+        .select('id, title, description, date, time, location, type, category')
+        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`)
+        .limit(5);
+
+      // Search jobs
+      const { data: jobs } = await supabase
+        .from('jobs')
+        .select('id, title, company_name, location, job_type, work_mode, industry')
+        .or(`title.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%,industry.ilike.%${searchQuery}%`)
+        .eq('is_active', true)
+        .limit(5);
+
       setSearchResults({
         users: users || [],
         posts: posts || [],
-        hashtags: hashtags || []
+        hashtags: hashtags || [],
+        communities: communities || [],
+        events: events || [],
+        jobs: jobs || []
       });
     } catch (error) {
       console.error('Search error:', error);
@@ -82,9 +110,24 @@ const GlobalSearchModal = ({ open, onClose }) => {
     onClose();
   };
 
+  const handleCommunityClick = (communityId) => {
+    navigate(`/community/${communityId}`);
+    onClose();
+  };
+
+  const handleEventClick = (eventId) => {
+    navigate(`/events?event=${eventId}`);
+    onClose();
+  };
+
+  const handleJobClick = (jobId) => {
+    navigate(`/jobs?job=${jobId}`);
+    onClose();
+  };
+
   const clearAndClose = () => {
     setSearchQuery('');
-    setSearchResults({ users: [], posts: [], hashtags: [] });
+    setSearchResults({ users: [], posts: [], hashtags: [], communities: [], events: [], jobs: [] });
     onClose();
   };
 
@@ -102,7 +145,7 @@ const GlobalSearchModal = ({ open, onClose }) => {
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search people, posts, hashtags..."
+              placeholder="Search people, communities, events, jobs, posts, hashtags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -184,6 +227,97 @@ const GlobalSearchModal = ({ open, onClose }) => {
                 </div>
               )}
 
+              {/* Communities */}
+              {searchResults.communities.length > 0 && (
+                <div>
+                  <h3 className="flex items-center gap-2 font-semibold text-gray-700 mb-3">
+                    <Users className="w-4 h-4" />
+                    Communities
+                  </h3>
+                  <div className="space-y-2">
+                    {searchResults.communities.map((community) => (
+                      <div
+                        key={community.id}
+                        onClick={() => handleCommunityClick(community.id)}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer border"
+                      >
+                        <Avatar className="h-10 w-10 rounded-lg">
+                          <AvatarImage src={community.image_url} />
+                          <AvatarFallback>{community.name?.charAt(0) || 'C'}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <p className="font-medium">{community.name}</p>
+                          <p className="text-sm text-gray-600 line-clamp-1">
+                            {community.description}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">{community.category}</Badge>
+                            <span className="text-xs text-gray-500">{community.members_count} members</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Events */}
+              {searchResults.events.length > 0 && (
+                <div>
+                  <h3 className="flex items-center gap-2 font-semibold text-gray-700 mb-3">
+                    <Calendar className="w-4 h-4" />
+                    Events
+                  </h3>
+                  <div className="space-y-2">
+                    {searchResults.events.map((event) => (
+                      <div
+                        key={event.id}
+                        onClick={() => handleEventClick(event.id)}
+                        className="p-3 rounded-lg hover:bg-gray-50 cursor-pointer border"
+                      >
+                        <p className="font-medium">{event.title}</p>
+                        <p className="text-sm text-gray-600 line-clamp-1">
+                          {event.description}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="outline" className="text-xs">{event.type}</Badge>
+                          <span className="text-xs text-gray-500">
+                            {new Date(event.date).toLocaleDateString()} • {event.location}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Jobs */}
+              {searchResults.jobs.length > 0 && (
+                <div>
+                  <h3 className="flex items-center gap-2 font-semibold text-gray-700 mb-3">
+                    <Briefcase className="w-4 h-4" />
+                    Jobs
+                  </h3>
+                  <div className="space-y-2">
+                    {searchResults.jobs.map((job) => (
+                      <div
+                        key={job.id}
+                        onClick={() => handleJobClick(job.id)}
+                        className="p-3 rounded-lg hover:bg-gray-50 cursor-pointer border"
+                      >
+                        <p className="font-medium">{job.title}</p>
+                        <p className="text-sm text-gray-600">{job.company_name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="outline" className="text-xs">{job.job_type}</Badge>
+                          <Badge variant="outline" className="text-xs">{job.work_mode}</Badge>
+                          <span className="text-xs text-gray-500">{job.location}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Hashtags */}
               {searchResults.hashtags.length > 0 && (
                 <div>
@@ -211,7 +345,10 @@ const GlobalSearchModal = ({ open, onClose }) => {
               {/* No results */}
               {searchResults.users.length === 0 && 
                searchResults.posts.length === 0 && 
-               searchResults.hashtags.length === 0 && (
+               searchResults.hashtags.length === 0 &&
+               searchResults.communities.length === 0 &&
+               searchResults.events.length === 0 &&
+               searchResults.jobs.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                   <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p>No results found for "{searchQuery}"</p>
@@ -224,8 +361,9 @@ const GlobalSearchModal = ({ open, onClose }) => {
           {searchQuery.length <= 2 && (
             <div className="text-center py-8 text-gray-500">
               <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>Start typing to search people, posts, and hashtags</p>
-              <p className="text-sm">Use Ctrl+K to quickly open search</p>
+              <p className="font-medium mb-2">Search across the entire platform</p>
+              <p className="text-sm">Find people, communities, events, jobs, posts, and hashtags</p>
+              <p className="text-xs mt-3 text-gray-400">Tip: Press Ctrl+K anywhere to quickly open search</p>
             </div>
           )}
         </div>
