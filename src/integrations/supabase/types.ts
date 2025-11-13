@@ -143,7 +143,22 @@ export type Database = {
           participant2_id?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conversations_participant1_id_fkey"
+            columns: ["participant1_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_participant2_id_fkey"
+            columns: ["participant2_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       endorsements: {
         Row: {
@@ -1181,14 +1196,8 @@ export type Database = {
         }
         Returns: string
       }
-      generate_otp: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      increment_job_views: {
-        Args: { job_id: string }
-        Returns: undefined
-      }
+      generate_otp: { Args: never; Returns: string }
+      increment_job_views: { Args: { job_id: string }; Returns: undefined }
       process_post_hashtags: {
         Args: { content: string; post_id: string }
         Returns: undefined
