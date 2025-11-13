@@ -23,6 +23,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import DashboardLayout from '@/components/DashboardLayout';
+import CallModal from '@/components/CallModal';
+import { WebRTCManager } from '@/utils/webrtc';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -38,11 +40,32 @@ const Messages = () => {
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [searchingUsers, setSearchingUsers] = useState(false);
   const messagesEndRef = useRef(null);
+  
+  // Call states
+  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+  const [callType, setCallType] = useState(null); // 'audio' or 'video'
+  const [callState, setCallState] = useState('idle'); // 'idle', 'calling', 'incoming', 'active'
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+  const webrtcManagerRef = useRef(null);
+  const incomingCallChannel = useRef(null);
 
   useEffect(() => {
     if (user) {
       fetchConversations();
+      setupIncomingCallListener();
     }
+    
+    return () => {
+      if (incomingCallChannel.current) {
+        supabase.removeChannel(incomingCallChannel.current);
+      }
+      if (webrtcManagerRef.current) {
+        webrtcManagerRef.current.cleanup();
+      }
+    };
   }, [user]);
 
   useEffect(() => {
@@ -79,6 +102,145 @@ const Messages = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const setupIncomingCallListener = () => {
+    if (!user) return;
+    
+    incomingCallChannel.current = supabase
+      .channel(`user-calls-${user.id}`)
+      .on('broadcast', { event: 'incoming-call' }, async ({ payload }) => {
+        if (payload.from !== user.id && selectedConversation) {
+          const otherParticipant = getOtherParticipant(selectedConversation);
+          if (payload.from === otherParticipant.id) {
+            setCallType(payload.callType);
+            setCallState('incoming');
+            setIsCallModalOpen(true);
+            
+            // Initialize WebRTC and accept call
+            await handleAcceptCall(payload.callType);
+          }
+        }
+      })
+      .subscribe();
+  };
+
+  const initiateCall = async (type) => {
+    if (!selectedConversation) return;
+    
+    try {
+      setCallType(type);
+      setCallState('calling');
+      setIsCallModalOpen(true);
+
+      // Initialize WebRTC manager
+      webrtcManagerRef.current = new WebRTCManager(user.id, selectedConversation.id);
+      await webrtcManagerRef.current.initializeSignaling();
+
+      // Set up callbacks
+      webrtcManagerRef.current.onRemoteStream = (stream) => {
+        setRemoteStream(stream);
+        setCallState('active');
+      };
+
+      webrtcManagerRef.current.onCallEnded = () => {
+        handleEndCall();
+      };
+
+      // Start call
+      const stream = await webrtcManagerRef.current.startCall(type === 'video');
+      setLocalStream(stream);
+
+      // Notify other user
+      const otherParticipant = getOtherParticipant(selectedConversation);
+      await supabase.channel(`user-calls-${otherParticipant.id}`).send({
+        type: 'broadcast',
+        event: 'incoming-call',
+        payload: {
+          from: user.id,
+          callType: type,
+          conversationId: selectedConversation.id
+        }
+      });
+
+      toast({
+        title: "Calling...",
+        description: `${type === 'video' ? 'Video' : 'Voice'} call initiated`
+      });
+    } catch (error) {
+      console.error('Error initiating call:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start call",
+        variant: "destructive"
+      });
+      handleEndCall();
+    }
+  };
+
+  const handleAcceptCall = async (type) => {
+    try {
+      setCallState('connecting');
+      
+      // Initialize WebRTC manager if not already done
+      if (!webrtcManagerRef.current) {
+        webrtcManagerRef.current = new WebRTCManager(user.id, selectedConversation.id);
+        await webrtcManagerRef.current.initializeSignaling();
+      }
+
+      // Set up callbacks
+      webrtcManagerRef.current.onRemoteStream = (stream) => {
+        setRemoteStream(stream);
+        setCallState('active');
+      };
+
+      webrtcManagerRef.current.onCallEnded = () => {
+        handleEndCall();
+      };
+    } catch (error) {
+      console.error('Error accepting call:', error);
+      toast({
+        title: "Error",
+        description: "Failed to accept call",
+        variant: "destructive"
+      });
+      handleEndCall();
+    }
+  };
+
+  const handleEndCall = async () => {
+    if (webrtcManagerRef.current) {
+      await webrtcManagerRef.current.endCall();
+      webrtcManagerRef.current = null;
+    }
+    
+    setIsCallModalOpen(false);
+    setCallState('idle');
+    setLocalStream(null);
+    setRemoteStream(null);
+    setIsMuted(false);
+    setIsVideoOff(false);
+    setCallType(null);
+  };
+
+  const handleToggleMute = () => {
+    if (localStream) {
+      const audioTrack = localStream.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        setIsMuted(!audioTrack.enabled);
+      }
+    }
+  };
+
+  const handleToggleVideo = () => {
+    if (localStream) {
+      const videoTrack = localStream.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        setIsVideoOff(!videoTrack.enabled);
+      }
+    }
   };
 
   const fetchConversations = async () => {
@@ -428,10 +590,20 @@ const Messages = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" className="hover-lift">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="hover-lift"
+                      onClick={() => initiateCall('audio')}
+                    >
                       <Phone className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="hover-lift">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="hover-lift"
+                      onClick={() => initiateCall('video')}
+                    >
                       <Video className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" className="hover-lift">
@@ -528,6 +700,22 @@ const Messages = () => {
           )}
         </div>
       </div>
+
+      {/* Call Modal */}
+      <CallModal
+        isOpen={isCallModalOpen}
+        onClose={handleEndCall}
+        callType={callType}
+        callState={callState}
+        localStream={localStream}
+        remoteStream={remoteStream}
+        otherUser={selectedConversation ? getOtherParticipant(selectedConversation) : null}
+        onEndCall={handleEndCall}
+        onToggleMute={handleToggleMute}
+        onToggleVideo={handleToggleVideo}
+        isMuted={isMuted}
+        isVideoOff={isVideoOff}
+      />
     </DashboardLayout>
   );
 };
