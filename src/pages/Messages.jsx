@@ -56,6 +56,7 @@ const Messages = () => {
     if (user) {
       fetchConversations();
       setupIncomingCallListener();
+      setupConversationsRealtime();
     }
     
     return () => {
@@ -67,6 +68,78 @@ const Messages = () => {
       }
     };
   }, [user]);
+
+  // Real-time subscription for all conversations and messages
+  const setupConversationsRealtime = () => {
+    if (!user) return;
+    
+    // Listen for new conversations
+    const conversationsChannel = supabase
+      .channel('user-conversations')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'conversations',
+          filter: `or(participant1_id.eq.${user.id},participant2_id.eq.${user.id})`
+        },
+        () => {
+          fetchConversations();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'conversations',
+          filter: `or(participant1_id.eq.${user.id},participant2_id.eq.${user.id})`
+        },
+        () => {
+          fetchConversations();
+        }
+      )
+      .subscribe();
+    
+    // Listen for all messages to update conversation list
+    const allMessagesChannel = supabase
+      .channel('all-user-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `or(sender_id.eq.${user.id},receiver_id.eq.${user.id})`
+        },
+        (payload) => {
+          fetchConversations();
+          
+          // If message is for currently selected conversation, add it to messages
+          if (selectedConversation && payload.new.conversation_id === selectedConversation.id) {
+            setMessages(prev => {
+              // Avoid duplicates
+              if (prev.some(m => m.id === payload.new.id)) return prev;
+              return [...prev, payload.new];
+            });
+            scrollToBottom();
+          } else if (payload.new.receiver_id === user.id) {
+            // Show notification for new message
+            toast({
+              title: "New Message",
+              description: payload.new.content.substring(0, 50) + (payload.new.content.length > 50 ? '...' : ''),
+            });
+          }
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(conversationsChannel);
+      supabase.removeChannel(allMessagesChannel);
+    };
+  };
 
   useEffect(() => {
     if (selectedConversation) {
@@ -110,15 +183,38 @@ const Messages = () => {
     incomingCallChannel.current = supabase
       .channel(`user-calls-${user.id}`)
       .on('broadcast', { event: 'incoming-call' }, async ({ payload }) => {
-        if (payload.from !== user.id && selectedConversation) {
-          const otherParticipant = getOtherParticipant(selectedConversation);
-          if (payload.from === otherParticipant.id) {
+        if (payload.from !== user.id) {
+          // Find or create the conversation
+          let conversation = conversations.find(c => 
+            (c.participant1_id === payload.from || c.participant2_id === payload.from)
+          );
+          
+          if (!conversation) {
+            // Fetch conversation by ID
+            const { data } = await supabase
+              .from('conversations')
+              .select(`
+                *,
+                participant1:profiles!conversations_participant1_id_fkey(id, full_name, avatar_url),
+                participant2:profiles!conversations_participant2_id_fkey(id, full_name, avatar_url)
+              `)
+              .eq('id', payload.conversationId)
+              .single();
+            
+            if (data) {
+              conversation = data;
+              setConversations(prev => [data, ...prev]);
+            }
+          }
+          
+          if (conversation) {
+            setSelectedConversation(conversation);
             setCallType(payload.callType);
             setCallState('incoming');
             setIsCallModalOpen(true);
             
             // Initialize WebRTC and accept call
-            await handleAcceptCall(payload.callType);
+            await handleAcceptCall(payload.callType, conversation);
           }
         }
       })
@@ -151,15 +247,21 @@ const Messages = () => {
       const stream = await webrtcManagerRef.current.startCall(type === 'video');
       setLocalStream(stream);
 
-      // Notify other user
+      // Notify other user via broadcast
       const otherParticipant = getOtherParticipant(selectedConversation);
-      await supabase.channel(`user-calls-${otherParticipant.id}`).send({
-        type: 'broadcast',
-        event: 'incoming-call',
-        payload: {
-          from: user.id,
-          callType: type,
-          conversationId: selectedConversation.id
+      const callChannel = supabase.channel(`user-calls-${otherParticipant.id}`);
+      
+      await callChannel.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await callChannel.send({
+            type: 'broadcast',
+            event: 'incoming-call',
+            payload: {
+              from: user.id,
+              callType: type,
+              conversationId: selectedConversation.id
+            }
+          });
         }
       });
 
@@ -178,13 +280,18 @@ const Messages = () => {
     }
   };
 
-  const handleAcceptCall = async (type) => {
+  const handleAcceptCall = async (type, conversation = null) => {
     try {
       setCallState('connecting');
       
+      const convToUse = conversation || selectedConversation;
+      if (!convToUse) {
+        throw new Error('No conversation found');
+      }
+      
       // Initialize WebRTC manager if not already done
       if (!webrtcManagerRef.current) {
-        webrtcManagerRef.current = new WebRTCManager(user.id, selectedConversation.id);
+        webrtcManagerRef.current = new WebRTCManager(user.id, convToUse.id);
         await webrtcManagerRef.current.initializeSignaling();
       }
 
@@ -197,6 +304,10 @@ const Messages = () => {
       webrtcManagerRef.current.onCallEnded = () => {
         handleEndCall();
       };
+      
+      // Start receiving call
+      const stream = await webrtcManagerRef.current.startCall(type === 'video');
+      setLocalStream(stream);
     } catch (error) {
       console.error('Error accepting call:', error);
       toast({
