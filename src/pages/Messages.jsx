@@ -384,10 +384,7 @@ const Messages = () => {
     try {
       const { data, error } = await supabase
         .from('messages')
-        .select(`
-          *,
-          profiles(full_name, avatar_url)
-        `)
+        .select('*')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
