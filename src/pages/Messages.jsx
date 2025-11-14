@@ -627,7 +627,7 @@ const Messages = () => {
             </div>
           </div>
 
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 h-0">
             {filteredConversations.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full p-8 text-center">
                 <MessageCircle className="h-12 w-12 text-muted-foreground/40 mb-3" />
@@ -720,7 +720,7 @@ const Messages = () => {
               </div>
 
               {/* Messages */}
-              <ScrollArea className="flex-1 p-4 bg-accent/5">
+              <ScrollArea className="flex-1 h-0 p-4 bg-accent/5">
                 {messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
