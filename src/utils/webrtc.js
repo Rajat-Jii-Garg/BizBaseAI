@@ -191,6 +191,28 @@ export class WebRTCManager {
     }
   }
 
+  toggleMute() {
+    if (this.localStream) {
+      const audioTrack = this.localStream.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        return !audioTrack.enabled;
+      }
+    }
+    return false;
+  }
+
+  toggleVideo() {
+    if (this.localStream) {
+      const videoTrack = this.localStream.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        return !videoTrack.enabled;
+      }
+    }
+    return false;
+  }
+
   async endCall() {
     // Send call ended signal
     if (this.signalingChannel) {
