@@ -335,22 +335,16 @@ const Messages = () => {
   };
 
   const handleToggleMute = () => {
-    if (localStream) {
-      const audioTrack = localStream.getAudioTracks()[0];
-      if (audioTrack) {
-        audioTrack.enabled = !audioTrack.enabled;
-        setIsMuted(!audioTrack.enabled);
-      }
+    if (webrtcManagerRef.current) {
+      const muted = webrtcManagerRef.current.toggleMute();
+      setIsMuted(muted);
     }
   };
 
   const handleToggleVideo = () => {
-    if (localStream) {
-      const videoTrack = localStream.getVideoTracks()[0];
-      if (videoTrack) {
-        videoTrack.enabled = !videoTrack.enabled;
-        setIsVideoOff(!videoTrack.enabled);
-      }
+    if (webrtcManagerRef.current) {
+      const videoOff = webrtcManagerRef.current.toggleVideo();
+      setIsVideoOff(videoOff);
     }
   };
 
