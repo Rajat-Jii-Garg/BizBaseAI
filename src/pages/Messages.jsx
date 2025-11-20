@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,6 +50,8 @@ const Messages = () => {
   const [isVideoOff, setIsVideoOff] = useState(false);
   const webrtcManagerRef = useRef(null);
   const incomingCallChannel = useRef(null);
+  const [unreadCounts, setUnreadCounts] = useState({});
+
 
   useEffect(() => {
     if (user) {
@@ -119,12 +120,17 @@ const Messages = () => {
           // If message is for currently selected conversation, add it to messages
           if (selectedConversation && payload.new.conversation_id === selectedConversation.id) {
             setMessages(prev => {
-              // Avoid duplicates
               if (prev.some(m => m.id === payload.new.id)) return prev;
               return [...prev, payload.new];
             });
             scrollToBottom();
           } else if (payload.new.receiver_id === user.id) {
+            // Update unread count if message belongs to another conversation -
+            setUnreadCounts(prev => ({
+              ...prev,
+              [payload.new.conversation_id]: (prev[payload.new.conversation_id] || 0) + 1
+            }));
+
             // Show notification for new message
             toast({
               title: "New Message",
@@ -157,8 +163,25 @@ const Messages = () => {
             filter: `conversation_id=eq.${selectedConversation.id}`
           },
           (payload) => {
-            setMessages(prev => [...prev, payload.new]);
-            scrollToBottom();
+            const msg = payload.new;
+
+            // Update conversation order locally (instant UI update)
+            setConversations(prev => {
+              let updated = prev.map(c => 
+                c.id === msg.conversation_id ? { ...c, updated_at: msg.created_at } : c
+              );
+
+              // Sort by updated_at DESC
+              updated.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+              return updated;
+            });
+
+            // If selected conversation → add message inside UI
+            if (selectedConversation?.id === msg.conversation_id) {
+              setMessages(prev => [...prev, msg]);
+              scrollToBottom();
+            }
           }
         )
         .subscribe();
@@ -640,7 +663,15 @@ const Messages = () => {
                           ? 'bg-primary/5 border-l-4 border-primary shadow-sm'
                           : 'hover:bg-accent/50'
                       }`}
-                      onClick={() => setSelectedConversation(conversation)}
+                      onClick={() => {
+                        setSelectedConversation(conversation);
+
+                        // Reset unread for that conversation
+                        setUnreadCounts(prev => ({
+                          ...prev,
+                          [conversation.id]: 0
+                        }));
+                      }}
                     >
                       <div className="flex items-center space-x-3">
                         <div className="relative">
@@ -654,9 +685,19 @@ const Messages = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">{otherParticipant?.full_name || 'Unknown User'}</p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            Click to view messages
-                          </p>
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs text-muted-foreground truncate">
+                              {unreadCounts[conversation.id] > 0 
+                                ? "New messages" 
+                                : "Click to view messages"}
+                            </p>
+
+                            {unreadCounts[conversation.id] > 0 && (
+                              <Badge className="ml-2 bg-primary text-white">
+                                {unreadCounts[conversation.id]}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

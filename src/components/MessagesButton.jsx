@@ -8,13 +8,13 @@ import { supabase } from '@/integrations/supabase/client';
 const MessagesButton = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadUsersCount, setUnreadUsersCount] = useState(0);
 
   useEffect(() => {
     if (user) {
-      fetchUnreadMessages();
+      fetchUnreadUsers();
       
-      // Set up real-time subscription for messages
+      // Real-time listener for incoming/outgoing messages
       const channel = supabase
         .channel('messages')
         .on(
@@ -26,7 +26,7 @@ const MessagesButton = () => {
             filter: `receiver_id=eq.${user.id}`
           },
           () => {
-            fetchUnreadMessages();
+            fetchUnreadUsers();
           }
         )
         .subscribe();
@@ -37,19 +37,31 @@ const MessagesButton = () => {
     }
   }, [user]);
 
-  const fetchUnreadMessages = async () => {
+  const fetchUnreadUsers = async () => {
     if (!user) return;
-    
+
     try {
-      const { count } = await supabase
+      const { data, error } = await supabase
         .from('messages')
-        .select('*', { count: 'exact', head: true })
+        .select('sender_id, read')
         .eq('receiver_id', user.id)
         .eq('read', false);
-      
-      setUnreadCount(count || 0);
-    } catch (error) {
-      console.error('Error fetching unread messages:', error);
+
+      if (error) {
+        console.error('Unread users fetch error:', error);
+        return;
+      }
+
+      // Collect unique user IDs who sent unread messages
+      const uniqueUnreadSenders = new Set(
+        data
+          .map(message => message.sender_id)
+          .filter(senderId => senderId !== user.id)
+      );
+
+      setUnreadUsersCount(uniqueUnreadSenders.size);
+    } catch (err) {
+      console.error('Error fetching unread users:', err);
     }
   };
 
@@ -61,9 +73,10 @@ const MessagesButton = () => {
       onClick={() => navigate('/messages')}
     >
       <MessageSquare className="w-5 h-5 text-gray-600" />
-      {unreadCount > 0 && (
+
+      {unreadUsersCount > 0 && (
         <span className="absolute -top-1 -right-1 min-w-5 h-5 bg-blue-500 rounded-full text-xs text-white flex items-center justify-center px-1 font-medium">
-          {unreadCount > 99 ? '99+' : unreadCount}
+          {unreadUsersCount > 99 ? '99+' : unreadUsersCount}
         </span>
       )}
     </Button>
