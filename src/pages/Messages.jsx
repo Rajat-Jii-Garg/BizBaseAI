@@ -183,7 +183,7 @@ const Messages = () => {
 
     // 🛑 Clean old channel
     if (messageChannelRef.current) {
-      supabase.removeChannel(c);
+      supabase.removeChannel(messageChannelRef.current);
     }
       
     // Set up real-time subscription for messages
