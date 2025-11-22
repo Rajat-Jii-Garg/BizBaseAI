@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   MessageCircle, 
   Send, 
@@ -16,8 +18,12 @@ import {
   Paperclip,
   Smile,
   Plus,
-  Loader2
+  Loader2,
+  X,
+  Image as ImageIcon,
+  FileText
 } from 'lucide-react';
+import EmojiPicker from 'emoji-picker-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,6 +45,7 @@ const Messages = () => {
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [searchingUsers, setSearchingUsers] = useState(false);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
   
   // Call states
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
@@ -49,20 +56,26 @@ const Messages = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const webrtcManagerRef = useRef(null);
-  const incomingCallChannel = useRef(null);
+  const callChannelRef = useRef(null);
   const [unreadCounts, setUnreadCounts] = useState({});
+  
+  // UI states
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
 
   useEffect(() => {
     if (user) {
       fetchConversations();
-      setupIncomingCallListener();
+      setupCallListener();
       setupConversationsRealtime();
     }
     
     return () => {
-      if (incomingCallChannel.current) {
-        supabase.removeChannel(incomingCallChannel.current);
+      if (callChannelRef.current) {
+        supabase.removeChannel(callChannelRef.current);
       }
       if (webrtcManagerRef.current) {
         webrtcManagerRef.current.cleanup();
@@ -150,9 +163,10 @@ const Messages = () => {
   useEffect(() => {
     if (selectedConversation) {
       fetchMessages(selectedConversation.id);
+      markMessagesAsRead(selectedConversation.id);
       
-      // Set up real-time subscription for new messages
-      const channel = supabase
+      // Set up real-time subscription for messages
+      const messagesChannel = supabase
         .channel(`messages:${selectedConversation.id}`)
         .on(
           'postgres_changes',
@@ -164,30 +178,24 @@ const Messages = () => {
           },
           (payload) => {
             const msg = payload.new;
-
-            // Update conversation order locally (instant UI update)
-            setConversations(prev => {
-              let updated = prev.map(c => 
-                c.id === msg.conversation_id ? { ...c, updated_at: msg.created_at } : c
-              );
-
-              // Sort by updated_at DESC
-              updated.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-
-              return updated;
+            
+            setMessages(prev => {
+              if (prev.some(m => m.id === msg.id)) return prev;
+              return [...prev, msg];
             });
-
-            // If selected conversation → add message inside UI
-            if (selectedConversation?.id === msg.conversation_id) {
-              setMessages(prev => [...prev, msg]);
-              scrollToBottom();
+            
+            scrollToBottom();
+            
+            // Mark as read if it's from the other user
+            if (msg.sender_id !== user.id) {
+              markMessagesAsRead(selectedConversation.id);
             }
           }
         )
         .subscribe();
 
       return () => {
-        supabase.removeChannel(channel);
+        supabase.removeChannel(messagesChannel);
       };
     }
   }, [selectedConversation]);
@@ -200,45 +208,49 @@ const Messages = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const setupIncomingCallListener = () => {
+  const setupCallListener = () => {
     if (!user) return;
     
-    incomingCallChannel.current = supabase
+    callChannelRef.current = supabase
       .channel(`user-calls-${user.id}`)
       .on('broadcast', { event: 'incoming-call' }, async ({ payload }) => {
-        if (payload.from !== user.id) {
-          // Find or create the conversation
-          let conversation = conversations.find(c => 
-            (c.participant1_id === payload.from || c.participant2_id === payload.from)
-          );
-          
-          if (!conversation) {
-            // Fetch conversation by ID
-            const { data } = await supabase
-              .from('conversations')
-              .select(`
-                *,
-                participant1:profiles!conversations_participant1_id_fkey(id, full_name, avatar_url),
-                participant2:profiles!conversations_participant2_id_fkey(id, full_name, avatar_url)
-              `)
-              .eq('id', payload.conversationId)
-              .single();
-            
-            if (data) {
-              conversation = data;
-              setConversations(prev => [data, ...prev]);
-            }
-          }
-          
-          if (conversation) {
-            setSelectedConversation(conversation);
-            setCallType(payload.callType);
-            setCallState('incoming');
-            setIsCallModalOpen(true);
-            
-            // Initialize WebRTC and accept call
-            await handleAcceptCall(payload.callType, conversation);
-          }
+        if (payload.from === user.id) return;
+        
+        const { data: conversation } = await supabase
+          .from('conversations')
+          .select(`
+            *,
+            participant1:profiles!conversations_participant1_id_fkey(id, full_name, avatar_url),
+            participant2:profiles!conversations_participant2_id_fkey(id, full_name, avatar_url)
+          `)
+          .eq('id', payload.conversationId)
+          .single();
+        
+        if (conversation) {
+          setSelectedConversation(conversation);
+          setCallType(payload.callType);
+          setCallState('incoming');
+          setIsCallModalOpen(true);
+        }
+      })
+      .on('broadcast', { event: 'call-accepted' }, async ({ payload }) => {
+        if (payload.to === user.id && callState === 'calling') {
+          setCallState('connecting');
+        }
+      })
+      .on('broadcast', { event: 'call-rejected' }, ({ payload }) => {
+        if (payload.to === user.id) {
+          toast({
+            title: "Call Declined",
+            description: "The user declined your call",
+            variant: "destructive"
+          });
+          handleEndCall();
+        }
+      })
+      .on('broadcast', { event: 'call-ended' }, ({ payload }) => {
+        if (payload.to === user.id || payload.from === user.id) {
+          handleEndCall();
         }
       })
       .subscribe();
@@ -312,13 +324,23 @@ const Messages = () => {
         throw new Error('No conversation found');
       }
       
-      // Initialize WebRTC manager if not already done
-      if (!webrtcManagerRef.current) {
-        webrtcManagerRef.current = new WebRTCManager(user.id, convToUse.id);
-        await webrtcManagerRef.current.initializeSignaling();
+      // Send accept signal
+      const otherParticipant = getOtherParticipant(convToUse);
+      if (callChannelRef.current) {
+        await callChannelRef.current.send({
+          type: 'broadcast',
+          event: 'call-accepted',
+          payload: {
+            from: user.id,
+            to: otherParticipant.id
+          }
+        });
       }
+      
+      // Initialize WebRTC
+      webrtcManagerRef.current = new WebRTCManager(user.id, convToUse.id);
+      await webrtcManagerRef.current.initializeSignaling();
 
-      // Set up callbacks
       webrtcManagerRef.current.onRemoteStream = (stream) => {
         setRemoteStream(stream);
         setCallState('active');
@@ -328,7 +350,6 @@ const Messages = () => {
         handleEndCall();
       };
       
-      // Start receiving call
       const stream = await webrtcManagerRef.current.startCall(type === 'video');
       setLocalStream(stream);
     } catch (error) {
@@ -342,9 +363,39 @@ const Messages = () => {
     }
   };
 
+  const handleDeclineCall = async () => {
+    const otherParticipant = getOtherParticipant(selectedConversation);
+    
+    if (callChannelRef.current) {
+      await callChannelRef.current.send({
+        type: 'broadcast',
+        event: 'call-rejected',
+        payload: {
+          from: user.id,
+          to: otherParticipant.id
+        }
+      });
+    }
+    
+    handleEndCall();
+  };
+
   const handleEndCall = async () => {
+    const otherParticipant = selectedConversation ? getOtherParticipant(selectedConversation) : null;
+    
+    if (callChannelRef.current && otherParticipant) {
+      await callChannelRef.current.send({
+        type: 'broadcast',
+        event: 'call-ended',
+        payload: {
+          from: user.id,
+          to: otherParticipant.id
+        }
+      });
+    }
+    
     if (webrtcManagerRef.current) {
-      await webrtcManagerRef.current.endCall();
+      await webrtcManagerRef.current.cleanup();
       webrtcManagerRef.current = null;
     }
     
@@ -412,33 +463,97 @@ const Messages = () => {
     }
   };
 
+  const markMessagesAsRead = async (conversationId) => {
+    try {
+      await supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('conversation_id', conversationId)
+        .eq('receiver_id', user.id)
+        .eq('read', false);
+      
+      setUnreadCounts(prev => ({
+        ...prev,
+        [conversationId]: 0
+      }));
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        toast({
+          title: "File too large",
+          description: "Please select a file smaller than 10MB",
+          variant: "destructive"
+        });
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const uploadFile = async (file) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `${user.id}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('chat-files')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('chat-files')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
   const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedConversation) return;
+    if ((!newMessage.trim() && !selectedFile) || !selectedConversation || sendingMessage) return;
 
     const otherParticipant = getOtherParticipant(selectedConversation);
     const receiverId = otherParticipant.id;
 
+    setSendingMessage(true);
     try {
+      let fileUrl = null;
+      
+      if (selectedFile) {
+        setUploadingFile(true);
+        fileUrl = await uploadFile(selectedFile);
+        setUploadingFile(false);
+      }
+
+      const messageContent = selectedFile 
+        ? `${newMessage.trim()}\n[FILE: ${selectedFile.name}](${fileUrl})`
+        : newMessage.trim();
+
       const { error } = await supabase
         .from('messages')
         .insert({
           conversation_id: selectedConversation.id,
           sender_id: user.id,
           receiver_id: receiverId,
-          content: newMessage.trim()
+          content: messageContent
         });
 
       if (error) throw error;
 
       setNewMessage('');
+      setSelectedFile(null);
+      setShowEmojiPicker(false);
       
-      // Update conversation timestamp
       await supabase
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', selectedConversation.id);
 
-      fetchConversations();
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -446,7 +561,14 @@ const Messages = () => {
         description: "Failed to send message",
         variant: "destructive"
       });
+    } finally {
+      setSendingMessage(false);
+      setUploadingFile(false);
     }
+  };
+
+  const onEmojiClick = (emojiData) => {
+    setNewMessage(prev => prev + emojiData.emoji);
   };
 
   const searchUsers = async (query) => {
@@ -807,25 +929,87 @@ const Messages = () => {
               </ScrollArea>
 
               {/* Message Input */}
-              <div className="p-4 border-t bg-card/50 backdrop-blur-sm">
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0">
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0">
-                    <Smile className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                    className="flex-1 bg-background"
+              <div className="border-t bg-card/50 backdrop-blur-sm p-4">
+                {selectedFile && (
+                  <div className="mb-2 flex items-center gap-2 p-2 bg-muted rounded-lg">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <span className="text-sm flex-1 truncate">{selectedFile.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setSelectedFile(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                <div className="flex items-end gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                    accept="image/*,.pdf,.doc,.docx"
                   />
                   <Button 
-                    onClick={sendMessage}
-                    disabled={!newMessage.trim()}
+                    variant="ghost" 
                     size="icon"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={sendingMessage}
+                    className="hover:bg-primary/10 transition-colors shrink-0"
+                  >
+                    <Paperclip className="h-5 w-5 text-muted-foreground" />
+                  </Button>
+                  <div className="flex-1 min-w-0">
+                    <Textarea
+                      placeholder="Type a message..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          sendMessage();
+                        }
+                      }}
+                      disabled={sendingMessage}
+                      className="min-h-[44px] max-h-32 resize-none border-0 bg-background/50 focus-visible:ring-1"
+                      rows={1}
+                    />
+                  </div>
+                  <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        disabled={sendingMessage}
+                        className="hover:bg-primary/10 transition-colors shrink-0"
+                      >
+                        <Smile className="h-5 w-5 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0 border-0" align="end">
+                      <EmojiPicker 
+                        onEmojiClick={onEmojiClick}
+                        width="100%"
+                        height="400px"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Button 
+                    onClick={sendMessage}
+                    size="icon"
+                    disabled={sendingMessage || uploadingFile || (!newMessage.trim() && !selectedFile)}
+                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shrink-0"
+                  >
+                    {sendingMessage || uploadingFile ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Send className="h-5 w-5" />
+                    )}
+                  </Button>
+                </div>
+              </div>
                     className="h-9 w-9 shrink-0"
                   >
                     <Send className="h-4 w-4" />

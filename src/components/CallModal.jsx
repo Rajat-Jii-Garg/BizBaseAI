@@ -13,6 +13,8 @@ const CallModal = ({
   remoteStream, 
   otherUser,
   onEndCall,
+  onAcceptCall,
+  onDeclineCall,
   onToggleMute,
   onToggleVideo,
   isMuted,
@@ -186,7 +188,26 @@ const CallModal = ({
           {/* Call Controls */}
           {!isMinimized && (showControls || callState !== 'active') && (
             <div className="p-6 bg-gradient-to-t from-background/95 via-background/90 to-transparent backdrop-blur-xl border-t border-border/50">
-              <div className="flex items-center justify-center gap-3">
+              {callState === 'incoming' ? (
+                <div className="flex items-center justify-center gap-4">
+                  <Button
+                    size="lg"
+                    variant="destructive"
+                    className="h-16 w-16 rounded-full shadow-2xl hover:scale-110 transition-all"
+                    onClick={onDeclineCall}
+                  >
+                    <PhoneOff className="h-7 w-7" />
+                  </Button>
+                  <Button
+                    size="lg"
+                    className="h-16 w-16 rounded-full bg-green-500 hover:bg-green-600 shadow-2xl hover:scale-110 transition-all"
+                    onClick={onAcceptCall}
+                  >
+                    <Phone className="h-7 w-7" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-3">
                 {/* Mute Toggle */}
                 <Button
                   size="lg"
@@ -241,6 +262,7 @@ const CallModal = ({
                   <PhoneOff className="h-7 w-7" />
                 </Button>
               </div>
+              )}
             </div>
           )}
 
