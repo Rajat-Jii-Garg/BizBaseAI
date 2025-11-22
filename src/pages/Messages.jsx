@@ -168,8 +168,8 @@ const Messages = () => {
       .subscribe();
     
     return () => {
-      supabase.removeChannel(conversationsChannel);
-      supabase.removeChannel(allMessagesChannel);
+      supabase.removeChannel(conversationsRealtimeRef);
+      supabase.removeChannel(allMessagesRealtimeRef);
     };
   };
 
