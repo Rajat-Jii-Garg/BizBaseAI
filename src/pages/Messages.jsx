@@ -109,7 +109,7 @@ const Messages = () => {
           event: 'INSERT',
           schema: 'public',
           table: 'conversations',
-          filter: `or(participant1_id.eq.${user.id},participant2_id.eq.${user.id})`
+          filter: `participant1_id.eq.${user.id} OR participant2_id.eq.${user.id})`
         },
         () => {
           fetchConversations();
@@ -121,7 +121,7 @@ const Messages = () => {
           event: 'UPDATE',
           schema: 'public',
           table: 'conversations',
-          filter: `or(participant1_id.eq.${user.id},participant2_id.eq.${user.id})`
+          filter: `participant1_id.eq.${user.id} OR participant2_id.eq.${user.id})`
         },
         () => {
           fetchConversations();
@@ -138,7 +138,7 @@ const Messages = () => {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `or(sender_id.eq.${user.id},receiver_id.eq.${user.id})`
+          filter: `sender_id.eq.${user.id} OR receiver_id.eq.${user.id})`
         },
         (payload) => {
           fetchConversations();
