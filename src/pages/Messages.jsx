@@ -1010,12 +1010,6 @@ const Messages = () => {
                   </Button>
                 </div>
               </div>
-                    className="h-9 w-9 shrink-0"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
             </>
           ) : (
             <div className="flex items-center justify-center h-full bg-gradient-to-br from-accent/10 to-accent/5">
