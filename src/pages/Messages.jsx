@@ -66,6 +66,10 @@ const Messages = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
 
+  const conversationsRealtimeRef = useRef(null);
+  const allMessagesRealtimeRef = useRef(null);
+  const messageChannelRef = useRef(null);
+
 
   useEffect(() => {
     if (user) {
@@ -87,9 +91,17 @@ const Messages = () => {
   // Real-time subscription for all conversations and messages
   const setupConversationsRealtime = () => {
     if (!user) return;
+
+    // 🛑 Already subscribed? Remove first!
+    if (conversationsRealtimeRef.current) {
+      supabase.removeChannel(conversationsRealtimeRef.current);
+    }
+    if (allMessagesRealtimeRef.current) {
+      supabase.removeChannel(allMessagesRealtimeRef.current);
+    }
     
     // Listen for new conversations
-    const conversationsChannel = supabase
+    conversationsRealtimeRef.current = supabase
       .channel('user-conversations')
       .on(
         'postgres_changes',
@@ -118,7 +130,7 @@ const Messages = () => {
       .subscribe();
     
     // Listen for all messages to update conversation list
-    const allMessagesChannel = supabase
+    allMessagesRealtimeRef.current = supabase
       .channel('all-user-messages')
       .on(
         'postgres_changes',
@@ -161,44 +173,52 @@ const Messages = () => {
     };
   };
 
+  // useEffect(() => {
+  //   if (selectedConversation) {
+  //     fetchMessages(selectedConversation.id);
+  //     markMessagesAsRead(selectedConversation.id);
+
   useEffect(() => {
-    if (selectedConversation) {
-      fetchMessages(selectedConversation.id);
-      markMessagesAsRead(selectedConversation.id);
+    if (!selectedConversation) return;
+
+    // 🛑 Clean old channel
+    if (messageChannelRef.current) {
+      supabase.removeChannel(c);
+    }
       
-      // Set up real-time subscription for messages
-      const messagesChannel = supabase
-        .channel(`messages:${selectedConversation.id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `conversation_id=eq.${selectedConversation.id}`
-          },
-          (payload) => {
-            const msg = payload.new;
+    // Set up real-time subscription for messages
+    messageChannelRef.current = supabase
+      .channel(`messages:${selectedConversation.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${selectedConversation.id}`
+        },
+        (payload) => {
+          const msg = payload.new;
             
-            setMessages(prev => {
-              if (prev.some(m => m.id === msg.id)) return prev;
-              return [...prev, msg];
-            });
+          setMessages(prev => {
+            if (prev.some(m => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
             
-            scrollToBottom();
+          scrollToBottom();
             
-            // Mark as read if it's from the other user
-            if (msg.sender_id !== user.id) {
-              markMessagesAsRead(selectedConversation.id);
-            }
+          // Mark as read if it's from the other user
+          if (msg.sender_id !== user.id) {
+            markMessagesAsRead(selectedConversation.id);
           }
-        )
-        .subscribe();
+        }
+      )
+      .subscribe();
 
       return () => {
-        supabase.removeChannel(messagesChannel);
+        if (messageChannelRef.current)
+          supabase.removeChannel(messageChannelRef.current);
       };
-    }
   }, [selectedConversation]);
 
   useEffect(() => {
@@ -211,6 +231,10 @@ const Messages = () => {
 
   const setupCallListener = () => {
     if (!user) return;
+
+    if (callChannelRef.current) {
+      supabase.removeChannel(callChannelRef.current);
+    }
     
     callChannelRef.current = supabase
       .channel(`user-calls-${user.id}`)
