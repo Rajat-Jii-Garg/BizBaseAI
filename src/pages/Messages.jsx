@@ -173,11 +173,11 @@ const Messages = () => {
     };
   };
 
-  useEffect(() => {
-    if (selectedConversation) {
-      fetchMessages(selectedConversation.id);
-      markMessagesAsRead(selectedConversation.id);
-    }}
+  // useEffect(() => {
+  //   if (selectedConversation) {
+  //     fetchMessages(selectedConversation.id);
+  //     markMessagesAsRead(selectedConversation.id);
+  //   }}
   useEffect(() => {
     if (!selectedConversation) return;
 
