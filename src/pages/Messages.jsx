@@ -285,21 +285,18 @@ const Messages = () => {
 
       // Notify other user via broadcast
       const otherParticipant = getOtherParticipant(selectedConversation);
-      const callChannel = supabase.channel(`user-calls-${otherParticipant.id}`);
       
-      await callChannel.subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await callChannel.send({
-            type: 'broadcast',
-            event: 'incoming-call',
-            payload: {
-              from: user.id,
-              callType: type,
-              conversationId: selectedConversation.id
-            }
-          });
+      if (callChannelRef.current) {
+      await callChannelRef.current.send({
+        type: "broadcast",
+        event: "incoming-call",
+        payload: {
+          from: user.id,
+          callType: type,
+          conversationId: selectedConversation.id
         }
       });
+    }
 
       toast({
         title: "Calling...",
