@@ -40,7 +40,7 @@
 // }
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 import DashboardLayout from "@/components/DashboardLayout";
@@ -59,9 +59,8 @@ import {
   Calendar,
 } from "lucide-react";
 
-const ProfilePreviewPage = () => {
+export default function ProfilePreviewPage() {
   const { userId } = useParams();
-  const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -76,13 +75,12 @@ const ProfilePreviewPage = () => {
 
   const fetchProfile = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
 
-      if (error) throw error;
       setProfile(data);
     } catch (err) {
       console.error("Profile fetch error:", err);
@@ -108,18 +106,8 @@ const ProfilePreviewPage = () => {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin h-12 w-12 border-b-2 border-primary rounded-full" />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen text-muted-foreground">
-          Profile not found.
+        <div className="flex justify-center items-center h-screen">
+          <p className="text-lg font-medium">Loading profile preview...</p>
         </div>
       </DashboardLayout>
     );
@@ -127,180 +115,158 @@ const ProfilePreviewPage = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-5xl mx-auto space-y-6 px-4 md:px-6 pb-10">
+      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-6">
 
-        {/* HEADER */}
-        <Card className="overflow-hidden bg-card border-border shadow-md">
-          {/* Cover Image */}
+        {/* ======= PROFILE HEADER ======= */}
+        <Card className="overflow-hidden shadow-lg border-border bg-card">
+
+          {/* Banner */}
           <div className="relative h-32 md:h-48">
             <img
               src={
-                profile.banner_url ||
+                profile?.banner_url ||
                 "https://images.unsplash.com/photo-1557683316-973673baf926"
               }
-              alt="Cover"
               className="w-full h-full object-cover"
+              alt="banner"
             />
           </div>
 
-          {/* Avatar & Basic Info */}
-          <div className="px-4 md:px-6 pb-6 -mt-14 md:-mt-20 relative">
-            <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background shadow-lg">
-              <AvatarImage src={profile.avatar_url} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-3xl">
-                {profile.full_name?.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
+          <div className="px-4 md:px-6 pb-4 md:pb-6 relative">
+            <div className="flex flex-col md:flex-row md:justify-between -mt-12 md:-mt-16">
 
-            <div className="mt-4 space-y-2">
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                {profile.full_name}
-                {profile.is_verified && (
-                  <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+              {/* Avatar */}
+              <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background shadow-xl">
+                <AvatarImage src={profile?.avatar_url} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                  {profile?.full_name?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
+
+              {/* PREVIEW MODE = NO BUTTONS */}
+            </div>
+
+            {/* NAME + INFO */}
+            <div className="mt-4">
+              <h1 className="text-xl md:text-3xl font-bold flex items-center gap-2">
+                {profile?.full_name}
+                {profile?.is_verified && (
+                  <Badge variant="secondary" className="text-xs">
                     Verified
                   </Badge>
                 )}
               </h1>
 
-              <p className="text-muted-foreground text-sm md:text-base">
-                {profile.profession ||
-                  profile.current_position ||
-                  "Professional Account"}
+              <p className="text-base md:text-lg text-muted-foreground">
+                {profile?.profession || profile?.current_position}
               </p>
 
-              {/* Meta Info */}
               <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mt-2">
-                {profile.location && (
+                {profile?.location && (
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" /> {profile.location}
+                    <MapPin className="w-4 h-4" />
+                    {profile.location}
                   </span>
                 )}
 
-                {profile.company_name && (
+                {profile?.company_name && (
                   <span className="flex items-center gap-1">
-                    <Briefcase className="w-4 h-4" /> {profile.company_name}
+                    <Briefcase className="w-4 h-4" />
+                    {profile.company_name}
                   </span>
                 )}
 
-                {profile.created_at && (
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" /> Joined{" "}
-                    {new Date(profile.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </span>
-                )}
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  Joined{" "}
+                  {new Date(profile.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
+            </div>
+
+            {/* CONTACT INFO */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-muted/30 rounded-lg mt-4">
+              {profile?.email && (
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <span>{profile.email}</span>
+                </div>
+              )}
+              {profile?.phone && (
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <span>{profile.phone}</span>
+                </div>
+              )}
+              {profile?.website && (
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-muted-foreground" />
+                  <a
+                    href={profile.website}
+                    target="_blank"
+                    className="text-primary underline"
+                  >
+                    {profile.website}
+                  </a>
+                </div>
+              )}
+              {profile?.linkedin_url && (
+                <div className="flex items-center gap-2">
+                  <Linkedin className="w-4 h-4 text-muted-foreground" />
+                  <a
+                    href={profile.linkedin_url}
+                    target="_blank"
+                    className="text-primary underline"
+                  >
+                    LinkedIn
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </Card>
 
-        {/* BIO */}
+        {/* ======= POSTS SECTION ======= */}
         <Card className="bg-card border-border">
-          <CardHeader className="px-4 md:px-6">
-            <CardTitle className="text-lg">About</CardTitle>
+          <CardHeader>
+            <CardTitle>Posts</CardTitle>
           </CardHeader>
-          <CardContent className="px-4 md:px-6">
-            <p className="text-sm md:text-base text-foreground leading-relaxed">
-              {profile.bio ||
-                profile.about ||
-                "No bio added yet."}
-            </p>
-          </CardContent>
-        </Card>
 
-        {/* CONTACT */}
-        <Card className="bg-card border-border">
-          <CardHeader className="px-4 md:px-6">
-            <CardTitle className="text-lg">Contact Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 px-4 md:px-6">
-
-            {profile.email && (
-              <div className="flex items-center gap-2 text-sm">
-                <Mail className="w-4 h-4 text-muted-foreground" />
-                <span>{profile.email}</span>
-              </div>
-            )}
-
-            {profile.phone && (
-              <div className="flex items-center gap-2 text-sm">
-                <Phone className="w-4 h-4 text-muted-foreground" />
-                <span>{profile.phone}</span>
-              </div>
-            )}
-
-            {profile.website && (
-              <div className="flex items-center gap-2 text-sm">
-                <Globe className="w-4 h-4 text-muted-foreground" />
-                <a
-                  href={profile.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  {profile.website.replace(/^https?:\/\//, "")}
-                </a>
-              </div>
-            )}
-
-            {profile.linkedin_url && (
-              <div className="flex items-center gap-2 text-sm">
-                <Linkedin className="w-4 h-4 text-muted-foreground" />
-                <a
-                  href={profile.linkedin_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  LinkedIn
-                </a>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* POSTS */}
-        <Card className="bg-card border-border">
-          <CardHeader className="px-4 md:px-6">
-            <CardTitle className="text-lg">
-              Posts ({posts.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 px-4 md:px-6">
+          <CardContent>
             {posts.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-6">
-                No posts available.
+              <p className="text-center text-muted-foreground py-6">
+                No posts available
               </p>
             ) : (
-              posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="border border-border rounded-lg p-4 space-y-3"
-                >
-                  <p className="text-sm text-foreground">{post.content}</p>
+              <div className="space-y-4">
+                {posts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="border border-border rounded-lg p-4 space-y-3"
+                  >
+                    <p className="text-sm">{post.content}</p>
 
-                  {post.image_url && (
-                    <img
-                      src={post.image_url}
-                      alt="Post"
-                      className="rounded-lg max-h-96 object-cover w-full"
-                    />
-                  )}
+                    {post.image_url && (
+                      <img
+                        src={post.image_url}
+                        className="rounded-lg w-full max-h-80 object-cover"
+                        alt="post"
+                      />
+                    )}
 
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(post.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              ))
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
-
       </div>
     </DashboardLayout>
   );
-};
-
-export default ProfilePreviewPage;
+}
