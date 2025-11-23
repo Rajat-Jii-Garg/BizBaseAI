@@ -66,7 +66,7 @@ const App = () => (
                 <ProtectedRoute>
                   <ProfilePreviewPage />
                 </ProtectedRoute>
-              } />
+              }/>
               <Route path="/messages" element={
                 <ProtectedRoute>
                   <Messages />
