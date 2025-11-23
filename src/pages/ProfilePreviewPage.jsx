@@ -1,10 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import DashboardLayout from '@/components/DashboardLayout';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-
-// Just import your Profile UI component (the full profile UI)
-// We will create this next
-import PublicProfileView from '@/components/PublicProfileView';
+import {
+  Camera,
+  CheckCircle,
+  Edit3,
+  Mail,
+  MapPin,
+  Phone,
+  Globe,
+  Linkedin,
+  Share2,
+  Eye,
+  Users,
+  Bookmark,
+  FileText,
+  MessageSquare,
+  Repeat2,
+  Settings,
+  User,
+  Briefcase,
+  Calendar
+} from 'lucide-react';
+// import PublicProfileView from '@/components/PublicProfileView';
 
 export default function ProfilePreviewPage() {
   const { userId } = useParams();
