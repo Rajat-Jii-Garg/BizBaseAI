@@ -35,6 +35,7 @@ import Demo from "./pages/Demo";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import ProfileDashboard from "./pages/ProfileDashboard";
+import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 
 const queryClient = new QueryClient();
 
