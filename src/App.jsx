@@ -57,7 +57,15 @@ const App = () => (
                   <Dashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/profile/:userId?" element={
+              {/* Logged-in user (self profile) */}
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } />
+
+              {/* View other user profile */}
+              <Route path="/profile/:userId" element={
                 <ProtectedRoute>
                   <ProfilePage />
                 </ProtectedRoute>

@@ -66,27 +66,20 @@ const ProfilePage = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('none');
 
-  // useEffect(() => {
-  //   if (userId && user) {
-  //     setIsOwnProfile(userId === user.id);
-  //     fetchUserProfile();
-  //     fetchUserPosts();
-  //     checkConnectionStatus();
-  //   } else if (user) {
-  //     setIsOwnProfile(true);
-  //     fetchCurrentUserProfile();
-  //     fetchUserPosts();
-  //   }
-  // }, [userId, user]);
-
-  // FORCE this page to act as "view other user"
   useEffect(() => {
-    if (!userId) return;
+  if (!user) return;
 
+  if (userId) {
+    setIsOwnProfile(userId === user.id);
     fetchUserProfile();
     fetchUserPosts();
     checkConnectionStatus();
-  }, [userId]);
+  } else {
+    setIsOwnProfile(true);
+    fetchCurrentUserProfile();
+    fetchUserPosts();
+  }
+}, [userId, user]);
 
   const fetchCurrentUserProfile = async () => {
     if (!user) return;
