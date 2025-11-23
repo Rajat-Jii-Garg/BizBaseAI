@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      call_signals: {
+        Row: {
+          conversation_id: string | null
+          created_at: string | null
+          data: Json | null
+          id: string
+          receiver_id: string | null
+          sender_id: string | null
+          signal_type: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          receiver_id?: string | null
+          sender_id?: string | null
+          signal_type?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          receiver_id?: string | null
+          sender_id?: string | null
+          signal_type?: string | null
+        }
+        Relationships: []
+      }
       communities: {
         Row: {
           activity_level: string | null
