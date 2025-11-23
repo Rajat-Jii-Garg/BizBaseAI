@@ -30,7 +30,7 @@ import {
   Briefcase,
   Calendar
 } from 'lucide-react';
-// import PublicProfileView from '@/components/PublicProfileView';
+import PublicProfileView from '@/components/PublicProfileView';
 
 export default function ProfilePreviewPage() {
   const { userId } = useParams();
