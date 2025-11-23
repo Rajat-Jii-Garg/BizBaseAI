@@ -62,7 +62,7 @@ const App = () => (
                   <ProfilePage />
                 </ProtectedRoute>
               } />
-              <Route path="/profile/preview/:userId" element={
+              <Route path="/profile/preview" element={
                 <ProtectedRoute>
                   <ProfilePreviewPage />
                 </ProtectedRoute>

@@ -9,28 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  Camera,
-  CheckCircle,
-  Edit3,
-  Mail,
-  MapPin,
-  Phone,
-  Globe,
-  Linkedin,
-  Share2,
-  Eye,
-  Users,
-  Bookmark,
-  FileText,
-  MessageSquare,
-  Repeat2,
-  Settings,
-  User,
-  Briefcase,
-  Calendar
-} from 'lucide-react';
-import PublicProfileView from '@/components/PublicProfileView';
+// import PublicProfileView from '@/components/PublicProfileView';
 
 export default function ProfilePreviewPage() {
   const { userId } = useParams();
