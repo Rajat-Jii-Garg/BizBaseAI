@@ -291,7 +291,7 @@ const BusinessSetup = () => {
         <div className="text-center mb-8">
           
           <button onClick={() => navigate('/dashboard')} className="absolute left-0 flex items-center gap-1 text-gray-700 hover:text-black">
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-6 h-6" />
           </button>
           
           <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
