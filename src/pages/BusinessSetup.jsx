@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { useNavigate } from "react-router-dom";
 import { 
   Building2, 
   Users, 
@@ -25,7 +24,6 @@ import { useToast } from '@/hooks/use-toast';
 
 const BusinessSetup = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -289,11 +287,6 @@ const BusinessSetup = () => {
       <div className="max-w-4xl mx-auto p-6">          
         {/* Header */}
         <div className="text-center mb-8">
-          
-          <button onClick={() => navigate('/dashboard')} className="absolute left-2 flex items-center gap-1 text-gray-700 hover:text-black">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          
           <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
             <Building2 className="w-8 h-8 text-blue-600" />
             Register Your Business
