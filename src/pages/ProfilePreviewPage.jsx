@@ -52,6 +52,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -66,6 +67,7 @@ import {
 
 export default function ProfilePreviewPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const { userId } = useParams();
   const navigate = useNavigate();
 
