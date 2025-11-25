@@ -33,7 +33,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ProfileDashboard = () => {
+const ProfilePage = () => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +67,7 @@ const ProfileDashboard = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userID)
+        .eq('id', userId)
         .single();
 
       if (error) throw error;
@@ -90,12 +90,12 @@ const ProfileDashboard = () => {
         supabase
           .from('connections')
           .select('id')
-          .or(`requester_id.eq.${userID},addressee_id.eq.${userID}`)
+          .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
           .eq('status', 'accepted'),
         supabase
           .from('posts')
           .select('likes_count, comments_count, shares_count')
-          .eq('user_id', userID)
+          .eq('user_id', userId)
       ]);
 
       const totalEngagement = postsRes.data?.reduce((sum, post) => 
@@ -123,7 +123,7 @@ const ProfileDashboard = () => {
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
-        .eq('user_id', userID)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (postsError) throw postsError;
@@ -138,7 +138,7 @@ const ProfileDashboard = () => {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url, current_position, company_name')
-        .eq('id', userID)
+        .eq('id', userId)
         .single();
 
       if (profileError) {
@@ -607,4 +607,4 @@ const ProfileDashboard = () => {
   );
 };
 
-export default ProfileDashboard;
+export default ProfilePage;
