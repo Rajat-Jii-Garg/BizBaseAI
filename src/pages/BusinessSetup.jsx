@@ -286,7 +286,11 @@ const BusinessSetup = () => {
     <DashboardLayout>
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
-        <div className="text-center mb-8">
+        {/* <div className="text-center mb-8"> */}
+        <div className="flex items-center gap-3 justify-center relative mb-8">
+          <button onClick={() => navigate('/dashboard/home')} className="absolute left-0 flex items-center gap-1 text-gray-700 hover:text-black">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
             <Building2 className="w-8 h-8 text-blue-600" />
             Register Your Business
