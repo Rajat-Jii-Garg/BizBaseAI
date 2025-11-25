@@ -5,8 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";               // this is the change
 import { 
   Building2, 
   Users, 
@@ -26,7 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const BusinessSetup = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const navigate = useNavigate();                              // this is the change
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -286,13 +285,17 @@ const BusinessSetup = () => {
   };
 
   return (
-    // <DashboardLayout>
-      <div className="max-w-4xl mx-auto p-6">
+    // <DashboardLayout>                                // this is the change
+      <div className="max-w-4xl mx-auto p-6 relative">          
         {/* Header */}
         <div className="text-center mb-8">
+          
+          // this is the change ----------------------------------------
           <button onClick={() => navigate('/dashboard/home')} className="absolute left-0 flex items-center gap-1 text-gray-700 hover:text-black">
             <ArrowLeft className="w-5 h-5" />
           </button>
+          -----------------------------------------------------------------
+          
           <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
             <Building2 className="w-8 h-8 text-blue-600" />
             Register Your Business
