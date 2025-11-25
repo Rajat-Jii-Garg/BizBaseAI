@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { useNavigate } from "react-router-dom";               // this is the change
+import { useNavigate } from "react-router-dom";
 import { 
   Building2, 
   Users, 
@@ -25,7 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const BusinessSetup = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();                              // this is the change
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -285,8 +285,8 @@ const BusinessSetup = () => {
   };
 
   return (
-    <DashboardLayout>                                // this is the change
-      <div className="max-w-4xl mx-auto p-6 relative">          
+    <DashboardLayout>
+      <div className="max-w-4xl mx-auto p-6">          
         {/* Header */}
         <div className="text-center mb-8">
           
@@ -350,7 +350,7 @@ const BusinessSetup = () => {
           )}
         </div>
       </div>
-    // </DashboardLayout>
+    </DashboardLayout>
   );
 };
 
