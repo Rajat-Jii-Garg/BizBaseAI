@@ -78,7 +78,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
     : post.content;
 
   const handleProfileClick = () => {
-    navigate(`/profile/${post.userId}`);
+    navigate(`/profile/${post.user_id}`);
   };
 
   const handleEdit = async () => {
