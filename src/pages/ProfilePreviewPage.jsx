@@ -49,6 +49,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { Button } from "@/components/ui/button";
+import { Users, MessageSquare } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 import {
   Mail,
   Phone,
@@ -60,7 +65,12 @@ import {
 } from "lucide-react";
 
 export default function ProfilePreviewPage() {
+  const { user } = useAuth();
   const { userId } = useParams();
+  const navigate = useNavigate();
+
+  const isOwnProfile = user?.id === userId;
+  const profileUserId = userId;
 
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -103,6 +113,28 @@ export default function ProfilePreviewPage() {
     }
   };
 
+  const handleSendFriendRequest = async (targetId) => {
+  try {
+    const { error } = await supabase
+      .from("connections")
+      .insert([
+        {
+          requester_id: user.id,
+          addressee_id: targetId,
+          status: "pending",
+        },
+      ]);
+
+    if (error) throw error;
+
+    alert("Friend request sent!");
+  } catch (err) {
+    console.error("Friend request error:", err);
+    alert("Error sending request.");
+  }
+};
+
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -143,7 +175,15 @@ export default function ProfilePreviewPage() {
                 </AvatarFallback>
               </Avatar>
 
-              {/* PREVIEW MODE = NO BUTTONS */}
+              <div className="mt-4 md:mt-0 flex gap-2 flex-wrap">
+                <Button variant="default" size="sm" disabled={isOwnProfile} onClick={() => !isOwnProfile && handleSendFriendRequest(profileUserId)} className="flex-1 md:flex-none">
+                  <Users className="w-4 h-4 mr-2" />Add Friend
+                </Button>
+
+                <Button variant="outline" size="sm" disabled={isOwnProfile} onClick={() => !isOwnProfile && navigate(`/messages/${profileUserId}`)} className="flex-1 md:flex-none">
+                  <MessageSquare className="w-4 h-4 mr-2" />Message
+                </Button>
+              </div>
             </div>
 
             {/* NAME + INFO */}
