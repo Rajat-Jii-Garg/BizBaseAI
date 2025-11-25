@@ -290,7 +290,7 @@ const BusinessSetup = () => {
         {/* Header */}
         <div className="text-center mb-8">
           
-          <button onClick={() => navigate('/dashboard')} className="absolute left-1 flex items-center gap-1 text-gray-700 hover:text-black">
+          <button onClick={() => navigate('/dashboard')} className="absolute left-7 flex items-center gap-1 text-gray-700 hover:text-black">
             <ArrowLeft className="w-6 h-6" />
           </button>
           
