@@ -285,7 +285,7 @@ const BusinessSetup = () => {
   };
 
   return (
-    // <DashboardLayout>                                // this is the change
+    <DashboardLayout>                                // this is the change
       <div className="max-w-4xl mx-auto p-6 relative">          
         {/* Header */}
         <div className="text-center mb-8">
