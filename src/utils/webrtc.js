@@ -7,9 +7,9 @@ export class WebRTCManager {
     this.peerConnection = null;
     this.localStream = null;
     this.remoteStream = null;
-    this.signalingChannel = null;
     this.onRemoteStream = null;
     this.onCallEnded = null;
+    this.onIceCandidate = null; // Callback for ICE candidates
     this.pendingCandidates = [];
     
     this.configuration = {
@@ -24,171 +24,130 @@ export class WebRTCManager {
     };
   }
 
-  async initializeSignaling() {
-    console.log('Initializing signaling for conversation:', this.conversationId);
-    
-    this.signalingChannel = supabase
-      .channel(`webrtc-${this.conversationId}`)
-      .on('broadcast', { event: 'offer' }, ({ payload }) => {
-        console.log('Received offer from:', payload.from);
-        if (payload.from !== this.userId) {
-          this.handleOffer(payload);
-        }
-      })
-      .on('broadcast', { event: 'answer' }, ({ payload }) => {
-        console.log('Received answer from:', payload.from);
-        if (payload.from !== this.userId) {
-          this.handleAnswer(payload);
-        }
-      })
-      .on('broadcast', { event: 'ice-candidate' }, ({ payload }) => {
-        console.log('Received ICE candidate from:', payload.from);
-        if (payload.from !== this.userId) {
-          this.handleIceCandidate(payload);
-        }
-      })
-      .on('broadcast', { event: 'call-ended' }, ({ payload }) => {
-        console.log('Call ended signal from:', payload.from);
-        if (payload.from !== this.userId) {
-          this.handleCallEnded();
-        }
-      })
-      .subscribe((status) => {
-        console.log('WebRTC signaling channel status:', status);
+  createPeerConnection() {
+    console.log('Creating peer connection...');
+    this.peerConnection = new RTCPeerConnection(this.configuration);
+
+    // Handle remote stream
+    this.peerConnection.ontrack = (event) => {
+      console.log('ontrack event received:', event.streams);
+      if (!this.remoteStream) {
+        this.remoteStream = new MediaStream();
+      }
+      event.streams[0].getTracks().forEach(track => {
+        console.log('Adding remote track:', track.kind);
+        this.remoteStream.addTrack(track);
       });
+      if (this.onRemoteStream) {
+        this.onRemoteStream(this.remoteStream);
+      }
+    };
+
+    // Handle ICE candidates
+    this.peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
+        console.log('ICE candidate generated:', event.candidate.candidate?.substring(0, 50));
+        if (this.onIceCandidate) {
+          this.onIceCandidate(event.candidate);
+        }
+      }
+    };
+
+    this.peerConnection.oniceconnectionstatechange = () => {
+      console.log('ICE connection state:', this.peerConnection?.iceConnectionState);
+      if (this.peerConnection?.iceConnectionState === 'failed' ||
+          this.peerConnection?.iceConnectionState === 'disconnected') {
+        console.log('ICE connection failed or disconnected');
+      }
+      if (this.peerConnection?.iceConnectionState === 'connected') {
+        console.log('ICE connection established!');
+      }
+    };
+
+    this.peerConnection.onconnectionstatechange = () => {
+      console.log('Connection state:', this.peerConnection?.connectionState);
+    };
+
+    return this.peerConnection;
   }
 
   async startCall(isVideo = false) {
     try {
+      console.log('Starting call, isVideo:', isVideo);
+      
       // Get local stream
       this.localStream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: isVideo
       });
+      console.log('Got local stream:', this.localStream.getTracks().map(t => t.kind));
 
       // Create peer connection
-      this.peerConnection = new RTCPeerConnection(this.configuration);
+      this.createPeerConnection();
 
       // Add local tracks
       this.localStream.getTracks().forEach(track => {
+        console.log('Adding local track:', track.kind);
         this.peerConnection.addTrack(track, this.localStream);
       });
 
-      // Handle remote stream
-      this.peerConnection.ontrack = (event) => {
-        if (!this.remoteStream) {
-          this.remoteStream = new MediaStream();
-        }
-        event.streams[0].getTracks().forEach(track => {
-          this.remoteStream.addTrack(track);
-        });
-        if (this.onRemoteStream) {
-          this.onRemoteStream(this.remoteStream);
-        }
-      };
-
-      // Handle ICE candidates
-      this.peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-          this.signalingChannel.send({
-            type: 'broadcast',
-            event: 'ice-candidate',
-            payload: {
-              from: this.userId,
-              candidate: event.candidate
-            }
-          });
-        }
-      };
-
-      // Create and send offer
+      // Create and set local description
       const offer = await this.peerConnection.createOffer();
       await this.peerConnection.setLocalDescription(offer);
+      console.log('Local description set (offer)');
 
-      await this.signalingChannel.send({
-        type: 'broadcast',
-        event: 'offer',
-        payload: {
-          from: this.userId,
-          offer: offer,
-          isVideo: isVideo
-        }
-      });
-
-      return this.localStream;
+      return { stream: this.localStream, offer: offer };
     } catch (error) {
       console.error('Error starting call:', error);
       throw error;
     }
   }
 
-  async handleOffer(payload) {
+  async answerCall(offer, isVideo = false) {
     try {
+      console.log('Answering call, isVideo:', isVideo);
+      
       // Get local stream
       this.localStream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: payload.isVideo
+        video: isVideo
       });
+      console.log('Got local stream:', this.localStream.getTracks().map(t => t.kind));
 
       // Create peer connection
-      this.peerConnection = new RTCPeerConnection(this.configuration);
+      this.createPeerConnection();
 
       // Add local tracks
       this.localStream.getTracks().forEach(track => {
+        console.log('Adding local track:', track.kind);
         this.peerConnection.addTrack(track, this.localStream);
       });
 
-      // Handle remote stream
-      this.peerConnection.ontrack = (event) => {
-        if (!this.remoteStream) {
-          this.remoteStream = new MediaStream();
-        }
-        event.streams[0].getTracks().forEach(track => {
-          this.remoteStream.addTrack(track);
-        });
-        if (this.onRemoteStream) {
-          this.onRemoteStream(this.remoteStream);
-        }
-      };
-
-      // Handle ICE candidates
-      this.peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-          this.signalingChannel.send({
-            type: 'broadcast',
-            event: 'ice-candidate',
-            payload: {
-              from: this.userId,
-              candidate: event.candidate
-            }
-          });
-        }
-      };
-
-      // Set remote description and create answer
-      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(payload.offer));
+      // Set remote description (the offer from caller)
+      console.log('Setting remote description (offer from caller)');
+      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      
+      // Process any pending ICE candidates
       await this.processPendingCandidates();
+
+      // Create and set local description (answer)
       const answer = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(answer);
+      console.log('Local description set (answer)');
 
-      await this.signalingChannel.send({
-        type: 'broadcast',
-        event: 'answer',
-        payload: {
-          from: this.userId,
-          answer: answer
-        }
-      });
-
-      return this.localStream;
+      return { stream: this.localStream, answer: answer };
     } catch (error) {
-      console.error('Error handling offer:', error);
+      console.error('Error answering call:', error);
       throw error;
     }
   }
 
   async handleAnswer(payload) {
     try {
+      if (!this.peerConnection) {
+        console.error('No peer connection when handling answer');
+        return;
+      }
       console.log('Setting remote description from answer');
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(payload.answer));
       await this.processPendingCandidates();
@@ -218,6 +177,7 @@ export class WebRTCManager {
       for (const candidate of this.pendingCandidates) {
         try {
           await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+          console.log('Added pending ICE candidate');
         } catch (error) {
           console.error('Error adding pending ICE candidate:', error);
         }
@@ -248,21 +208,6 @@ export class WebRTCManager {
     return false;
   }
 
-  async endCall() {
-    // Send call ended signal
-    if (this.signalingChannel) {
-      await this.signalingChannel.send({
-        type: 'broadcast',
-        event: 'call-ended',
-        payload: {
-          from: this.userId
-        }
-      });
-    }
-
-    this.cleanup();
-  }
-
   handleCallEnded() {
     if (this.onCallEnded) {
       this.onCallEnded();
@@ -271,15 +216,23 @@ export class WebRTCManager {
   }
 
   cleanup() {
+    console.log('Cleaning up WebRTC...');
+    
     // Stop local stream
     if (this.localStream) {
-      this.localStream.getTracks().forEach(track => track.stop());
+      this.localStream.getTracks().forEach(track => {
+        track.stop();
+        console.log('Stopped local track:', track.kind);
+      });
       this.localStream = null;
     }
 
     // Stop remote stream
     if (this.remoteStream) {
-      this.remoteStream.getTracks().forEach(track => track.stop());
+      this.remoteStream.getTracks().forEach(track => {
+        track.stop();
+        console.log('Stopped remote track:', track.kind);
+      });
       this.remoteStream = null;
     }
 
@@ -287,12 +240,9 @@ export class WebRTCManager {
     if (this.peerConnection) {
       this.peerConnection.close();
       this.peerConnection = null;
+      console.log('Peer connection closed');
     }
 
-    // Unsubscribe from signaling
-    if (this.signalingChannel) {
-      supabase.removeChannel(this.signalingChannel);
-      this.signalingChannel = null;
-    }
+    this.pendingCandidates = [];
   }
 }
