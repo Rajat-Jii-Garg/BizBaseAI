@@ -236,10 +236,14 @@ const Messages = () => {
       supabase.removeChannel(callChannelRef.current);
     }
     
+    // Create a global call channel that all users can broadcast to
     callChannelRef.current = supabase
-      .channel(`user-calls-${user.id}`)
+      .channel('global-calls')
       .on('broadcast', { event: 'incoming-call' }, async ({ payload }) => {
-        if (payload.from === user.id) return;
+        // Only respond if this call is for me
+        if (payload.to !== user.id || payload.from === user.id) return;
+        
+        console.log('Incoming call received:', payload);
         
         const { data: conversation } = await supabase
           .from('conversations')
@@ -259,7 +263,8 @@ const Messages = () => {
         }
       })
       .on('broadcast', { event: 'call-accepted' }, async ({ payload }) => {
-        if (payload.to === user.id && callState === 'calling') {
+        if (payload.to === user.id) {
+          console.log('Call accepted:', payload);
           setCallState('connecting');
         }
       })
@@ -278,7 +283,9 @@ const Messages = () => {
           handleEndCall();
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Call channel status:', status);
+      });
   };
 
   const initiateCall = async (type) => {
@@ -311,16 +318,18 @@ const Messages = () => {
       const otherParticipant = getOtherParticipant(selectedConversation);
       
       if (callChannelRef.current) {
-      await callChannelRef.current.send({
-        type: "broadcast",
-        event: "incoming-call",
-        payload: {
-          from: user.id,
-          callType: type,
-          conversationId: selectedConversation.id
-        }
-      });
-    }
+        console.log('Sending call to:', otherParticipant.id);
+        await callChannelRef.current.send({
+          type: "broadcast",
+          event: "incoming-call",
+          payload: {
+            from: user.id,
+            to: otherParticipant.id,
+            callType: type,
+            conversationId: selectedConversation.id
+          }
+        });
+      }
 
       toast({
         title: "Calling...",
@@ -1060,6 +1069,8 @@ const Messages = () => {
         remoteStream={remoteStream}
         otherUser={selectedConversation ? getOtherParticipant(selectedConversation) : null}
         onEndCall={handleEndCall}
+        onAcceptCall={() => handleAcceptCall(callType)}
+        onDeclineCall={handleDeclineCall}
         onToggleMute={handleToggleMute}
         onToggleVideo={handleToggleVideo}
         isMuted={isMuted}

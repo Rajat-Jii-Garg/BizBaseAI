@@ -10,39 +10,52 @@ export class WebRTCManager {
     this.signalingChannel = null;
     this.onRemoteStream = null;
     this.onCallEnded = null;
+    this.pendingCandidates = [];
     
     this.configuration = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
-      ]
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' },
+      ],
+      iceCandidatePoolSize: 10
     };
   }
 
   async initializeSignaling() {
+    console.log('Initializing signaling for conversation:', this.conversationId);
+    
     this.signalingChannel = supabase
       .channel(`webrtc-${this.conversationId}`)
       .on('broadcast', { event: 'offer' }, ({ payload }) => {
+        console.log('Received offer from:', payload.from);
         if (payload.from !== this.userId) {
           this.handleOffer(payload);
         }
       })
       .on('broadcast', { event: 'answer' }, ({ payload }) => {
+        console.log('Received answer from:', payload.from);
         if (payload.from !== this.userId) {
           this.handleAnswer(payload);
         }
       })
       .on('broadcast', { event: 'ice-candidate' }, ({ payload }) => {
+        console.log('Received ICE candidate from:', payload.from);
         if (payload.from !== this.userId) {
           this.handleIceCandidate(payload);
         }
       })
       .on('broadcast', { event: 'call-ended' }, ({ payload }) => {
+        console.log('Call ended signal from:', payload.from);
         if (payload.from !== this.userId) {
           this.handleCallEnded();
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('WebRTC signaling channel status:', status);
+      });
   }
 
   async startCall(isVideo = false) {
@@ -154,6 +167,7 @@ export class WebRTCManager {
 
       // Set remote description and create answer
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(payload.offer));
+      await this.processPendingCandidates();
       const answer = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(answer);
 
@@ -175,7 +189,9 @@ export class WebRTCManager {
 
   async handleAnswer(payload) {
     try {
+      console.log('Setting remote description from answer');
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(payload.answer));
+      await this.processPendingCandidates();
     } catch (error) {
       console.error('Error handling answer:', error);
     }
@@ -183,11 +199,30 @@ export class WebRTCManager {
 
   async handleIceCandidate(payload) {
     try {
-      if (this.peerConnection) {
+      if (this.peerConnection && this.peerConnection.remoteDescription) {
         await this.peerConnection.addIceCandidate(new RTCIceCandidate(payload.candidate));
+        console.log('Added ICE candidate successfully');
+      } else {
+        // Queue the candidate if remote description not set yet
+        console.log('Queuing ICE candidate for later');
+        this.pendingCandidates.push(payload.candidate);
       }
     } catch (error) {
       console.error('Error handling ICE candidate:', error);
+    }
+  }
+
+  async processPendingCandidates() {
+    if (this.peerConnection && this.peerConnection.remoteDescription) {
+      console.log('Processing', this.pendingCandidates.length, 'pending candidates');
+      for (const candidate of this.pendingCandidates) {
+        try {
+          await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (error) {
+          console.error('Error adding pending ICE candidate:', error);
+        }
+      }
+      this.pendingCandidates = [];
     }
   }
 
