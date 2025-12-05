@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Phone, Video, Mic, MicOff, VideoOff, PhoneOff, Volume2, VolumeX, Maximize2, Minimize2, SwitchCamera } from 'lucide-react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 const CallModal = ({ 
   isOpen, 
@@ -87,6 +88,16 @@ const CallModal = ({
         } p-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/10 transition-all duration-300 border-2 border-primary/20`}
         onMouseMove={handleMouseMove}
       >
+        <VisuallyHidden>
+          <DialogTitle>
+            {callState === 'incoming' ? 'Incoming Call' : callType === 'video' ? 'Video Call' : 'Voice Call'}
+          </DialogTitle>
+          <DialogDescription>
+            {callState === 'incoming' 
+              ? `Incoming ${callType} call from ${otherUser?.full_name || 'Unknown'}` 
+              : `${callType === 'video' ? 'Video' : 'Voice'} call with ${otherUser?.full_name || 'Unknown'}`}
+          </DialogDescription>
+        </VisuallyHidden>
         <div className="relative w-full h-full flex flex-col">
           {/* Remote Video/Avatar */}
           <div className="relative flex-1 bg-gradient-to-br from-muted/30 to-muted/10 flex items-center justify-center overflow-hidden">

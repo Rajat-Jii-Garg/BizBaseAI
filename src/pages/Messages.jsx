@@ -59,6 +59,8 @@ const Messages = () => {
   const webrtcManagerRef = useRef(null);
   const callChannelRef = useRef(null);
   const [unreadCounts, setUnreadCounts] = useState({});
+  const pendingOfferRef = useRef(null); // Store offer from caller
+  const callerIdRef = useRef(null); // Store caller ID
   
   // UI states
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -245,6 +247,10 @@ const Messages = () => {
         
         console.log('Incoming call received:', payload);
         
+        // Store the offer and caller info for later use
+        pendingOfferRef.current = payload.offer;
+        callerIdRef.current = payload.from;
+        
         const { data: conversation } = await supabase
           .from('conversations')
           .select(`
@@ -264,7 +270,11 @@ const Messages = () => {
       })
       .on('broadcast', { event: 'call-accepted' }, async ({ payload }) => {
         if (payload.to === user.id) {
-          console.log('Call accepted:', payload);
+          console.log('Call accepted, received answer:', payload);
+          // Apply the answer from receiver
+          if (webrtcManagerRef.current && payload.answer) {
+            await webrtcManagerRef.current.handleAnswer({ answer: payload.answer, from: payload.from });
+          }
           setCallState('connecting');
         }
       })
@@ -283,6 +293,12 @@ const Messages = () => {
           handleEndCall();
         }
       })
+      .on('broadcast', { event: 'ice-candidate' }, async ({ payload }) => {
+        if (payload.to === user.id && webrtcManagerRef.current) {
+          console.log('Received ICE candidate via global channel');
+          await webrtcManagerRef.current.handleIceCandidate(payload);
+        }
+      })
       .subscribe((status) => {
         console.log('Call channel status:', status);
       });
@@ -296,12 +312,29 @@ const Messages = () => {
       setCallState('calling');
       setIsCallModalOpen(true);
 
-      // Initialize WebRTC manager
+      const otherParticipant = getOtherParticipant(selectedConversation);
+
+      // Initialize WebRTC manager with ICE callback for global channel
       webrtcManagerRef.current = new WebRTCManager(user.id, selectedConversation.id);
-      await webrtcManagerRef.current.initializeSignaling();
+      
+      // Set ICE candidate callback to send via global channel
+      webrtcManagerRef.current.onIceCandidate = async (candidate) => {
+        if (callChannelRef.current) {
+          await callChannelRef.current.send({
+            type: 'broadcast',
+            event: 'ice-candidate',
+            payload: {
+              from: user.id,
+              to: otherParticipant.id,
+              candidate: candidate
+            }
+          });
+        }
+      };
 
       // Set up callbacks
       webrtcManagerRef.current.onRemoteStream = (stream) => {
+        console.log('Got remote stream!');
         setRemoteStream(stream);
         setCallState('active');
       };
@@ -310,15 +343,13 @@ const Messages = () => {
         handleEndCall();
       };
 
-      // Start call
-      const stream = await webrtcManagerRef.current.startCall(type === 'video');
+      // Start call and get offer
+      const { stream, offer } = await webrtcManagerRef.current.startCall(type === 'video');
       setLocalStream(stream);
 
-      // Notify other user via broadcast
-      const otherParticipant = getOtherParticipant(selectedConversation);
-      
+      // Send call with offer included
       if (callChannelRef.current) {
-        console.log('Sending call to:', otherParticipant.id);
+        console.log('Sending call with offer to:', otherParticipant.id);
         await callChannelRef.current.send({
           type: "broadcast",
           event: "incoming-call",
@@ -326,7 +357,8 @@ const Messages = () => {
             from: user.id,
             to: otherParticipant.id,
             callType: type,
-            conversationId: selectedConversation.id
+            conversationId: selectedConversation.id,
+            offer: offer
           }
         });
       }
@@ -355,24 +387,29 @@ const Messages = () => {
         throw new Error('No conversation found');
       }
       
-      // Send accept signal
       const otherParticipant = getOtherParticipant(convToUse);
-      if (callChannelRef.current) {
-        await callChannelRef.current.send({
-          type: 'broadcast',
-          event: 'call-accepted',
-          payload: {
-            from: user.id,
-            to: otherParticipant.id
-          }
-        });
-      }
+      const callerId = callerIdRef.current || otherParticipant.id;
       
       // Initialize WebRTC
       webrtcManagerRef.current = new WebRTCManager(user.id, convToUse.id);
-      await webrtcManagerRef.current.initializeSignaling();
+      
+      // Set ICE candidate callback
+      webrtcManagerRef.current.onIceCandidate = async (candidate) => {
+        if (callChannelRef.current) {
+          await callChannelRef.current.send({
+            type: 'broadcast',
+            event: 'ice-candidate',
+            payload: {
+              from: user.id,
+              to: callerId,
+              candidate: candidate
+            }
+          });
+        }
+      };
 
       webrtcManagerRef.current.onRemoteStream = (stream) => {
+        console.log('Got remote stream!');
         setRemoteStream(stream);
         setCallState('active');
       };
@@ -381,8 +418,35 @@ const Messages = () => {
         handleEndCall();
       };
       
-      const stream = await webrtcManagerRef.current.startCall(type === 'video');
+      // Answer the call using the pending offer
+      if (!pendingOfferRef.current) {
+        throw new Error('No offer received from caller');
+      }
+      
+      const { stream, answer } = await webrtcManagerRef.current.answerCall(
+        pendingOfferRef.current, 
+        type === 'video'
+      );
       setLocalStream(stream);
+      
+      // Send accept signal WITH the answer
+      if (callChannelRef.current) {
+        console.log('Sending call accepted with answer to:', callerId);
+        await callChannelRef.current.send({
+          type: 'broadcast',
+          event: 'call-accepted',
+          payload: {
+            from: user.id,
+            to: callerId,
+            answer: answer
+          }
+        });
+      }
+      
+      // Clear pending offer
+      pendingOfferRef.current = null;
+      callerIdRef.current = null;
+      
     } catch (error) {
       console.error('Error accepting call:', error);
       toast({
@@ -395,40 +459,49 @@ const Messages = () => {
   };
 
   const handleDeclineCall = async () => {
-    const otherParticipant = getOtherParticipant(selectedConversation);
+    const otherParticipant = selectedConversation ? getOtherParticipant(selectedConversation) : null;
+    const targetId = callerIdRef.current || otherParticipant?.id;
     
-    if (callChannelRef.current) {
+    if (callChannelRef.current && targetId) {
       await callChannelRef.current.send({
         type: 'broadcast',
         event: 'call-rejected',
         payload: {
           from: user.id,
-          to: otherParticipant.id
+          to: targetId
         }
       });
     }
     
+    // Clear refs
+    pendingOfferRef.current = null;
+    callerIdRef.current = null;
     handleEndCall();
   };
 
   const handleEndCall = async () => {
     const otherParticipant = selectedConversation ? getOtherParticipant(selectedConversation) : null;
+    const targetId = callerIdRef.current || otherParticipant?.id;
     
-    if (callChannelRef.current && otherParticipant) {
+    if (callChannelRef.current && targetId) {
       await callChannelRef.current.send({
         type: 'broadcast',
         event: 'call-ended',
         payload: {
           from: user.id,
-          to: otherParticipant.id
+          to: targetId
         }
       });
     }
     
     if (webrtcManagerRef.current) {
-      await webrtcManagerRef.current.cleanup();
+      webrtcManagerRef.current.cleanup();
       webrtcManagerRef.current = null;
     }
+    
+    // Clear refs
+    pendingOfferRef.current = null;
+    callerIdRef.current = null;
     
     setIsCallModalOpen(false);
     setCallState('idle');
