@@ -84,6 +84,15 @@ const Messages = () => {
       if (callChannelRef.current) {
         supabase.removeChannel(callChannelRef.current);
       }
+      if (conversationsRealtimeRef.current) {
+        supabase.removeChannel(conversationsRealtimeRef.current);
+      }
+      if (allMessagesRealtimeRef.current) {
+        supabase.removeChannel(allMessagesRealtimeRef.current);
+      }
+      if (messageChannelRef.current) {
+        supabase.removeChannel(messageChannelRef.current);
+      }
       if (webrtcManagerRef.current) {
         webrtcManagerRef.current.cleanup();
       }
@@ -102,77 +111,67 @@ const Messages = () => {
       supabase.removeChannel(allMessagesRealtimeRef.current);
     }
     
-    // Listen for new conversations
+    // Listen for conversation changes (INSERT and UPDATE)
     conversationsRealtimeRef.current = supabase
-      .channel('user-conversations')
+      .channel(`conversations-${user.id}-${Date.now()}`)
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
-          table: 'conversations',
-          filter: `or(participant1_id.eq.${user.id},participant2_id.eq.${user.id})`
-        },
-        () => {
-          fetchConversations();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'conversations',
-          filter: `or(participant1_id.eq.${user.id},participant2_id.eq.${user.id})`
-        },
-        () => {
-          fetchConversations();
-        }
-      )
-      .subscribe();
-    
-    // Listen for all messages to update conversation list
-    allMessagesRealtimeRef.current = supabase
-      .channel('all-user-messages')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `or(sender_id.eq.${user.id},receiver_id.eq.${user.id})`
+          table: 'conversations'
         },
         (payload) => {
-          fetchConversations();
-          
-          // If message is for currently selected conversation, add it to messages
-          if (selectedConversation && payload.new.conversation_id === selectedConversation.id) {
-            setMessages(prev => {
-              if (prev.some(m => m.id === payload.new.id)) return prev;
-              return [...prev, payload.new];
-            });
-            scrollToBottom();
-          } else if (payload.new.receiver_id === user.id) {
-            // Update unread count if message belongs to another conversation -
-            setUnreadCounts(prev => ({
-              ...prev,
-              [payload.new.conversation_id]: (prev[payload.new.conversation_id] || 0) + 1
-            }));
-
-            // Show notification for new message
-            toast({
-              title: "New Message",
-              description: payload.new.content.substring(0, 50) + (payload.new.content.length > 50 ? '...' : ''),
-            });
+          const conv = payload.new;
+          // Check if this conversation involves the current user
+          if (conv && (conv.participant1_id === user.id || conv.participant2_id === user.id)) {
+            console.log('Conversation update received:', payload.eventType);
+            fetchConversations();
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Conversations channel status:', status);
+      });
     
-    return () => {
-      supabase.removeChannel(conversationsRealtimeRef);
-      supabase.removeChannel(allMessagesRealtimeRef);
-    };
+    // Listen for all messages to update conversation list and show notifications
+    allMessagesRealtimeRef.current = supabase
+      .channel(`all-messages-${user.id}-${Date.now()}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages'
+        },
+        (payload) => {
+          const msg = payload.new;
+          // Only process if this message is for the current user
+          if (msg.sender_id === user.id || msg.receiver_id === user.id) {
+            console.log('New message received:', msg.id);
+            fetchConversations();
+            
+            // If message is NOT for currently selected conversation and user is receiver
+            if (msg.receiver_id === user.id && 
+                (!selectedConversation || msg.conversation_id !== selectedConversation.id)) {
+              // Update unread count
+              setUnreadCounts(prev => ({
+                ...prev,
+                [msg.conversation_id]: (prev[msg.conversation_id] || 0) + 1
+              }));
+
+              // Show notification for new message
+              toast({
+                title: "New Message",
+                description: msg.content?.substring(0, 50) + (msg.content?.length > 50 ? '...' : ''),
+              });
+            }
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('All messages channel status:', status);
+      });
   };
 
   // useEffect(() => {
@@ -183,14 +182,24 @@ const Messages = () => {
   useEffect(() => {
     if (!selectedConversation) return;
 
+    // Fetch messages immediately when conversation is selected
+    fetchMessages(selectedConversation.id);
+    markMessagesAsRead(selectedConversation.id);
+    
+    // Clear unread count for this conversation
+    setUnreadCounts(prev => ({
+      ...prev,
+      [selectedConversation.id]: 0
+    }));
+
     // 🛑 Clean old channel
     if (messageChannelRef.current) {
       supabase.removeChannel(messageChannelRef.current);
     }
       
-    // Set up real-time subscription for messages
+    // Set up real-time subscription for messages in this conversation
     messageChannelRef.current = supabase
-      .channel(`messages:${selectedConversation.id}`)
+      .channel(`messages-${selectedConversation.id}-${Date.now()}`)
       .on(
         'postgres_changes',
         {
@@ -201,6 +210,7 @@ const Messages = () => {
         },
         (payload) => {
           const msg = payload.new;
+          console.log('Real-time message received:', msg);
             
           setMessages(prev => {
             if (prev.some(m => m.id === msg.id)) return prev;
@@ -215,13 +225,16 @@ const Messages = () => {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Message channel status:', status);
+      });
 
-      return () => {
-        if (messageChannelRef.current)
-          supabase.removeChannel(messageChannelRef.current);
-      };
-  }, [selectedConversation]);
+    return () => {
+      if (messageChannelRef.current) {
+        supabase.removeChannel(messageChannelRef.current);
+      }
+    };
+  }, [selectedConversation?.id]);
 
   useEffect(() => {
     scrollToBottom();
@@ -239,13 +252,14 @@ const Messages = () => {
     }
     
     // Create a global call channel that all users can broadcast to
+    // Using unique channel name to ensure fresh connection
     callChannelRef.current = supabase
-      .channel('global-calls')
+      .channel(`global-calls-${Date.now()}`)
       .on('broadcast', { event: 'incoming-call' }, async ({ payload }) => {
         // Only respond if this call is for me
         if (payload.to !== user.id || payload.from === user.id) return;
         
-        console.log('Incoming call received:', payload);
+        console.log('📞 Incoming call received:', payload);
         
         // Store the offer and caller info for later use
         pendingOfferRef.current = payload.offer;
@@ -266,11 +280,16 @@ const Messages = () => {
           setCallType(payload.callType);
           setCallState('incoming');
           setIsCallModalOpen(true);
+          
+          toast({
+            title: "Incoming Call",
+            description: `${payload.callType === 'video' ? 'Video' : 'Voice'} call from ${conversation.participant1_id === user.id ? conversation.participant2?.full_name : conversation.participant1?.full_name}`,
+          });
         }
       })
       .on('broadcast', { event: 'call-accepted' }, async ({ payload }) => {
         if (payload.to === user.id) {
-          console.log('Call accepted, received answer:', payload);
+          console.log('✅ Call accepted, received answer:', payload);
           // Apply the answer from receiver
           if (webrtcManagerRef.current && payload.answer) {
             await webrtcManagerRef.current.handleAnswer({ answer: payload.answer, from: payload.from });
@@ -280,6 +299,7 @@ const Messages = () => {
       })
       .on('broadcast', { event: 'call-rejected' }, ({ payload }) => {
         if (payload.to === user.id) {
+          console.log('❌ Call rejected');
           toast({
             title: "Call Declined",
             description: "The user declined your call",
@@ -290,17 +310,18 @@ const Messages = () => {
       })
       .on('broadcast', { event: 'call-ended' }, ({ payload }) => {
         if (payload.to === user.id || payload.from === user.id) {
+          console.log('📴 Call ended');
           handleEndCall();
         }
       })
       .on('broadcast', { event: 'ice-candidate' }, async ({ payload }) => {
         if (payload.to === user.id && webrtcManagerRef.current) {
-          console.log('Received ICE candidate via global channel');
+          console.log('🧊 Received ICE candidate');
           await webrtcManagerRef.current.handleIceCandidate(payload);
         }
       })
       .subscribe((status) => {
-        console.log('Call channel status:', status);
+        console.log('📡 Call channel status:', status);
       });
   };
 
