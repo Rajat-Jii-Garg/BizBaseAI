@@ -573,16 +573,17 @@ const Dashboard = () => {
             <div className="lg:col-span-3 space-y-6">
 
               {/* Smart Connections */}
-              <Card className="bg-white shadow-lg border-0">
-                <CardHeader className="pb-3">
+              <Card className="bg-white shadow-lg border-0 overflow-hidden">
+                <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <Brain className="w-5 h-5 text-purple-600" />
-                      Smart Connections
+                    <CardTitle className="text-base font-bold text-gray-900 flex items-center gap-2">
+                      <Brain className="w-4 h-4 text-purple-600 shrink-0" />
+                      <span className="truncate">Smart Connections</span>
                     </CardTitle>
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="h-8 w-8 p-0 shrink-0"
                       onClick={fetchSmartConnections}
                       disabled={loadingConnections}
                     >
@@ -590,67 +591,69 @@ const Dashboard = () => {
                     </Button>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-3 pt-0 space-y-3">
                   {loadingConnections ? (
                     <div className="text-center py-4">
                       <Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-600" />
                     </div>
                   ) : smartConnections.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                      <p className="text-gray-600">No suggestions available</p>
-                      <p className="text-sm text-gray-500">Try refreshing to get new connections</p>
+                    <div className="text-center py-6">
+                      <Users className="w-10 h-10 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-600">No suggestions available</p>
+                      <p className="text-xs text-gray-500">Try refreshing</p>
                     </div>
                   ) : (
                     smartConnections.map((connection) => (
-                      <div key={connection.id} className="p-4 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors">
-                        <div className="flex items-start space-x-3">
+                      <div key={connection.id} className="p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors">
+                        <div className="flex items-center gap-3">
                           <Avatar 
-                            className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all"
+                            className="h-10 w-10 shrink-0 cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all"
                             onClick={() => navigate(`/profile/${connection.id}`)}
                           >
                             <AvatarImage src={connection.avatar_url} />
-                            <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                            <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold text-sm">
                               {connection.full_name?.charAt(0) || 'U'}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <h4 
-                              className="font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors truncate"
+                              className="font-semibold text-sm text-gray-900 cursor-pointer hover:text-blue-600 transition-colors truncate"
                               onClick={() => navigate(`/profile/${connection.id}`)}
                             >
                               {connection.full_name || 'Professional User'}
                             </h4>
-                            <p className="text-sm text-gray-600 truncate">
+                            <p className="text-xs text-gray-600 truncate">
                               {connection.current_position || 'Professional'} 
                               {connection.company_name && ` at ${connection.company_name}`}
                             </p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleSendConnectionRequest(connection.id)}
-                              >
-                                <UserPlus className="w-3 h-3 mr-1" />
-                                Connect
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => navigate(`/messages?user=${connection.id}`)}
-                              >
-                                <MessageSquare className="w-3 h-3 mr-1" />
-                                Message
-                              </Button>
-                            </div>
                           </div>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2 pl-13">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs flex-1"
+                            onClick={() => handleSendConnectionRequest(connection.id)}
+                          >
+                            <UserPlus className="w-3 h-3 mr-1" />
+                            Connect
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs"
+                            onClick={() => navigate(`/messages?user=${connection.id}`)}
+                          >
+                            <MessageSquare className="w-3 h-3" />
+                          </Button>
                         </div>
                       </div>
                     ))
                   )}
                   <Button
                     variant="outline"
-                    className="w-full mt-4"
+                    size="sm"
+                    className="w-full h-8 text-xs"
                     onClick={() => navigate('/connections')}
                   >
                     View More Recommendations

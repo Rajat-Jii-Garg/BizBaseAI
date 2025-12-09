@@ -805,9 +805,11 @@ const Messages = () => {
 
   return (
     <DashboardLayout>
-      <div className="h-[calc(100vh-4rem)] flex bg-background">
-        {/* Conversations Sidebar */}
-        <Card className="w-80 flex flex-col h-full rounded-none border-r border-l-0 border-t-0 border-b-0 shadow-sm">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="h-[calc(100vh-8rem)] flex bg-background rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            {/* Conversations Sidebar */}
+            <Card className="w-80 flex flex-col h-full rounded-none border-0 border-r shadow-none">
           <CardHeader className="p-4 border-b bg-card/50">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-primary">Messages</CardTitle>
@@ -1152,6 +1154,7 @@ const Messages = () => {
           )}
         </div>
       </div>
+    </div>
 
       {/* Call Modal */}
       <CallModal
