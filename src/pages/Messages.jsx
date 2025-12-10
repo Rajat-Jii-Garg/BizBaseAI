@@ -1154,6 +1154,8 @@ const Messages = () => {
           )}
         </div>
       </div>
+      </div>
+      </div>
 
       {/* Call Modal */}
       <CallModal
@@ -1172,7 +1174,6 @@ const Messages = () => {
         isMuted={isMuted}
         isVideoOff={isVideoOff}
       />
-    </div>
     </DashboardLayout>
   );
 };
