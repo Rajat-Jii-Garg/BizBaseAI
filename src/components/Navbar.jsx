@@ -1,14 +1,17 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { LogIn, Sparkles, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-slate-200/50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
+
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
@@ -59,12 +62,33 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button variant="ghost" size="sm" className="p-2">
+            <Button variant="ghost" size="sm" className="p-2" onClick={() => setMobileOpen(!mobileOpen)}>
               <Menu className="w-6 h-6 text-slate-700" />
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Dropdown */}
+      {mobileOpen && (
+        <div className="md:hidden absolute top-20 left-0 w-full bg-white shadow-xl rounded-b-2xl p-6 space-y-6">
+          <a href="#features" className="block text-lg font-semibold text-slate-700">Features</a>
+          <a href="#solutions" className="block text-lg font-semibold text-slate-700">Solutions</a>
+          <a href="#pricing" className="block text-lg font-semibold text-slate-700">Pricing</a>
+          <a href="#contact" className="block text-lg font-semibold text-slate-700">Contact</a>
+
+          <div className="pt-4 border-t">
+            <Link to="/login">
+              <Button variant="ghost" className="w-full">Login</Button>
+            </Link>
+            <Link to="/signup">
+              <Button className="w-full mt-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                Get Started Free
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
