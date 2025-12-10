@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedPostComposer from '@/components/EnhancedPostComposer';
 import EnhancedPostCard from '@/components/EnhancedPostCard';
@@ -52,7 +52,6 @@ import QuickProfileActions from '@/components/QuickProfileActions'
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [showWelcome, setShowWelcome] = useState(true);
   const [allPosts, setAllPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
@@ -233,11 +232,7 @@ const Dashboard = () => {
       setAllPosts(enrichedPosts);
     } catch (error) {
       console.error('Dashboard: Error fetching all posts:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load posts",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to load posts" });
     } finally {
       setLoadingPosts(false);
     }
@@ -276,17 +271,10 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Connection Request Sent!",
-        description: "Your connection request has been sent successfully."
-      });
+      toast.success("Connection Request Sent!", { description: "Your connection request has been sent successfully." });
     } catch (error) {
       console.error('Error sending connection request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send connection request",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to send connection request" });
     }
   };
 
@@ -331,20 +319,13 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Connection Request Sent!",
-        description: "Your connection request has been sent successfully."
-      });
+      toast.success("Connection Request Sent!", { description: "Your connection request has been sent successfully." });
 
       // Remove from suggestions
       setSmartConnections(prev => prev.filter(conn => conn.id !== profileId));
     } catch (error) {
       console.error('Error sending connection request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send connection request",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to send connection request" });
     }
   };
 
