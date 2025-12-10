@@ -806,10 +806,10 @@ const Messages = () => {
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="h-[calc(100vh-8rem)] flex bg-background rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            {/* Conversations Sidebar */}
-            <Card className="w-80 flex flex-col h-full rounded-none border-0 border-r shadow-none">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-2 sm:py-6">
+          <div className="h-[calc(100vh-8rem)] sm:h-[calc(100vh-10rem)] flex bg-background rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            {/* Conversations Sidebar - Hidden on mobile when conversation is selected */}
+            <Card className={`${selectedConversation ? 'hidden md:flex' : 'flex'} w-full md:w-80 flex-col h-full rounded-none border-0 md:border-r shadow-none`}>
           <CardHeader className="p-4 border-b bg-card/50">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-primary">Messages</CardTitle>
@@ -959,13 +959,22 @@ const Messages = () => {
           </ScrollArea>
         </Card>
 
-        {/* Chat Area */}
-        <div className="flex-1 flex flex-col h-full">
+        {/* Chat Area - Full width on mobile when conversation is selected */}
+        <div className={`${selectedConversation ? 'flex' : 'hidden md:flex'} flex-1 flex-col h-full`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b bg-card/50 backdrop-blur-sm flex items-center justify-between">
-                <div className="flex items-center space-x-3">
+              <div className="p-3 sm:p-4 border-b bg-card/50 backdrop-blur-sm flex items-center justify-between">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  {/* Back button for mobile */}
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="md:hidden h-9 w-9 mr-1"
+                    onClick={() => setSelectedConversation(null)}
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
                   <div className="relative">
                     <Avatar className="h-10 w-10 border-2 border-background">
                       <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />
@@ -1026,7 +1035,7 @@ const Messages = () => {
                           key={message.id}
                           className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                         >
-                          <div className={`flex items-end space-x-2 max-w-[70%] ${isOwn ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                          <div className={`flex items-end space-x-2 max-w-[85%] sm:max-w-[70%] ${isOwn ? 'flex-row-reverse space-x-reverse' : ''}`}>
                             {!isOwn && showAvatar && (
                               <Avatar className="h-7 w-7 mb-1">
                                 <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />

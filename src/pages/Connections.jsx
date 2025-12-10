@@ -340,7 +340,7 @@ const Connections = () => {
               <p className="text-muted-foreground">Check back later for new networking opportunities.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {suggestions.map((profile) => (
                 <Card key={profile.id} className="card-professional hover-lift group">
                   <CardContent className="p-6">
@@ -408,35 +408,40 @@ const Connections = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="max-w-7xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header */}
         {/* <div className="text-center mb-8">
           <h1 className="text-3xl font-bold gradient-text-primary mb-2">My Network</h1>
           <p className="text-muted-foreground text-lg">Build meaningful professional connections</p>
         </div> */}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg p-1 space-x-1">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg p-1 gap-1">
             <TabsTrigger 
               value="suggestions" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
+              className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
-              <Users className="w-4 h-4 mr-2" />
-              Suggestions
+              <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Suggestions</span>
+              <span className="sm:hidden">Suggest</span>
             </TabsTrigger>
             <TabsTrigger 
               value="connections" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
+              className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
-              <UserCheck className="w-4 h-4 mr-2" />
-              My Connections ({connections.length})
+              <UserCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">My Connections</span>
+              <span className="sm:hidden">Connect</span>
+              <span className="ml-1">({connections.length})</span>
             </TabsTrigger>
             <TabsTrigger 
               value="requests" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
+              className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Requests ({pendingRequests.length + sentRequests.length})
+              <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Requests</span>
+              <span className="sm:hidden">Req</span>
+              <span className="ml-1">({pendingRequests.length + sentRequests.length})</span>
             </TabsTrigger>
           </TabsList>
 
