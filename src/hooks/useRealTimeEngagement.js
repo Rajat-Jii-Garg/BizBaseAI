@@ -1,9 +1,8 @@
-
+import React from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect } from 'react';
 
 export const useRealTimeEngagement = (onUpdate) => {
-  useEffect(() => {
+  React.useEffect(() => {
     // Subscribe to real-time changes for posts engagement
     const likesChannel = supabase
       .channel('post-likes-changes')
@@ -15,7 +14,6 @@ export const useRealTimeEngagement = (onUpdate) => {
           table: 'post_likes'
         },
         () => {
-          // Update with 0.11 second delay for smooth UX
           setTimeout(onUpdate, 110);
         }
       )
