@@ -1,11 +1,11 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export const usePosts = () => {
-  const [posts, setPosts] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   const fetchPosts = async () => {
@@ -194,7 +194,7 @@ export const usePosts = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       fetchPosts();
     }
