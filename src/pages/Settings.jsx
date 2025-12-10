@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   Bell,
   Eye,
@@ -25,7 +25,6 @@ import { useState } from 'react';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   
   const [settings, setSettings] = useState({

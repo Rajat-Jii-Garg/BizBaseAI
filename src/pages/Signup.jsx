@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +26,6 @@ const Signup = () => {
   
   const navigate = useNavigate();
   const { signUp, user } = useAuth();
-  const { toast } = useToast();
 
   // Redirect if already logged in
   useEffect(() => {

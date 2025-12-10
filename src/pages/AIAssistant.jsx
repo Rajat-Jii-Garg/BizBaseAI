@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   Bot,
   Brain,
@@ -21,7 +21,6 @@ import { useState } from 'react';
 
 const AIAssistant = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([]); // ✅ fixed (no TS)
   const [isLoading, setIsLoading] = useState(false);
