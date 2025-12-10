@@ -72,10 +72,10 @@ const Navbar = () => {
       {/* Mobile Dropdown */}
       {mobileOpen && (
         <div className="md:hidden absolute top-20 left-0 w-full bg-white shadow-xl rounded-b-2xl p-6 space-y-6">
-          <a href="#features" className="block text-lg font-semibold text-slate-700">Features</a>
+          {/* <a href="#features" className="block text-lg font-semibold text-slate-700">Features</a>
           <a href="#solutions" className="block text-lg font-semibold text-slate-700">Solutions</a>
           <a href="#pricing" className="block text-lg font-semibold text-slate-700">Pricing</a>
-          <a href="#contact" className="block text-lg font-semibold text-slate-700">Contact</a>
+          <a href="#contact" className="block text-lg font-semibold text-slate-700">Contact</a> */}
 
           <div className="pt-4 border-t">
             <Link to="/login">
