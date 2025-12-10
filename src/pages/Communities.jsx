@@ -284,56 +284,56 @@ const Communities = () => {
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                  <Users className="w-8 h-8 text-blue-600" />
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2 sm:gap-3">
+                  <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
                   Communities
                 </h1>
-                <p className="text-gray-600">Connect with like-minded professionals and grow your network</p>
+                <p className="text-sm sm:text-base text-gray-600">Connect with like-minded professionals</p>
               </div>
               <CreateCommunityModal onCommunityCreated={() => { fetchCommunities(); fetchJoinedCommunities(); }} />
             </div>
           </div>
 
           {/* Search */}
-          <Card className="mb-6 shadow-lg border-0">
-            <CardContent className="p-6">
+          <Card className="mb-4 sm:mb-6 shadow-lg border-0">
+            <CardContent className="p-3 sm:p-6">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                 <Input
                   type="text"
-                  placeholder="Search communities, topics, or interests..."
+                  placeholder="Search communities..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 pr-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="pl-10 sm:pl-12 pr-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             </CardContent>
           </Card>
 
           {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
             <TabsList className="grid w-full grid-cols-2 bg-white shadow-lg border-0 p-1 rounded-xl">
               <TabsTrigger
                 value="discover"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
+                className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
               >
                 Communities
               </TabsTrigger>
               <TabsTrigger
                 value="my-communities"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
+                className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white font-medium rounded-lg"
               >
                 My Communities
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="discover">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {loading ? (
                   Array.from({ length: 6 }).map((_, index) => (
                     <Card key={index} className="animate-pulse">

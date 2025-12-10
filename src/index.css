@@ -386,4 +386,70 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
   }
+  
+  /* Reduce animation on mobile for performance */
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+  
+  .card-professional:hover {
+    transform: translateY(-3px);
+  }
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile-first touch interactions */
+@media (hover: none) {
+  .hover-lift:active {
+    transform: translateY(-4px);
+  }
+  
+  .btn-professional:active {
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+/* Safe area for mobile devices */
+@supports (padding: max(0px)) {
+  .safe-bottom {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-top {
+    padding-top: max(0rem, env(safe-area-inset-top));
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Touch action improvements */
+.touch-pan-y {
+  touch-action: pan-y;
+}
+
+/* Better tap targets on mobile */
+@media (max-width: 640px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Prevent text selection on interactive elements */
+.select-none-touch {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
