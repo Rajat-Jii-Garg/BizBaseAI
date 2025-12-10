@@ -25,8 +25,7 @@ import {
 } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-// import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import DashboardLayout from '@/components/DashboardLayout';
 import CallModal from '@/components/CallModal';
@@ -34,7 +33,6 @@ import { WebRTCManager } from '@/utils/webrtc';
 
 const Messages = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -161,8 +159,7 @@ const Messages = () => {
               }));
 
               // Show notification for new message
-              toast({
-                title: "New Message",
+              toast.info("New Message", {
                 description: msg.content?.substring(0, 50) + (msg.content?.length > 50 ? '...' : ''),
               });
             }
@@ -281,8 +278,7 @@ const Messages = () => {
           setCallState('incoming');
           setIsCallModalOpen(true);
           
-          toast({
-            title: "Incoming Call",
+          toast.info("Incoming Call", {
             description: `${payload.callType === 'video' ? 'Video' : 'Voice'} call from ${conversation.participant1_id === user.id ? conversation.participant2?.full_name : conversation.participant1?.full_name}`,
           });
         }
@@ -300,11 +296,7 @@ const Messages = () => {
       .on('broadcast', { event: 'call-rejected' }, ({ payload }) => {
         if (payload.to === user.id) {
           console.log('❌ Call rejected');
-          toast({
-            title: "Call Declined",
-            description: "The user declined your call",
-            variant: "destructive"
-          });
+          toast.error("Call Declined", { description: "The user declined your call" });
           handleEndCall();
         }
       })
@@ -384,17 +376,10 @@ const Messages = () => {
         });
       }
 
-      toast({
-        title: "Calling...",
-        description: `${type === 'video' ? 'Video' : 'Voice'} call initiated`
-      });
+      toast.info("Calling...", { description: `${type === 'video' ? 'Video' : 'Voice'} call initiated` });
     } catch (error) {
       console.error('Error initiating call:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to start call",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: error.message || "Failed to start call" });
       handleEndCall();
     }
   };
@@ -470,11 +455,7 @@ const Messages = () => {
       
     } catch (error) {
       console.error('Error accepting call:', error);
-      toast({
-        title: "Error",
-        description: "Failed to accept call",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to accept call" });
       handleEndCall();
     }
   };
@@ -563,11 +544,7 @@ const Messages = () => {
       setConversations(data || []);
     } catch (error) {
       console.error('Error fetching conversations:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch conversations",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to fetch conversations" });
     } finally {
       setLoading(false);
     }
@@ -610,11 +587,7 @@ const Messages = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        toast({
-          title: "File too large",
-          description: "Please select a file smaller than 10MB",
-          variant: "destructive"
-        });
+        toast.error("File too large", { description: "Please select a file smaller than 10MB" });
         return;
       }
       setSelectedFile(file);
@@ -681,11 +654,7 @@ const Messages = () => {
 
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to send message" });
     } finally {
       setSendingMessage(false);
       setUploadingFile(false);
@@ -768,17 +737,10 @@ const Messages = () => {
       setUserSearchQuery('');
       setSearchedUsers([]);
       
-      toast({
-        title: "Success",
-        description: "Conversation started successfully"
-      });
+      toast.success("Success", { description: "Conversation started successfully" });
     } catch (error) {
       console.error('Error starting conversation:', error);
-      toast({
-        title: "Error",
-        description: "Failed to start conversation",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to start conversation" });
     }
   };
 
