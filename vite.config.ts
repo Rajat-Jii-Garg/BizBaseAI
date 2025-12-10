@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  // Force new cache directory to bypass stale cache
+  cacheDir: 'node_modules/.vite-fresh',
   plugins: [
     react(),
     mode === 'development' &&
@@ -19,22 +21,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
       "react": path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
-      "react/jsx-runtime": path.resolve(__dirname, "node_modules/react/jsx-runtime"),
     },
     dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
   },
   optimizeDeps: {
-    include: [
-      'react', 
-      'react-dom', 
-      'react/jsx-runtime',
-    ],
-    exclude: [],
+    include: ['react', 'react-dom', 'react/jsx-runtime'],
     force: true,
-  },
-  build: {
-    commonjsOptions: {
-      include: [/node_modules/],
-    },
   },
 }));
