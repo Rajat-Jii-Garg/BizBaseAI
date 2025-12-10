@@ -8,9 +8,12 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    headers: {
+      'Cache-Control': 'no-store',
+    },
   },
-  // Force new cache directory to bypass stale cache
-  cacheDir: 'node_modules/.vite-fresh',
+  // Force completely new cache
+  cacheDir: 'node_modules/.vite-v2',
   plugins: [
     react(),
     mode === 'development' &&
