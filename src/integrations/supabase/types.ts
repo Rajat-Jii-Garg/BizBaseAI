@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      call_signals: {
+        Row: {
+          conversation_id: string | null
+          created_at: string | null
+          data: Json | null
+          id: string
+          receiver_id: string | null
+          sender_id: string | null
+          signal_type: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          receiver_id?: string | null
+          sender_id?: string | null
+          signal_type?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          receiver_id?: string | null
+          sender_id?: string | null
+          signal_type?: string | null
+        }
+        Relationships: []
+      }
       communities: {
         Row: {
           activity_level: string | null
@@ -143,7 +173,22 @@ export type Database = {
           participant2_id?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conversations_participant1_id_fkey"
+            columns: ["participant1_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_participant2_id_fkey"
+            columns: ["participant2_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       endorsements: {
         Row: {
@@ -1181,14 +1226,8 @@ export type Database = {
         }
         Returns: string
       }
-      generate_otp: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      increment_job_views: {
-        Args: { job_id: string }
-        Returns: undefined
-      }
+      generate_otp: { Args: never; Returns: string }
+      increment_job_views: { Args: { job_id: string }; Returns: undefined }
       process_post_hashtags: {
         Args: { content: string; post_id: string }
         Returns: undefined

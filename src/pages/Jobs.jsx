@@ -280,9 +280,10 @@ const Jobs = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="bg-white rounded-lg border p-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          {/* Header */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Jobs Portal</h1>
@@ -326,8 +327,8 @@ const Jobs = () => {
           </div>
         </div>
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg border p-6">
+          {/* Search and Filters */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="space-y-4">
             {/* Search Bar */}
             <div className="relative">
@@ -399,9 +400,9 @@ const Jobs = () => {
           </div>
         </div>
 
-        {/* AI Recommendations */}
-        {user && showRecommendations && (
-          <div className="bg-white rounded-lg border p-6">
+          {/* AI Recommendations */}
+          {user && showRecommendations && (
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Brain className="h-5 w-5 text-blue-600" />
@@ -457,16 +458,16 @@ const Jobs = () => {
           </div>
         )}
 
-        {/* Jobs List */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">
-              {filteredJobs.length} Job{filteredJobs.length !== 1 ? 's' : ''} Found
-            </h2>
-          </div>
+          {/* Jobs List */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {filteredJobs.length} Job{filteredJobs.length !== 1 ? 's' : ''} Found
+              </h2>
+            </div>
 
-          {filteredJobs.map((job) => (
-            <Card key={job.id} className="hover:shadow-md transition-shadow">
+            {filteredJobs.map((job) => (
+              <Card key={job.id} className="hover:shadow-md transition-shadow bg-white border border-gray-200 rounded-xl">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
@@ -661,6 +662,7 @@ const Jobs = () => {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
     </DashboardLayout>
   );

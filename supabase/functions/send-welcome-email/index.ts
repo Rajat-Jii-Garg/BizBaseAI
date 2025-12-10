@@ -109,12 +109,13 @@ const handler = async (req: Request): Promise<Response> => {
 
       } catch (emailError) {
         console.error("Welcome email sending error:", emailError);
+        const errorMessage = emailError instanceof Error ? emailError.message : 'Failed to send welcome email';
         
         return new Response(
           JSON.stringify({ 
             success: false, 
             message: "Failed to send welcome email",
-            error: emailError.message
+            error: errorMessage
           }), 
           {
             status: 500,

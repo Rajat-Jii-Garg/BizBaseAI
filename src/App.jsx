@@ -35,6 +35,7 @@ import Demo from "./pages/Demo";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import ProfileDashboard from "./pages/ProfileDashboard";
+import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 
 const queryClient = new QueryClient();
 
@@ -56,11 +57,17 @@ const App = () => (
                   <Dashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/profile/:userId?" element={
+              {/* View other user profile */}
+              <Route path="/profile/:userId" element={
                 <ProtectedRoute>
                   <ProfilePage />
                 </ProtectedRoute>
               } />
+              <Route path="/profile/preview/:userId" element={
+                <ProtectedRoute>
+                  <ProfilePreviewPage />
+                </ProtectedRoute>
+              }/>
               <Route path="/messages" element={
                 <ProtectedRoute>
                   <Messages />

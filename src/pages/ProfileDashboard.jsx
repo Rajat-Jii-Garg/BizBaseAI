@@ -317,7 +317,7 @@ const ProfileDashboard = () => {
                   <Share2 className="w-4 h-4 mr-2" />
                   Share
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={() => navigate(`/public-profile/${user.id}`)}>
+                <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={() => navigate(`/profile/preview/${user.id}`)}>
                   <Eye className="w-4 h-4 mr-2" />
                   Preview
                 </Button>

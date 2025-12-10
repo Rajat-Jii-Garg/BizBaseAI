@@ -52,20 +52,26 @@ export const AuthProvider = ({ children }) => {
   // END NEW FUNCTION ---------------------------------------------------------------------------------------------------------------
 
   useEffect(() => {
-    const handleAuthChange = async (event, session) => {
-      try {
-        const currentUser = session?.user ?? null;
-        setSession(session);
-        setUser(currentUser);
-        
-        if (currentUser) {
-          await fetchUserProfile(currentUser.id);
-        } else {
-          setProfile(null);
-        }
-      } catch (err) {
-        console.error("Auth change error:", err);
-      } finally {
+    let mounted = true;
+    
+    const handleAuthChange = (event, session) => {
+      if (!mounted) return;
+      
+      const currentUser = session?.user ?? null;
+      setSession(session);
+      setUser(currentUser);
+      
+      if (currentUser) {
+        // Defer profile fetch with setTimeout to avoid deadlock
+        setTimeout(() => {
+          if (mounted) {
+            fetchUserProfile(currentUser.id).finally(() => {
+              if (mounted) setLoading(false);
+            });
+          }
+        }, 0);
+      } else {
+        setProfile(null);
         setLoading(false);
       }
     };
@@ -75,30 +81,38 @@ export const AuthProvider = ({ children }) => {
 
     // Get initial session
     supabase.auth.getSession()
-      .then(async ({ data: { session } }) => {
+      .then(({ data: { session } }) => {
+        if (!mounted) return;
+        
         const currentUser = session?.user ?? null;
         setSession(session);
         setUser(currentUser);
         
         if (currentUser) {
-          await fetchUserProfile(currentUser.id);
+          // Fetch profile before marking as loaded
+          fetchUserProfile(currentUser.id).finally(() => {
+            if (mounted) setLoading(false);
+          });
+        } else {
+          setLoading(false);
         }
       })
       .catch(err => {
         console.error("Session fetch error:", err);
-      })
-      .finally(() => {
-        setLoading(false);
+        if (mounted) setLoading(false);
       });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Failsafe: ensure loading doesn't get stuck
   useEffect(() => {
     const t = setTimeout(() => {
-      setLoading(prev => (prev ? false : prev));
-    }, 2500);
+      setLoading(false);
+    }, 5000); // Increased timeout for slower connections
     return () => clearTimeout(t);
   }, []);
 
