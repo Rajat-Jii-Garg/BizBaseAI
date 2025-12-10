@@ -804,541 +804,377 @@ const Messages = () => {
   }
 
   return (
-    // <DashboardLayout>
-    //   <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-    //     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    //       <div className="h-[calc(100vh-8rem)] flex bg-background rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-    //         {/* Conversations Sidebar */}
-    //         <Card className="w-80 flex flex-col h-full rounded-none border-0 border-r shadow-none">
-    //       <CardHeader className="p-4 border-b bg-card/50">
-    //         <div className="flex items-center justify-between">
-    //           <CardTitle className="text-lg font-semibold text-primary">Messages</CardTitle>
-    //           <Dialog open={newChatOpen} onOpenChange={setNewChatOpen}>
-    //             <DialogTrigger asChild>
-    //               <Button size="icon" variant="outline" className="h-8 w-8">
-    //                 <Plus className="h-4 w-4" />
-    //               </Button>
-    //             </DialogTrigger>
-    //             <DialogContent className="sm:max-w-md">
-    //               <DialogHeader>
-    //                 <DialogTitle>Start New Conversation</DialogTitle>
-    //               </DialogHeader>
-    //               <div className="space-y-4">
-    //                 <div className="relative">
-    //                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-    //                   <Input
-    //                     placeholder="Search users..."
-    //                     className="pl-10"
-    //                     value={userSearchQuery}
-    //                     onChange={(e) => {
-    //                       setUserSearchQuery(e.target.value);
-    //                       searchUsers(e.target.value);
-    //                     }}
-    //                   />
-    //                 </div>
-    //                 <ScrollArea className="h-64">
-    //                   {searchingUsers ? (
-    //                     <div className="flex items-center justify-center py-8">
-    //                       <Loader2 className="h-6 w-6 animate-spin text-primary" />
-    //                     </div>
-    //                   ) : searchedUsers.length > 0 ? (
-    //                     <div className="space-y-2">
-    //                       {searchedUsers.map((searchUser) => (
-    //                         <div
-    //                           key={searchUser.id}
-    //                           className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors"
-    //                           onClick={() => startConversation(searchUser)}
-    //                         >
-    //                           <Avatar className="h-10 w-10">
-    //                             <AvatarImage src={searchUser.avatar_url} />
-    //                             <AvatarFallback className="bg-primary/10 text-primary">
-    //                               {searchUser.full_name?.charAt(0) || 'U'}
-    //                             </AvatarFallback>
-    //                           </Avatar>
-    //                           <div className="flex-1 min-w-0">
-    //                             <p className="font-medium truncate">{searchUser.full_name}</p>
-    //                             {searchUser.current_position && (
-    //                               <p className="text-sm text-muted-foreground truncate">
-    //                                 {searchUser.current_position}
-    //                               </p>
-    //                             )}
-    //                           </div>
-    //                         </div>
-    //                       ))}
-    //                     </div>
-    //                   ) : userSearchQuery ? (
-    //                     <div className="text-center py-8 text-muted-foreground">
-    //                       <p>No users found</p>
-    //                     </div>
-    //                   ) : (
-    //                     <div className="text-center py-8 text-muted-foreground">
-    //                       <p>Search for users to start a conversation</p>
-    //                     </div>
-    //                   )}
-    //                 </ScrollArea>
-    //               </div>
-    //             </DialogContent>
-    //           </Dialog>
-    //         </div>
-    //       </CardHeader>
-    //       <div className="px-4 py-3 border-b">
-    //         <div className="relative">
-    //           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-    //           <Input
-    //             placeholder="Search conversations..."
-    //             className="pl-10 h-9 bg-background"
-    //             value={searchQuery}
-    //             onChange={(e) => setSearchQuery(e.target.value)}
-    //           />
-    //         </div>
-    //       </div>
-
-    //       <ScrollArea className="flex-1 h-0">
-    //         {filteredConversations.length === 0 ? (
-    //           <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-    //             <MessageCircle className="h-12 w-12 text-muted-foreground/40 mb-3" />
-    //             <h3 className="font-medium text-muted-foreground mb-1">No conversations found</h3>
-    //             <p className="text-xs text-muted-foreground">Start a new conversation</p>
-    //           </div>
-    //         ) : (
-    //           <div className="p-2 space-y-1">
-    //             {filteredConversations.map((conversation) => {
-    //               const otherParticipant = getOtherParticipant(conversation);
-    //               return (
-    //                 <div
-    //                   key={conversation.id}
-    //                   className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-    //                     selectedConversation?.id === conversation.id
-    //                       ? 'bg-primary/5 border-l-4 border-primary shadow-sm'
-    //                       : 'hover:bg-accent/50'
-    //                   }`}
-    //                   onClick={() => {
-    //                     setSelectedConversation(conversation);
-    //                     fetchMessages(conversation.id);
-    //                     markMessagesAsRead(conversation.id);
-
-    //                     // Reset unread for that conversation
-    //                     setUnreadCounts(prev => ({
-    //                       ...prev,
-    //                       [conversation.id]: 0
-    //                     }));
-    //                   }}
-    //                 >
-    //                   <div className="flex items-center space-x-3">
-    //                     <div className="relative">
-    //                       <Avatar className="h-10 w-10 border-2 border-background">
-    //                         <AvatarImage src={otherParticipant?.avatar_url} />
-    //                         <AvatarFallback className="bg-primary/10 text-primary font-medium">
-    //                           {otherParticipant?.full_name?.charAt(0) || 'U'}
-    //                         </AvatarFallback>
-    //                       </Avatar>
-    //                       <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-background rounded-full"></div>
-    //                     </div>
-    //                     <div className="flex-1 min-w-0">
-    //                       <p className="font-medium text-sm truncate">{otherParticipant?.full_name || 'Unknown User'}</p>
-    //                       <div className="flex items-center justify-between">
-    //                         <p className="text-xs text-muted-foreground truncate">
-    //                           {unreadCounts[conversation.id] > 0 
-    //                             ? "New messages" 
-    //                             : "Click to view messages"}
-    //                         </p>
-
-    //                         {unreadCounts[conversation.id] > 0 && (
-    //                           <Badge className="ml-2 bg-primary text-white">
-    //                             {unreadCounts[conversation.id]}
-    //                           </Badge>
-    //                         )}
-    //                       </div>
-    //                     </div>
-    //                   </div>
-    //                 </div>
-    //               );
-    //             })}
-    //           </div>
-    //         )}
-    //       </ScrollArea>
-    //     </Card>
-
-    //     {/* Chat Area */}
-    //     <div className="flex-1 flex flex-col h-full">
-    //       {selectedConversation ? (
-    //         <>
-    //           {/* Chat Header */}
-    //           <div className="p-4 border-b bg-card/50 backdrop-blur-sm flex items-center justify-between">
-    //             <div className="flex items-center space-x-3">
-    //               <div className="relative">
-    //                 <Avatar className="h-10 w-10 border-2 border-background">
-    //                   <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />
-    //                   <AvatarFallback className="bg-primary/10 text-primary font-medium">
-    //                     {getOtherParticipant(selectedConversation)?.full_name?.charAt(0) || 'U'}
-    //                   </AvatarFallback>
-    //                 </Avatar>
-    //                 <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-background rounded-full"></div>
-    //               </div>
-    //               <div>
-    //                 <h3 className="font-semibold text-foreground">{getOtherParticipant(selectedConversation)?.full_name || 'Unknown User'}</h3>
-    //                 <p className="text-xs text-muted-foreground">Active now</p>
-    //               </div>
-    //             </div>
-    //             <div className="flex items-center space-x-1">
-    //               <Button 
-    //                 variant="ghost" 
-    //                 size="icon"
-    //                 className="h-9 w-9"
-    //                 onClick={() => initiateCall('audio')}
-    //                 disabled={callState !== 'idle'}
-    //               >
-    //                 <Phone className="h-4 w-4" />
-    //               </Button>
-    //               <Button 
-    //                 variant="ghost" 
-    //                 size="icon"
-    //                 className="h-9 w-9"
-    //                 onClick={() => initiateCall('video')}
-    //                 disabled={callState !== 'idle'}
-    //               >
-    //                 <Video className="h-4 w-4" />
-    //               </Button>
-    //               <Button variant="ghost" size="icon" className="h-9 w-9">
-    //                 <MoreVertical className="h-4 w-4" />
-    //               </Button>
-    //             </div>
-    //           </div>
-
-    //           {/* Messages */}
-    //           <ScrollArea className="flex-1 h-0 p-4 bg-accent/5">
-    //             {messages.length === 0 ? (
-    //               <div className="flex items-center justify-center h-full">
-    //                 <div className="text-center">
-    //                   <MessageCircle className="h-12 w-12 text-muted-foreground/40 mx-auto mb-3" />
-    //                   <p className="font-medium text-muted-foreground">No messages yet</p>
-    //                   <p className="text-sm text-muted-foreground/70">Send a message to start the conversation</p>
-    //                 </div>
-    //               </div>
-    //             ) : (
-    //               <div className="space-y-4 pb-4">
-    //                 {messages.map((message, index) => {
-    //                   const isOwn = message.sender_id === user.id;
-    //                   const showAvatar = index === 0 || messages[index - 1].sender_id !== message.sender_id;
-                      
-    //                   return (
-    //                     <div
-    //                       key={message.id}
-    //                       className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
-    //                     >
-    //                       <div className={`flex items-end space-x-2 max-w-[70%] ${isOwn ? 'flex-row-reverse space-x-reverse' : ''}`}>
-    //                         {!isOwn && showAvatar && (
-    //                           <Avatar className="h-7 w-7 mb-1">
-    //                             <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />
-    //                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-    //                               {getOtherParticipant(selectedConversation)?.full_name?.charAt(0) || 'U'}
-    //                             </AvatarFallback>
-    //                           </Avatar>
-    //                         )}
-    //                         {!isOwn && !showAvatar && <div className="w-7" />}
-    //                         <div
-    //                           className={`rounded-2xl px-4 py-2 shadow-sm ${
-    //                             isOwn
-    //                               ? 'bg-primary text-primary-foreground rounded-br-md'
-    //                               : 'bg-card text-card-foreground border rounded-bl-md'
-    //                           }`}
-    //                         >
-    //                           <p className="text-sm leading-relaxed">{message.content}</p>
-    //                           <span className={`text-xs mt-1 block ${isOwn ? 'opacity-70' : 'text-muted-foreground'}`}>
-    //                             {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-    //                           </span>
-    //                         </div>
-    //                       </div>
-    //                     </div>
-    //                   );
-    //                 })}
-    //                 <div ref={messagesEndRef} />
-    //               </div>
-    //             )}
-    //           </ScrollArea>
-
-    //           {/* Message Input */}
-    //           <div className="border-t bg-card/50 backdrop-blur-sm p-4">
-    //             {selectedFile && (
-    //               <div className="mb-2 flex items-center gap-2 p-2 bg-muted rounded-lg">
-    //                 <FileText className="h-4 w-4 text-primary" />
-    //                 <span className="text-sm flex-1 truncate">{selectedFile.name}</span>
-    //                 <Button
-    //                   variant="ghost"
-    //                   size="icon"
-    //                   className="h-6 w-6"
-    //                   onClick={() => setSelectedFile(null)}
-    //                 >
-    //                   <X className="h-4 w-4" />
-    //                 </Button>
-    //               </div>
-    //             )}
-    //             <div className="flex items-end gap-2">
-    //               <input
-    //                 ref={fileInputRef}
-    //                 type="file"
-    //                 className="hidden"
-    //                 onChange={handleFileSelect}
-    //                 accept="image/*,.pdf,.doc,.docx"
-    //               />
-    //               <Button 
-    //                 variant="ghost" 
-    //                 size="icon"
-    //                 onClick={() => fileInputRef.current?.click()}
-    //                 disabled={sendingMessage}
-    //                 className="hover:bg-primary/10 transition-colors shrink-0"
-    //               >
-    //                 <Paperclip className="h-5 w-5 text-muted-foreground" />
-    //               </Button>
-    //               <div className="flex-1 min-w-0">
-    //                 <Textarea
-    //                   placeholder="Type a message..."
-    //                   value={newMessage}
-    //                   onChange={(e) => setNewMessage(e.target.value)}
-    //                   onKeyDown={(e) => {
-    //                     if (e.key === 'Enter' && !e.shiftKey) {
-    //                       e.preventDefault();
-    //                       sendMessage();
-    //                     }
-    //                   }}
-    //                   disabled={sendingMessage}
-    //                   className="min-h-[44px] max-h-32 resize-none border-0 bg-background/50 focus-visible:ring-1"
-    //                   rows={1}
-    //                 />
-    //               </div>
-    //               <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-    //                 <PopoverTrigger asChild>
-    //                   <Button 
-    //                     variant="ghost" 
-    //                     size="icon"
-    //                     disabled={sendingMessage}
-    //                     className="hover:bg-primary/10 transition-colors shrink-0"
-    //                   >
-    //                     <Smile className="h-5 w-5 text-muted-foreground" />
-    //                   </Button>
-    //                 </PopoverTrigger>
-    //                 <PopoverContent className="w-full p-0 border-0" align="end">
-    //                   <EmojiPicker 
-    //                     onEmojiClick={onEmojiClick}
-    //                     width="100%"
-    //                     height="400px"
-    //                   />
-    //                 </PopoverContent>
-    //               </Popover>
-    //               <Button 
-    //                 onClick={sendMessage}
-    //                 size="icon"
-    //                 disabled={sendingMessage || uploadingFile || (!newMessage.trim() && !selectedFile)}
-    //                 className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shrink-0"
-    //               >
-    //                 {sendingMessage || uploadingFile ? (
-    //                   <Loader2 className="h-5 w-5 animate-spin" />
-    //                 ) : (
-    //                   <Send className="h-5 w-5" />
-    //                 )}
-    //               </Button>
-    //             </div>
-    //           </div>
-    //         </>
-    //       ) : (
-    //         <div className="flex items-center justify-center h-full bg-gradient-to-br from-accent/10 to-accent/5">
-    //           <div className="text-center max-w-md px-4">
-    //             <div className="mb-6 relative">
-    //               <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full"></div>
-    //               <MessageCircle className="h-20 w-20 text-primary/60 mx-auto relative" strokeWidth={1.5} />
-    //             </div>
-    //             <h3 className="text-2xl font-semibold mb-2 text-primary">Select a conversation</h3>
-    //             <p className="text-muted-foreground text-sm">Choose a conversation from the sidebar to start messaging</p>
-    //           </div>
-    //         </div>
-    //       )}
-    //     </div>
-    //   </div>
-    //   </div>
-    //   </div>
-
-    //   {/* Call Modal */}
-    //   <CallModal
-    //     isOpen={isCallModalOpen}
-    //     onClose={handleEndCall}
-    //     callType={callType}
-    //     callState={callState}
-    //     localStream={localStream}
-    //     remoteStream={remoteStream}
-    //     otherUser={selectedConversation ? getOtherParticipant(selectedConversation) : null}
-    //     onEndCall={handleEndCall}
-    //     onAcceptCall={() => handleAcceptCall(callType)}
-    //     onDeclineCall={handleDeclineCall}
-    //     onToggleMute={handleToggleMute}
-    //     onToggleVideo={handleToggleVideo}
-    //     isMuted={isMuted}
-    //     isVideoOff={isVideoOff}
-    //   />
-    // </DashboardLayout>
-
     <DashboardLayout>
-
-    {/* FULL PAGE FLEX — no card, no boxes */}
-    <div className="flex h-[calc(100vh-80px)] bg-white dark:bg-[#0f0f0f]">
-
-      {/* ---------------- LEFT : CHAT LIST PANEL ---------------- */}
-      <div className="w-[28%] border-r border-gray-300 dark:border-gray-800 flex flex-col">
-
-        {/* Search bar */}
-        <div className="p-4 border-b border-gray-300 dark:border-gray-800">
-          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-xl">
-            <Search size={18} className="text-gray-500" />
-            <input 
-              type="text"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Scroll ONLY on chat list */}
-        <div className="flex-1 overflow-y-auto no-scrollbar">
-          {conversations.map((conv) => {
-            const other = getOtherParticipant(conv);
-            const unread = unreadCounts[conv.id] || 0;
-
-            return (
-              <div
-                key={conv.id}
-                onClick={() => setSelectedConversation(conv)}
-                className={`flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition 
-                  ${selectedConversation?.id === conv.id ? "bg-gray-200 dark:bg-gray-700" : ""}`}
-              >
-                <Avatar className="h-11 w-11">
-                  <AvatarImage src={other?.avatar_url} />
-                  <AvatarFallback>{other?.full_name?.substring(0,2)}</AvatarFallback>
-                </Avatar>
-
-                <div className="flex-1">
-                  <p className="font-medium">{other?.full_name}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                    {conv.last_message || "Start chatting…"}
-                  </p>
-                </div>
-
-                {unread > 0 && (
-                  <div className="h-6 w-6 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center">
-                    {unread}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="h-[calc(100vh-8rem)] flex bg-background rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            {/* Conversations Sidebar */}
+            <Card className="w-80 flex flex-col h-full rounded-none border-0 border-r shadow-none">
+          <CardHeader className="p-4 border-b bg-card/50">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-semibold text-primary">Messages</CardTitle>
+              <Dialog open={newChatOpen} onOpenChange={setNewChatOpen}>
+                <DialogTrigger asChild>
+                  <Button size="icon" variant="outline" className="h-8 w-8">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Start New Conversation</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search users..."
+                        className="pl-10"
+                        value={userSearchQuery}
+                        onChange={(e) => {
+                          setUserSearchQuery(e.target.value);
+                          searchUsers(e.target.value);
+                        }}
+                      />
+                    </div>
+                    <ScrollArea className="h-64">
+                      {searchingUsers ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        </div>
+                      ) : searchedUsers.length > 0 ? (
+                        <div className="space-y-2">
+                          {searchedUsers.map((searchUser) => (
+                            <div
+                              key={searchUser.id}
+                              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors"
+                              onClick={() => startConversation(searchUser)}
+                            >
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={searchUser.avatar_url} />
+                                <AvatarFallback className="bg-primary/10 text-primary">
+                                  {searchUser.full_name?.charAt(0) || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate">{searchUser.full_name}</p>
+                                {searchUser.current_position && (
+                                  <p className="text-sm text-muted-foreground truncate">
+                                    {searchUser.current_position}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : userSearchQuery ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <p>No users found</p>
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <p>Search for users to start a conversation</p>
+                        </div>
+                      )}
+                    </ScrollArea>
                   </div>
-                )}
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardHeader>
+          <div className="px-4 py-3 border-b">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search conversations..."
+                className="pl-10 h-9 bg-background"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
 
+          <ScrollArea className="flex-1 h-0">
+            {filteredConversations.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                <MessageCircle className="h-12 w-12 text-muted-foreground/40 mb-3" />
+                <h3 className="font-medium text-muted-foreground mb-1">No conversations found</h3>
+                <p className="text-xs text-muted-foreground">Start a new conversation</p>
               </div>
-            );
-          })}
-        </div>
-      </div>
+            ) : (
+              <div className="p-2 space-y-1">
+                {filteredConversations.map((conversation) => {
+                  const otherParticipant = getOtherParticipant(conversation);
+                  return (
+                    <div
+                      key={conversation.id}
+                      className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                        selectedConversation?.id === conversation.id
+                          ? 'bg-primary/5 border-l-4 border-primary shadow-sm'
+                          : 'hover:bg-accent/50'
+                      }`}
+                      onClick={() => {
+                        setSelectedConversation(conversation);
+                        fetchMessages(conversation.id);
+                        markMessagesAsRead(conversation.id);
 
-      {/* ---------------- RIGHT : CHAT WINDOW ---------------- */}
-      <div className="flex-1 flex flex-col">
+                        // Reset unread for that conversation
+                        setUnreadCounts(prev => ({
+                          ...prev,
+                          [conversation.id]: 0
+                        }));
+                      }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="relative">
+                          <Avatar className="h-10 w-10 border-2 border-background">
+                            <AvatarImage src={otherParticipant?.avatar_url} />
+                            <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                              {otherParticipant?.full_name?.charAt(0) || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-background rounded-full"></div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{otherParticipant?.full_name || 'Unknown User'}</p>
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs text-muted-foreground truncate">
+                              {unreadCounts[conversation.id] > 0 
+                                ? "New messages" 
+                                : "Click to view messages"}
+                            </p>
 
-        {/* HEADER — name, avatar, buttons */}
-        {selectedConversation ? (
-          <>
-            <div className="p-4 border-b border-gray-300 dark:border-gray-800 flex items-center justify-between">
+                            {unreadCounts[conversation.id] > 0 && (
+                              <Badge className="ml-2 bg-primary text-white">
+                                {unreadCounts[conversation.id]}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </ScrollArea>
+        </Card>
 
-              {/* Left side */}
-              <div className="flex items-center gap-3">
-                <Avatar className="h-11 w-11">
-                  <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />
-                  <AvatarFallback>
-                    {getOtherParticipant(selectedConversation)?.full_name?.substring(0,2)}
-                  </AvatarFallback>
-                </Avatar>
-
-                <div>
-                  <p className="font-semibold text-lg">
-                    {getOtherParticipant(selectedConversation)?.full_name}
-                  </p>
-                  <p className="text-xs text-gray-500">Online</p>
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col h-full">
+          {selectedConversation ? (
+            <>
+              {/* Chat Header */}
+              <div className="p-4 border-b bg-card/50 backdrop-blur-sm flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <Avatar className="h-10 w-10 border-2 border-background">
+                      <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                        {getOtherParticipant(selectedConversation)?.full_name?.charAt(0) || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-background rounded-full"></div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">{getOtherParticipant(selectedConversation)?.full_name || 'Unknown User'}</h3>
+                    <p className="text-xs text-muted-foreground">Active now</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => initiateCall('audio')}
+                    disabled={callState !== 'idle'}
+                  >
+                    <Phone className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => initiateCall('video')}
+                    disabled={callState !== 'idle'}
+                  >
+                    <Video className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
 
-              {/* Right side */}
-              <div className="flex items-center gap-4">
-                <Phone onClick={() => initiateCall("audio")} className="cursor-pointer" />
-                <Video onClick={() => initiateCall("video")} className="cursor-pointer" />
-                <MoreVertical className="cursor-pointer" />
-              </div>
-
-            </div>
-
-            {/* CHAT MESSAGES - only this area scrolls */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-3 no-scrollbar">
-              {messages.map((msg) => {
-                const mine = msg.sender_id === user.id;
-
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex ${mine ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[60%] px-4 py-2 rounded-2xl shadow 
-                        ${mine 
-                          ? "bg-blue-600 text-white rounded-br-none" 
-                          : "bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded-bl-none"
-                        }`}
-                    >
-                      {msg.content}
+              {/* Messages */}
+              <ScrollArea className="flex-1 h-0 p-4 bg-accent/5">
+                {messages.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <MessageCircle className="h-12 w-12 text-muted-foreground/40 mx-auto mb-3" />
+                      <p className="font-medium text-muted-foreground">No messages yet</p>
+                      <p className="text-sm text-muted-foreground/70">Send a message to start the conversation</p>
                     </div>
                   </div>
-                );
-              })}
+                ) : (
+                  <div className="space-y-4 pb-4">
+                    {messages.map((message, index) => {
+                      const isOwn = message.sender_id === user.id;
+                      const showAvatar = index === 0 || messages[index - 1].sender_id !== message.sender_id;
+                      
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div className={`flex items-end space-x-2 max-w-[70%] ${isOwn ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                            {!isOwn && showAvatar && (
+                              <Avatar className="h-7 w-7 mb-1">
+                                <AvatarImage src={getOtherParticipant(selectedConversation)?.avatar_url} />
+                                <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                                  {getOtherParticipant(selectedConversation)?.full_name?.charAt(0) || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                            {!isOwn && !showAvatar && <div className="w-7" />}
+                            <div
+                              className={`rounded-2xl px-4 py-2 shadow-sm ${
+                                isOwn
+                                  ? 'bg-primary text-primary-foreground rounded-br-md'
+                                  : 'bg-card text-card-foreground border rounded-bl-md'
+                              }`}
+                            >
+                              <p className="text-sm leading-relaxed">{message.content}</p>
+                              <span className={`text-xs mt-1 block ${isOwn ? 'opacity-70' : 'text-muted-foreground'}`}>
+                                {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div ref={messagesEndRef} />
+                  </div>
+                )}
+              </ScrollArea>
 
-              <div ref={messagesEndRef}></div>
-            </div>
-
-            {/* TYPE MESSAGE AREA */}
-            <div className="p-4 border-t border-gray-300 dark:border-gray-800">
-              <div className="flex items-center gap-3 bg-gray-100 dark:bg-gray-900 px-4 py-3 rounded-2xl">
-
-                <Smile 
-                  className="cursor-pointer" 
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)} 
-                />
-
-                <input
-                  type="text"
-                  className="flex-1 bg-transparent outline-none"
-                  placeholder="Type a message…"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                />
-
-                <Paperclip 
-                  className="cursor-pointer" 
-                  onClick={() => fileInputRef.current.click()}
-                />
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  className="hidden"
-                  onChange={handleFileSelect}
-                />
-
-                <Send 
-                  onClick={sendMessage}
-                  className="cursor-pointer text-blue-600"
-                />
+              {/* Message Input */}
+              <div className="border-t bg-card/50 backdrop-blur-sm p-4">
+                {selectedFile && (
+                  <div className="mb-2 flex items-center gap-2 p-2 bg-muted rounded-lg">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <span className="text-sm flex-1 truncate">{selectedFile.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setSelectedFile(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                <div className="flex items-end gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                    accept="image/*,.pdf,.doc,.docx"
+                  />
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={sendingMessage}
+                    className="hover:bg-primary/10 transition-colors shrink-0"
+                  >
+                    <Paperclip className="h-5 w-5 text-muted-foreground" />
+                  </Button>
+                  <div className="flex-1 min-w-0">
+                    <Textarea
+                      placeholder="Type a message..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          sendMessage();
+                        }
+                      }}
+                      disabled={sendingMessage}
+                      className="min-h-[44px] max-h-32 resize-none border-0 bg-background/50 focus-visible:ring-1"
+                      rows={1}
+                    />
+                  </div>
+                  <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        disabled={sendingMessage}
+                        className="hover:bg-primary/10 transition-colors shrink-0"
+                      >
+                        <Smile className="h-5 w-5 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0 border-0" align="end">
+                      <EmojiPicker 
+                        onEmojiClick={onEmojiClick}
+                        width="100%"
+                        height="400px"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Button 
+                    onClick={sendMessage}
+                    size="icon"
+                    disabled={sendingMessage || uploadingFile || (!newMessage.trim() && !selectedFile)}
+                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shrink-0"
+                  >
+                    {sendingMessage || uploadingFile ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Send className="h-5 w-5" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-full bg-gradient-to-br from-accent/10 to-accent/5">
+              <div className="text-center max-w-md px-4">
+                <div className="mb-6 relative">
+                  <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full"></div>
+                  <MessageCircle className="h-20 w-20 text-primary/60 mx-auto relative" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-2xl font-semibold mb-2 text-primary">Select a conversation</h3>
+                <p className="text-muted-foreground text-sm">Choose a conversation from the sidebar to start messaging</p>
               </div>
             </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
-            Select a conversation to start chatting
-          </div>
-        )}
-
+          )}
+        </div>
       </div>
-    </div>
-  </DashboardLayout>
+      </div>
+      </div>
+
+      {/* Call Modal */}
+      <CallModal
+        isOpen={isCallModalOpen}
+        onClose={handleEndCall}
+        callType={callType}
+        callState={callState}
+        localStream={localStream}
+        remoteStream={remoteStream}
+        otherUser={selectedConversation ? getOtherParticipant(selectedConversation) : null}
+        onEndCall={handleEndCall}
+        onAcceptCall={() => handleAcceptCall(callType)}
+        onDeclineCall={handleDeclineCall}
+        onToggleMute={handleToggleMute}
+        onToggleVideo={handleToggleVideo}
+        isMuted={isMuted}
+        isVideoOff={isVideoOff}
+      />
+    </DashboardLayout>
   );
 };
 
