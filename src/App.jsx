@@ -40,10 +40,10 @@ import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <Sonner />
-      <TooltipProvider>
+<QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
         <BrowserRouter>
           <AuthProvider>
             <Routes>
@@ -165,7 +165,7 @@ const App = () => (
             </Routes>
           </AuthProvider>
         </BrowserRouter>
-      </TooltipProvider>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 
