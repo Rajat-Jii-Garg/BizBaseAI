@@ -19,22 +19,22 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
       "react": path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+      "react/jsx-runtime": path.resolve(__dirname, "node_modules/react/jsx-runtime"),
     },
-    dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
+    dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
   },
   optimizeDeps: {
     include: [
       'react', 
       'react-dom', 
       'react/jsx-runtime',
-      '@radix-ui/react-tooltip',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-popover',
     ],
+    exclude: [],
     force: true,
   },
-  esbuild: {
-    jsx: 'automatic',
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
   },
 }));
