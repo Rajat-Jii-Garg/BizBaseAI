@@ -400,8 +400,8 @@ const Dashboard = () => {
 
           {/* Main Dashboard Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-            {/* Left Sidebar - Profile & Stats - Hidden on mobile, shown in drawer or at bottom */}
-            <div className="lg:col-span-3 space-y-4 sm:space-y-6 order-2 lg:order-1">
+            {/* Left Sidebar - Profile & Stats */}
+            <div className="lg:col-span-3 space-y-4 sm:space-y-6">
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
                 <div className="h-16 sm:h-20 bg-gradient-to-r from-blue-600 to-purple-600 bg-cover bg-center" 
                      style={profile?.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : {}}>
