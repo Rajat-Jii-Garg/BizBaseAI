@@ -1,10 +1,10 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export const useHashtags = () => {
-  const [hashtags, setHashtags] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [hashtags, setHashtags] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchTrendingHashtags = async (limit = 10) => {
     try {
@@ -71,7 +71,7 @@ export const useHashtags = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchTrendingHashtags();
   }, []);
 

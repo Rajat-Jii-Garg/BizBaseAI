@@ -1,12 +1,12 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export const useConnections = () => {
-  const [connections, setConnections] = React.useState([]);
-  const [pendingRequests, setPendingRequests] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [connections, setConnections] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   const fetchConnections = async () => {
@@ -99,7 +99,7 @@ export const useConnections = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchConnections();
   }, [user]);
 
