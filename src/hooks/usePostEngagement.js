@@ -1,11 +1,11 @@
-import React from 'react';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export const usePostEngagement = () => {
   const { user } = useAuth();
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
 
   const toggleLike = async (postId) => {
     if (!user) {
