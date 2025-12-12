@@ -15,10 +15,16 @@ export class WebRTCManager {
     this.configuration = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        { urls: 'stun:stun3.l.google.com:19302' },
-        { urls: 'stun:stun4.l.google.com:19302' },
+        {
+          urls: "turn:global.relay.metered.ca:80",
+          username: "demo",
+          credential: "demo",
+        },
+        {
+          urls: "turn:global.relay.metered.ca:443",
+          username: "demo",
+          credential: "demo",
+        }
       ],
       iceCandidatePoolSize: 10
     };
@@ -30,14 +36,14 @@ export class WebRTCManager {
 
     // Handle remote stream
     this.peerConnection.ontrack = (event) => {
-      console.log('ontrack event received:', event.streams);
+      console.log("Remote track received");
+
       if (!this.remoteStream) {
         this.remoteStream = new MediaStream();
       }
-      event.streams[0].getTracks().forEach(track => {
-        console.log('Adding remote track:', track.kind);
-        this.remoteStream.addTrack(track);
-      });
+
+      this.remoteStream.addTrack(event.track);
+
       if (this.onRemoteStream) {
         this.onRemoteStream(this.remoteStream);
       }
@@ -158,13 +164,16 @@ export class WebRTCManager {
 
   async handleIceCandidate(payload) {
     try {
+      const candidateObj = payload.candidate;
+      const rtcCandidate = new RTCIceCandidate(candidateObj);
+
       if (this.peerConnection && this.peerConnection.remoteDescription) {
-        await this.peerConnection.addIceCandidate(new RTCIceCandidate(payload.candidate));
+        await this.peerConnection.addIceCandidate(rtcCandidate);
         console.log('Added ICE candidate successfully');
       } else {
         // Queue the candidate if remote description not set yet
         console.log('Queuing ICE candidate for later');
-        this.pendingCandidates.push(payload.candidate);
+        this.pendingCandidates.push(candidateObj);
       }
     } catch (error) {
       console.error('Error handling ICE candidate:', error);
