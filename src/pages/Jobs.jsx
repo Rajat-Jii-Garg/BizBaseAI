@@ -9,13 +9,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { MapPin, Clock, DollarSign, Building, Users, Search, Filter, Bookmark, BookmarkCheck, Brain, Target, Plus, Eye, Briefcase, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import CreateJobModal from '@/components/CreateJobModal';
 
 const Jobs = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [savedJobs, setSavedJobs] = useState(new Set());
@@ -283,11 +282,11 @@ const Jobs = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
           {/* Header */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Jobs Portal</h1>
-              <p className="text-gray-600">Discover opportunities that match your skills and career goals</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Jobs Portal</h1>
+              <p className="text-sm sm:text-base text-gray-600">Discover opportunities that match your skills and career goals</p>
             </div>
             <div className="flex gap-3">
               <CreateJobModal onJobCreated={fetchJobs} />
@@ -295,7 +294,7 @@ const Jobs = () => {
           </div>
           
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-blue-600" />
@@ -328,7 +327,7 @@ const Jobs = () => {
         </div>
 
           {/* Search and Filters */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
           <div className="space-y-4">
             {/* Search Bar */}
             <div className="relative">
@@ -342,7 +341,7 @@ const Jobs = () => {
             </div>
 
             {/* Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
               <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
                 <SelectTrigger>
                   <SelectValue placeholder="Industry" />
@@ -461,45 +460,45 @@ const Jobs = () => {
           {/* Jobs List */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                 {filteredJobs.length} Job{filteredJobs.length !== 1 ? 's' : ''} Found
               </h2>
             </div>
 
             {filteredJobs.map((job) => (
               <Card key={job.id} className="hover:shadow-md transition-shadow bg-white border border-gray-200 rounded-xl">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       <h3 
-                        className="text-xl font-semibold text-gray-900 cursor-pointer hover:text-blue-600"
+                        className="text-lg sm:text-xl font-semibold text-gray-900 cursor-pointer hover:text-blue-600"
                         onClick={() => incrementJobViews(job.id)}
                       >
                         {job.title}
                       </h3>
                       {job.is_featured && (
-                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Featured</Badge>
+                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">Featured</Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-4 text-gray-600 mb-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-3">
                       <div className="flex items-center gap-1">
                         <Building className="h-4 w-4" />
-                        <span>{job.company_name}</span>
+                        <span className="truncate max-w-[150px]">{job.company_name}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
-                        <span>{job.location}</span>
+                        <span className="truncate max-w-[100px]">{job.location}</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="hidden sm:flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         <span>{new Date(job.created_at).toLocaleDateString()}</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="hidden md:flex items-center gap-1">
                         <Eye className="h-4 w-4" />
                         <span>{job.views_count} views</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="hidden md:flex items-center gap-1">
                         <Users className="h-4 w-4" />
                         <span>{job.applications_count} applications</span>
                       </div>
@@ -565,7 +564,7 @@ const Jobs = () => {
                     )}
                   </div>
                   
-                  <div className="flex flex-col gap-2 ml-4">
+                  <div className="flex flex-row sm:flex-col gap-2 sm:ml-4 justify-end">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -580,7 +579,7 @@ const Jobs = () => {
                     </Button>
                     
                     {appliedJobs.has(job.id) ? (
-                      <Button variant="outline" size="sm" disabled>
+                      <Button variant="outline" size="sm" disabled className="text-xs sm:text-sm">
                         Applied
                       </Button>
                     ) : (
@@ -588,8 +587,9 @@ const Jobs = () => {
                         variant="default"
                         size="sm"
                         onClick={() => handleApplyJob(job.id)}
+                        className="text-xs sm:text-sm"
                       >
-                        Apply Now
+                        Apply
                       </Button>
                     )}
                   </div>

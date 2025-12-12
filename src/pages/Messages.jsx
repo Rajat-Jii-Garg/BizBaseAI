@@ -120,6 +120,7 @@ const Messages = () => {
       pendingOfferRef.current = null;
       callerIdRef.current = null;
     };
+
   }, [user]);
 
   // Real-time subscription for all conversations and messages

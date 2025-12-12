@@ -1,8 +1,17 @@
+// Force rebuild: 2025-01-08
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
 
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
+const container = document.getElementById("root");
+if (!container) {
+  throw new Error("Root element not found");
+}
 
-createRoot(document.getElementById("root")).render(
-  <App />
+const root = ReactDOM.createRoot(container);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );

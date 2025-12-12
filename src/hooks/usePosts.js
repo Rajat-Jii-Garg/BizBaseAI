@@ -1,22 +1,18 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-// import { Post } from '@/hooks/usePosts';
+import { toast } from 'sonner';
 
 export const usePosts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { toast } = useToast();
 
   const fetchPosts = async () => {
     try {
       console.log('Fetching posts...');
       setLoading(true);
 
-      // First get all posts
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
@@ -35,11 +31,9 @@ export const usePosts = () => {
         return;
       }
 
-      // Get unique user IDs
       const userIds = Array.from(new Set(postsData.map(post => post.user_id)));
       console.log('Fetching profiles for user IDs:', userIds);
 
-      // Fetch profiles directly
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url, current_position, company_name')
@@ -49,7 +43,6 @@ export const usePosts = () => {
         console.error('Error fetching profiles:', profilesError);
       }
 
-      // Create profiles map
       const profilesMap = new Map();
       if (profilesData) {
         profilesData.forEach((profile) => {
@@ -57,7 +50,6 @@ export const usePosts = () => {
         });
       }
 
-      // Check likes for current user
       let likedPostIds = new Set();
       if (user) {
         const postIds = postsData.map(post => post.id);
@@ -70,7 +62,6 @@ export const usePosts = () => {
         likedPostIds = new Set(likes?.map(like => like.post_id) || []);
       }
 
-      // Combine data
       const enrichedPosts = postsData.map(post => ({
         ...post,
         likes_count: post.likes_count || 0,
@@ -89,11 +80,7 @@ export const usePosts = () => {
       setPosts(enrichedPosts);
     } catch (error) {
       console.error('Error in fetchPosts:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load posts",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to load posts" });
     } finally {
       setLoading(false);
     }
@@ -101,11 +88,7 @@ export const usePosts = () => {
 
   const createPost = async (content, imageUrl, mediaType) => {
     if (!user) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to create posts",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "You must be logged in to create posts" });
       return;
     }
 
@@ -131,7 +114,6 @@ export const usePosts = () => {
 
       console.log('Post created successfully:', data);
 
-      // Process hashtags from the post content
       if (data && content) {
         try {
           const { error: hashtagError } = await supabase.rpc('process_post_hashtags', {
@@ -147,15 +129,10 @@ export const usePosts = () => {
         }
       }
 
-      // Refresh posts
       await fetchPosts();
     } catch (error) {
       console.error('Error creating post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create post: " + error.message,
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to create post: " + error.message });
     }
   };
 
@@ -167,7 +144,6 @@ export const usePosts = () => {
       if (!post) return;
 
       if (post.user_has_liked) {
-        // Unlike
         const { error } = await supabase
           .from('post_likes')
           .delete()
@@ -176,7 +152,6 @@ export const usePosts = () => {
 
         if (error) throw error;
       } else {
-        // Like
         const { error } = await supabase
           .from('post_likes')
           .insert([
@@ -192,11 +167,7 @@ export const usePosts = () => {
       await fetchPosts();
     } catch (error) {
       console.error('Error toggling like:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update like",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to update like" });
     }
   };
 
@@ -215,19 +186,11 @@ export const usePosts = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Post shared successfully!"
-      });
-
+      toast.success("Success", { description: "Post shared successfully!" });
       await fetchPosts();
     } catch (error) {
       console.error('Error sharing post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to share post",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to share post" });
     }
   };
 
@@ -239,11 +202,7 @@ export const usePosts = () => {
 
   const editPost = async (postId, newContent) => {
     if (!user) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to edit posts",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "You must be logged in to edit posts" });
       return;
     }
 
@@ -255,11 +214,10 @@ export const usePosts = () => {
           updated_at: new Date().toISOString()
         })
         .eq('id', postId)
-        .eq('user_id', user.id); // Ensure user can only edit their own posts
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
-      // Process hashtags if content was updated
       if (newContent) {
         try {
           const { error: hashtagError } = await supabase.rpc('process_post_hashtags', {
@@ -284,11 +242,7 @@ export const usePosts = () => {
 
   const deletePost = async (postId) => {
     if (!user) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to delete posts",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "You must be logged in to delete posts" });
       return;
     }
 
@@ -297,7 +251,7 @@ export const usePosts = () => {
         .from('posts')
         .delete()
         .eq('id', postId)
-        .eq('user_id', user.id); // Ensure user can only delete their own posts
+        .eq('user_id', user.id);
 
       if (error) throw error;
 

@@ -1,12 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const useHashtags = () => {
   const [hashtags, setHashtags] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   const fetchTrendingHashtags = async (limit = 10) => {
     try {
@@ -21,11 +19,7 @@ export const useHashtags = () => {
       setHashtags(data || []);
     } catch (error) {
       console.error('Error fetching hashtags:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load hashtags",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to load hashtags" });
     } finally {
       setLoading(false);
     }
@@ -44,11 +38,7 @@ export const useHashtags = () => {
       return data || [];
     } catch (error) {
       console.error('Error searching hashtags:', error);
-      toast({
-        title: "Error",
-        description: "Failed to search hashtags",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to search hashtags" });
       return [];
     }
   };
@@ -76,11 +66,7 @@ export const useHashtags = () => {
       return data || [];
     } catch (error) {
       console.error('Error fetching posts by hashtag:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load posts",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to load posts" });
       return [];
     }
   };

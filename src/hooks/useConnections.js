@@ -1,21 +1,18 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const useConnections = () => {
   const [connections, setConnections] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { toast } = useToast();
 
   const fetchConnections = async () => {
     if (!user) return;
 
     try {
-      // First get connections without profile joins
       const { data: connectionsData, error } = await supabase
         .from('connections')
         .select('*')
@@ -23,26 +20,22 @@ export const useConnections = () => {
 
       if (error) throw error;
 
-      // Get unique user IDs to fetch profiles
       const userIds = new Set();
       connectionsData?.forEach(conn => {
         userIds.add(conn.requester_id);
         userIds.add(conn.addressee_id);
       });
 
-      // Fetch profiles for these users
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url')
         .in('id', Array.from(userIds));
 
-      // Create a map of profiles
       const profilesMap = new Map();
       profilesData?.forEach(profile => {
         profilesMap.set(profile.id, profile);
       });
 
-      // Combine connections with profile data
       const connectionsWithProfiles = connectionsData?.map(conn => ({
         ...conn,
         status: conn.status,
@@ -59,11 +52,7 @@ export const useConnections = () => {
       setPendingRequests(pending);
     } catch (error) {
       console.error('Error fetching connections:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load connections",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to load connections" });
     } finally {
       setLoading(false);
     }
@@ -85,19 +74,11 @@ export const useConnections = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Connection request sent!"
-      });
-
+      toast.success("Success", { description: "Connection request sent!" });
       fetchConnections();
     } catch (error) {
       console.error('Error sending connection request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send connection request",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to send connection request" });
     }
   };
 
@@ -110,19 +91,11 @@ export const useConnections = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: `Connection request ${status}!`
-      });
-
+      toast.success("Success", { description: `Connection request ${status}!` });
       fetchConnections();
     } catch (error) {
       console.error('Error responding to request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to respond to request",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to respond to request" });
     }
   };
 

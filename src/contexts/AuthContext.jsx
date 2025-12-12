@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const AuthContext = createContext(undefined);
 
@@ -16,9 +16,8 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
-  const [profile, setProfile] = useState(null); // <--- 1. NEW STATE
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   // 2. NEW FUNCTION: Profile table से data fetch करने के लिए -------------------------------------------------------------------------
   const fetchUserProfile = async (userId) => {
@@ -152,11 +151,7 @@ export const AuthProvider = ({ children }) => {
 
       if (error) {
         console.error('Account creation error:', error);
-        toast({
-          title: 'Account Creation Error',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error('Account Creation Error', { description: error.message });
         return { error };
       }
 
@@ -178,9 +173,8 @@ export const AuthProvider = ({ children }) => {
         console.error('Failed to send welcome email:', emailError);
       }
 
-      toast({
-        title: "Account Created Successfully!",
-        description: "Welcome to BizBase! Check your email for a welcome message.",
+      toast.success("Account Created Successfully!", { 
+        description: "Welcome to BizBase! Check your email for a welcome message." 
       });
       
       return { error: null };
@@ -199,16 +193,9 @@ export const AuthProvider = ({ children }) => {
 
       if (error) {
         console.error('Login error:', error);
-        toast({
-          title: 'Login Error',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error('Login Error', { description: error.message });
       } else {
-        toast({
-          title: 'Welcome Back!',
-          description: 'Successfully signed in to BizBase.',
-        });
+        toast.success('Welcome Back!', { description: 'Successfully signed in to BizBase.' });
       }
 
       return { error };
@@ -221,17 +208,10 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      toast({
-        title: 'Signed Out',
-        description: 'Successfully signed out from BizBase.',
-      });
+      toast.success('Signed Out', { description: 'Successfully signed out from BizBase.' });
     } catch (error) {
       console.error('Signout error:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to sign out.',
-        variant: 'destructive',
-      });
+      toast.error('Error', { description: 'Failed to sign out.' });
     }
   };
 
@@ -242,16 +222,9 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (error) {
-        toast({
-          title: 'Error',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error('Error', { description: error.message });
       } else {
-        toast({
-          title: 'Password Reset',
-          description: 'Check your email for reset instructions.',
-        });
+        toast.success('Password Reset', { description: 'Check your email for reset instructions.' });
       }
 
       return { error };
@@ -275,11 +248,7 @@ export const AuthProvider = ({ children }) => {
       return { error: null };
     } catch (error) {
       console.error('Send OTP error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send OTP. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to send OTP. Please try again." });
       return { error };
     }
   };

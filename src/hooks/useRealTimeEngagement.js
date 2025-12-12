@@ -1,6 +1,5 @@
-
-import { supabase } from '@/integrations/supabase/client';
 import { useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useRealTimeEngagement = (onUpdate) => {
   useEffect(() => {
@@ -15,7 +14,6 @@ export const useRealTimeEngagement = (onUpdate) => {
           table: 'post_likes'
         },
         () => {
-          // Update with 0.11 second delay for smooth UX
           setTimeout(onUpdate, 110);
         }
       )

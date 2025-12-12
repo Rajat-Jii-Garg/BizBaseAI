@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedPostComposer from '@/components/EnhancedPostComposer';
 import EnhancedPostCard from '@/components/EnhancedPostCard';
@@ -52,7 +52,6 @@ import QuickProfileActions from '@/components/QuickProfileActions'
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [showWelcome, setShowWelcome] = useState(true);
   const [allPosts, setAllPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
@@ -233,11 +232,7 @@ const Dashboard = () => {
       setAllPosts(enrichedPosts);
     } catch (error) {
       console.error('Dashboard: Error fetching all posts:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load posts",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to load posts" });
     } finally {
       setLoadingPosts(false);
     }
@@ -276,17 +271,10 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Connection Request Sent!",
-        description: "Your connection request has been sent successfully."
-      });
+      toast.success("Connection Request Sent!", { description: "Your connection request has been sent successfully." });
     } catch (error) {
       console.error('Error sending connection request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send connection request",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to send connection request" });
     }
   };
 
@@ -331,20 +319,13 @@ const Dashboard = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Connection Request Sent!",
-        description: "Your connection request has been sent successfully."
-      });
+      toast.success("Connection Request Sent!", { description: "Your connection request has been sent successfully." });
 
       // Remove from suggestions
       setSmartConnections(prev => prev.filter(conn => conn.id !== profileId));
     } catch (error) {
       console.error('Error sending connection request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send connection request",
-        variant: "destructive"
-      });
+      toast.error("Error", { description: "Failed to send connection request" });
     }
   };
 
@@ -418,50 +399,50 @@ const Dashboard = () => {
           )}
 
           {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
             {/* Left Sidebar - Profile & Stats */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-3 space-y-4 sm:space-y-6">
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
-                <div className="h-20 bg-gradient-to-r from-blue-600 to-purple-600 bg-cover bg-center" 
+                <div className="h-16 sm:h-20 bg-gradient-to-r from-blue-600 to-purple-600 bg-cover bg-center" 
                      style={profile?.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : {}}>
                 </div>
-                <CardContent className="p-6 text-center relative">
+                <CardContent className="p-4 sm:p-6 text-center relative">
                   <Avatar 
-                    className="h-20 w-20 mx-auto -mt-12 mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
+                    className="h-16 w-16 sm:h-20 sm:w-20 mx-auto -mt-10 sm:-mt-12 mb-3 sm:mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
                     onClick={() => navigate('/profile-dashboard')}
                   >
                     <AvatarImage src={profile?.avatar_url} />
-                    <AvatarFallback className="text-lg">
+                    <AvatarFallback className="text-base sm:text-lg">
                       {profile?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <h3 
-                    className="font-bold text-gray-900 mb-1 text-lg cursor-pointer hover:text-blue-600 transition-colors"
+                    className="font-bold text-gray-900 mb-1 text-base sm:text-lg cursor-pointer hover:text-blue-600 transition-colors"
                     onClick={() => navigate('/profile-dashboard')}
                   >
                     {profile?.full_name || 'Professional User'}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
-                    <Award className="w-4 h-4 text-yellow-500" />
+                  <p className="text-xs sm:text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
+                    <Award className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
                     AI-Enhanced Profile
                   </p>
                   <div className="flex justify-center gap-4 mb-4">
                     <div className="text-center">
-                      <div className="text-lg font-bold text-blue-600">{connections.length}</div>
+                      <div className="text-base sm:text-lg font-bold text-blue-600">{connections.length}</div>
                       <div className="text-xs text-gray-500">Connections</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-purple-600">{profile?.profile_completion_score || 0}%</div>
+                      <div className="text-base sm:text-lg font-bold text-purple-600">{profile?.profile_completion_score || 0}%</div>
                       <div className="text-xs text-gray-500">AI Score</div>
                     </div>
                   </div>
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full"
+                    className="w-full text-xs sm:text-sm"
                     onClick={() => navigate('/profile-dashboard')}
                   >
-                    <Edit className="w-4 h-4 mr-2" />
+                    <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     View Profile
                   </Button>
                 </CardContent>
