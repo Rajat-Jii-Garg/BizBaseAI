@@ -4,111 +4,108 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export const useConnections = () => {
-  const [connections, setConnections] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+
+  const [connections, setConnections] = useState([]);
+  const [receivedRequests, setReceivedRequests] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchConnections = async () => {
     if (!user) return;
 
     try {
-      const { data: connectionsData, error } = await supabase
+      const { data, error } = await supabase
         .from('connections')
-        .select('*')
+        .select(`
+          *,
+          requester_profile:profiles!connections_requester_id_fkey(id, full_name, avatar_url, current_position, location),
+          addressee_profile:profiles!connections_addressee_id_fkey(id, full_name, avatar_url, current_position, location)
+        `)
         .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
 
       if (error) throw error;
 
-      const userIds = new Set();
-      connectionsData?.forEach(conn => {
-        userIds.add(conn.requester_id);
-        userIds.add(conn.addressee_id);
+      const accepted = [];
+      const received = [];
+      const sent = [];
+
+      data.forEach(conn => {
+        if (conn.status === 'accepted') accepted.push(conn);
+
+        if (conn.status === 'pending') {
+          if (conn.addressee_id === user.id) received.push(conn);
+          if (conn.requester_id === user.id) sent.push(conn);
+        }
       });
-
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('id, full_name, avatar_url')
-        .in('id', Array.from(userIds));
-
-      const profilesMap = new Map();
-      profilesData?.forEach(profile => {
-        profilesMap.set(profile.id, profile);
-      });
-
-      const connectionsWithProfiles = connectionsData?.map(conn => ({
-        ...conn,
-        status: conn.status,
-        requester_profile: profilesMap.get(conn.requester_id) || { full_name: 'Unknown User' },
-        addressee_profile: profilesMap.get(conn.addressee_id) || { full_name: 'Unknown User' }
-      })) || [];
-
-      const accepted = connectionsWithProfiles.filter(conn => conn.status === 'accepted');
-      const pending = connectionsWithProfiles.filter(conn => 
-        conn.status === 'pending' && conn.addressee_id === user.id
-      );
 
       setConnections(accepted);
-      setPendingRequests(pending);
-    } catch (error) {
-      console.error('Error fetching connections:', error);
-      toast.error("Error", { description: "Failed to load connections" });
+      setReceivedRequests(received);
+      setSentRequests(sent);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to load connections');
     } finally {
       setLoading(false);
     }
   };
 
-  const sendConnectionRequest = async (addresseeId) => {
+  const sendRequest = async (addresseeId) => {
     if (!user) return;
 
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .insert([
-          {
-            requester_id: user.id,
-            addressee_id: addresseeId,
-            status: 'pending'
-          }
-        ]);
+    const { error } = await supabase.from('connections').insert({
+      requester_id: user.id,
+      addressee_id: addresseeId,
+      status: 'pending'
+    });
 
-      if (error) throw error;
-
-      toast.success("Success", { description: "Connection request sent!" });
-      fetchConnections();
-    } catch (error) {
-      console.error('Error sending connection request:', error);
-      toast.error("Error", { description: "Failed to send connection request" });
+    if (error) {
+      toast.error('Failed to send request');
+    } else {
+      toast.success('Connection request sent');
     }
   };
 
-  const respondToRequest = async (connectionId, status) => {
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .update({ status, updated_at: new Date().toISOString() })
-        .eq('id', connectionId);
-
-      if (error) throw error;
-
-      toast.success("Success", { description: `Connection request ${status}!` });
-      fetchConnections();
-    } catch (error) {
-      console.error('Error responding to request:', error);
-      toast.error("Error", { description: "Failed to respond to request" });
-    }
+  const acceptRequest = async (connectionId) => {
+    await supabase
+      .from('connections')
+      .update({ status: 'accepted' })
+      .eq('id', connectionId);
   };
 
+  const rejectRequest = async (connectionId) => {
+    await supabase
+      .from('connections')
+      .update({ status: 'rejected' })
+      .eq('id', connectionId);
+  };
+
+  // 🔥 REALTIME
   useEffect(() => {
+    if (!user) return;
+
     fetchConnections();
+
+    const channel = supabase
+      .channel('connections-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'connections' },
+        fetchConnections
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
   }, [user]);
 
   return {
-    connections,
-    pendingRequests,
     loading,
-    sendConnectionRequest,
-    respondToRequest,
-    refreshConnections: fetchConnections
+    connections,
+    receivedRequests,
+    sentRequests,
+    sendRequest,
+    acceptRequest,
+    rejectRequest,
+    refresh: fetchConnections
   };
 };
