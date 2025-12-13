@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Users, 
-  Search, 
-  MessageSquare, 
+import {
+  Users,
+  Search,
+  MessageSquare,
   UserMinus,
   UserPlus,
   MapPin,
@@ -38,6 +38,14 @@ const Connections = () => {
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('suggestions');
   const [requestsSubTab, setRequestsSubTab] = useState('received');
+
+  const refreshAllConnections = async () => {
+    await Promise.all([
+      fetchConnections(),
+      fetchPendingRequests(),
+      fetchSentRequests()
+    ]);
+  };
 
   useEffect(() => {
     if (user) {
@@ -89,7 +97,7 @@ const Connections = () => {
         .from('connections')
         .select(`
           *,
-          profiles!connections_requester_id_fkey (*)
+          requester_profile:profiles!connections_requester_id_fkey (*)
         `)
         .eq('addressee_id', user.id)
         .eq('status', 'pending');
@@ -109,7 +117,7 @@ const Connections = () => {
         .from('connections')
         .select(`
           *,
-          profiles!connections_addressee_id_fkey (*)
+          addressee_profile:profiles!connections_addressee_id_fkey (*)
         `)
         .eq('requester_id', user.id)
         .eq('status', 'pending');
@@ -208,7 +216,7 @@ const Connections = () => {
 
       // Remove from suggestions and refresh sent requests
       removeSuggestion(profileId);
-      fetchSentRequests();
+      await refreshAllConnections();
     } catch (error) {
       console.error('Error sending connection request:', error);
       toast({
@@ -233,8 +241,7 @@ const Connections = () => {
         description: "You have successfully accepted the connection request."
       });
 
-      fetchConnections();
-      fetchPendingRequests();
+      await refreshAllConnections();
     } catch (error) {
       console.error('Error accepting request:', error);
       toast({
@@ -259,7 +266,7 @@ const Connections = () => {
         description: "You have rejected the connection request."
       });
 
-      fetchPendingRequests();
+      await refreshAllConnections();
     } catch (error) {
       console.error('Error rejecting request:', error);
       toast({

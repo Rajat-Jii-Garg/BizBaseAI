@@ -30,6 +30,8 @@ const Network = () => {
   const [loading, setLoading] = useState(true);
   const [connectionRequests, setConnectionRequests] = useState(new Set());
   const [existingConnections, setExistingConnections] = useState(new Set());
+  const [incomingRequests, setIncomingRequests] = useState(new Set());
+
 
   useEffect(() => {
     if (user) {
@@ -53,14 +55,23 @@ const Network = () => {
       const pendingIds = new Set();
 
       connections?.forEach(conn => {
-        const otherId = conn.requester_id === user.id ? conn.addressee_id : conn.requester_id;
         if (conn.status === 'accepted') {
-          connectedIds.add(otherId);
-        } else if (conn.status === 'pending' && conn.requester_id === user.id) {
-          pendingIds.add(conn.addressee_id);
+          const otherId =
+            conn.requester_id === user.id ? conn.addressee_id : conn.requester_id;
+            connectedIds.add(otherId);
+        }
+
+        if (conn.status === 'pending') {
+          if (conn.requester_id === user.id) {
+            pendingIds.add(conn.addressee_id); // SENT
+          }
+          if (conn.addressee_id === user.id) {
+            incomingRequests.add(conn.requester_id); // RECEIVED
+          }
         }
       });
 
+      setIncomingRequests(new Set(incomingRequests));
       setExistingConnections(connectedIds);
       setConnectionRequests(pendingIds);
     } catch (error) {
@@ -130,13 +141,6 @@ const Network = () => {
     }
   };
 
-  // const filteredProfessionals = professionals.filter(prof =>
-  //   prof.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   prof.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   prof.current_position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   prof.industry?.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
-
   const filteredProfessionals = professionals.filter(prof =>
     (prof.full_name && prof.full_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (prof.company_name && prof.company_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -147,7 +151,8 @@ const Network = () => {
 
   const getConnectionStatus = (profileId) => {
     if (existingConnections.has(profileId)) return 'connected';
-    if (connectionRequests.has(profileId)) return 'pending';
+    if (connectionRequests.has(profileId)) return 'sent';
+    if (incomingRequests.has(profileId)) return 'received';
     return 'none';
   };
 
@@ -250,21 +255,15 @@ const Network = () => {
                     </div>
 
                     <div className="flex gap-2">
-                      {status === 'connected' ? (
+                      {status === 'connected' && <Button size="sm" variant="outline" disabled className="flex-1">Connected</Button>}
+                      {status === 'sent' && <Button size="sm" variant="outline" disabled className="flex-1">Request Sent</Button>}
+                      {status === 'received' && (
                         <Button size="sm" variant="outline" disabled className="flex-1">
-                          Connected
+                          Respond in Requests
                         </Button>
-                      ) : status === 'pending' ? (
-                        <Button size="sm" variant="outline" disabled className="flex-1">
-                          Request Sent
-                        </Button>
-                      ) : (
-                        <Button 
-                          size="sm" 
-                          className="flex-1 bg-blue-600 hover:bg-blue-700"
-                          onClick={() => sendConnectionRequest(professional.id)}
-                        >
-                          <UserPlus className="w-4 h-4 mr-2" />
+                      )}
+                      {status === 'none' && (
+                        <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => sendConnectionRequest(professional.id)}> <UserPlus className="w-4 h-4 mr-2" />
                           Connect
                         </Button>
                       )}
