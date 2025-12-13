@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import {
   Search,
   Users,
   UserPlus,
-  MessageSquare, 
+  MessageSquare,
   Filter,
   MapPin,
   Briefcase,
@@ -40,6 +39,28 @@ const Network = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('realtime-network')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'connections'
+        },
+        () => {
+          fetchExistingConnections();
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const fetchExistingConnections = async () => {
     if (!user) return;
 
@@ -53,27 +74,33 @@ const Network = () => {
 
       const connectedIds = new Set();
       const pendingIds = new Set();
+      const receivedIds = new Set();
 
       connections?.forEach(conn => {
         if (conn.status === 'accepted') {
           const otherId =
-            conn.requester_id === user.id ? conn.addressee_id : conn.requester_id;
-            connectedIds.add(otherId);
-        }
+            conn.requester_id === user.id
+              ? conn.addressee_id
+              : conn.requester_id;
+          connectedIds.add(otherId);
+        } 
 
         if (conn.status === 'pending') {
           if (conn.requester_id === user.id) {
             pendingIds.add(conn.addressee_id); // SENT
           }
+
           if (conn.addressee_id === user.id) {
-            incomingRequests.add(conn.requester_id); // RECEIVED
+            receivedIds.add(conn.requester_id); // RECEIVED
           }
         }
       });
 
-      setIncomingRequests(new Set(incomingRequests));
       setExistingConnections(connectedIds);
       setConnectionRequests(pendingIds);
+      setIncomingRequests(receivedIds);
+
+
     } catch (error) {
       console.error('Error fetching connections:', error);
     }

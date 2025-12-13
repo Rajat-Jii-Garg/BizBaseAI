@@ -80,9 +80,10 @@ const ConnectionsList = ({
           ) : (
             connections.slice(0, 5).map((connection) => {
               // Show the other person's profile (not current user)
-              const profile = connection.requester_profile?.full_name !== undefined 
-                ? connection.requester_profile 
-                : connection.addressee_profile;
+              const profile =
+                connection.profile ||
+                connection.requester_profile ||
+                connection.addressee_profile;
               
               return (
                 <div key={connection.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg gap-2">
