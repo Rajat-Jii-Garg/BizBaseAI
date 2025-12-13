@@ -39,23 +39,6 @@ const Connections = () => {
   const [activeTab, setActiveTab] = useState('suggestions');
   const [requestsSubTab, setRequestsSubTab] = useState('received');
 
-  const refreshAllConnections = async () => {
-    await Promise.all([
-      fetchConnections(),
-      fetchPendingRequests(),
-      fetchSentRequests()
-    ]);
-  };
-
-  useEffect(() => {
-    if (user) {
-      fetchConnections();
-      fetchPendingRequests();
-      fetchSentRequests();
-      fetchSuggestions();
-    }
-  }, [user]);
-
   const fetchConnections = async () => {
     if (!user) return;
 
@@ -88,6 +71,47 @@ const Connections = () => {
       setLoading(false);
     }
   };
+  
+  const refreshAllConnections = async () => {
+    await Promise.all([
+      fetchConnections(),
+      fetchPendingRequests(),
+      fetchSentRequests()
+    ]);
+  };
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Initial load
+    fetchConnections();
+    fetchPendingRequests();
+    fetchSentRequests();
+    fetchSuggestions();
+
+    // 🔥 REALTIME CONNECTIONS LISTENER
+    const channel = supabase
+      .channel('realtime-connections')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'connections'
+        },
+        (payload) => {
+          console.log('Realtime connection update:', payload);
+          refreshAllConnections();
+        }
+      )
+      .subscribe();
+
+    // 🧹 CLEANUP
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
 
   const fetchPendingRequests = async () => {
     if (!user) return;
