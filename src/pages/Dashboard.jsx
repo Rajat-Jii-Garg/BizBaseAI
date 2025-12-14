@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,6 +47,7 @@ import WelcomeFlow from '@/components/WelcomeFlow';
 import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
 import NetworkSuggestions from '@/components/NetworkSuggestions';
 import QuickProfileActions from '@/components/QuickProfileActions'
+import { useConnections } from '@/hooks/useConnections';
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
@@ -68,14 +68,12 @@ const Dashboard = () => {
     refreshPosts 
   } = usePosts();
   
-  const { 
-    connections, 
-    pendingRequests, 
-    loading: connectionsLoading,
-    respondToRequest 
+  const {
+    connections,
+    receivedRequests,
+    acceptRequest,
+    rejectRequest
   } = useConnections();
-
-  // Profile is now fetched by AuthContext, no need to fetch here
 
   // Fetch performance analytics (last 7 days)
   const fetchPerformanceData = async () => {
@@ -307,7 +305,7 @@ const Dashboard = () => {
     { label: "AI Insights", icon: Brain, action: () => navigate('/insights'), color: "bg-purple-600" },
   ];
 
-  const handleSendConnectionRequest = async (profileId) => {
+  const SendRequest = async (profileId) => {
     try {
       const { error } = await supabase
         .from('connections')
@@ -329,7 +327,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleAcceptRequest = (connectionId) => {
+  const handleacceptRequest = (connectionId) => {
     respondToRequest(connectionId, 'accepted');
   };
 
@@ -614,7 +612,7 @@ const Dashboard = () => {
                             variant="outline"
                             size="sm"
                             className="h-7 text-xs flex-1"
-                            onClick={() => handleSendConnectionRequest(connection.id)}
+                            onClick={() => sendRequest(connection.id)}
                           >
                             <UserPlus className="w-3 h-3 mr-1" />
                             Connect
@@ -689,9 +687,9 @@ const Dashboard = () => {
               ) : (
                 <ConnectionsList
                   connections={connections}
-                  pendingRequests={pendingRequests}
-                  onAcceptRequest={handleAcceptRequest}
-                  onRejectRequest={handleRejectRequest}
+                  receivedRequests={receivedRequests}
+                  onAcceptRequest={acceptRequest}
+                  onRejectRequest={rejectRequest}
                 />
               )}
 

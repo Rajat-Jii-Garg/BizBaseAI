@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,23 +7,23 @@ import { Users, UserPlus, Check, X } from 'lucide-react';
 
 const ConnectionsList = ({
   connections,
-  pendingRequests,
+  receivedRequests,
   onAcceptRequest,
   onRejectRequest
 }) => {
   return (
     <div className="space-y-4">
       {/* Pending Requests */}
-      {pendingRequests.length > 0 && (
+      {receivedRequests.length > 0 && (
         <Card className="bg-white shadow-sm border border-gray-200 overflow-hidden">
           <CardHeader className="pb-2 px-3 pt-3">
             <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
               <UserPlus className="w-4 h-4 mr-2 shrink-0 text-blue-600" />
-              <span className="truncate">Connection Requests ({pendingRequests.length})</span>
+              <span className="truncate">Connection Requests ({receivedRequests.length})</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-3 pt-0 space-y-2">
-            {pendingRequests.map((request) => (
+            {receivedRequests.map((request) => (
               <div key={request.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg gap-2">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <Avatar className="h-8 w-8 shrink-0">

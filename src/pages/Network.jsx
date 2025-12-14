@@ -16,7 +16,8 @@ import {
   Loader2
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { supabase } from '@/integrations/supabase/client';
+import { useConnections } from '@/hooks/useConnections';
+// import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,8 +35,12 @@ const Network = () => {
 
   useEffect(() => {
     if (user) {
-      fetchProfessionals();
-      fetchExistingConnections();
+      const {
+        connections,
+        receivedRequests,
+        sentRequests,
+        sendRequest
+      } = useConnections();
     }
   }, [user]);
 
@@ -177,9 +182,14 @@ const Network = () => {
 
 
   const getConnectionStatus = (profileId) => {
-    if (existingConnections.has(profileId)) return 'connected';
-    if (connectionRequests.has(profileId)) return 'sent';
-    if (incomingRequests.has(profileId)) return 'received';
+    if (connections.some(c =>
+      c.requester_id === profileId || c.addressee_id === profileId
+    )) return 'connected';
+
+    if (sentRequests.some(r => r.addressee_id === profileId)) return 'sent';
+
+    if (receivedRequests.some(r => r.requester_id === profileId)) return 'received';
+
     return 'none';
   };
 
@@ -290,7 +300,7 @@ const Network = () => {
                         </Button>
                       )}
                       {status === 'none' && (
-                        <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => sendConnectionRequest(professional.id)}> <UserPlus className="w-4 h-4 mr-2" />
+                        <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => sendRequest(professional.id)}> <UserPlus className="w-4 h-4 mr-2" />
                           Connect
                         </Button>
                       )}

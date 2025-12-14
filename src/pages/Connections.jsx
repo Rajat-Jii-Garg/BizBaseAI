@@ -21,20 +21,21 @@ import {
   UserCheck
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useConnections } from '@/hooks/useConnections';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+// import { supabase } from '@/integrations/supabase/client';
 
 const Connections = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [connections, setConnections] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState([]);
-  const [sentRequests, setSentRequests] = useState([]);
+  // const [connections, setConnections] = useState([]);
+  // const [pendingRequests, setPendingRequests] = useState([]);
+  // const [sentRequests, setSentRequests] = useState([]);
+  // const [loading, setLoading] = useState(true);
   const [suggestions, setSuggestions] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('suggestions');
   const [requestsSubTab, setRequestsSubTab] = useState('received');
@@ -82,34 +83,16 @@ const Connections = () => {
 
   useEffect(() => {
     if (!user) return;
-
-    // Initial load
-    fetchConnections();
-    fetchPendingRequests();
-    fetchSentRequests();
-    fetchSuggestions();
-
-    // 🔥 REALTIME CONNECTIONS LISTENER
-    const channel = supabase
-      .channel('realtime-connections')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'connections'
-        },
-        (payload) => {
-          console.log('Realtime connection update:', payload);
-          refreshAllConnections();
-        }
-      )
-      .subscribe();
-
-    // 🧹 CLEANUP
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    
+    const {
+      connections,
+      receivedRequests,
+      sentRequests,
+      loading,
+      sendRequest,
+      acceptRequest,
+      rejectRequest
+    } = useConnections();
   }, [user]);
 
 
@@ -193,11 +176,11 @@ const Connections = () => {
       if (error) throw error;
 
       // Prioritize profiles from same industry
-      const sameIndustry = allProfiles?.filter(p => 
+      const sameIndustry = allProfiles?.filter(p =>
         userProfile?.industry && p.industry === userProfile.industry
       ) || [];
       
-      const otherProfiles = allProfiles?.filter(p => 
+      const otherProfiles = allProfiles?.filter(p =>
         !userProfile?.industry || p.industry !== userProfile.industry
       ) || [];
 
@@ -413,7 +396,7 @@ const Connections = () => {
                       <Button 
                         size="sm" 
                         className="flex-1 btn-professional"
-                        onClick={() => handleSendConnectionRequest(profile.id)}
+                        onClick={() => sendRequest(profile.id)}
                       >
                         <UserPlus className="w-3 h-3 mr-1" />
                         Connect
@@ -448,16 +431,16 @@ const Connections = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
           <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg p-1 gap-1">
-            <TabsTrigger 
-              value="suggestions" 
+            <TabsTrigger
+              value="suggestions"
               className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
               <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Suggestions</span>
               <span className="sm:hidden">Suggest</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="connections" 
+            <TabsTrigger
+              value="connections"
               className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
               <UserCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -465,8 +448,8 @@ const Connections = () => {
               <span className="sm:hidden">Connect</span>
               <span className="ml-1">({connections.length})</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="requests" 
+            <TabsTrigger
+              value="requests"
               className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
             >
               <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -510,7 +493,7 @@ const Connections = () => {
                     <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                     <h3 className="text-xl font-semibold mb-2">No connections yet</h3>
                     <p className="text-muted-foreground mb-4">Start building your professional network today!</p>
-                    <Button 
+                    <Button
                       onClick={() => setActiveTab('suggestions')}
                       className="btn-professional"
                     >
@@ -593,7 +576,7 @@ const Connections = () => {
                 <Tabs value={requestsSubTab} onValueChange={setRequestsSubTab} className="mt-4">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="received">
-                      Received ({pendingRequests.length})
+                      Received ({receivedRequests.length})
                     </TabsTrigger>
                     <TabsTrigger value="sent">
                       Sent ({sentRequests.length})
@@ -609,7 +592,7 @@ const Connections = () => {
                         <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                         <h3 className="text-xl font-semibold mb-2">No Active Requests</h3>
                         <p className="text-muted-foreground mb-4">You don't have any pending connection requests.</p>
-                        <Button 
+                        <Button
                           onClick={() => setActiveTab('suggestions')}
                           className="btn-professional"
                         >
@@ -656,15 +639,15 @@ const Connections = () => {
                                 <Button 
                                   size="sm" 
                                   className="flex-1 bg-green-600 hover:bg-green-700"
-                                  onClick={() => handleAcceptRequest(request.id)}
+                                  onClick={() => acceptRequest(request.id)}
                                 >
                                   <Check className="w-4 h-4 mr-1" />
                                   Accept
                                 </Button>
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   variant="outline"
-                                  onClick={() => handleRejectRequest(request.id)}
+                                  onClick={() => rejectRequest(request.id)}
                                   className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                                 >
                                   <X className="w-4 h-4 mr-1" />
@@ -684,7 +667,7 @@ const Connections = () => {
                         <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                         <h3 className="text-xl font-semibold mb-2">No Sent Requests</h3>
                         <p className="text-muted-foreground mb-4">You haven't sent any connection requests yet.</p>
-                        <Button 
+                        <Button
                           onClick={() => setActiveTab('suggestions')}
                           className="btn-professional"
                         >

@@ -63,6 +63,7 @@ export const useConnections = () => {
       toast.error('Failed to send request');
     } else {
       toast.success('Connection request sent');
+      fetchConnections(); // ✅ ADD THIS
     }
   };
 
@@ -71,6 +72,7 @@ export const useConnections = () => {
       .from('connections')
       .update({ status: 'accepted' })
       .eq('id', connectionId);
+    fetchConnections();
   };
 
   const rejectRequest = async (connectionId) => {
@@ -78,6 +80,7 @@ export const useConnections = () => {
       .from('connections')
       .update({ status: 'rejected' })
       .eq('id', connectionId);
+    fetchConnections();
   };
 
   // 🔥 REALTIME
