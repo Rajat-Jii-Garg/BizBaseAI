@@ -47,7 +47,6 @@ import WelcomeFlow from '@/components/WelcomeFlow';
 import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
 import NetworkSuggestions from '@/components/NetworkSuggestions';
 import QuickProfileActions from '@/components/QuickProfileActions'
-import { useConnections } from '@/hooks/useConnections';
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
@@ -59,13 +58,13 @@ const Dashboard = () => {
   const [smartConnections, setSmartConnections] = useState([]);
   const [loadingConnections, setLoadingConnections] = useState(false);
   
-  const { 
-    posts: userPosts, 
-    loading: userPostsLoading, 
-    createPost, 
+  const {
+    posts: userPosts,
+    loading: userPostsLoading,
+    createPost,
     editPost,
     deletePost,
-    refreshPosts 
+    refreshPosts
   } = usePosts();
   
   const {
