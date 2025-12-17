@@ -174,16 +174,37 @@ const Connections = () => {
       <div className="max-w-7xl mx-auto p-4 space-y-6">
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="connections">
-              <UserCheck className="w-4 h-4 mr-2" />
-              Connections ({connections.length})
+          <TabsList className="grid w-full grid-cols-3 glass border-0 shadow-lg p-1 gap-1">
+            <TabsTrigger value="suggestions"
+              className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
+            >
+              <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Suggestions</span>
+              <span className="sm:hidden">Suggest</span>
             </TabsTrigger>
-            <TabsTrigger value="requests">
-              <UserPlus className="w-4 h-4 mr-2" />
-              Requests ({receivedRequests.length + sentRequests.length})
+
+            <TabsTrigger value="connections"
+              className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
+            >
+              <UserCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">My Connections</span>
+              <span className="sm:hidden">Connect</span>
+              <span className="ml-1">({connections.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="requests"
+              className="text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:rounded-lg"
+            >
+              <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Requests</span>
+              <span className="sm:hidden">Req</span>
+              <span className="ml-1">({pendingRequests.length + sentRequests.length})</span>
             </TabsTrigger>
           </TabsList>
+
+          {/* SUGGESTIONS */}
+          <TabsContent value="suggestions">
+            <SuggestionsTab />
+          </TabsContent>
 
           {/* CONNECTIONS */}
           <TabsContent value="connections">
