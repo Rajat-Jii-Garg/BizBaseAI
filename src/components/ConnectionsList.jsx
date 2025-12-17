@@ -3,7 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Users, UserPlus, Check, X } from 'lucide-react';
+import { Users, UserPlus, Check, X, MessageSquare, MapPin, Briefcase } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ConnectionsList = ({
   connections,
@@ -11,48 +13,71 @@ const ConnectionsList = ({
   onAcceptRequest,
   onRejectRequest
 }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Helper to get the other person's profile from a connection
+  const getOtherProfile = (connection) => {
+    if (!user) return connection.requester_profile || connection.addressee_profile;
+    
+    // If current user is the requester, show addressee profile
+    if (connection.requester_id === user.id) {
+      return connection.addressee_profile;
+    }
+    // If current user is the addressee, show requester profile
+    return connection.requester_profile;
+  };
+
   return (
     <div className="space-y-4">
       {/* Pending Requests */}
-      {receivedRequests.length > 0 && (
-        <Card className="bg-white shadow-sm border border-gray-200 overflow-hidden">
-          <CardHeader className="pb-2 px-3 pt-3">
+      {receivedRequests && receivedRequests.length > 0 && (
+        <Card className="bg-white shadow-lg border-0 overflow-hidden">
+          <CardHeader className="pb-2 px-4 pt-4 bg-gradient-to-r from-blue-50 to-purple-50">
             <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
               <UserPlus className="w-4 h-4 mr-2 shrink-0 text-blue-600" />
-              <span className="truncate">Connection Requests ({receivedRequests.length})</span>
+              <span className="truncate">Connection Requests</span>
+              <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700">
+                {receivedRequests.length}
+              </Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3 pt-0 space-y-2">
+          <CardContent className="p-3 space-y-2">
             {receivedRequests.map((request) => (
-              <div key={request.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg gap-2">
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <Avatar className="h-8 w-8 shrink-0">
+              <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl gap-2 hover:bg-blue-50 transition-colors">
+                <div 
+                  className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
+                  onClick={() => navigate(`/profile/${request.requester_profile?.id}`)}
+                >
+                  <Avatar className="h-10 w-10 shrink-0 ring-2 ring-blue-100">
                     <AvatarImage src={request.requester_profile?.avatar_url} />
-                    <AvatarFallback className="bg-gray-100 text-gray-600 text-xs">
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm font-medium">
                       {request.requester_profile?.full_name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-semibold text-gray-900 truncate hover:text-blue-600 transition-colors">
                       {request.requester_profile?.full_name || 'Professional User'}
                     </p>
-                    <p className="text-xs text-gray-500">wants to connect</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {request.requester_profile?.current_position || 'Professional'} 
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <Button
                     size="sm"
-                    variant="outline"
                     onClick={() => onAcceptRequest(request.id)}
-                    className="h-7 w-7 p-0 bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                    className="h-8 px-3 bg-green-600 hover:bg-green-700 text-white text-xs"
                   >
-                    <Check className="w-3 h-3" />
+                    <Check className="w-3 h-3 mr-1" />
+                    Accept
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => onRejectRequest(request.id)}
-                    className="h-7 w-7 p-0 bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+                    className="h-8 px-3 border-red-200 text-red-600 hover:bg-red-50 text-xs"
                   >
                     <X className="w-3 h-3" />
                   </Button>
@@ -64,53 +89,108 @@ const ConnectionsList = ({
       )}
 
       {/* My Connections */}
-      <Card className="bg-white shadow-sm border border-gray-200 overflow-hidden">
-        <CardHeader className="pb-2 px-3 pt-3">
-          <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
-            <Users className="w-4 h-4 mr-2 shrink-0 text-green-600" />
-            <span className="truncate">My Network ({connections.length})</span>
-          </CardTitle>
+      <Card className="bg-white shadow-lg border-0 overflow-hidden">
+        <CardHeader className="pb-2 px-4 pt-4 bg-gradient-to-r from-green-50 to-blue-50">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
+              <Users className="w-4 h-4 mr-2 shrink-0 text-green-600" />
+              <span className="truncate">My Connections</span>
+              <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700">
+                {connections?.length || 0}
+              </Badge>
+            </CardTitle>
+            {connections && connections.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs text-blue-600 hover:text-blue-700"
+                onClick={() => navigate('/connections')}
+              >
+                View All
+              </Button>
+            )}
+          </div>
         </CardHeader>
-        <CardContent className="p-3 pt-0 space-y-2">
-          {connections.length === 0 ? (
-            <p className="text-xs text-gray-500 text-center py-4">
-              No connections yet. Start building your network!
-            </p>
+        <CardContent className="p-3 space-y-2 max-h-[400px] overflow-y-auto">
+          {!connections || connections.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+                <Users className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-sm font-medium text-gray-700 mb-1">No connections yet</p>
+              <p className="text-xs text-gray-500 mb-3">Start building your professional network!</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs"
+                onClick={() => navigate('/connections')}
+              >
+                <UserPlus className="w-3 h-3 mr-1" />
+                Find People
+              </Button>
+            </div>
           ) : (
-            connections.slice(0, 5).map((connection) => {
-              // Show the other person's profile (not current user)
-              const profile =
-                connection.profile ||
-                connection.requester_profile ||
-                connection.addressee_profile;
+            connections.map((connection) => {
+              const profile = getOtherProfile(connection);
               
               return (
-                <div key={connection.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg gap-2">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <Avatar className="h-8 w-8 shrink-0">
+                <div 
+                  key={connection.id} 
+                  className="p-3 bg-gray-50 rounded-xl hover:bg-blue-50 transition-all hover:shadow-sm group"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar 
+                      className="h-12 w-12 shrink-0 cursor-pointer ring-2 ring-white shadow-sm group-hover:ring-blue-200 transition-all"
+                      onClick={() => navigate(`/profile/${profile?.id}`)}
+                    >
                       <AvatarImage src={profile?.avatar_url} />
-                      <AvatarFallback className="bg-gray-100 text-gray-600 text-xs">
+                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-medium">
                         {profile?.full_name?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p 
+                        className="text-sm font-semibold text-gray-900 truncate cursor-pointer hover:text-blue-600 transition-colors"
+                        onClick={() => navigate(`/profile/${profile?.id}`)}
+                      >
                         {profile?.full_name || 'Professional User'}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">Professional Member</p>
+                      {profile?.current_position && (
+                        <p className="text-xs text-gray-600 truncate flex items-center gap-1">
+                          <Briefcase className="w-3 h-3 shrink-0" />
+                          {profile.current_position}
+                        </p>
+                      )}
+                      {profile?.location && (
+                        <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                          <MapPin className="w-3 h-3 shrink-0" />
+                          {profile.location}
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <Badge variant="secondary" className="text-xs shrink-0">
-                    Connected
-                  </Badge>
+                  <div className="flex items-center gap-2 mt-3 pt-2 border-t border-gray-100">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs flex-1"
+                      onClick={() => navigate(`/messages?user=${profile?.id}`)}
+                    >
+                      <MessageSquare className="w-3 h-3 mr-1" />
+                      Message
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => navigate(`/profile/${profile?.id}`)}
+                    >
+                      View Profile
+                    </Button>
+                  </div>
                 </div>
               );
             })
-          )}
-          {connections.length > 5 && (
-            <Button variant="outline" size="sm" className="w-full text-xs h-7 mt-2">
-              View All Connections
-            </Button>
           )}
         </CardContent>
       </Card>
