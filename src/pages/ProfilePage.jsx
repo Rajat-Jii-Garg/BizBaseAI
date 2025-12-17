@@ -27,38 +27,34 @@ import {
   MapPin,
   Phone,
   Globe,
-  Linkedin,
   Share2,
   Eye,
   Users,
-  Bookmark,
   FileText,
   MessageSquare,
-  Repeat2,
   Settings,
   User,
   Briefcase,
-  Calendar,
   UserPlus,
   UserCheck,
   Clock,
   Loader2,
   MoreHorizontal,
   ChevronRight,
+  ChevronDown,
   Award,
   Target,
   Coins,
-  Star,
   BadgeCheck,
-  Building,
   GraduationCap,
   FolderOpen,
   Handshake,
   Lightbulb,
+  Sparkles,
   TrendingUp,
-  Sparkles
+  ExternalLink
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
@@ -76,8 +72,6 @@ const ProfilePage = () => {
   const [stats, setStats] = useState({
     connections: 0,
     posts: 0,
-    projectsCompleted: 0,
-    clientsHelped: 0,
     bizcoins: 0
   });
   const [uploading, setUploading] = useState(false);
@@ -175,8 +169,6 @@ const ProfilePage = () => {
       setStats({
         connections: connectionsRes.data?.length || 0,
         posts: postsRes.data?.length || 0,
-        projectsCompleted: Math.floor(Math.random() * 50) + 10,
-        clientsHelped: Math.floor(Math.random() * 30) + 5,
         bizcoins: profile?.bizcoins || 0
       });
     } catch (error) {
@@ -349,35 +341,46 @@ const ProfilePage = () => {
     navigate('/messages', { state: { selectedUserId: userId } });
   };
 
-  const profileCompletionScore = profile?.profile_completion_score || 70;
+  const profileCompletionScore = profile?.profile_completion_score || 0;
+
+  const getTimeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) return '1 day ago';
+    return `${diffInDays} days ago`;
+  };
 
   const getConnectionButton = () => {
     if (connectionStatus === 'connected') {
       return (
-        <Button variant="outline" className="gap-2" disabled>
-          <UserCheck className="w-4 h-4 text-green-600" />
+        <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white" disabled>
+          <UserCheck className="w-4 h-4" />
           Connected
         </Button>
       );
     }
     if (connectionStatus === 'pending_sent') {
       return (
-        <Button variant="outline" className="gap-2" disabled>
-          <Clock className="w-4 h-4 text-amber-600" />
+        <Button variant="outline" className="gap-2 border-amber-500 text-amber-600" disabled>
+          <Clock className="w-4 h-4" />
           Request Sent
         </Button>
       );
     }
     if (connectionStatus === 'pending_received') {
       return (
-        <Button variant="default" className="gap-2 bg-primary" onClick={() => navigate('/connections')}>
+        <Button className="gap-2 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white" onClick={() => navigate('/connections')}>
           <UserPlus className="w-4 h-4" />
           Accept Request
         </Button>
       );
     }
     return (
-      <Button variant="default" className="gap-2 bg-primary hover:bg-primary/90" onClick={handleConnect} disabled={connectLoading}>
+      <Button className="gap-2 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white" onClick={handleConnect} disabled={connectLoading}>
         {connectLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
         Connect
       </Button>
@@ -388,7 +391,7 @@ const ProfilePage = () => {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#5B6CFF]"></div>
         </div>
       </DashboardLayout>
     );
@@ -399,33 +402,81 @@ const ProfilePage = () => {
       <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-6 pb-8">
         {/* Cover Section */}
         <Card className="overflow-hidden bg-card border-border shadow-lg rounded-xl">
-          <div className="relative h-40 md:h-56 bg-gradient-to-r from-primary/30 via-accent/30 to-secondary/30">
+          <div className="relative h-40 md:h-52 bg-gradient-to-r from-[#5B6CFF]/30 via-[#8B5CF6]/30 to-[#06B6D4]/30">
             <img
               src={profile?.banner_url || 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200'}
               alt="Cover"
               className="w-full h-full object-cover"
             />
-            {isOwnProfile && (
-              <div className="absolute top-4 right-4">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="bg-background/90 backdrop-blur-sm hover:bg-background gap-2"
-                  onClick={() => document.getElementById('banner-upload').click()}
-                  disabled={uploading}
-                >
-                  <Camera className="w-4 h-4" />
-                  Edit Cover
-                </Button>
-                <input
-                  id="banner-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleImageUpload(e.target.files[0], 'banner')}
-                />
-              </div>
-            )}
+            
+            {/* Cover Action Buttons */}
+            <div className="absolute top-4 right-4 flex items-center gap-2">
+              {isOwnProfile ? (
+                <>
+                  {/* Edit Cover Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="bg-white/90 hover:bg-white backdrop-blur-sm gap-2 text-gray-700"
+                        disabled={uploading}
+                      >
+                        <Camera className="w-4 h-4" />
+                        Edit Cover
+                        <ChevronDown className="w-3 h-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => document.getElementById('banner-upload').click()}>
+                        <Camera className="w-4 h-4 mr-2" />
+                        Upload Photo
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => document.getElementById('banner-upload').click()}>
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        Change Cover
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
+                  {/* More Dropdown for Own Profile */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white gap-2"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        More
+                        <ChevronDown className="w-3 h-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem>
+                        <Handshake className="w-4 h-4 mr-2" />
+                        Collaborate
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Briefcase className="w-4 h-4 mr-2" />
+                        Hire Me
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Lightbulb className="w-4 h-4 mr-2" />
+                        Invest with Me
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : null}
+              <input
+                id="banner-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageUpload(e.target.files[0], 'banner')}
+              />
+            </div>
           </div>
 
           {/* Hero Section */}
@@ -433,15 +484,15 @@ const ProfilePage = () => {
             <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
               {/* Avatar */}
               <div className="relative -mt-16 md:-mt-20">
-                <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-background shadow-xl">
+                <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-white shadow-xl">
                   <AvatarImage src={profile?.avatar_url} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-3xl md:text-4xl font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6] text-white text-3xl md:text-4xl font-bold">
                     {profile?.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 {profile?.is_verified && (
-                  <div className="absolute bottom-2 right-2 bg-primary rounded-full p-1">
-                    <CheckCircle className="w-5 h-5 text-primary-foreground" />
+                  <div className="absolute bottom-2 right-2 bg-[#10B981] rounded-full p-1.5 border-2 border-white">
+                    <CheckCircle className="w-4 h-4 text-white" />
                   </div>
                 )}
                 {isOwnProfile && (
@@ -449,11 +500,11 @@ const ProfilePage = () => {
                     <Button
                       variant="secondary"
                       size="icon"
-                      className="absolute bottom-0 right-0 rounded-full shadow-md h-8 w-8"
+                      className="absolute bottom-0 right-0 rounded-full shadow-md h-8 w-8 bg-white hover:bg-gray-100"
                       onClick={() => document.getElementById('avatar-upload').click()}
                       disabled={uploading}
                     >
-                      <Camera className="w-4 h-4" />
+                      <Camera className="w-4 h-4 text-gray-700" />
                     </Button>
                     <input
                       id="avatar-upload"
@@ -473,12 +524,14 @@ const ProfilePage = () => {
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
                       {profile?.full_name || 'Professional User'}
                       {profile?.is_verified && (
-                        <BadgeCheck className="w-6 h-6 text-primary" />
+                        <BadgeCheck className="w-6 h-6 text-[#5B6CFF]" />
                       )}
                     </h1>
                     <p className="text-base md:text-lg text-muted-foreground">
                       {profile?.profession || profile?.current_position || 'Professional Member'}
-                      {profile?.company_name && ` & ${profile.company_name}`}
+                      {profile?.company_name && (
+                        <span className="font-medium text-foreground"> & {profile.company_name}</span>
+                      )}
                     </p>
                   </div>
 
@@ -487,12 +540,12 @@ const ProfilePage = () => {
                     {isOwnProfile ? (
                       <>
                         <ProfileEditModal onProfileUpdate={fetchProfile}>
-                          <Button variant="default" className="gap-2">
+                          <Button className="gap-2 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white">
                             <Edit3 className="w-4 h-4" />
                             Edit Profile
                           </Button>
                         </ProfileEditModal>
-                        <Button variant="outline" onClick={handleShare} className="gap-2">
+                        <Button variant="outline" onClick={handleShare} className="gap-2 border-gray-300 hover:bg-gray-50">
                           <Share2 className="w-4 h-4" />
                           Share
                         </Button>
@@ -500,18 +553,19 @@ const ProfilePage = () => {
                     ) : (
                       <>
                         {getConnectionButton()}
-                        <Button variant="outline" className="gap-2" onClick={handleMessage}>
+                        <Button variant="outline" className="gap-2 border-gray-300 hover:bg-gray-50" onClick={handleMessage}>
                           <MessageSquare className="w-4 h-4" />
                           Message
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="gap-2">
+                            <Button variant="outline" className="gap-2 border-gray-300 hover:bg-gray-50">
                               <MoreHorizontal className="w-4 h-4" />
                               More
+                              <ChevronDown className="w-3 h-3" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem onClick={handleShare}>
                               <Share2 className="w-4 h-4 mr-2" />
                               Share Profile
@@ -545,24 +599,24 @@ const ProfilePage = () => {
             <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-4 pt-4 border-t border-border text-sm text-muted-foreground">
               {profile?.email && (
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
+                  <Mail className="w-4 h-4 text-[#5B6CFF]" />
                   <span>{profile.email}</span>
                 </div>
               )}
               {profile?.location && (
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
+                  <MapPin className="w-4 h-4 text-[#5B6CFF]" />
                   <span>{profile.location}</span>
                 </div>
               )}
               {profile?.phone && (
                 <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
+                  <Phone className="w-4 h-4 text-[#5B6CFF]" />
                   <span>{profile.phone}</span>
                 </div>
               )}
               {profile?.website && (
-                <a href={profile.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                <a href={profile.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#5B6CFF] hover:underline">
                   <Globe className="w-4 h-4" />
                   <span>{profile.website.replace(/^https?:\/\//, '')}</span>
                 </a>
@@ -578,7 +632,7 @@ const ProfilePage = () => {
             {/* Profile Navigation */}
             <Card className="bg-card border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
+                <CardTitle className="text-sm font-semibold text-foreground">Profile Navigation</CardTitle>
                 <p className="text-xs text-muted-foreground">Explore content sections</p>
               </CardHeader>
               <CardContent className="p-2">
@@ -586,20 +640,22 @@ const ProfilePage = () => {
                   {[
                     { id: 'overview', label: 'Overview', icon: User },
                     { id: 'projects', label: 'Projects', icon: FolderOpen, count: certificates.length },
-                    { id: 'services', label: 'Services', icon: Briefcase },
+                    { id: 'services', label: 'Services', icon: Briefcase, count: 0 },
                     { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
-                    { id: 'mentions', label: 'Mentions', icon: MessageSquare },
+                    { id: 'mentions', label: 'Mentions', icon: MessageSquare, count: 0 },
                   ].map((item) => (
                     <Button
                       key={item.id}
                       variant={activeTab === item.id ? 'default' : 'ghost'}
-                      className="w-full justify-start"
+                      className={`w-full justify-start ${activeTab === item.id ? 'bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white' : 'hover:bg-[#5B6CFF]/10'}`}
                       onClick={() => setActiveTab(item.id)}
                     >
                       <item.icon className="w-4 h-4 mr-2" />
                       {item.label}
-                      {item.count !== undefined && (
-                        <Badge variant="secondary" className="ml-auto">{item.count}</Badge>
+                      {item.count !== undefined && item.count > 0 && (
+                        <Badge variant={activeTab === item.id ? 'outline' : 'secondary'} className={`ml-auto ${activeTab === item.id ? 'border-white/50 text-white' : 'bg-[#5B6CFF]/10 text-[#5B6CFF]'}`}>
+                          {item.count}
+                        </Badge>
                       )}
                     </Button>
                   ))}
@@ -608,7 +664,7 @@ const ProfilePage = () => {
                     <>
                       <Separator className="my-2" />
                       <ProfileEditModal onProfileUpdate={fetchProfile}>
-                        <Button variant="ghost" className="w-full justify-start">
+                        <Button variant="ghost" className="w-full justify-start hover:bg-[#5B6CFF]/10">
                           <Settings className="w-4 h-4 mr-2" />
                           Edit Profile
                         </Button>
@@ -620,18 +676,26 @@ const ProfilePage = () => {
             </Card>
 
             {/* BizScore Card */}
-            <Card className="bg-gradient-to-br from-primary/10 via-card to-accent/10 border-border">
-              <CardContent className="p-6 text-center">
+            <Card className="bg-gradient-to-br from-[#5B6CFF]/5 via-card to-[#8B5CF6]/5 border-border overflow-hidden">
+              <CardContent className="p-6 text-center relative">
                 <div className="relative inline-flex items-center justify-center">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-card flex items-center justify-center">
-                      <span className="text-3xl font-bold text-primary">{profile?.bizcoins || 720}</span>
+                  <div className="w-28 h-28 rounded-full bg-gradient-to-r from-[#5B6CFF] to-[#8B5CF6] p-1">
+                    <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
+                      <div className="text-center">
+                        <span className="text-3xl font-bold bg-gradient-to-r from-[#5B6CFF] to-[#8B5CF6] bg-clip-text text-transparent">
+                          {profile?.bizcoins || 0}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <BadgeCheck className="absolute -top-1 -right-1 w-6 h-6 text-primary" />
+                  <div className="absolute -top-1 -right-1 bg-[#5B6CFF] rounded-full p-1">
+                    <BadgeCheck className="w-5 h-5 text-white" />
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-3">Bizcenta</p>
-                <p className="text-xs text-muted-foreground">Experienced</p>
+                <p className="text-sm font-medium text-[#5B6CFF] mt-4">Bizcenta</p>
+                <p className="text-xs text-muted-foreground">
+                  {profile?.bizcoins >= 1000 ? 'Expert' : profile?.bizcoins >= 500 ? 'Experienced' : profile?.bizcoins >= 100 ? 'Rising' : 'Beginner'}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -641,12 +705,12 @@ const ProfilePage = () => {
             {/* Content Tabs */}
             <Card className="bg-card border-border">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full justify-start bg-transparent border-b rounded-none p-0 h-auto">
+                <TabsList className="w-full justify-start bg-transparent border-b rounded-none p-0 h-auto overflow-x-auto">
                   {['Overview', 'Projects', 'Services', 'Case Studies', 'Posts'].map((tab) => (
                     <TabsTrigger
                       key={tab.toLowerCase().replace(' ', '-')}
                       value={tab.toLowerCase().replace(' ', '-')}
-                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:text-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3 whitespace-nowrap"
                     >
                       {tab}
                     </TabsTrigger>
@@ -659,33 +723,41 @@ const ProfilePage = () => {
             {activeTab === 'overview' && (
               <>
                 <Card className="bg-card border-border">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="text-lg">My Value & Impact</CardTitle>
-                    <Button variant="ghost" size="sm" className="text-primary">
+                  <CardHeader className="flex flex-row items-center justify-between pb-4">
+                    <CardTitle className="text-lg font-semibold">My Value & Impact</CardTitle>
+                    <Button variant="ghost" size="sm" className="text-[#5B6CFF] hover:text-[#4A5AEE] hover:bg-[#5B6CFF]/10">
                       View more <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="text-center p-4 bg-muted/30 rounded-lg">
-                        <Users className="w-6 h-6 mx-auto mb-2 text-primary" />
-                        <p className="text-2xl font-bold text-foreground">{stats.clientsHelped}</p>
-                        <p className="text-xs text-muted-foreground">Clients Helped</p>
-                      </div>
-                      <div className="text-center p-4 bg-muted/30 rounded-lg">
-                        <Target className="w-6 h-6 mx-auto mb-2 text-green-600" />
-                        <p className="text-2xl font-bold text-foreground">{stats.projectsCompleted}</p>
-                        <p className="text-xs text-muted-foreground">Projects Completed</p>
-                      </div>
-                      <div className="text-center p-4 bg-muted/30 rounded-lg">
-                        <Star className="w-6 h-6 mx-auto mb-2 text-amber-500" />
+                      <div className="text-center p-4 bg-[#5B6CFF]/5 rounded-xl border border-[#5B6CFF]/10">
+                        <div className="w-10 h-10 mx-auto mb-2 bg-[#5B6CFF]/10 rounded-full flex items-center justify-center">
+                          <Users className="w-5 h-5 text-[#5B6CFF]" />
+                        </div>
                         <p className="text-2xl font-bold text-foreground">{stats.connections}</p>
                         <p className="text-xs text-muted-foreground">Connections</p>
                       </div>
-                      <div className="text-center p-4 bg-muted/30 rounded-lg">
-                        <Coins className="w-6 h-6 mx-auto mb-2 text-yellow-600" />
+                      <div className="text-center p-4 bg-[#10B981]/5 rounded-xl border border-[#10B981]/10">
+                        <div className="w-10 h-10 mx-auto mb-2 bg-[#10B981]/10 rounded-full flex items-center justify-center">
+                          <Target className="w-5 h-5 text-[#10B981]" />
+                        </div>
+                        <p className="text-2xl font-bold text-foreground">{certificates.length}</p>
+                        <p className="text-xs text-muted-foreground">Certifications</p>
+                      </div>
+                      <div className="text-center p-4 bg-[#8B5CF6]/5 rounded-xl border border-[#8B5CF6]/10">
+                        <div className="w-10 h-10 mx-auto mb-2 bg-[#8B5CF6]/10 rounded-full flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-[#8B5CF6]" />
+                        </div>
+                        <p className="text-2xl font-bold text-foreground">{stats.posts}</p>
+                        <p className="text-xs text-muted-foreground">Posts</p>
+                      </div>
+                      <div className="text-center p-4 bg-[#F59E0B]/5 rounded-xl border border-[#F59E0B]/10">
+                        <div className="w-10 h-10 mx-auto mb-2 bg-[#F59E0B]/10 rounded-full flex items-center justify-center">
+                          <Coins className="w-5 h-5 text-[#F59E0B]" />
+                        </div>
                         <p className="text-2xl font-bold text-foreground">{profile?.bizcoins || 0}</p>
-                        <p className="text-xs text-muted-foreground">BizCoins Earned</p>
+                        <p className="text-xs text-muted-foreground">BizCoins</p>
                       </div>
                     </div>
                   </CardContent>
@@ -693,9 +765,9 @@ const ProfilePage = () => {
 
                 {/* Verified Skills */}
                 <Card className="bg-card border-border">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="text-lg">Verified Skills</CardTitle>
-                    <Button variant="ghost" size="sm" className="text-primary">
+                  <CardHeader className="flex flex-row items-center justify-between pb-4">
+                    <CardTitle className="text-lg font-semibold">Verified Skills</CardTitle>
+                    <Button variant="ghost" size="sm" className="text-[#5B6CFF] hover:text-[#4A5AEE] hover:bg-[#5B6CFF]/10">
                       View Details <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </CardHeader>
@@ -703,27 +775,29 @@ const ProfilePage = () => {
                     {skills.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {skills.slice(0, 6).map((skill) => (
-                          <div key={skill.id} className="p-4 border border-border rounded-lg bg-muted/20">
+                          <div key={skill.id} className="p-4 border border-[#10B981]/30 rounded-xl bg-gradient-to-br from-[#10B981]/5 to-transparent">
                             <div className="flex items-start gap-3">
-                              <div className="p-2 bg-primary/10 rounded-full">
-                                <BadgeCheck className="w-5 h-5 text-primary" />
+                              <div className="p-2 bg-[#10B981] rounded-full">
+                                <BadgeCheck className="w-4 h-4 text-white" />
                               </div>
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-foreground">{skill.skill_name}</h4>
-                                <p className="text-xs text-muted-foreground mt-1">{skill.level} Level</p>
-                                <p className="text-xs text-muted-foreground">{skill.endorsements_count} endorsements</p>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-foreground truncate">{skill.skill_name}</h4>
+                                <p className="text-xs text-muted-foreground mt-1">{skill.endorsements_count} endorsements</p>
                               </div>
                             </div>
+                            <Button size="sm" className="w-full mt-3 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white text-xs">
+                              View Proof
+                            </Button>
                           </div>
                         ))}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
                         <Award className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                        <p>No skills added yet</p>
+                        <p className="mb-1">No skills added yet</p>
                         {isOwnProfile && (
                           <ProfileEditModal onProfileUpdate={() => { fetchProfile(); fetchSkills(); }}>
-                            <Button variant="outline" size="sm" className="mt-3">Add Skills</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-[#5B6CFF] text-[#5B6CFF] hover:bg-[#5B6CFF]/10">Add Skills</Button>
                           </ProfileEditModal>
                         )}
                       </div>
@@ -733,11 +807,11 @@ const ProfilePage = () => {
 
                 {/* Experience */}
                 <Card className="bg-card border-border">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="text-lg">Experience</CardTitle>
+                  <CardHeader className="flex flex-row items-center justify-between pb-4">
+                    <CardTitle className="text-lg font-semibold">Experience</CardTitle>
                     {isOwnProfile && (
                       <ProfileEditModal onProfileUpdate={() => { fetchProfile(); fetchExperience(); }}>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="text-[#5B6CFF] hover:bg-[#5B6CFF]/10">
                           <Edit3 className="w-4 h-4" />
                         </Button>
                       </ProfileEditModal>
@@ -747,23 +821,33 @@ const ProfilePage = () => {
                     {experience.length > 0 ? (
                       <div className="space-y-6">
                         {experience.map((exp, index) => (
-                          <div key={exp.id} className="relative pl-6 pb-6 last:pb-0">
+                          <div key={exp.id} className="relative pl-8 pb-6 last:pb-0">
                             {index !== experience.length - 1 && (
-                              <div className="absolute left-[9px] top-6 bottom-0 w-0.5 bg-border" />
+                              <div className="absolute left-[11px] top-8 bottom-0 w-0.5 bg-gradient-to-b from-[#5B6CFF] to-[#8B5CF6]/30" />
                             )}
-                            <div className="absolute left-0 top-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                              <Briefcase className="w-3 h-3 text-primary-foreground" />
+                            <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-gradient-to-r from-[#5B6CFF] to-[#8B5CF6] flex items-center justify-center">
+                              <Briefcase className="w-3 h-3 text-white" />
                             </div>
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
                               <div>
-                                <h4 className="font-semibold text-foreground">{exp.position}</h4>
+                                <div className="flex items-center gap-2">
+                                  <h4 className="font-semibold text-foreground">{exp.position}</h4>
+                                  <Badge className="bg-[#5B6CFF]/10 text-[#5B6CFF] border-0 text-xs">
+                                    {new Date(exp.start_date).getFullYear()}
+                                  </Badge>
+                                </div>
                                 <p className="text-sm text-muted-foreground">{exp.company}</p>
+                                {exp.location && (
+                                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                                    <MapPin className="w-3 h-3" /> {exp.location}
+                                  </p>
+                                )}
                                 {exp.description && (
-                                  <p className="text-sm text-muted-foreground mt-2">{exp.description}</p>
+                                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{exp.description}</p>
                                 )}
                               </div>
-                              <Badge variant="outline" className="w-fit">
-                                {new Date(exp.start_date).getFullYear()} - {exp.is_current ? 'Present' : exp.end_date ? new Date(exp.end_date).getFullYear() : ''}
+                              <Badge variant="outline" className="w-fit shrink-0 border-[#5B6CFF]/30 text-[#5B6CFF]">
+                                {exp.is_current ? 'Present' : exp.end_date ? new Date(exp.end_date).getFullYear() : ''}
                               </Badge>
                             </div>
                           </div>
@@ -772,10 +856,10 @@ const ProfilePage = () => {
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
                         <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                        <p>No experience added yet</p>
+                        <p className="mb-1">No experience added yet</p>
                         {isOwnProfile && (
                           <ProfileEditModal onProfileUpdate={() => { fetchProfile(); fetchExperience(); }}>
-                            <Button variant="outline" size="sm" className="mt-3">Add Experience</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-[#5B6CFF] text-[#5B6CFF] hover:bg-[#5B6CFF]/10">Add Experience</Button>
                           </ProfileEditModal>
                         )}
                       </div>
@@ -785,11 +869,11 @@ const ProfilePage = () => {
 
                 {/* Projects and Certifications */}
                 <Card className="bg-card border-border">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="text-lg">Projects and Certifications</CardTitle>
+                  <CardHeader className="flex flex-row items-center justify-between pb-4">
+                    <CardTitle className="text-lg font-semibold">Projects and Certifications</CardTitle>
                     {isOwnProfile && (
                       <ProfileEditModal onProfileUpdate={() => { fetchProfile(); fetchCertificates(); }}>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="text-[#5B6CFF] hover:bg-[#5B6CFF]/10">
                           <Edit3 className="w-4 h-4" />
                         </Button>
                       </ProfileEditModal>
@@ -799,13 +883,13 @@ const ProfilePage = () => {
                     {certificates.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {certificates.map((cert) => (
-                          <div key={cert.id} className="p-4 border border-border rounded-lg bg-muted/20">
+                          <div key={cert.id} className="p-4 border border-border rounded-xl bg-gradient-to-br from-[#F59E0B]/5 to-transparent hover:shadow-md transition-shadow">
                             <div className="flex items-start gap-3">
-                              <div className="p-2 bg-amber-500/10 rounded-full">
-                                <Award className="w-5 h-5 text-amber-600" />
+                              <div className="p-2 bg-gradient-to-r from-[#F59E0B] to-[#EF4444] rounded-full">
+                                <Award className="w-5 h-5 text-white" />
                               </div>
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-foreground">{cert.title}</h4>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-foreground truncate">{cert.title}</h4>
                                 <p className="text-sm text-muted-foreground">{cert.issuer}</p>
                                 {cert.issue_date && (
                                   <p className="text-xs text-muted-foreground mt-1">
@@ -813,7 +897,8 @@ const ProfilePage = () => {
                                   </p>
                                 )}
                                 {cert.credential_url && (
-                                  <a href={cert.credential_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-2 inline-block">
+                                  <a href={cert.credential_url} target="_blank" rel="noopener noreferrer" className="text-xs text-[#5B6CFF] hover:underline mt-2 inline-flex items-center gap-1">
+                                    <ExternalLink className="w-3 h-3" />
                                     View Credential
                                   </a>
                                 )}
@@ -825,10 +910,10 @@ const ProfilePage = () => {
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
                         <GraduationCap className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                        <p>No certifications added yet</p>
+                        <p className="mb-1">No certifications added yet</p>
                         {isOwnProfile && (
                           <ProfileEditModal onProfileUpdate={() => { fetchProfile(); fetchCertificates(); }}>
-                            <Button variant="outline" size="sm" className="mt-3">Add Certifications</Button>
+                            <Button variant="outline" size="sm" className="mt-3 border-[#5B6CFF] text-[#5B6CFF] hover:bg-[#5B6CFF]/10">Add Certifications</Button>
                           </ProfileEditModal>
                         )}
                       </div>
@@ -843,7 +928,7 @@ const ProfilePage = () => {
               <div className="space-y-4">
                 {postsLoading ? (
                   <div className="text-center py-12">
-                    <Loader2 className="animate-spin h-10 w-10 mx-auto text-primary mb-4" />
+                    <Loader2 className="animate-spin h-10 w-10 mx-auto text-[#5B6CFF] mb-4" />
                     <p className="text-muted-foreground">Loading posts...</p>
                   </div>
                 ) : posts.length > 0 ? (
@@ -858,7 +943,7 @@ const ProfilePage = () => {
                         {isOwnProfile ? "You haven't posted anything yet" : "No posts yet"}
                       </p>
                       {isOwnProfile && (
-                        <Button variant="outline" onClick={() => navigate('/dashboard')}>
+                        <Button className="bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white" onClick={() => navigate('/dashboard')}>
                           Create Your First Post
                         </Button>
                       )}
@@ -873,7 +958,12 @@ const ProfilePage = () => {
               <Card className="bg-card border-border">
                 <CardContent className="py-12 text-center">
                   <FolderOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <p className="text-muted-foreground">No {activeTab.replace('-', ' ')} yet</p>
+                  <p className="text-muted-foreground capitalize">No {activeTab.replace('-', ' ')} yet</p>
+                  {isOwnProfile && (
+                    <Button variant="outline" size="sm" className="mt-4 border-[#5B6CFF] text-[#5B6CFF] hover:bg-[#5B6CFF]/10">
+                      Add {activeTab.replace('-', ' ')}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -882,14 +972,14 @@ const ProfilePage = () => {
           {/* Right Sidebar */}
           <div className="lg:col-span-3 space-y-6">
             {/* Profile Completion */}
-            <Card className="bg-card border-border">
+            <Card className="bg-card border-border overflow-hidden">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-start justify-between mb-4">
                   <div>
                     <p className="text-lg font-semibold text-foreground">Your Profile is {profileCompletionScore}%</p>
                     <p className="text-sm text-muted-foreground">Boost your profile to unlock more opportunities.</p>
                   </div>
-                  <div className="relative">
+                  <div className="relative shrink-0">
                     <img 
                       src="https://illustrations.popsy.co/amber/success.svg" 
                       alt="Success" 
@@ -897,8 +987,8 @@ const ProfilePage = () => {
                     />
                   </div>
                 </div>
-                <Progress value={profileCompletionScore} className="h-2 mb-4" />
-                <Button variant="default" className="w-full bg-primary">
+                <Progress value={profileCompletionScore} className="h-2 mb-4 bg-[#5B6CFF]/10 [&>div]:bg-gradient-to-r [&>div]:from-[#5B6CFF] [&>div]:to-[#8B5CF6]" />
+                <Button className="w-full bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Show Suggestions
                 </Button>
@@ -907,26 +997,26 @@ const ProfilePage = () => {
 
             {/* Recent Activity */}
             <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-lg">Recent Activity</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {recentActivity.length > 0 ? (
                   recentActivity.map((activity) => (
                     <div key={activity.id} className="flex items-start gap-3">
-                      <Avatar className="h-10 w-10">
+                      <Avatar className="h-10 w-10 border-2 border-[#5B6CFF]/20">
                         <AvatarImage src={profile?.avatar_url} />
-                        <AvatarFallback>{profile?.full_name?.charAt(0) || 'U'}</AvatarFallback>
+                        <AvatarFallback className="bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6] text-white text-sm">
+                          {profile?.full_name?.charAt(0) || 'U'}
+                        </AvatarFallback>
                       </Avatar>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm">
                           <span className="font-semibold text-foreground">{profile?.full_name?.split(' ')[0]}</span>
-                          <span className="text-muted-foreground ml-2 text-xs">
-                            {new Date(activity.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
-                          </span>
+                          <span className="text-muted-foreground ml-2 text-xs">{getTimeAgo(activity.created_at)}</span>
                         </p>
                         <p className="text-sm text-muted-foreground line-clamp-2">
-                          {activity.content.substring(0, 60)}...
+                          Posted "{activity.content.substring(0, 50)}..."
                         </p>
                       </div>
                     </div>
@@ -938,15 +1028,15 @@ const ProfilePage = () => {
             </Card>
 
             {/* Explore Opportunities */}
-            <Card className="bg-gradient-to-br from-primary/20 via-card to-accent/20 border-border overflow-hidden">
+            <Card className="bg-gradient-to-br from-[#5B6CFF]/10 via-[#8B5CF6]/5 to-[#06B6D4]/10 border-[#5B6CFF]/20 overflow-hidden">
               <CardContent className="p-6 relative">
                 <h3 className="text-lg font-semibold text-foreground mb-2">Explore Opportunities Together</h3>
                 <img 
                   src="https://illustrations.popsy.co/amber/work-party.svg" 
                   alt="Opportunities" 
-                  className="w-24 h-24 absolute top-4 right-4 opacity-80"
+                  className="w-24 h-24 absolute top-2 right-2 opacity-80"
                 />
-                <Button variant="default" className="mt-4 bg-primary w-full">
+                <Button className="mt-4 bg-[#5B6CFF] hover:bg-[#4A5AEE] w-full text-white">
                   <Handshake className="w-4 h-4 mr-2" />
                   Let's Connect
                 </Button>
