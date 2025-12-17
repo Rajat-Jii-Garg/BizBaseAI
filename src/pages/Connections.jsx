@@ -32,27 +32,21 @@ const Connections = () => {
   const [activeTab, setActiveTab] = useState('connections');
   const [requestsSubTab, setRequestsSubTab] = useState('received');
 
-  // Use the connections hook at the top level
   const {
     connections,
     receivedRequests,
     sentRequests,
     suggestions,
     suggestionsLoading,
+    loading: connectionsLoading,
     sendRequest,
     acceptRequest,
     rejectRequest,
-    loading: connectionsLoading,
+    disconnect,
     refreshSuggestions,
-    removeSuggestion
+    removeSuggestion,
+    refreshAllConnections
   } = useConnections();
-
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-  }, [user]);
 
   const filteredConnections = connections.filter(conn => {
     const profile =
@@ -197,7 +191,7 @@ const Connections = () => {
               <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Requests</span>
               <span className="sm:hidden">Req</span>
-              <span className="ml-1">({pendingRequests.length + sentRequests.length})</span>
+              <span className="ml-1">({receivedRequests.length + sentRequests.length})</span>
             </TabsTrigger>
           </TabsList>
 
@@ -220,9 +214,20 @@ const Connections = () => {
 
               <CardContent>
                 {connectionsLoading ? (
-                  <p>Loading...</p>
+                  <div className="text-center py-12">
+                    <Loader2 className="animate-spin h-12 w-12 mx-auto mb-4 text-primary" />
+                    <p className="text-muted-foreground">Loading your connections...</p>
+                  </div>
                 ) : filteredConnections.length === 0 ? (
-                  <p>No connections yet.</p>
+                  <div className="text-center py-12">
+                    <UserCheck className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                    <h3 className="text-lg font-semibold mb-2">No Connections Yet</h3>
+                    <p className="text-muted-foreground mb-4">Start building your professional network by connecting with others.</p>
+                    <Button onClick={() => setActiveTab('suggestions')}>
+                      <Users className="w-4 h-4 mr-2" />
+                      Find Connections
+                    </Button>
+                  </div>
                 ) : (
                   <div className="grid md:grid-cols-3 gap-4">
                     {filteredConnections.map(conn => {
@@ -232,27 +237,56 @@ const Connections = () => {
                           : conn.requester_profile;
 
                       return (
-                        <Card key={conn.id}>
+                        <Card key={conn.id} className="card-professional hover-lift">
                           <CardContent className="p-4 text-center">
-                            <Avatar className="mx-auto mb-2">
+                            <Avatar 
+                              className="mx-auto mb-2 h-16 w-16 cursor-pointer ring-2 ring-primary/20 hover:ring-primary/40 transition-all"
+                              onClick={() => navigate(`/profile/${profile?.id}`)}
+                            >
                               <AvatarImage src={profile?.avatar_url} />
-                              <AvatarFallback>
-                                {profile?.full_name?.[0]}
+                              <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                                {profile?.full_name?.[0] || 'U'}
                               </AvatarFallback>
                             </Avatar>
-                            <h3 className="font-semibold">
-                              {profile?.full_name}
-                            </h3>
-                            <Badge className="mt-2">Connected</Badge>
-
-                            <Button
-                              className="mt-3 w-full"
-                              variant="outline"
-                              onClick={() => navigate('/messages')}
+                            <h3 
+                              className="font-semibold cursor-pointer hover:text-primary transition-colors"
+                              onClick={() => navigate(`/profile/${profile?.id}`)}
                             >
-                              <MessageSquare className="w-4 h-4 mr-2" />
-                              Message
-                            </Button>
+                              {profile?.full_name || 'Unknown User'}
+                            </h3>
+                            {profile?.current_position && (
+                              <p className="text-sm text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                                <Briefcase className="w-3 h-3" />
+                                {profile.current_position}
+                              </p>
+                            )}
+                            {profile?.location && (
+                              <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                                <MapPin className="w-3 h-3" />
+                                {profile.location}
+                              </p>
+                            )}
+                            <Badge className="mt-2" variant="secondary">Connected</Badge>
+
+                            <div className="flex gap-2 mt-3">
+                              <Button
+                                className="flex-1"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => navigate('/messages')}
+                              >
+                                <MessageSquare className="w-4 h-4 mr-1" />
+                                Message
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => disconnect(conn.id)}
+                                className="hover:bg-destructive hover:text-destructive-foreground"
+                              >
+                                <UserMinus className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </CardContent>
                         </Card>
                       );
@@ -279,47 +313,99 @@ const Connections = () => {
               <CardContent>
                 {requestsSubTab === 'received' && (
                   receivedRequests.length === 0
-                    ? <p>No incoming requests.</p>
-                    : receivedRequests.map(req => {
-                        const profile = req.requester_profile;
-                        return (
-                          <Card key={req.id} className="mb-3">
-                            <CardContent className="p-4 text-center">
-                              <h3>{profile?.full_name}</h3>
-                              <div className="flex gap-2 mt-3">
-                                <Button
-                                  className="flex-1"
-                                  onClick={() => acceptRequest(req.id)}
+                    ? (
+                      <div className="text-center py-12">
+                        <UserPlus className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                        <h3 className="text-lg font-semibold mb-2">No Incoming Requests</h3>
+                        <p className="text-muted-foreground">When someone sends you a connection request, it will appear here.</p>
+                      </div>
+                    )
+                    : (
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {receivedRequests.map(req => {
+                          const profile = req.requester_profile;
+                          return (
+                            <Card key={req.id} className="card-professional hover-lift">
+                              <CardContent className="p-4 text-center">
+                                <Avatar 
+                                  className="mx-auto mb-2 h-14 w-14 cursor-pointer ring-2 ring-primary/20"
+                                  onClick={() => navigate(`/profile/${profile?.id}`)}
                                 >
-                                  <Check className="w-4 h-4 mr-1" />
-                                  Accept
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => rejectRequest(req.id)}
-                                >
-                                  <X className="w-4 h-4 mr-1" />
-                                  Decline
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })
+                                  <AvatarImage src={profile?.avatar_url} />
+                                  <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                                    {profile?.full_name?.[0] || 'U'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <h3 className="font-semibold">{profile?.full_name || 'Unknown User'}</h3>
+                                {profile?.current_position && (
+                                  <p className="text-sm text-muted-foreground">{profile.current_position}</p>
+                                )}
+                                <div className="flex gap-2 mt-3">
+                                  <Button
+                                    className="flex-1 btn-professional"
+                                    size="sm"
+                                    onClick={() => acceptRequest(req.id)}
+                                  >
+                                    <Check className="w-4 h-4 mr-1" />
+                                    Accept
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1"
+                                    onClick={() => rejectRequest(req.id)}
+                                  >
+                                    <X className="w-4 h-4 mr-1" />
+                                    Decline
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )
                 )}
 
                 {requestsSubTab === 'sent' && (
                   sentRequests.length === 0
-                    ? <p>No sent requests.</p>
-                    : sentRequests.map(req => (
-                        <Card key={req.id} className="mb-3">
-                          <CardContent className="p-4 text-center">
-                            <h3>{req.addressee_profile?.full_name}</h3>
-                            <Badge className="mt-2">Request Sent</Badge>
-                          </CardContent>
-                        </Card>
-                      ))
+                    ? (
+                      <div className="text-center py-12">
+                        <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                        <h3 className="text-lg font-semibold mb-2">No Sent Requests</h3>
+                        <p className="text-muted-foreground">Connection requests you send will appear here.</p>
+                      </div>
+                    )
+                    : (
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {sentRequests.map(req => {
+                          const profile = req.addressee_profile;
+                          return (
+                            <Card key={req.id} className="card-professional">
+                              <CardContent className="p-4 text-center">
+                                <Avatar 
+                                  className="mx-auto mb-2 h-14 w-14 cursor-pointer"
+                                  onClick={() => navigate(`/profile/${profile?.id}`)}
+                                >
+                                  <AvatarImage src={profile?.avatar_url} />
+                                  <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold">
+                                    {profile?.full_name?.[0] || 'U'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <h3 className="font-semibold">{profile?.full_name || 'Unknown User'}</h3>
+                                {profile?.current_position && (
+                                  <p className="text-sm text-muted-foreground">{profile.current_position}</p>
+                                )}
+                                <Badge className="mt-2" variant="secondary">
+                                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                  Pending
+                                </Badge>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )
                 )}
               </CardContent>
             </Card>
