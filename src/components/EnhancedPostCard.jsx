@@ -1,14 +1,12 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2, X, Save } from 'lucide-react';
+import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2, X, Save, Repeat2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-// import { Post } from '@/hooks/usePosts';
 import PostEngagementActions from './PostEngagementActions';
 import CommentsSection from './CommentsSection';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +22,12 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [userHasReposted, setUserHasReposted] = useState(post.user_has_reposted || false);
+
+  // Update repost status when post changes
+  useEffect(() => {
+    setUserHasReposted(post.user_has_reposted || false);
+  }, [post.user_has_reposted]);
 
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
@@ -129,10 +133,19 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   };
 
   const isOwnPost = user?.id === post.user_id;
+  const isRepost = !!post.repost_of_post_id;
 
   return (
     <Card className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300 overflow-hidden">
       <CardContent className="p-6">
+        {/* Repost indicator */}
+        {isRepost && (
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-3 pb-2 border-b border-gray-100">
+            <Repeat2 className="w-4 h-4" />
+            <span>Reposted by {post.profiles?.full_name || 'User'}</span>
+          </div>
+        )}
+
         {/* Post Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start space-x-4">
@@ -206,7 +219,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
         {/* Post Content */}
         <div className="mb-4">
-          <div className="text-base text-gray-800 leading-relaxed mb-3">
+          <div className="text-base text-gray-800 leading-relaxed mb-3 whitespace-pre-line">
             {renderContent(displayContent)}
             {shouldTruncate && (
               <button
@@ -260,11 +273,14 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
           likesCount={post.likes_count || 0}
           commentsCount={post.comments_count || 0}
           sharesCount={post.shares_count || 0}
+          repostsCount={post.reposts_count || 0}
           userHasLiked={post.user_has_liked || false}
+          userHasReposted={userHasReposted}
           onEngagementUpdate={onEngagementUpdate}
+          originalPost={post}
         />
 
-        {/* Comments Section */}
+        {/* Feedback Section */}
         <CommentsSection
           postId={post.id}
           commentsCount={post.comments_count || 0}

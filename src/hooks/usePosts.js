@@ -51,8 +51,11 @@ export const usePosts = () => {
       }
 
       let likedPostIds = new Set();
+      let repostedPostIds = new Set();
       if (user) {
         const postIds = postsData.map(post => post.id);
+        
+        // Check likes
         const { data: likes } = await supabase
           .from('post_likes')
           .select('post_id')
@@ -60,6 +63,15 @@ export const usePosts = () => {
           .in('post_id', postIds);
 
         likedPostIds = new Set(likes?.map(like => like.post_id) || []);
+
+        // Check reposts
+        const { data: reposts } = await supabase
+          .from('post_reposts')
+          .select('post_id')
+          .eq('user_id', user.id)
+          .in('post_id', postIds);
+
+        repostedPostIds = new Set(reposts?.map(repost => repost.post_id) || []);
       }
 
       const enrichedPosts = postsData.map(post => ({
@@ -67,13 +79,15 @@ export const usePosts = () => {
         likes_count: post.likes_count || 0,
         comments_count: post.comments_count || 0,
         shares_count: post.shares_count || 0,
+        reposts_count: post.reposts_count || 0,
         profiles: profilesMap.get(post.user_id) || { 
           full_name: 'Professional User',
           avatar_url: null,
           current_position: null,
           company_name: null
         },
-        user_has_liked: likedPostIds.has(post.id)
+        user_has_liked: likedPostIds.has(post.id),
+        user_has_reposted: repostedPostIds.has(post.id)
       }));
 
       console.log('Final enriched posts:', enrichedPosts);

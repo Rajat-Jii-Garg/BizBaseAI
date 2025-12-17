@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
-import { Send, MoreVertical } from 'lucide-react';
+import { Send, MoreVertical, MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 const CommentsSection = ({ postId, commentsCount, onCommentUpdate }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -42,7 +42,7 @@ const CommentsSection = ({ postId, commentsCount, onCommentUpdate }) => {
 
       setComments(commentsWithProfiles);
     } catch (error) {
-      console.error('Error fetching comments:', error);
+      console.error('Error fetching feedback:', error);
     }
   };
 
@@ -64,10 +64,10 @@ const CommentsSection = ({ postId, commentsCount, onCommentUpdate }) => {
       setNewComment('');
       fetchComments();
       onCommentUpdate();
-      toast({ title: "Comment added successfully!" });
+      toast({ title: "Feedback added successfully!" });
     } catch (error) {
-      console.error('Error adding comment:', error);
-      toast({ title: "Failed to add comment", variant: "destructive" });
+      console.error('Error adding feedback:', error);
+      toast({ title: "Failed to add feedback", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -84,24 +84,25 @@ const CommentsSection = ({ postId, commentsCount, onCommentUpdate }) => {
       <Button
         variant="ghost"
         onClick={() => setShowComments(!showComments)}
-        className="text-sm text-muted-foreground p-0 h-auto"
+        className="text-sm text-muted-foreground p-0 h-auto flex items-center gap-1"
       >
-        {commentsCount} comments
+        <MessageSquare className="w-4 h-4" />
+        {commentsCount} feedback
       </Button>
 
       {showComments && (
         <div className="space-y-4">
-          {/* Add Comment */}
+          {/* Add Feedback */}
           <div className="flex gap-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarImage src={profile?.avatar_url} />
               <AvatarFallback className="text-xs">
-                {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+                {profile?.full_name?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 space-y-2">
               <Textarea
-                placeholder="Write a comment..."
+                placeholder="Write your feedback..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 className="min-h-[80px] resize-none"
@@ -113,12 +114,12 @@ const CommentsSection = ({ postId, commentsCount, onCommentUpdate }) => {
                 className="ml-auto flex items-center gap-2"
               >
                 <Send className="h-4 w-4" />
-                Comment
+                Send Feedback
               </Button>
             </div>
           </div>
 
-          {/* Comments List */}
+          {/* Feedback List */}
           <div className="space-y-3">
             {comments.map((comment) => (
               <Card key={comment.id} className="p-3">
