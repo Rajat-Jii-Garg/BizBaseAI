@@ -5,6 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,37 +24,49 @@ import {
   MapPin,
   Phone,
   Globe,
-  Linkedin,
   Share2,
   Eye,
   Users,
-  Bookmark,
   FileText,
   MessageSquare,
-  Repeat2,
   Settings,
   User,
   Briefcase,
+  ChevronDown,
+  Award,
+  Target,
+  Coins,
+  BadgeCheck,
+  GraduationCap,
+  FolderOpen,
+  Handshake,
+  Lightbulb,
+  Sparkles,
+  TrendingUp,
+  ExternalLink,
   Calendar
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileDashboard = () => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState('about');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [activeNav, setActiveNav] = useState('overview');
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [skills, setSkills] = useState([]);
+  const [experience, setExperience] = useState([]);
+  const [certificates, setCertificates] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
   const [stats, setStats] = useState({
     connections: 0,
     posts: 0,
-    mentions: 0,
-    reposts: 0,
-    articles: 0,
-    saved: 0,
-    totalEngagement: 0
+    bizcoins: 0,
+    projectsCompleted: 0,
+    clientsHelped: 0
   });
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
@@ -57,46 +77,26 @@ const ProfileDashboard = () => {
       fetchProfile();
       fetchStats();
       fetchPosts();
+      fetchSkills();
+      fetchExperience();
+      fetchCertificates();
+      fetchRecentActivity();
     }
   }, [user]);
 
-  // Real-time subscription for posts - separate effect with cleanup
   useEffect(() => {
     if (!user) return;
 
     const channel = supabase
-      .channel(`my_posts_${user.id}_${Date.now()}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'posts',
-          filter: `user_id=eq.${user.id}`
-        },
-        () => {
-          fetchPosts();
-          fetchStats();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'post_likes'
-        },
-        () => fetchPosts()
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'post_comments'
-        },
-        () => fetchPosts()
-      )
+      .channel(`my_profile_${user.id}_${Date.now()}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts', filter: `user_id=eq.${user.id}` }, () => {
+        fetchPosts();
+        fetchStats();
+        fetchRecentActivity();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_skills', filter: `user_id=eq.${user.id}` }, () => fetchSkills())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_experience', filter: `user_id=eq.${user.id}` }, () => fetchExperience())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_certificates', filter: `user_id=eq.${user.id}` }, () => fetchCertificates())
       .subscribe();
 
     return () => {
@@ -116,11 +116,7 @@ const ProfileDashboard = () => {
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load profile data',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: 'Failed to load profile data', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -129,28 +125,16 @@ const ProfileDashboard = () => {
   const fetchStats = async () => {
     try {
       const [connectionsRes, postsRes] = await Promise.all([
-        supabase
-          .from('connections')
-          .select('id')
-          .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
-          .eq('status', 'accepted'),
-        supabase
-          .from('posts')
-          .select('likes_count, comments_count, shares_count')
-          .eq('user_id', user.id)
+        supabase.from('connections').select('id').or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`).eq('status', 'accepted'),
+        supabase.from('posts').select('likes_count, comments_count, shares_count').eq('user_id', user.id)
       ]);
-
-      const totalEngagement = postsRes.data?.reduce((sum, post) => 
-        sum + (post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0), 0) || 0;
 
       setStats({
         connections: connectionsRes.data?.length || 0,
         posts: postsRes.data?.length || 0,
-        mentions: 12,
-        reposts: 8,
-        articles: 6,
-        saved: 5,
-        totalEngagement: totalEngagement || 0
+        bizcoins: profile?.bizcoins || 0,
+        projectsCompleted: profile?.posts_count || postsRes.data?.length || 0,
+        clientsHelped: connectionsRes.data?.length || 0
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -160,8 +144,6 @@ const ProfileDashboard = () => {
   const fetchPosts = async () => {
     try {
       setPostsLoading(true);
-      
-      // Fetch posts
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
@@ -176,18 +158,12 @@ const ProfileDashboard = () => {
         return;
       }
 
-      // Fetch profile data
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url, current_position, company_name')
         .eq('id', user.id)
         .single();
 
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-      }
-
-      // Get like status for current user
       const postIds = postsData.map(post => post.id);
       const { data: likes } = await supabase
         .from('post_likes')
@@ -197,28 +173,78 @@ const ProfileDashboard = () => {
 
       const likedPostIds = new Set(likes?.map(like => like.post_id) || []);
 
-      // Combine data
       const enrichedPosts = postsData.map(post => ({
         ...post,
-        profiles: profileData || {
-          full_name: 'Professional User',
-          avatar_url: null,
-          current_position: null,
-          company_name: null
-        },
+        profiles: profileData || { full_name: 'Professional User', avatar_url: null, current_position: null, company_name: null },
         user_has_liked: likedPostIds.has(post.id)
       }));
 
       setPosts(enrichedPosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load posts',
-        variant: 'destructive'
-      });
     } finally {
       setPostsLoading(false);
+    }
+  };
+
+  const fetchSkills = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_skills')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('endorsements_count', { ascending: false });
+
+      if (error) throw error;
+      setSkills(data || []);
+    } catch (error) {
+      console.error('Error fetching skills:', error);
+    }
+  };
+
+  const fetchExperience = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_experience')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('start_date', { ascending: false });
+
+      if (error) throw error;
+      setExperience(data || []);
+    } catch (error) {
+      console.error('Error fetching experience:', error);
+    }
+  };
+
+  const fetchCertificates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_certificates')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('issue_date', { ascending: false });
+
+      if (error) throw error;
+      setCertificates(data || []);
+    } catch (error) {
+      console.error('Error fetching certificates:', error);
+    }
+  };
+
+  const fetchRecentActivity = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('id, content, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      setRecentActivity(data || []);
+    } catch (error) {
+      console.error('Error fetching recent activity:', error);
     }
   };
 
@@ -237,9 +263,7 @@ const ProfileDashboard = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
 
       const updateField = type === 'avatar' ? 'avatar_url' : 'banner_url';
       const { error: updateError } = await supabase
@@ -250,17 +274,10 @@ const ProfileDashboard = () => {
       if (updateError) throw updateError;
 
       await fetchProfile();
-      toast({
-        title: 'Success',
-        description: `${type === 'avatar' ? 'Profile photo' : 'Cover image'} updated successfully`
-      });
+      toast({ title: 'Success', description: `${type === 'avatar' ? 'Profile photo' : 'Cover image'} updated successfully` });
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to upload image',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: 'Failed to upload image', variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -269,17 +286,36 @@ const ProfileDashboard = () => {
   const handleShare = () => {
     const profileUrl = `${window.location.origin}/profile/${user.id}`;
     navigator.clipboard.writeText(profileUrl);
-    toast({
-      title: 'Link copied!',
-      description: 'Profile link copied to clipboard'
-    });
+    toast({ title: 'Link copied!', description: 'Profile link copied to clipboard' });
   };
+
+  const getTimeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) return '1 day ago';
+    return `${diffInDays} days ago`;
+  };
+
+  const profileCompletionScore = profile?.profile_completion_score || 0;
+
+  const navItems = [
+    { id: 'overview', label: 'Overview', icon: User },
+    { id: 'projects', label: 'Projects', icon: FolderOpen, count: certificates.length },
+    { id: 'services', label: 'Services', icon: Briefcase, count: skills.length },
+    { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
+    { id: 'mentions', label: 'Mentions', icon: MessageSquare, count: 0 },
+    { id: 'articles', label: 'Articles', icon: FileText, count: 0 },
+  ];
 
   if (loading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#5B6CFF]"></div>
         </div>
       </DashboardLayout>
     );
@@ -287,65 +323,107 @@ const ProfileDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-6">
-        {/* Profile Header */}
-        <Card className="overflow-hidden bg-card border-border shadow-lg">
-          {/* Cover Image */}
-          <div className="relative h-32 md:h-48 bg-gradient-to-r from-primary/20 via-accent/20 to-secondary/20">
+      <div className="max-w-7xl mx-auto space-y-6 px-4 md:px-6 pb-8">
+        {/* Cover Section */}
+        <Card className="overflow-hidden bg-card border-border shadow-lg rounded-xl">
+          <div className="relative h-40 md:h-52 bg-gradient-to-r from-[#5B6CFF]/30 via-[#8B5CF6]/30 to-[#06B6D4]/30">
             <img
-              src={profile?.banner_url || 'https://images.unsplash.com/photo-1557683316-973673baf926'}
+              src={profile?.banner_url || 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200'}
               alt="Cover"
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-2 md:top-4 left-2 md:left-4 flex flex-wrap gap-2">
-              <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm text-xs">
-                <Users className="w-3 h-3 mr-1" />
-                {stats.connections} Connections
-              </Badge>
-              <Badge variant="default" className="bg-primary text-primary-foreground text-xs">
-                Pro Member
-              </Badge>
+            
+            {/* Cover Action Buttons */}
+            <div className="absolute top-4 right-4 flex items-center gap-2">
+              {/* Edit Cover Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="bg-white/90 hover:bg-white backdrop-blur-sm gap-2 text-gray-700"
+                    disabled={uploading}
+                  >
+                    <Camera className="w-4 h-4" />
+                    Edit Cover
+                    <ChevronDown className="w-3 h-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => document.getElementById('banner-upload').click()}>
+                    <Camera className="w-4 h-4 mr-2" />
+                    Upload Photo
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => document.getElementById('banner-upload').click()}>
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Change Cover
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              {/* More Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white gap-2"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    More
+                    <ChevronDown className="w-3 h-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem>
+                    <Handshake className="w-4 h-4 mr-2" />
+                    Collaborate
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Briefcase className="w-4 h-4 mr-2" />
+                    Hire Me
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Lightbulb className="w-4 h-4 mr-2" />
+                    Invest with Me
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <input
+                id="banner-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageUpload(e.target.files[0], 'banner')}
+              />
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="absolute top-2 md:top-4 right-2 md:right-4 bg-background/80 backdrop-blur-sm hover:bg-background text-xs md:text-sm"
-              onClick={() => document.getElementById('banner-upload').click()}
-              disabled={uploading}
-            >
-              <Camera className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
-              <span className="hidden md:inline">Edit Cover</span>
-            </Button>
-            <input
-              id="banner-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handleImageUpload(e.target.files[0], 'banner')}
-            />
           </div>
 
-          {/* Profile Info */}
-          <div className="px-4 md:px-6 pb-4 md:pb-6">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between -mt-12 md:-mt-16 relative">
+          {/* Hero Section */}
+          <div className="px-4 md:px-8 pb-6 relative">
+            <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
               {/* Avatar */}
-              <div className="relative mb-4 md:mb-0">
-                <Avatar className="h-24 w-24 md:h-32 md:w-32 border-4 border-background shadow-xl">
+              <div className="relative -mt-16 md:-mt-20">
+                <Avatar className="h-28 w-28 md:h-36 md:w-36 border-4 border-white shadow-xl">
                   <AvatarImage src={profile?.avatar_url} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl md:text-3xl font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6] text-white text-3xl md:text-4xl font-bold">
                     {profile?.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
+                {profile?.is_verified && (
+                  <div className="absolute bottom-2 right-2 bg-[#10B981] rounded-full p-1.5 border-2 border-white">
+                    <CheckCircle className="w-4 h-4 text-white" />
+                  </div>
+                )}
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="absolute bottom-0 right-0 rounded-full shadow-md hover:shadow-lg h-8 w-8"
+                  className="absolute bottom-0 left-0 rounded-full shadow-md hover:shadow-lg h-8 w-8 bg-white"
                   onClick={() => document.getElementById('avatar-upload').click()}
                   disabled={uploading}
                 >
-                  <Camera className="w-3 h-3 md:w-4 md:h-4" />
+                  <Camera className="w-4 h-4 text-gray-600" />
                 </Button>
-                <div className="absolute -bottom-1 -right-1 h-4 w-4 md:h-5 md:w-5 bg-green-500 rounded-full border-2 border-background" />
                 <input
                   id="avatar-upload"
                   type="file"
@@ -355,156 +433,105 @@ const ProfileDashboard = () => {
                 />
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 flex-wrap">
-                <Button variant="default" onClick={handleShare} size="sm" className="flex-1 md:flex-none">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={() => navigate(`/profile/preview/${user.id}`)}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  Preview
-                </Button>
+              {/* User Info */}
+              <div className="flex-1 pt-2 md:pt-4">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
+                      {profile?.full_name || 'Professional User'}
+                    </h1>
+                    <p className="text-base md:text-lg text-muted-foreground mt-1">
+                      {profile?.profession || profile?.current_position || 'Professional'} 
+                      {profile?.company_name && <span className="font-medium text-foreground"> & {profile.company_name}</span>}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
+                      {profile?.bio || 'Building innovative solutions and driving digital transformation.'}
+                    </p>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <ProfileEditModal onProfileUpdate={fetchProfile}>
+                      <Button className="gap-2 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white">
+                        <Edit3 className="w-4 h-4" />
+                        Edit Profile
+                      </Button>
+                    </ProfileEditModal>
+                    <Button variant="outline" className="gap-2" onClick={handleShare}>
+                      <Share2 className="w-4 h-4" />
+                      Share
+                    </Button>
+                    <Button variant="outline" className="gap-2" onClick={() => navigate(`/profile/${user.id}`)}>
+                      <Eye className="w-4 h-4" />
+                      Preview
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Profile Details */}
-            <div className="mt-4 space-y-3">
-              <div>
-                <h1 className="text-xl md:text-3xl font-bold text-foreground flex items-center gap-2 flex-wrap">
-                  {profile?.full_name || 'Professional User'}
-                  {profile?.is_verified && (
-                    <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Verified
-                    </Badge>
-                  )}
-                </h1>
-                <p className="text-base md:text-lg text-muted-foreground mt-1">
-                  {profile?.profession || profile?.current_position || 'Senior Product Manager & Digital Innovation Leader'}
-                </p>
-                <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-2 text-xs md:text-sm text-muted-foreground">
-                  {profile?.location && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 md:w-4 md:h-4" />
-                      {profile.location}
-                    </span>
-                  )}
-                  {profile?.company_name && (
-                    <span className="flex items-center gap-1">
-                      <Briefcase className="w-3 h-3 md:w-4 md:h-4" />
-                      {profile.company_name}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-                    Joined {new Date(profile?.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                  </span>
+            {/* Contact Info */}
+            <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-6 text-sm text-muted-foreground border-t border-border pt-4">
+              {profile?.email && (
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  <span>{profile.email}</span>
                 </div>
-              </div>
-
-              {/* Contact Info Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 p-3 md:p-4 bg-muted/30 rounded-lg">
-                {profile?.email && (
-                  <div className="flex items-center gap-2 text-xs md:text-sm">
-                    <Mail className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-foreground truncate">{profile.email}</span>
-                  </div>
-                )}
-                {profile?.phone && (
-                  <div className="flex items-center gap-2 text-xs md:text-sm">
-                    <Phone className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-foreground">{profile.phone}</span>
-                  </div>
-                )}
-                {profile?.website && (
-                  <div className="flex items-center gap-2 text-xs md:text-sm">
-                    <Globe className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
-                    <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate">
-                      {profile.website.replace(/^https?:\/\//, '')}
-                    </a>
-                  </div>
-                )}
-                {profile?.linkedin_url && (
-                  <div className="flex items-center gap-2 text-xs md:text-sm">
-                    <Linkedin className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
-                    <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      LinkedIn Profile
-                    </a>
-                  </div>
-                )}
-              </div>
+              )}
+              {profile?.location && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>{profile.location}</span>
+                </div>
+              )}
+              {profile?.phone && (
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  <span>{profile.phone}</span>
+                </div>
+              )}
+              {profile?.website && (
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-[#5B6CFF] hover:underline">
+                    {profile.website.replace(/^https?:\/\//, '')}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </Card>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
-          {/* Sidebar Navigation */}
-          <div className="lg:col-span-1">
-            <Card className="bg-card border-border lg:sticky lg:top-20">
-              <CardHeader className="pb-3 px-4">
+        {/* Main Content - 3 Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Sidebar */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* Profile Navigation */}
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
-                <p className="text-xs text-muted-foreground mt-1">Explore content sections</p>
+                <p className="text-xs text-muted-foreground">Explore content sections</p>
               </CardHeader>
-              <CardContent className="p-0 px-2 md:px-0">
+              <CardContent className="p-2">
                 <div className="space-y-1">
-                  <Button
-                    variant={activeSection === 'about' ? 'default' : 'ghost'}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setActiveSection('about')}
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    About
-                  </Button>
-                  <Button
-                    variant={activeSection === 'posts' ? 'default' : 'ghost'}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setActiveSection('posts')}
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Posts
-                    <Badge variant="secondary" className="ml-auto text-xs">{stats.posts}</Badge>
-                  </Button>
-                  <Button
-                    variant={activeSection === 'mentions' ? 'default' : 'ghost'}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setActiveSection('mentions')}
-                  >
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Mentions
-                    <Badge variant="secondary" className="ml-auto text-xs">{stats.mentions}</Badge>
-                  </Button>
-                  <Button
-                    variant={activeSection === 'reposts' ? 'default' : 'ghost'}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setActiveSection('reposts')}
-                  >
-                    <Repeat2 className="w-4 h-4 mr-2" />
-                    Reposts
-                    <Badge variant="secondary" className="ml-auto text-xs">{stats.reposts}</Badge>
-                  </Button>
-                  <Button
-                    variant={activeSection === 'articles' ? 'default' : 'ghost'}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setActiveSection('articles')}
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Articles
-                    <Badge variant="secondary" className="ml-auto text-xs">{stats.articles}</Badge>
-                  </Button>
-                  <Button
-                    variant={activeSection === 'saved' ? 'default' : 'ghost'}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setActiveSection('saved')}
-                  >
-                    <Bookmark className="w-4 h-4 mr-2" />
-                    Saved
-                    <Badge variant="secondary" className="ml-auto text-xs">{stats.saved}</Badge>
-                  </Button>
-                  
+                  {navItems.map((item) => (
+                    <Button
+                      key={item.id}
+                      variant={activeNav === item.id ? 'default' : 'ghost'}
+                      className={`w-full justify-start text-sm ${activeNav === item.id ? 'bg-[#5B6CFF] text-white' : ''}`}
+                      onClick={() => {
+                        setActiveNav(item.id);
+                        setActiveTab(item.id);
+                      }}
+                    >
+                      <item.icon className="w-4 h-4 mr-2" />
+                      {item.label}
+                      {item.count !== undefined && item.count > 0 && (
+                        <Badge variant="secondary" className="ml-auto text-xs">{item.count}</Badge>
+                      )}
+                    </Button>
+                  ))}
                   <Separator className="my-2" />
-                  
                   <ProfileEditModal onProfileUpdate={fetchProfile}>
                     <Button variant="ghost" className="w-full justify-start text-sm">
                       <Settings className="w-4 h-4 mr-2" />
@@ -512,115 +539,279 @@ const ProfileDashboard = () => {
                     </Button>
                   </ProfileEditModal>
                 </div>
-                
-                <Separator className="my-4" />
-                
-                <div className="px-4 py-3">
-                  <p className="text-xs text-muted-foreground mb-1">Total Engagement</p>
-                  <p className="text-xl md:text-2xl font-bold text-foreground">{stats.totalEngagement.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">This Month</p>
+              </CardContent>
+            </Card>
+
+            {/* BizScore Card */}
+            <Card className="bg-gradient-to-br from-[#5B6CFF]/10 to-[#8B5CF6]/10 border-[#5B6CFF]/20">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="text-[#5B6CFF] font-semibold text-sm">Bizcenta</span>
+                  <BadgeCheck className="w-4 h-4 text-[#5B6CFF]" />
                 </div>
+                <div className="text-4xl font-bold text-[#5B6CFF] mb-1">
+                  {profile?.bizcoins || 0}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {profile?.bizcoins >= 500 ? 'Expert' : profile?.bizcoins >= 100 ? 'Experienced' : 'Beginner'}
+                </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Main Content Area */}
-          <div className="lg:col-span-3 space-y-4 md:space-y-6">
-            {/* About Section */}
-            {activeSection === 'about' && (
-              <Card className="bg-card border-border">
-                <CardHeader className="flex flex-row items-center justify-between px-4 md:px-6">
-                  <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                    <User className="w-4 h-4 md:w-5 md:h-5" />
-                    About
-                  </CardTitle>
-                  <ProfileEditModal onProfileUpdate={fetchProfile}>
-                    <Button variant="ghost" size="sm">
-                      <Edit3 className="w-3 h-3 md:w-4 md:h-4" />
-                    </Button>
-                  </ProfileEditModal>
-                </CardHeader>
-                <CardContent className="space-y-4 px-4 md:px-6">
-                  <p className="text-foreground leading-relaxed text-sm md:text-base">
-                    {profile?.bio || profile?.about || 'Passionate product manager with 8+ years of experience driving digital transformation at Fortune 500 companies. I specialize in building user-centered products that solve real-world problems and deliver measurable business impact. Currently leading cross-functional teams to develop next-generation SaaS solutions that empower businesses to scale efficiently. My expertise spans across agile methodologies, user experience design, data analytics, and strategic planning. I believe in fostering collaborative environments where innovation thrives and teams can achieve extraordinary results.'}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="text-xs">#ProductManagement</Badge>
-                    <Badge variant="secondary" className="text-xs">#Innovation</Badge>
-                    <Badge variant="secondary" className="text-xs">#Leadership</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+          {/* Middle Content */}
+          <div className="lg:col-span-6 space-y-6">
+            {/* Tabs */}
+            <Card className="bg-card border-border">
+              <CardContent className="p-0">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none">
+                    <TabsTrigger 
+                      value="overview" 
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
+                    >
+                      Overview
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="projects"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
+                    >
+                      Projects
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="services"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
+                    >
+                      Services
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="case-studies"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
+                    >
+                      Case Studies
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="posts"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
+                    >
+                      Posts
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </CardContent>
+            </Card>
 
-            {/* Posts Section */}
-            {activeSection === 'posts' && (
+            {/* My Value & Impact */}
+            <Card className="bg-card border-border">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-semibold">My Value & Impact</CardTitle>
+                <Button variant="ghost" size="sm" className="text-[#5B6CFF] gap-1">
+                  View more <ExternalLink className="w-3 h-3" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-muted/30 rounded-xl">
+                    <Users className="w-6 h-6 text-[#5B6CFF] mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-foreground">{stats.clientsHelped}</div>
+                    <p className="text-xs text-muted-foreground">Clients Helped</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/30 rounded-xl">
+                    <Target className="w-6 h-6 text-[#10B981] mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-foreground">{stats.projectsCompleted}</div>
+                    <p className="text-xs text-muted-foreground">Projects Completed</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/30 rounded-xl">
+                    <TrendingUp className="w-6 h-6 text-[#8B5CF6] mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-foreground">₹{(profile?.bizcoins || 0) * 100}</div>
+                    <p className="text-xs text-muted-foreground">Earnings</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/30 rounded-xl">
+                    <Coins className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-foreground">{profile?.bizcoins || 0}</div>
+                    <p className="text-xs text-muted-foreground">BizCoin Earned</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Verified Skills */}
+            <Card className="bg-card border-border">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-semibold">Verified Skills</CardTitle>
+                <Button variant="ghost" size="sm" className="text-[#5B6CFF] gap-1">
+                  View Details <ExternalLink className="w-3 h-3" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {skills.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {skills.slice(0, 6).map((skill) => (
+                      <div key={skill.id} className="p-4 border border-[#10B981]/30 bg-[#10B981]/5 rounded-xl">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-[#10B981] rounded-full">
+                            <CheckCircle className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="font-semibold text-foreground text-sm">{skill.skill_name}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-3">
+                          {skill.endorsements_count} endorsements • {skill.level}
+                        </p>
+                        <Button size="sm" className="w-full bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white text-xs">
+                          View Proof
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Award className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No skills added yet</p>
+                    <Button variant="outline" size="sm" className="mt-4">Add Skills</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Experience */}
+            <Card className="bg-card border-border">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-semibold">Experience</CardTitle>
+                <Button variant="ghost" size="sm" className="text-[#5B6CFF]">
+                  <Edit3 className="w-4 h-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {experience.length > 0 ? (
+                  <div className="space-y-6">
+                    {experience.map((exp, index) => (
+                      <div key={exp.id} className="relative pl-6 border-l-2 border-[#5B6CFF]/30">
+                        <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-[#5B6CFF] flex items-center justify-center">
+                          <div className="w-2 h-2 rounded-full bg-white" />
+                        </div>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-bold text-[#5B6CFF]">
+                                {new Date(exp.start_date).getFullYear()}
+                              </span>
+                              <span className="text-foreground font-medium">{exp.position}</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{exp.company}</p>
+                            {exp.description && (
+                              <p className="text-sm text-muted-foreground mt-2">{exp.description}</p>
+                            )}
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {exp.is_current ? 'Present' : new Date(exp.end_date || new Date()).getFullYear()}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No experience added yet</p>
+                    <Button variant="outline" size="sm" className="mt-4">Add Experience</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Projects and Certifications */}
+            <Card className="bg-card border-border">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-semibold">Projects and Certifications</CardTitle>
+                <Button variant="ghost" size="sm" className="text-[#5B6CFF]">
+                  <Edit3 className="w-4 h-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {certificates.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {certificates.map((cert) => (
+                      <div key={cert.id} className="p-4 border border-border rounded-xl bg-muted/20">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-[#5B6CFF]/10 rounded-lg">
+                            <GraduationCap className="w-5 h-5 text-[#5B6CFF]" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-foreground text-sm">{cert.title}</h4>
+                            <p className="text-xs text-muted-foreground">{cert.issuer}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Issued {cert.issue_date ? new Date(cert.issue_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
+                            </p>
+                            {cert.credential_url && (
+                              <a href={cert.credential_url} target="_blank" rel="noopener noreferrer" className="text-xs text-[#5B6CFF] hover:underline mt-2 inline-flex items-center gap-1">
+                                View Credential <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                          {cert.is_verified && (
+                            <BadgeCheck className="w-5 h-5 text-[#10B981]" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FolderOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No projects or certifications added yet</p>
+                    <Button variant="outline" size="sm" className="mt-4">Add Project</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Posts Tab Content */}
+            {activeTab === 'posts' && (
               <Card className="bg-card border-border">
-                <CardHeader className="px-4 md:px-6">
-                  <CardTitle className="text-base md:text-lg">Recent Posts ({stats.posts})</CardTitle>
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Recent Posts ({stats.posts})</CardTitle>
                 </CardHeader>
-                <CardContent className="px-4 md:px-6">
+                <CardContent>
                   {postsLoading ? (
                     <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5B6CFF] mx-auto"></div>
                     </div>
                   ) : posts.length > 0 ? (
                     <div className="space-y-4">
                       {posts.map((post) => (
-                        <div key={post.id} className="border border-border rounded-lg p-4 space-y-3">
+                        <div key={post.id} className="border border-border rounded-xl p-4">
                           <div className="flex items-start gap-3">
-                            <Avatar className="h-10 w-10 cursor-pointer" onClick={() => navigate(`/public-profile/${post.user_id}`)}>
-                              <AvatarImage src={post.profiles?.avatar_url || profile?.avatar_url} />
-                              <AvatarFallback className="bg-primary text-primary-foreground">
-                                {post.profiles?.full_name?.charAt(0) || 'U'}
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={profile?.avatar_url} />
+                              <AvatarFallback className="bg-[#5B6CFF] text-white">
+                                {profile?.full_name?.charAt(0) || 'U'}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1">
                               <div className="flex items-center gap-2">
-                                <h4 className="font-semibold text-sm cursor-pointer transition-colors" onClick={() => navigate(`/public-profile/${post.user_id}`)}>{post.profiles?.full_name || profile?.full_name}</h4>
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(post.created_at).toLocaleDateString()}
-                                </span>
+                                <h4 className="font-semibold text-sm">{profile?.full_name}</h4>
+                                <span className="text-xs text-muted-foreground">{getTimeAgo(post.created_at)}</span>
                               </div>
-                              <p className="text-xs text-muted-foreground">{post.profiles?.current_position || profile?.current_position}</p>
+                              <p className="text-xs text-muted-foreground">{profile?.current_position}</p>
                             </div>
                           </div>
-                          <p className="text-sm text-foreground whitespace-pre-wrap">{post.content}</p>
+                          <p className="text-sm mt-3 text-foreground whitespace-pre-wrap">{post.content}</p>
                           {post.image_url && (
-                            <img 
-                              src={post.image_url} 
-                              alt="Post" 
-                              className="w-full rounded-lg max-h-96 object-cover"
-                            />
+                            <img src={post.image_url} alt="Post" className="w-full rounded-lg mt-3 max-h-72 object-cover" />
                           )}
-                          <div className="flex items-center gap-6 pt-2 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <MessageSquare className="w-4 h-4" />
-                              {post.likes_count || 0}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <MessageSquare className="w-4 h-4" />
-                              {post.comments_count || 0}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Repeat2 className="w-4 h-4" />
-                              {post.shares_count || 0}
-                            </span>
+                          <div className="flex items-center gap-6 mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
+                            <span>{post.likes_count || 0} likes</span>
+                            <span>{post.comments_count || 0} comments</span>
+                            <span>{post.shares_count || 0} shares</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8 md:py-12 text-muted-foreground">
-                      <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-sm md:text-base">No posts yet</p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-4"
-                        onClick={() => navigate('/feed')}
-                      >
+                    <div className="text-center py-8 text-muted-foreground">
+                      <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No posts yet</p>
+                      <Button variant="outline" size="sm" className="mt-4" onClick={() => navigate('/feed')}>
                         Create Your First Post
                       </Button>
                     </div>
@@ -628,20 +819,74 @@ const ProfileDashboard = () => {
                 </CardContent>
               </Card>
             )}
+          </div>
 
-            {/* Other sections */}
-            {(activeSection === 'mentions' || activeSection === 'reposts' || activeSection === 'articles' || activeSection === 'saved') && (
-              <Card className="bg-card border-border">
-                <CardHeader className="px-4 md:px-6">
-                  <CardTitle className="capitalize text-base md:text-lg">{activeSection}</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 md:px-6">
-                  <div className="text-center py-8 md:py-12 text-muted-foreground">
-                    <p className="text-sm md:text-base">No {activeSection} yet</p>
+          {/* Right Sidebar */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* Profile Completion */}
+            <Card className="bg-card border-border">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="font-semibold text-foreground">Your Profile is {profileCompletionScore}%</h3>
+                    <p className="text-xs text-muted-foreground mt-1">Boost your profile to unlock more opportunities.</p>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#5B6CFF]/20 to-[#8B5CF6]/20 flex items-center justify-center">
+                      <span className="text-lg font-bold text-[#5B6CFF]">{profileCompletionScore}%</span>
+                    </div>
+                  </div>
+                </div>
+                <Progress value={profileCompletionScore} className="h-2 mb-4" />
+                <Button className="w-full bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white">
+                  Show Suggestions
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Recent Activity */}
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {recentActivity.length > 0 ? (
+                  <div className="space-y-4">
+                    {recentActivity.map((activity) => (
+                      <div key={activity.id} className="flex items-start gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={profile?.avatar_url} />
+                          <AvatarFallback className="bg-[#5B6CFF] text-white text-xs">
+                            {profile?.full_name?.charAt(0) || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{getTimeAgo(activity.created_at)}</p>
+                          <p className="text-sm text-foreground truncate">
+                            Posted "{activity.content?.substring(0, 50)}..."
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Explore Opportunities */}
+            <Card className="bg-gradient-to-br from-[#1E293B] to-[#334155] text-white border-0">
+              <CardContent className="p-6 text-center">
+                <h3 className="font-bold text-lg mb-2">Explore Opportunities Together</h3>
+                <div className="w-20 h-20 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
+                  <Handshake className="w-10 h-10 text-white/80" />
+                </div>
+                <Button className="w-full bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white">
+                  Let's Connect
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
