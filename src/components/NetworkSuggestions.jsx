@@ -22,41 +22,6 @@ const NetworkSuggestions = ({ limit = 5 }) => {
     }
   }, [user]);
 
-  const fetchSuggestions = async () => {
-    try {
-      setLoading(true);
-      
-      // Get users who are not already connected and not the current user
-      const { data: existingConnections } = await supabase
-        .from('connections')
-        .select('requester_id, addressee_id')
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
-
-      const connectedUserIds = new Set();
-      existingConnections?.forEach(conn => {
-        if (conn.requester_id !== user.id) connectedUserIds.add(conn.requester_id);
-        if (conn.addressee_id !== user.id) connectedUserIds.add(conn.addressee_id);
-      });
-
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, full_name, avatar_url, current_position, company_name, industry, location, skills')
-        .neq('id', user.id)
-        .not('full_name', 'is', null)
-        .limit(limit * 2); // Get more to filter out connected users
-
-      const filteredSuggestions = profiles?.filter(profile => 
-        !connectedUserIds.has(profile.id)
-      ).slice(0, limit) || [];
-
-      setSuggestions(filteredSuggestions);
-    } catch (error) {
-      console.error('Error fetching network suggestions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleConnect = async (profileId) => {
     try {
       const { error } = await supabase

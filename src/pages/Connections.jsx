@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,10 +29,9 @@ const Connections = () => {
   // Use the connections hook at the top level
   const {
     connections,
-    receivedRequests: pendingRequests,
+    receivedRequests,
     sentRequests,
     loading,
-    sendRequest,
     acceptRequest,
     rejectRequest,
     refresh: refreshAllConnections
@@ -41,278 +40,8 @@ const Connections = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('connections');
   const [requestsSubTab, setRequestsSubTab] = useState('received');
-
-  const fetchConnections = async () => {
-    if (!user) return;
-
-    try {
-      const { data: connectionData, error } = await supabase
-        .from('connections')
-        .select(`
-          *,
-          requester_profile:profiles!connections_requester_id_fkey (*),
-          addressee_profile:profiles!connections_addressee_id_fkey (*)
-        `)
-        .eq('status', 'accepted')
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
-
-      if (error) throw error;
-
-      const processedConnections = connectionData?.map(conn => {
-        const isRequester = conn.requester_id === user.id;
-        const profile = isRequester ? conn.addressee_profile : conn.requester_profile;
-        return {
-          ...conn,
-          profile
-        };
-      }) || [];
-
-      setConnections(processedConnections);
-    } catch (error) {
-      console.error('Error fetching connections:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const refreshAllConnections = async () => {
-    await Promise.all([
-      fetchConnections(),
-      fetchPendingRequests(),
-      fetchSentRequests()
-    ]);
-  };
-
-  useEffect(() => {
-    if (!user) return;
-    
-    const {
-      connections,
-      receivedRequests,
-      sentRequests,
-      loading,
-      sendRequest,
-      acceptRequest,
-      rejectRequest
-    } = useConnections();
-  }, [user]);
-
-
-  const fetchPendingRequests = async () => {
-    if (!user) return;
-
-    try {
-      const { data: requests, error } = await supabase
-        .from('connections')
-        .select(`
-          *,
-          requester_profile:profiles!connections_requester_id_fkey (*)
-        `)
-        .eq('addressee_id', user.id)
-        .eq('status', 'pending');
-
-      if (error) throw error;
-      setPendingRequests(requests || []);
-    } catch (error) {
-      console.error('Error fetching pending requests:', error);
-    }
-  };
-
-  const fetchSentRequests = async () => {
-    if (!user) return;
-
-    try {
-      const { data: requests, error } = await supabase
-        .from('connections')
-        .select(`
-          *,
-          addressee_profile:profiles!connections_addressee_id_fkey (*)
-        `)
-        .eq('requester_id', user.id)
-        .eq('status', 'pending');
-
-      if (error) throw error;
-      setSentRequests(requests || []);
-    } catch (error) {
-      console.error('Error fetching sent requests:', error);
-    }
-  };
-
-  const fetchSuggestions = async () => {
-    if (!user) return;
-    
-    setSuggestionsLoading(true);
-    try {
-      // Get user's profile to match by industry
-      const { data: userProfile } = await supabase
-        .from('profiles')
-        .select('industry')
-        .eq('id', user.id)
-        .single();
-
-      // Get connected user IDs and pending request IDs
-      const { data: existingConnections } = await supabase
-        .from('connections')
-        .select('requester_id, addressee_id')
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
-
-      const connectedUserIds = new Set();
-      existingConnections?.forEach(conn => {
-        connectedUserIds.add(conn.requester_id);
-        connectedUserIds.add(conn.addressee_id);
-      });
-
-      // Get suggestions: prioritize same industry, then random
-      let query = supabase
-        .from('profiles')
-        .select('*')
-        .not('id', 'eq', user.id)
-        .not('full_name', 'is', null);
-
-      if (Array.from(connectedUserIds).length > 0) {
-        query = query.not('id', 'in', `(${Array.from(connectedUserIds).join(',')})`);
-      }
-
-      const { data: allProfiles, error } = await query.limit(20);
-
-      if (error) throw error;
-
-      // Prioritize profiles from same industry
-      const sameIndustry = allProfiles?.filter(p =>
-        userProfile?.industry && p.industry === userProfile.industry
-      ) || [];
-      
-      const otherProfiles = allProfiles?.filter(p =>
-        !userProfile?.industry || p.industry !== userProfile.industry
-      ) || [];
-
-      // Mix both arrays and take first 8
-      const mixedSuggestions = [...sameIndustry, ...otherProfiles].slice(0, 8);
-      setSuggestions(mixedSuggestions);
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-    } finally {
-      setSuggestionsLoading(false);
-    }
-  };
-
-  const removeSuggestion = (profileId) => {
-    setSuggestions(prev => prev.filter(s => s.id !== profileId));
-    toast({
-      title: "Suggestion Removed",
-      description: "This profile has been removed from your suggestions."
-    });
-  };
-
-  const handleSendConnectionRequest = async (profileId) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .insert([{
-          requester_id: user.id,
-          addressee_id: profileId,
-          status: 'pending'
-        }]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Connection Request Sent",
-        description: "Your connection request has been sent successfully."
-      });
-
-      // Remove from suggestions and refresh sent requests
-      removeSuggestion(profileId);
-      await refreshAllConnections();
-    } catch (error) {
-      console.error('Error sending connection request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send connection request",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleAcceptRequest = async (requestId) => {
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .update({ status: 'accepted' })
-        .eq('id', requestId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Connection Accepted",
-        description: "You have successfully accepted the connection request."
-      });
-
-      await refreshAllConnections();
-    } catch (error) {
-      console.error('Error accepting request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to accept connection request",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleRejectRequest = async (requestId) => {
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .update({ status: 'rejected' })
-        .eq('id', requestId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Connection Rejected",
-        description: "You have rejected the connection request."
-      });
-
-      await refreshAllConnections();
-    } catch (error) {
-      console.error('Error rejecting request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to reject connection request",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDisconnect = async (connectionId) => {
-    if (!confirm('Are you sure you want to remove this connection?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .delete()
-        .eq('id', connectionId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Connection Removed",
-        description: "You have successfully removed this connection."
-      });
-      
-      fetchConnections();
-      fetchSuggestions(); // Refresh suggestions
-    } catch (error) {
-      console.error('Error removing connection:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove connection",
-        variant: "destructive"
-      });
-    }
-  };
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
   const filteredConnections = connections.filter(conn =>
     conn.profile?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -331,9 +60,9 @@ const Connections = () => {
                 Discover professionals in your industry and expand your network
               </p>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={fetchSuggestions}
               disabled={suggestionsLoading}
               className="hover:bg-gray-100 transition-colors duration-200"
@@ -361,7 +90,7 @@ const Connections = () => {
                 <Card key={profile.id} className="card-professional hover-lift group">
                   <CardContent className="p-6">
                     <div className="text-center mb-4">
-                      <Avatar 
+                      <Avatar
                         className="h-16 w-16 mx-auto mb-3 cursor-pointer ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all" 
                         onClick={() => navigate(`/profile/${profile.id}`)}
                       >
@@ -370,7 +99,7 @@ const Connections = () => {
                           {profile.full_name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
-                      <h4 
+                      <h4
                         className="font-semibold text-lg cursor-pointer hover:text-primary transition-colors line-clamp-1"
                         onClick={() => navigate(`/profile/${profile.id}`)}
                       >
@@ -395,16 +124,16 @@ const Connections = () => {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         className="flex-1 btn-professional"
                         onClick={() => sendRequest(profile.id)}
                       >
                         <UserPlus className="w-3 h-3 mr-1" />
                         Connect
                       </Button>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => removeSuggestion(profile.id)}
                         className="hover:bg-destructive hover:text-destructive-foreground"

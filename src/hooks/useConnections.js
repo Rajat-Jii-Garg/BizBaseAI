@@ -10,9 +10,18 @@ export const useConnections = () => {
   const [receivedRequests, setReceivedRequests] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+
+  const refreshAllConnections = async () => {
+    await fetchConnections();
+  };
 
   const fetchConnections = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -50,8 +59,83 @@ export const useConnections = () => {
     }
   };
 
+  const fetchSuggestions = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
+    setSuggestionsLoading(true);
+    try {
+      // Get user's profile to match by industry
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('industry')
+        .eq('id', user.id)
+        .single();
+
+      // Get connected user IDs and pending request IDs
+      const { data: existingConnections } = await supabase
+        .from('connections')
+        .select('requester_id, addressee_id')
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+
+      const connectedUserIds = new Set();
+      existingConnections?.forEach(conn => {
+        if (conn.requester_id !== user.id)
+          connectedUserIds.add(conn.requester_id);
+
+        if (conn.addressee_id !== user.id)
+          connectedUserIds.add(conn.addressee_id);
+      });
+
+      // Get suggestions: prioritize same industry, then random
+      let query = supabase
+        .from('profiles')
+        .select('*')
+        .not('id', 'eq', user.id)
+        .not('full_name', 'is', null);
+
+      if (Array.from(connectedUserIds).length > 0) {
+        query = query.not('id', 'in', `(${Array.from(connectedUserIds).join(',')})`);
+      }
+
+      const { data: allProfiles, error } = await query.limit(20);
+
+      if (error) throw error;
+
+      // Prioritize profiles from same industry
+      const sameIndustry = allProfiles?.filter(p =>
+        userProfile?.industry && p.industry === userProfile.industry
+      ) || [];
+      
+      const otherProfiles = allProfiles?.filter(p =>
+        !userProfile?.industry || p.industry !== userProfile.industry
+      ) || [];
+
+      // Mix both arrays and take first 8
+      const mixedSuggestions = [...sameIndustry, ...otherProfiles].slice(0, 8);
+      setSuggestions(mixedSuggestions);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    } finally {
+      setSuggestionsLoading(false);
+    }
+  };
+
+  const removeSuggestion = (profileId) => {
+    setSuggestions(prev => prev.filter(s => s.id !== profileId));
+    toast({
+      title: "Suggestion Removed",
+      description: "This profile has been removed from your suggestions."
+    });
+  };
+
   const sendRequest = async (addresseeId) => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.from('connections').insert({
       requester_id: user.id,
@@ -83,18 +167,57 @@ export const useConnections = () => {
     fetchConnections();
   };
 
+  const handleDisconnect = async (connectionId) => {
+    if (!confirm('Are you sure you want to remove this connection?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .delete()
+        .eq('id', connectionId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Connection Removed",
+        description: "You have successfully removed this connection."
+      });
+      
+      fetchConnections();
+      fetchSuggestions(); // Refresh suggestions
+    } catch (error) {
+      console.error('Error removing connection:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove connection",
+        variant: "destructive"
+      });
+    }
+  };
+
   // 🔥 REALTIME
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    fetchConnections();
+    setLoading(true);
+    fetchConnections().then(fetchSuggestions);
 
     const channel = supabase
       .channel('connections-realtime')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'connections' },
-        fetchConnections
+        { event: 'UPDATE', schema: 'public', table: 'connections' },
+        (payload) => {
+          if (
+            payload.new?.requester_id === user.id ||
+            payload.new?.addressee_id === user.id
+          ) {
+            fetchConnections();
+          }
+        }
       )
       .subscribe();
 
@@ -102,13 +225,22 @@ export const useConnections = () => {
   }, [user]);
 
   return {
+    // states
     loading,
     connections,
     receivedRequests,
     sentRequests,
+
+    suggestions,
+    suggestionsLoading,
+
+    // actions
     sendRequest,
     acceptRequest,
     rejectRequest,
-    refresh: fetchConnections
+    disconnect: handleDisconnect,
+
+    refreshConnections: fetchConnections,
+    refreshSuggestions: fetchSuggestions
   };
 };

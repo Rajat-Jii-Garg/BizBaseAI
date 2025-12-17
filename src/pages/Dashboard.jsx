@@ -70,6 +70,9 @@ const Dashboard = () => {
   const {
     connections,
     receivedRequests,
+    suggestions,
+    suggestionsLoading,
+    sendRequest,
     acceptRequest,
     rejectRequest,
     loading: connectionsLoading
