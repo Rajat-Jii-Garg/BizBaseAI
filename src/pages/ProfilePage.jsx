@@ -72,15 +72,15 @@ const ProfilePage = () => {
       fetchProfile();
       fetchStats();
       fetchPosts();
-      checkConnectionStatus();
-      setupRealTimeSubscription();
     }
   }, [user, userId]);
 
   // Real-time subscription for posts
-  const setupRealTimeSubscription = () => {
+  useEffect(() => {
+    if (!user || !userId) return;
+
     const channel = supabase
-      .channel(`profile_posts_${userId}`)
+      .channel(`profile_posts_${userId}_${Date.now()}`)
       .on(
         'postgres_changes',
         {
@@ -89,8 +89,7 @@ const ProfilePage = () => {
           table: 'posts',
           filter: `user_id=eq.${userId}`
         },
-        (payload) => {
-          console.log('Real-time post update:', payload);
+        () => {
           fetchPosts();
           fetchStats();
         }
@@ -118,7 +117,7 @@ const ProfilePage = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  };
+  }, [user, userId]);
 
   const checkConnectionStatus = () => {
     if (isOwnProfile) return;
