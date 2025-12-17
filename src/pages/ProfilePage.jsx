@@ -1,5 +1,6 @@
 import DashboardLayout from '@/components/DashboardLayout';
 import ProfileEditModal from '@/components/ProfileEditModal';
+import EnhancedPostCard from '@/components/EnhancedPostCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useConnections } from '@/hooks/useConnections';
 import { supabase } from '@/integrations/supabase/client';
 import { useParams } from "react-router-dom";
 import {
@@ -28,7 +30,12 @@ import {
   Settings,
   User,
   Briefcase,
-  Calendar
+  Calendar,
+  UserPlus,
+  UserCheck,
+  Clock,
+  Heart,
+  Loader2
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -51,16 +58,104 @@ const ProfilePage = () => {
     totalEngagement: 0
   });
   const [uploading, setUploading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState(null);
+  const [connectLoading, setConnectLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { connect, connections, sentRequests, receivedRequests } = useConnections();
+
+  // Check if viewing own profile
+  const isOwnProfile = user?.id === userId;
 
   useEffect(() => {
-    if (user) {
+    if (user && userId) {
       fetchProfile();
       fetchStats();
       fetchPosts();
+      checkConnectionStatus();
+      setupRealTimeSubscription();
     }
-  }, [user]);
+  }, [user, userId]);
+
+  // Real-time subscription for posts
+  const setupRealTimeSubscription = () => {
+    const channel = supabase
+      .channel(`profile_posts_${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'posts',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('Real-time post update:', payload);
+          fetchPosts();
+          fetchStats();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'post_likes'
+        },
+        () => fetchPosts()
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'post_comments'
+        },
+        () => fetchPosts()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
+  const checkConnectionStatus = () => {
+    if (isOwnProfile) return;
+
+    // Check if already connected
+    const isConnected = connections.some(
+      conn => conn.requester_id === userId || conn.addressee_id === userId
+    );
+    if (isConnected) {
+      setConnectionStatus('connected');
+      return;
+    }
+
+    // Check if request sent
+    const hasSentRequest = sentRequests.some(
+      req => req.addressee_id === userId
+    );
+    if (hasSentRequest) {
+      setConnectionStatus('pending_sent');
+      return;
+    }
+
+    // Check if request received
+    const hasReceivedRequest = receivedRequests.some(
+      req => req.requester_id === userId
+    );
+    if (hasReceivedRequest) {
+      setConnectionStatus('pending_received');
+      return;
+    }
+
+    setConnectionStatus(null);
+  };
+
+  useEffect(() => {
+    checkConnectionStatus();
+  }, [connections, sentRequests, receivedRequests, userId]);
 
   const fetchProfile = async () => {
     try {
@@ -104,10 +199,10 @@ const ProfilePage = () => {
       setStats({
         connections: connectionsRes.data?.length || 0,
         posts: postsRes.data?.length || 0,
-        mentions: 12,
-        reposts: 8,
-        articles: 6,
-        saved: 5,
+        mentions: 0,
+        reposts: 0,
+        articles: 0,
+        saved: 0,
         totalEngagement: totalEngagement || 0
       });
     } catch (error) {
@@ -119,7 +214,6 @@ const ProfilePage = () => {
     try {
       setPostsLoading(true);
       
-      // Fetch posts
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')
@@ -134,18 +228,12 @@ const ProfilePage = () => {
         return;
       }
 
-      // Fetch profile data
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url, current_position, company_name')
         .eq('id', userId)
         .single();
 
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-      }
-
-      // Get like status for current user
       const postIds = postsData.map(post => post.id);
       const { data: likes } = await supabase
         .from('post_likes')
@@ -155,7 +243,6 @@ const ProfilePage = () => {
 
       const likedPostIds = new Set(likes?.map(like => like.post_id) || []);
 
-      // Combine data
       const enrichedPosts = postsData.map(post => ({
         ...post,
         profiles: profileData || {
@@ -170,18 +257,13 @@ const ProfilePage = () => {
       setPosts(enrichedPosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load posts',
-        variant: 'destructive'
-      });
     } finally {
       setPostsLoading(false);
     }
   };
 
   const handleImageUpload = async (file, type) => {
-    if (!file) return;
+    if (!file || !isOwnProfile) return;
 
     try {
       setUploading(true);
@@ -225,12 +307,30 @@ const ProfilePage = () => {
   };
 
   const handleShare = () => {
-    const profileUrl = `${window.location.origin}/profile/${user.id}`;
+    const profileUrl = `${window.location.origin}/profile/${userId}`;
     navigator.clipboard.writeText(profileUrl);
     toast({
       title: 'Link copied!',
       description: 'Profile link copied to clipboard'
     });
+  };
+
+  const handleConnect = async () => {
+    if (!userId || connectLoading) return;
+    
+    setConnectLoading(true);
+    try {
+      await connect(userId);
+      setConnectionStatus('pending_sent');
+    } catch (error) {
+      console.error('Error connecting:', error);
+    } finally {
+      setConnectLoading(false);
+    }
+  };
+
+  const handleMessage = () => {
+    navigate('/messages', { state: { selectedUserId: userId } });
   };
 
   if (loading) {
@@ -264,23 +364,27 @@ const ProfilePage = () => {
                 Pro Member
               </Badge>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="absolute top-2 md:top-4 right-2 md:right-4 bg-background/80 backdrop-blur-sm hover:bg-background text-xs md:text-sm"
-              onClick={() => document.getElementById('banner-upload').click()}
-              disabled={uploading}
-            >
-              <Camera className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
-              <span className="hidden md:inline">Edit Cover</span>
-            </Button>
-            <input
-              id="banner-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handleImageUpload(e.target.files[0], 'banner')}
-            />
+            {isOwnProfile && (
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="absolute top-2 md:top-4 right-2 md:right-4 bg-background/80 backdrop-blur-sm hover:bg-background text-xs md:text-sm"
+                  onClick={() => document.getElementById('banner-upload').click()}
+                  disabled={uploading}
+                >
+                  <Camera className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+                  <span className="hidden md:inline">Edit Cover</span>
+                </Button>
+                <input
+                  id="banner-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleImageUpload(e.target.files[0], 'banner')}
+                />
+              </>
+            )}
           </div>
 
           {/* Profile Info */}
@@ -294,35 +398,88 @@ const ProfilePage = () => {
                     {profile?.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="absolute bottom-0 right-0 rounded-full shadow-md hover:shadow-lg h-8 w-8"
-                  onClick={() => document.getElementById('avatar-upload').click()}
-                  disabled={uploading}
-                >
-                  <Camera className="w-3 h-3 md:w-4 md:h-4" />
-                </Button>
+                {isOwnProfile && (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="absolute bottom-0 right-0 rounded-full shadow-md hover:shadow-lg h-8 w-8"
+                      onClick={() => document.getElementById('avatar-upload').click()}
+                      disabled={uploading}
+                    >
+                      <Camera className="w-3 h-3 md:w-4 md:h-4" />
+                    </Button>
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload(e.target.files[0], 'avatar')}
+                    />
+                  </>
+                )}
                 <div className="absolute -bottom-1 -right-1 h-4 w-4 md:h-5 md:w-5 bg-green-500 rounded-full border-2 border-background" />
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleImageUpload(e.target.files[0], 'avatar')}
-                />
               </div>
 
               {/* Action Buttons */}
               <div className="flex gap-2 flex-wrap">
-                <Button variant="default" onClick={handleShare} size="sm" className="flex-1 md:flex-none">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={() => navigate(`/profile/preview/${user.id}`)}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  Preview
-                </Button>
+                {isOwnProfile ? (
+                  <>
+                    <Button variant="default" onClick={handleShare} size="sm" className="flex-1 md:flex-none">
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Share
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={() => navigate(`/profile/preview/${user.id}`)}>
+                      <Eye className="w-4 h-4 mr-2" />
+                      Preview
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    {/* Connection Button */}
+                    {connectionStatus === 'connected' ? (
+                      <Button variant="outline" size="sm" className="flex-1 md:flex-none" disabled>
+                        <UserCheck className="w-4 h-4 mr-2 text-green-600" />
+                        Connected
+                      </Button>
+                    ) : connectionStatus === 'pending_sent' ? (
+                      <Button variant="outline" size="sm" className="flex-1 md:flex-none" disabled>
+                        <Clock className="w-4 h-4 mr-2 text-amber-600" />
+                        Request Sent
+                      </Button>
+                    ) : connectionStatus === 'pending_received' ? (
+                      <Button variant="default" size="sm" className="flex-1 md:flex-none" onClick={() => navigate('/connections')}>
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        Accept Request
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        className="flex-1 md:flex-none"
+                        onClick={handleConnect}
+                        disabled={connectLoading}
+                      >
+                        {connectLoading ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <UserPlus className="w-4 h-4 mr-2" />
+                        )}
+                        Connect
+                      </Button>
+                    )}
+                    
+                    {/* Message Button */}
+                    <Button variant="outline" size="sm" className="flex-1 md:flex-none" onClick={handleMessage}>
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Message
+                    </Button>
+                    
+                    <Button variant="ghost" size="sm" onClick={handleShare}>
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -339,7 +496,7 @@ const ProfilePage = () => {
                   )}
                 </h1>
                 <p className="text-base md:text-lg text-muted-foreground mt-1">
-                  {profile?.profession || profile?.current_position || 'Senior Product Manager & Digital Innovation Leader'}
+                  {profile?.profession || profile?.current_position || 'Professional Member'}
                 </p>
                 <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-2 text-xs md:text-sm text-muted-foreground">
                   {profile?.location && (
@@ -442,33 +599,29 @@ const ProfilePage = () => {
                     Reposts
                     <Badge variant="secondary" className="ml-auto text-xs">{stats.reposts}</Badge>
                   </Button>
-                  <Button
-                    variant={activeSection === 'articles' ? 'default' : 'ghost'}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setActiveSection('articles')}
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Articles
-                    <Badge variant="secondary" className="ml-auto text-xs">{stats.articles}</Badge>
-                  </Button>
-                  <Button
-                    variant={activeSection === 'saved' ? 'default' : 'ghost'}
-                    className="w-full justify-start text-sm"
-                    onClick={() => setActiveSection('saved')}
-                  >
-                    <Bookmark className="w-4 h-4 mr-2" />
-                    Saved
-                    <Badge variant="secondary" className="ml-auto text-xs">{stats.saved}</Badge>
-                  </Button>
                   
-                  <Separator className="my-2" />
-                  
-                  <ProfileEditModal onProfileUpdate={fetchProfile}>
-                    <Button variant="ghost" className="w-full justify-start text-sm">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  </ProfileEditModal>
+                  {isOwnProfile && (
+                    <>
+                      <Button
+                        variant={activeSection === 'saved' ? 'default' : 'ghost'}
+                        className="w-full justify-start text-sm"
+                        onClick={() => setActiveSection('saved')}
+                      >
+                        <Bookmark className="w-4 h-4 mr-2" />
+                        Saved
+                        <Badge variant="secondary" className="ml-auto text-xs">{stats.saved}</Badge>
+                      </Button>
+                      
+                      <Separator className="my-2" />
+                      
+                      <ProfileEditModal onProfileUpdate={fetchProfile}>
+                        <Button variant="ghost" className="w-full justify-start text-sm">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Edit Profile
+                        </Button>
+                      </ProfileEditModal>
+                    </>
+                  )}
                 </div>
                 
                 <Separator className="my-4" />
@@ -476,7 +629,7 @@ const ProfilePage = () => {
                 <div className="px-4 py-3">
                   <p className="text-xs text-muted-foreground mb-1">Total Engagement</p>
                   <p className="text-xl md:text-2xl font-bold text-foreground">{stats.totalEngagement.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">This Month</p>
+                  <p className="text-xs text-muted-foreground">All Time</p>
                 </div>
               </CardContent>
             </Card>
@@ -492,103 +645,77 @@ const ProfilePage = () => {
                     <User className="w-4 h-4 md:w-5 md:h-5" />
                     About
                   </CardTitle>
-                  <ProfileEditModal onProfileUpdate={fetchProfile}>
-                    <Button variant="ghost" size="sm">
-                      <Edit3 className="w-3 h-3 md:w-4 md:h-4" />
-                    </Button>
-                  </ProfileEditModal>
+                  {isOwnProfile && (
+                    <ProfileEditModal onProfileUpdate={fetchProfile}>
+                      <Button variant="ghost" size="sm">
+                        <Edit3 className="w-3 h-3 md:w-4 md:h-4" />
+                      </Button>
+                    </ProfileEditModal>
+                  )}
                 </CardHeader>
                 <CardContent className="space-y-4 px-4 md:px-6">
                   <p className="text-foreground leading-relaxed text-sm md:text-base">
-                    {profile?.bio || profile?.about || 'Passionate product manager with 8+ years of experience driving digital transformation at Fortune 500 companies. I specialize in building user-centered products that solve real-world problems and deliver measurable business impact. Currently leading cross-functional teams to develop next-generation SaaS solutions that empower businesses to scale efficiently. My expertise spans across agile methodologies, user experience design, data analytics, and strategic planning. I believe in fostering collaborative environments where innovation thrives and teams can achieve extraordinary results.'}
+                    {profile?.bio || profile?.about || 'No bio available.'}
                   </p>
                   
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="text-xs">#ProductManagement</Badge>
-                    <Badge variant="secondary" className="text-xs">#Innovation</Badge>
-                    <Badge variant="secondary" className="text-xs">#Leadership</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Posts Section */}
-            {activeSection === 'posts' && (
-              <Card className="bg-card border-border">
-                <CardHeader className="px-4 md:px-6">
-                  <CardTitle className="text-base md:text-lg">Recent Posts ({stats.posts})</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 md:px-6">
-                  {postsLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
-                    </div>
-                  ) : posts.length > 0 ? (
-                    <div className="space-y-4">
-                      {posts.map((post) => (
-                        <div key={post.id} className="border border-border rounded-lg p-4 space-y-3">
-                          <div className="flex items-start gap-3">
-                            <Avatar className="h-10 w-10 cursor-pointer" onClick={() => navigate(`/public-profile/${post.user_id}`)}>
-                              <AvatarImage src={post.profiles?.avatar_url || profile?.avatar_url} />
-                              <AvatarFallback className="bg-primary text-primary-foreground">
-                                {post.profiles?.full_name?.charAt(0) || 'U'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-semibold text-sm cursor-pointer transition-colors" onClick={() => navigate(`/public-profile/${post.user_id}`)}>{post.profiles?.full_name || profile?.full_name}</h4>
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(post.created_at).toLocaleDateString()}
-                                </span>
-                              </div>
-                              <p className="text-xs text-muted-foreground">{post.profiles?.current_position || profile?.current_position}</p>
-                            </div>
-                          </div>
-                          <p className="text-sm text-foreground whitespace-pre-wrap">{post.content}</p>
-                          {post.image_url && (
-                            <img 
-                              src={post.image_url} 
-                              alt="Post" 
-                              className="w-full rounded-lg max-h-96 object-cover"
-                            />
-                          )}
-                          <div className="flex items-center gap-6 pt-2 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <MessageSquare className="w-4 h-4" />
-                              {post.likes_count || 0}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <MessageSquare className="w-4 h-4" />
-                              {post.comments_count || 0}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Repeat2 className="w-4 h-4" />
-                              {post.shares_count || 0}
-                            </span>
-                          </div>
-                        </div>
+                  {profile?.skills && Array.isArray(profile.skills) && profile.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {profile.skills.map((skill, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">#{skill}</Badge>
                       ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 md:py-12 text-muted-foreground">
-                      <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-sm md:text-base">No posts yet</p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-4"
-                        onClick={() => navigate('/feed')}
-                      >
-                        Create Your First Post
-                      </Button>
                     </div>
                   )}
                 </CardContent>
               </Card>
             )}
 
+            {/* Posts Section */}
+            {activeSection === 'posts' && (
+              <div className="space-y-4">
+                <Card className="bg-card border-border">
+                  <CardHeader className="px-4 md:px-6">
+                    <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      Posts ({stats.posts})
+                    </CardTitle>
+                  </CardHeader>
+                </Card>
+                
+                {postsLoading ? (
+                  <div className="text-center py-12">
+                    <Loader2 className="animate-spin h-10 w-10 mx-auto text-primary mb-4" />
+                    <p className="text-muted-foreground">Loading posts...</p>
+                  </div>
+                ) : posts.length > 0 ? (
+                  <div className="space-y-4">
+                    {posts.map((post) => (
+                      <EnhancedPostCard
+                        key={post.id}
+                        post={post}
+                        onEngagementUpdate={fetchPosts}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="bg-card border-border">
+                    <CardContent className="py-12 text-center">
+                      <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                      <p className="text-muted-foreground mb-4">
+                        {isOwnProfile ? "You haven't posted anything yet" : "No posts yet"}
+                      </p>
+                      {isOwnProfile && (
+                        <Button variant="outline" onClick={() => navigate('/dashboard')}>
+                          Create Your First Post
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+
             {/* Other sections */}
-            {(activeSection === 'mentions' || activeSection === 'reposts' || activeSection === 'articles' || activeSection === 'saved') && (
+            {(activeSection === 'mentions' || activeSection === 'reposts' || activeSection === 'saved') && (
               <Card className="bg-card border-border">
                 <CardHeader className="px-4 md:px-6">
                   <CardTitle className="capitalize text-base md:text-lg">{activeSection}</CardTitle>

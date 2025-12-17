@@ -57,6 +57,47 @@ const ProfileDashboard = () => {
       fetchProfile();
       fetchStats();
       fetchPosts();
+      
+      // Real-time subscription for posts
+      const channel = supabase
+        .channel(`my_posts_${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'posts',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Real-time post update:', payload);
+            fetchPosts();
+            fetchStats();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'post_likes'
+          },
+          () => fetchPosts()
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'post_comments'
+          },
+          () => fetchPosts()
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
 
