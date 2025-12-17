@@ -306,9 +306,8 @@ const ProfileDashboard = () => {
     { id: 'overview', label: 'Overview', icon: User },
     { id: 'projects', label: 'Projects', icon: FolderOpen, count: certificates.length },
     { id: 'services', label: 'Services', icon: Briefcase, count: skills.length },
+    { id: 'case-studies', label: 'Case Studies', icon: Target },
     { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
-    { id: 'mentions', label: 'Mentions', icon: MessageSquare, count: 0 },
-    { id: 'articles', label: 'Articles', icon: FileText, count: 0 },
   ];
 
   if (loading) {
@@ -564,8 +563,8 @@ const ProfileDashboard = () => {
             {/* Tabs */}
             <Card className="bg-card border-border">
               <CardContent className="p-0">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none">
+                <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveNav(val); }} className="w-full">
+                  <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none overflow-x-auto">
                     <TabsTrigger 
                       value="overview" 
                       className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
@@ -601,169 +600,197 @@ const ProfileDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* My Value & Impact */}
-            <Card className="bg-card border-border">
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <CardTitle className="text-lg font-semibold">My Value & Impact</CardTitle>
-                <Button variant="ghost" size="sm" className="text-[#5B6CFF] gap-1">
-                  View more <ExternalLink className="w-3 h-3" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-muted/30 rounded-xl">
-                    <Users className="w-6 h-6 text-[#5B6CFF] mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-foreground">{stats.clientsHelped}</div>
-                    <p className="text-xs text-muted-foreground">Clients Helped</p>
+            {/* Overview Tab Content */}
+            {activeTab === 'overview' && (
+              <Card className="bg-card border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-4">
+                  <CardTitle className="text-lg font-semibold">My Value & Impact</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-[#5B6CFF] gap-1">
+                    View more <ExternalLink className="w-3 h-3" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-muted/30 rounded-xl">
+                      <Users className="w-6 h-6 text-[#5B6CFF] mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-foreground">{stats.clientsHelped}</div>
+                      <p className="text-xs text-muted-foreground">Clients Helped</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/30 rounded-xl">
+                      <Target className="w-6 h-6 text-[#10B981] mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-foreground">{stats.projectsCompleted}</div>
+                      <p className="text-xs text-muted-foreground">Projects Completed</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/30 rounded-xl">
+                      <TrendingUp className="w-6 h-6 text-[#8B5CF6] mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-foreground">₹{(profile?.bizcoins || 0) * 100}</div>
+                      <p className="text-xs text-muted-foreground">Earnings</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/30 rounded-xl">
+                      <Coins className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-foreground">{profile?.bizcoins || 0}</div>
+                      <p className="text-xs text-muted-foreground">BizCoin Earned</p>
+                    </div>
                   </div>
-                  <div className="text-center p-4 bg-muted/30 rounded-xl">
-                    <Target className="w-6 h-6 text-[#10B981] mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-foreground">{stats.projectsCompleted}</div>
-                    <p className="text-xs text-muted-foreground">Projects Completed</p>
-                  </div>
-                  <div className="text-center p-4 bg-muted/30 rounded-xl">
-                    <TrendingUp className="w-6 h-6 text-[#8B5CF6] mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-foreground">₹{(profile?.bizcoins || 0) * 100}</div>
-                    <p className="text-xs text-muted-foreground">Earnings</p>
-                  </div>
-                  <div className="text-center p-4 bg-muted/30 rounded-xl">
-                    <Coins className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-foreground">{profile?.bizcoins || 0}</div>
-                    <p className="text-xs text-muted-foreground">BizCoin Earned</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Verified Skills */}
-            <Card className="bg-card border-border">
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <CardTitle className="text-lg font-semibold">Verified Skills</CardTitle>
-                <Button variant="ghost" size="sm" className="text-[#5B6CFF] gap-1">
-                  View Details <ExternalLink className="w-3 h-3" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {skills.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {skills.slice(0, 6).map((skill) => (
-                      <div key={skill.id} className="p-4 border border-[#10B981]/30 bg-[#10B981]/5 rounded-xl">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="p-1.5 bg-[#10B981] rounded-full">
-                            <CheckCircle className="w-3 h-3 text-white" />
-                          </div>
-                          <span className="font-semibold text-foreground text-sm">{skill.skill_name}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mb-3">
-                          {skill.endorsements_count} endorsements • {skill.level}
-                        </p>
-                        <Button size="sm" className="w-full bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white text-xs">
-                          View Proof
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Award className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No skills added yet</p>
-                    <Button variant="outline" size="sm" className="mt-4">Add Skills</Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Experience */}
-            <Card className="bg-card border-border">
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <CardTitle className="text-lg font-semibold">Experience</CardTitle>
-                <Button variant="ghost" size="sm" className="text-[#5B6CFF]">
-                  <Edit3 className="w-4 h-4" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {experience.length > 0 ? (
-                  <div className="space-y-6">
-                    {experience.map((exp, index) => (
-                      <div key={exp.id} className="relative pl-6 border-l-2 border-[#5B6CFF]/30">
-                        <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-[#5B6CFF] flex items-center justify-center">
-                          <div className="w-2 h-2 rounded-full bg-white" />
-                        </div>
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-bold text-[#5B6CFF]">
-                                {new Date(exp.start_date).getFullYear()}
-                              </span>
-                              <span className="text-foreground font-medium">{exp.position}</span>
+            {/* Services Tab Content - Verified Skills */}
+            {activeTab === 'services' && (
+              <Card className="bg-card border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-4">
+                  <CardTitle className="text-lg font-semibold">Verified Skills & Services</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-[#5B6CFF] gap-1">
+                    View Details <ExternalLink className="w-3 h-3" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {skills.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {skills.map((skill) => (
+                        <div key={skill.id} className="p-4 border border-[#10B981]/30 bg-[#10B981]/5 rounded-xl">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1.5 bg-[#10B981] rounded-full">
+                              <CheckCircle className="w-3 h-3 text-white" />
                             </div>
-                            <p className="text-sm text-muted-foreground">{exp.company}</p>
-                            {exp.description && (
-                              <p className="text-sm text-muted-foreground mt-2">{exp.description}</p>
-                            )}
+                            <span className="font-semibold text-foreground text-sm">{skill.skill_name}</span>
                           </div>
-                          <Badge variant="outline" className="text-xs">
-                            {exp.is_current ? 'Present' : new Date(exp.end_date || new Date()).getFullYear()}
-                          </Badge>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            {skill.endorsements_count} endorsements • {skill.level}
+                          </p>
+                          <Button size="sm" className="w-full bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white text-xs">
+                            View Proof
+                          </Button>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No experience added yet</p>
-                    <Button variant="outline" size="sm" className="mt-4">Add Experience</Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Award className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No skills added yet</p>
+                      <Button variant="outline" size="sm" className="mt-4">Add Skills</Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Projects and Certifications */}
-            <Card className="bg-card border-border">
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <CardTitle className="text-lg font-semibold">Projects and Certifications</CardTitle>
-                <Button variant="ghost" size="sm" className="text-[#5B6CFF]">
-                  <Edit3 className="w-4 h-4" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {certificates.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {certificates.map((cert) => (
-                      <div key={cert.id} className="p-4 border border-border rounded-xl bg-muted/20">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2 bg-[#5B6CFF]/10 rounded-lg">
-                            <GraduationCap className="w-5 h-5 text-[#5B6CFF]" />
+            {/* Overview - Experience */}
+            {activeTab === 'overview' && (
+              <Card className="bg-card border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-4">
+                  <CardTitle className="text-lg font-semibold">Experience</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-[#5B6CFF]">
+                    <Edit3 className="w-4 h-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {experience.length > 0 ? (
+                    <div className="space-y-6">
+                      {experience.map((exp) => (
+                        <div key={exp.id} className="relative pl-6 border-l-2 border-[#5B6CFF]/30">
+                          <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-[#5B6CFF] flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-white" />
                           </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-foreground text-sm">{cert.title}</h4>
-                            <p className="text-xs text-muted-foreground">{cert.issuer}</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Issued {cert.issue_date ? new Date(cert.issue_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
-                            </p>
-                            {cert.credential_url && (
-                              <a href={cert.credential_url} target="_blank" rel="noopener noreferrer" className="text-xs text-[#5B6CFF] hover:underline mt-2 inline-flex items-center gap-1">
-                                View Credential <ExternalLink className="w-3 h-3" />
-                              </a>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-bold text-[#5B6CFF]">
+                                  {new Date(exp.start_date).getFullYear()}
+                                </span>
+                                <span className="text-foreground font-medium">{exp.position}</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{exp.company}</p>
+                              {exp.description && (
+                                <p className="text-sm text-muted-foreground mt-2">{exp.description}</p>
+                              )}
+                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              {exp.is_current ? 'Present' : new Date(exp.end_date || new Date()).getFullYear()}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No experience added yet</p>
+                      <Button variant="outline" size="sm" className="mt-4">Add Experience</Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Projects Tab Content */}
+            {activeTab === 'projects' && (
+              <Card className="bg-card border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-4">
+                  <CardTitle className="text-lg font-semibold">Projects and Certifications</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-[#5B6CFF]">
+                    <Edit3 className="w-4 h-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {certificates.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {certificates.map((cert) => (
+                        <div key={cert.id} className="p-4 border border-border rounded-xl bg-muted/20">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 bg-[#5B6CFF]/10 rounded-lg">
+                              <GraduationCap className="w-5 h-5 text-[#5B6CFF]" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-foreground text-sm">{cert.title}</h4>
+                              <p className="text-xs text-muted-foreground">{cert.issuer}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Issued {cert.issue_date ? new Date(cert.issue_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
+                              </p>
+                              {cert.credential_url && (
+                                <a href={cert.credential_url} target="_blank" rel="noopener noreferrer" className="text-xs text-[#5B6CFF] hover:underline mt-2 inline-flex items-center gap-1">
+                                  View Credential <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
+                            </div>
+                            {cert.is_verified && (
+                              <BadgeCheck className="w-5 h-5 text-[#10B981]" />
                             )}
                           </div>
-                          {cert.is_verified && (
-                            <BadgeCheck className="w-5 h-5 text-[#10B981]" />
-                          )}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <FolderOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No projects or certifications added yet</p>
+                      <Button variant="outline" size="sm" className="mt-4">Add Project</Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Case Studies Tab Content */}
+            {activeTab === 'case-studies' && (
+              <Card className="bg-card border-border">
+                <CardHeader className="flex flex-row items-center justify-between pb-4">
+                  <CardTitle className="text-lg font-semibold">Case Studies</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-[#5B6CFF]">
+                    <Edit3 className="w-4 h-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
                   <div className="text-center py-8 text-muted-foreground">
-                    <FolderOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No projects or certifications added yet</p>
-                    <Button variant="outline" size="sm" className="mt-4">Add Project</Button>
+                    <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No case studies added yet</p>
+                    <p className="text-xs mt-2">Share your success stories and client transformations</p>
+                    <Button variant="outline" size="sm" className="mt-4">Add Case Study</Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Posts Tab Content */}
             {activeTab === 'posts' && (
