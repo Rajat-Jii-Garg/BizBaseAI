@@ -1,4 +1,4 @@
-// Force rebuild: 2025-01-08-v2
+// Force rebuild: 2025-01-08-v3
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import App from './App.jsx';

@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   // Force completely new cache
-  cacheDir: 'node_modules/.vite-v2',
+  cacheDir: 'node_modules/.vite-v3',
   plugins: [
     react(),
     mode === 'development' &&
