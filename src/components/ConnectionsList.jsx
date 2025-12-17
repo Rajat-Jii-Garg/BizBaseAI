@@ -3,13 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Users, UserPlus, Check, X, MessageSquare, MapPin, Briefcase } from 'lucide-react';
+import { Users, UserPlus, Check, X, MessageSquare, MapPin, Briefcase, Send, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 const ConnectionsList = ({
   connections,
   receivedRequests,
+  sentRequests,
   onAcceptRequest,
   onRejectRequest
 }) => {
@@ -30,19 +31,19 @@ const ConnectionsList = ({
 
   return (
     <div className="space-y-4">
-      {/* Pending Requests */}
+      {/* Received Requests */}
       {receivedRequests && receivedRequests.length > 0 && (
         <Card className="bg-white shadow-lg border-0 overflow-hidden">
           <CardHeader className="pb-2 px-4 pt-4 bg-gradient-to-r from-blue-50 to-purple-50">
             <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
               <UserPlus className="w-4 h-4 mr-2 shrink-0 text-blue-600" />
-              <span className="truncate">Connection Requests</span>
+              <span className="truncate">Received Requests</span>
               <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700">
                 {receivedRequests.length}
               </Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3 space-y-2">
+          <CardContent className="p-3 space-y-2 max-h-[200px] overflow-y-auto">
             {receivedRequests.map((request) => (
               <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl gap-2 hover:bg-blue-50 transition-colors">
                 <div 
@@ -60,7 +61,7 @@ const ConnectionsList = ({
                       {request.requester_profile?.full_name || 'Professional User'}
                     </p>
                     <p className="text-xs text-gray-500 truncate">
-                      {request.requester_profile?.current_position || 'Professional'} 
+                      {request.requester_profile?.current_position || 'Wants to connect'} 
                     </p>
                   </div>
                 </div>
@@ -82,6 +83,50 @@ const ConnectionsList = ({
                     <X className="w-3 h-3" />
                   </Button>
                 </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Sent Requests */}
+      {sentRequests && sentRequests.length > 0 && (
+        <Card className="bg-white shadow-lg border-0 overflow-hidden">
+          <CardHeader className="pb-2 px-4 pt-4 bg-gradient-to-r from-orange-50 to-yellow-50">
+            <CardTitle className="text-sm font-semibold text-gray-900 flex items-center">
+              <Send className="w-4 h-4 mr-2 shrink-0 text-orange-600" />
+              <span className="truncate">Sent Requests</span>
+              <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-700">
+                {sentRequests.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 space-y-2 max-h-[200px] overflow-y-auto">
+            {sentRequests.map((request) => (
+              <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl gap-2 hover:bg-orange-50 transition-colors">
+                <div 
+                  className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
+                  onClick={() => navigate(`/profile/${request.addressee_profile?.id}`)}
+                >
+                  <Avatar className="h-10 w-10 shrink-0 ring-2 ring-orange-100">
+                    <AvatarImage src={request.addressee_profile?.avatar_url} />
+                    <AvatarFallback className="bg-gradient-to-br from-orange-500 to-yellow-500 text-white text-sm font-medium">
+                      {request.addressee_profile?.full_name?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-gray-900 truncate hover:text-orange-600 transition-colors">
+                      {request.addressee_profile?.full_name || 'Professional User'}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {request.addressee_profile?.current_position || 'Pending acceptance'} 
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="shrink-0 text-xs bg-orange-50 text-orange-600 border-orange-200">
+                  Pending
+                </Badge>
               </div>
             ))}
           </CardContent>

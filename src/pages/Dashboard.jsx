@@ -70,6 +70,7 @@ const Dashboard = () => {
   const {
     connections,
     receivedRequests,
+    sentRequests,
     suggestions,
     suggestionsLoading,
     sendRequest,
@@ -691,6 +692,7 @@ const Dashboard = () => {
                 <ConnectionsList
                   connections={connections}
                   receivedRequests={receivedRequests}
+                  sentRequests={sentRequests}
                   onAcceptRequest={acceptRequest}
                   onRejectRequest={rejectRequest}
                 />
