@@ -75,13 +75,6 @@ const Connections = () => {
     }
   };
   
-  const refreshAllConnections = async () => {
-    await Promise.all([
-      fetchConnections(),
-      fetchPendingRequests(),
-      fetchSentRequests()
-    ]);
-  };
 
   useEffect(() => {
     if (!user) return;
