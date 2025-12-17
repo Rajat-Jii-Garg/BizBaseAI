@@ -125,10 +125,7 @@ export const useConnections = () => {
 
   const removeSuggestion = (profileId) => {
     setSuggestions(prev => prev.filter(s => s.id !== profileId));
-    toast({
-      title: "Suggestion Removed",
-      description: "This profile has been removed from your suggestions."
-    });
+    toast.success("Suggestion removed from your list");
   };
 
   const sendRequest = async (addresseeId) => {
@@ -178,20 +175,13 @@ export const useConnections = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Connection Removed",
-        description: "You have successfully removed this connection."
-      });
+      toast.success("Connection removed successfully");
       
       fetchConnections();
       fetchSuggestions(); // Refresh suggestions
     } catch (error) {
       console.error('Error removing connection:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove connection",
-        variant: "destructive"
-      });
+      toast.error("Failed to remove connection");
     }
   };
 
