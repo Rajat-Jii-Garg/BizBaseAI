@@ -715,7 +715,7 @@ const Dashboard = () => {
         </div>
       </div>
     </DashboardLayout>
-  )
+  );
 };
 
-export default Dashboar
+export default Dashboard;
