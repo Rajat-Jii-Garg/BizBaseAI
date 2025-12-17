@@ -13,10 +13,6 @@ export const useConnections = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
-  const refreshAllConnections = async () => {
-    await fetchConnections();
-  };
-
   const fetchConnections = async () => {
     if (!user) {
       setLoading(false);
@@ -24,22 +20,55 @@ export const useConnections = () => {
     }
 
     try {
-      const { data, error } = await supabase
+      // Fetch connections without foreign key relationships
+      const { data: connectionsData, error: connectionsError } = await supabase
         .from('connections')
-        .select(`
-          *,
-          requester_profile:profiles!connections_requester_id_fkey(id, full_name, avatar_url, current_position, location),
-          addressee_profile:profiles!connections_addressee_id_fkey(id, full_name, avatar_url, current_position, location)
-        `)
+        .select('*')
         .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
 
-      if (error) throw error;
+      if (connectionsError) throw connectionsError;
+
+      if (!connectionsData || connectionsData.length === 0) {
+        setConnections([]);
+        setReceivedRequests([]);
+        setSentRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get all unique user IDs to fetch profiles
+      const userIds = new Set();
+      connectionsData.forEach(conn => {
+        if (conn.requester_id !== user.id) userIds.add(conn.requester_id);
+        if (conn.addressee_id !== user.id) userIds.add(conn.addressee_id);
+      });
+
+      // Fetch profiles for all connected users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, current_position, location, skills')
+        .in('id', Array.from(userIds));
+
+      if (profilesError) throw profilesError;
+
+      // Create a map for quick profile lookup
+      const profilesMap = {};
+      profilesData?.forEach(profile => {
+        profilesMap[profile.id] = profile;
+      });
+
+      // Enrich connections with profile data
+      const enrichedConnections = connectionsData.map(conn => ({
+        ...conn,
+        requester_profile: profilesMap[conn.requester_id] || null,
+        addressee_profile: profilesMap[conn.addressee_id] || null
+      }));
 
       const accepted = [];
       const received = [];
       const sent = [];
 
-      data.forEach(conn => {
+      enrichedConnections.forEach(conn => {
         if (conn.status === 'accepted') accepted.push(conn);
 
         if (conn.status === 'pending') {
@@ -52,8 +81,8 @@ export const useConnections = () => {
       setReceivedRequests(received);
       setSentRequests(sent);
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to load connections');
+      console.error('Error fetching connections:', err);
+      // Don't show toast for every error - only log it
     } finally {
       setLoading(false);
     }
@@ -61,7 +90,6 @@ export const useConnections = () => {
 
   const fetchSuggestions = async () => {
     if (!user) {
-      setLoading(false);
       return;
     }
     
@@ -128,43 +156,70 @@ export const useConnections = () => {
     toast.success("Suggestion removed from your list");
   };
 
-  const sendRequest = async (addresseeId) => {
+  const connect = async (addresseeId) => {
     if (!user) {
-      setLoading(false);
       return;
     }
 
-    const { error } = await supabase.from('connections').insert({
-      requester_id: user.id,
-      addressee_id: addresseeId,
-      status: 'pending'
-    });
+    try {
+      const { error } = await supabase.from('connections').insert({
+        requester_id: user.id,
+        addressee_id: addresseeId,
+        status: 'pending'
+      });
 
-    if (error) {
-      toast.error('Failed to send request');
-    } else {
-      toast.success('Connection request sent');
-      fetchConnections(); // ✅ ADD THIS
+      if (error) {
+        if (error.code === '23505') {
+          toast.error('Connection request already exists');
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success('Connection request sent');
+        await fetchConnections();
+      }
+    } catch (err) {
+      console.error('Error sending connection request:', err);
+      toast.error('Failed to send connection request');
+      throw err;
     }
   };
 
   const acceptRequest = async (connectionId) => {
-    await supabase
-      .from('connections')
-      .update({ status: 'accepted' })
-      .eq('id', connectionId);
-    fetchConnections();
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .update({ status: 'accepted' })
+        .eq('id', connectionId);
+
+      if (error) throw error;
+      
+      toast.success('Connection request accepted');
+      await fetchConnections();
+    } catch (err) {
+      console.error('Error accepting request:', err);
+      toast.error('Failed to accept request');
+    }
   };
 
   const rejectRequest = async (connectionId) => {
-    await supabase
-      .from('connections')
-      .update({ status: 'rejected' })
-      .eq('id', connectionId);
-    fetchConnections();
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .update({ status: 'rejected' })
+        .eq('id', connectionId);
+
+      if (error) throw error;
+      
+      toast.success('Connection request rejected');
+      await fetchConnections();
+    } catch (err) {
+      console.error('Error rejecting request:', err);
+      toast.error('Failed to reject request');
+    }
   };
 
-  const handleDisconnect = async (connectionId) => {
+  const disconnect = async (connectionId) => {
     if (!confirm('Are you sure you want to remove this connection?')) return;
 
     try {
@@ -177,17 +232,18 @@ export const useConnections = () => {
 
       toast.success("Connection removed successfully");
       
-      fetchConnections();
-      fetchSuggestions(); // Refresh suggestions
+      await fetchConnections();
+      await fetchSuggestions();
     } catch (error) {
       console.error('Error removing connection:', error);
       toast.error("Failed to remove connection");
     }
   };
 
-  // 🔥 REALTIME
+  // Initialize and setup realtime subscription
   useEffect(() => {
     if (!user) {
+      setLoading(false);
       return;
     }
 
@@ -195,14 +251,16 @@ export const useConnections = () => {
     fetchConnections().then(fetchSuggestions);
 
     const channel = supabase
-      .channel('connections-${user.id}')
+      .channel(`connections_${user.id}_${Date.now()}`)
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'connections' },
+        { event: '*', schema: 'public', table: 'connections' },
         (payload) => {
           if (
             payload.new?.requester_id === user.id ||
-            payload.new?.addressee_id === user.id
+            payload.new?.addressee_id === user.id ||
+            payload.old?.requester_id === user.id ||
+            payload.old?.addressee_id === user.id
           ) {
             fetchConnections();
           }
@@ -210,7 +268,9 @@ export const useConnections = () => {
       )
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   return {
@@ -219,17 +279,15 @@ export const useConnections = () => {
     connections,
     receivedRequests,
     sentRequests,
-
     suggestions,
     suggestionsLoading,
 
     // actions
-    sendRequest,
+    connect,
+    sendRequest: connect, // alias for backward compatibility
     acceptRequest,
     rejectRequest,
-    disconnect: handleDisconnect,
-
-
+    disconnect,
     removeSuggestion,
     refreshAllConnections: fetchConnections,
     refreshSuggestions: fetchSuggestions
