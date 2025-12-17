@@ -722,6 +722,35 @@ export type Database = {
           },
         ]
       }
+      post_reposts: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_reposts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_shares: {
         Row: {
           created_at: string
@@ -759,6 +788,9 @@ export type Database = {
           id: string
           image_url: string | null
           likes_count: number | null
+          repost_of_post_id: string | null
+          repost_of_user_id: string | null
+          reposts_count: number | null
           shares_count: number | null
           updated_at: string
           user_id: string
@@ -770,6 +802,9 @@ export type Database = {
           id?: string
           image_url?: string | null
           likes_count?: number | null
+          repost_of_post_id?: string | null
+          repost_of_user_id?: string | null
+          reposts_count?: number | null
           shares_count?: number | null
           updated_at?: string
           user_id: string
@@ -781,11 +816,22 @@ export type Database = {
           id?: string
           image_url?: string | null
           likes_count?: number | null
+          repost_of_post_id?: string | null
+          repost_of_user_id?: string | null
+          reposts_count?: number | null
           shares_count?: number | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_repost_of_post_id_fkey"
+            columns: ["repost_of_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profile_views: {
         Row: {

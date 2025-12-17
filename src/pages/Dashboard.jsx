@@ -202,10 +202,13 @@ const Dashboard = () => {
         profilesMap.set(profile.id, profile);
       });
 
-      // Check likes for current user
+      // Check likes and reposts for current user
       let likedPostIds = new Set();
+      let repostedPostIds = new Set();
       if (user) {
         const postIds = postsData.map(post => post.id);
+        
+        // Check likes
         const { data: likes } = await supabase
           .from('post_likes')
           .select('post_id')
@@ -213,6 +216,15 @@ const Dashboard = () => {
           .in('post_id', postIds);
 
         likedPostIds = new Set(likes?.map(like => like.post_id) || []);
+
+        // Check reposts
+        const { data: reposts } = await supabase
+          .from('post_reposts')
+          .select('post_id')
+          .eq('user_id', user.id)
+          .in('post_id', postIds);
+
+        repostedPostIds = new Set(reposts?.map(repost => repost.post_id) || []);
       }
 
       // Combine data
@@ -221,13 +233,15 @@ const Dashboard = () => {
         likes_count: post.likes_count || 0,
         comments_count: post.comments_count || 0,
         shares_count: post.shares_count || 0,
+        reposts_count: post.reposts_count || 0,
         profiles: profilesMap.get(post.user_id) || { 
           full_name: 'Unknown User',
           avatar_url: null,
           current_position: null,
           company_name: null
         },
-        user_has_liked: likedPostIds.has(post.id)
+        user_has_liked: likedPostIds.has(post.id),
+        user_has_reposted: repostedPostIds.has(post.id)
       }));
 
       console.log('Dashboard: Final enriched posts:', enrichedPosts);
