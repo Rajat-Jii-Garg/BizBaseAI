@@ -71,7 +71,8 @@ const Dashboard = () => {
     connections,
     receivedRequests,
     acceptRequest,
-    rejectRequest
+    rejectRequest,
+    loading: connectionsLoading
   } = useConnections();
 
   // Fetch performance analytics (last 7 days)
