@@ -33,7 +33,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import DashboardLayout from '@/components/DashboardLayout'aa
+import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedPostComposer from '@/components/EnhancedPostComposer';
 import EnhancedPostCard from '@/components/EnhancedPostCard';
 import ConnectionsList from '@/components/ConnectionsList';
@@ -715,7 +715,7 @@ const Dashboard = () => {
         </div>
       </div>
     </DashboardLayout>
-  );
+  )
 };
 
-export default Dashboard;
+export default Dashboard
