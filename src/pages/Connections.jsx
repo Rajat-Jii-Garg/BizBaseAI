@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -25,29 +27,45 @@ import { useConnections } from '@/hooks/useConnections';
 
 const Connections = () => {
   const navigate = useNavigate();
-  
+  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('connections');
+  const [requestsSubTab, setRequestsSubTab] = useState('received');
+
   // Use the connections hook at the top level
   const {
     connections,
     receivedRequests,
     sentRequests,
-    loading,
+    suggestions,
+    suggestionsLoading,
+    sendRequest,
     acceptRequest,
     rejectRequest,
-    refresh: refreshAllConnections
+    loading: connectionsLoading,
+    refreshSuggestions,
+    removeSuggestion
   } = useConnections();
-  
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('connections');
-  const [requestsSubTab, setRequestsSubTab] = useState('received');
-  const [suggestions, setSuggestions] = useState([]);
-  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
-  const filteredConnections = connections.filter(conn =>
-    conn.profile?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conn.profile?.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conn.profile?.current_position?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+  }, [user]);
+
+  const filteredConnections = connections.filter(conn => {
+    const profile =
+      conn.requester_profile?.id === user?.id
+        ? conn.addressee_profile
+        : conn.requester_profile;
+
+    return (
+      profile?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (profile?.current_position || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (profile?.location || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   const SuggestionsTab = () => (
     <div className="space-y-6">
@@ -63,7 +81,7 @@ const Connections = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={fetchSuggestions}
+              onClick={refreshSuggestions}
               disabled={suggestionsLoading}
               className="hover:bg-gray-100 transition-colors duration-200"
             >
@@ -180,7 +198,7 @@ const Connections = () => {
               </CardHeader>
 
               <CardContent>
-                {loading ? (
+                {connectionsLoading ? (
                   <p>Loading...</p>
                 ) : filteredConnections.length === 0 ? (
                   <p>No connections yet.</p>
@@ -188,7 +206,9 @@ const Connections = () => {
                   <div className="grid md:grid-cols-3 gap-4">
                     {filteredConnections.map(conn => {
                       const profile =
-                        conn.requester_profile || conn.addressee_profile;
+                        conn.requester_profile?.id === user?.id
+                          ? conn.addressee_profile
+                          : conn.requester_profile;
 
                       return (
                         <Card key={conn.id}>

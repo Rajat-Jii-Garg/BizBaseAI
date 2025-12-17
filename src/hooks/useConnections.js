@@ -198,7 +198,6 @@ export const useConnections = () => {
   // 🔥 REALTIME
   useEffect(() => {
     if (!user) {
-      setLoading(false);
       return;
     }
 
@@ -206,7 +205,7 @@ export const useConnections = () => {
     fetchConnections().then(fetchSuggestions);
 
     const channel = supabase
-      .channel('connections-realtime')
+      .channel('connections-${user.id}')
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'connections' },
@@ -240,7 +239,9 @@ export const useConnections = () => {
     rejectRequest,
     disconnect: handleDisconnect,
 
-    refreshConnections: fetchConnections,
+
+    removeSuggestion,
+    refreshAllConnections: fetchConnections,
     refreshSuggestions: fetchSuggestions
   };
 };
