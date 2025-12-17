@@ -690,9 +690,7 @@ const Dashboard = () => {
                 </Card>
               ) : (
                 <ConnectionsList
-                  connections={connections}
                   receivedRequests={receivedRequests}
-                  sentRequests={sentRequests}
                   onAcceptRequest={acceptRequest}
                   onRejectRequest={rejectRequest}
                 />

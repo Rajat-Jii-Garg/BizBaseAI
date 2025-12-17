@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,10 +27,22 @@ import { useConnections } from '@/hooks/useConnections';
 
 const Connections = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('connections');
-  const [requestsSubTab, setRequestsSubTab] = useState('received');
+  
+  // Read tab from URL query params - default to 'connections'
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl === 'received' ? 'requests' : 'connections');
+  const [requestsSubTab, setRequestsSubTab] = useState(tabFromUrl === 'received' ? 'received' : 'received');
+
+  // Update tabs when URL changes
+  useEffect(() => {
+    if (tabFromUrl === 'received') {
+      setActiveTab('requests');
+      setRequestsSubTab('received');
+    }
+  }, [tabFromUrl]);
 
   const {
     connections,
