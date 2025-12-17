@@ -434,7 +434,7 @@ const Connections = () => {
             </TabsTrigger>
             <TabsTrigger value="requests">
               <UserPlus className="w-4 h-4 mr-2" />
-              Requests ({receivedRequests.length + sentRequests.length})
+              Requests ({pendingRequests.length + sentRequests.length})
             </TabsTrigger>
           </TabsList>
 
