@@ -30,66 +30,24 @@ const Connections = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Use the connections hook at the top level
+  const {
+    connections,
+    receivedRequests: pendingRequests,
+    sentRequests,
+    loading,
+    sendRequest,
+    acceptRequest,
+    rejectRequest,
+    refresh: refreshAllConnections
+  } = useConnections();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('suggestions');
   const [requestsSubTab, setRequestsSubTab] = useState('received');
-
-  const fetchConnections = async () => {
-    if (!user) return;
-
-    try {
-      const { data: connectionData, error } = await supabase
-        .from('connections')
-        .select(`
-          *,
-          requester_profile:profiles!connections_requester_id_fkey (*),
-          addressee_profile:profiles!connections_addressee_id_fkey (*)
-        `)
-        .eq('status', 'accepted')
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
-
-      if (error) throw error;
-
-      const processedConnections = connectionData?.map(conn => {
-        const isRequester = conn.requester_id === user.id;
-        const profile = isRequester ? conn.addressee_profile : conn.requester_profile;
-        return {
-          ...conn,
-          profile
-        };
-      }) || [];
-
-      setConnections(processedConnections);
-    } catch (error) {
-      console.error('Error fetching connections:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const refreshAllConnections = async () => {
-    await Promise.all([
-      fetchConnections(),
-      fetchPendingRequests(),
-      fetchSentRequests()
-    ]);
-  };
-
-  useEffect(() => {
-    if (!user) return;
-    
-    const {
-      connections,
-      receivedRequests,
-      sentRequests,
-      loading,
-      sendRequest,
-      acceptRequest,
-      rejectRequest
-    } = useConnections();
-  }, [user]);
 
 
   const fetchPendingRequests = async () => {
