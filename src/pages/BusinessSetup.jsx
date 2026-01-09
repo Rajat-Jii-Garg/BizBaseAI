@@ -77,6 +77,14 @@ const BusinessSetup = () => {
   };
 
   const handleNext = () => {
+    if (!validateStep()) {
+      toast({
+        title: "Incomplete Information",
+        description: "Please fill all required fields before continuing.",
+        variant: "destructive"
+      });
+      return;
+    }
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -321,6 +329,24 @@ const BusinessSetup = () => {
     }
   };
 
+  const validateStep = () => {
+    if (currentStep === 1) {
+      return (
+        formData.businessName.trim() &&
+        formData.businessType &&
+        formData.industry &&
+        formData.description.trim()
+      );
+    }
+
+    if (currentStep === 2) {
+      return formData.email.trim();
+    }
+
+    return true;
+  };
+
+
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto p-6">          
@@ -366,6 +392,7 @@ const BusinessSetup = () => {
           {currentStep < totalSteps ? (
             <Button
               onClick={handleNext}
+              disabled={!validateStep()}
               className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
               Next
