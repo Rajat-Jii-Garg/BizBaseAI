@@ -33,6 +33,7 @@ const BusinessSetup = () => {
     businessName: '',
     businessType: '',
     industry: '',
+    category: '',
     description: '',
     website: '',
     email: '',
@@ -48,24 +49,108 @@ const BusinessSetup = () => {
   const businessTypes = [
     'Sole Proprietorship',
     'Partnership',
-    'LLC',
+    'Private Limited Company',
+    'Public Limited Company',
+    'Limited Liability Company (LLC)',
+    'Limited Liability Partnership (LLP)',
     'Corporation',
-    'Non-Profit',
-    'Startup',
+    'Trust',
+    'Cooperative',
+    'Freelancer',
+    'Non-Profit Organization',
+    'Agency / Firm',
+    'Startup (Early-stage)',
     'Other'
   ];
 
   const industries = [
-    'Technology',
-    'Healthcare',
-    'Finance',
+    'Technology / IT',
+    'Software & SaaS',
+    'Artificial Intelligence',
+    'Healthcare & Medical',
+    'Pharmaceuticals',
+    'Finance & Banking',
+    'FinTech',
+    'Insurance',
     'Education',
     'Manufacturing',
-    'Retail',
-    'Consulting',
-    'Real Estate',
-    'Marketing & Advertising',
-    'Food & Beverage',
+    'Industrial & Engineering',
+    'Retail & E-commerce',
+    'Consulting & Advisory',
+    'Legal & Compliance',
+    'Real Estate & Construction',
+    'Architecture & Interior Design',
+    'Marketing, Advertising & PR',
+    'Media & Entertainment',
+    'Travel & Tourism',
+    'Logistics & Supply Chain',
+    'Food & Beverages',
+    'Transportation',
+    'Automobile & Mobility',
+    'Energy & Utilities',
+    'Renewable Energy',
+    'Agriculture & AgriTech',
+    'Textile & Fashion',
+    'Beauty, Wellness & Fitness',
+    'Sports & Gaming',
+    'NGO / Social Impact',
+    'Government & Public Services',
+    'Other'
+  ];
+
+  const businessCategories = [
+    'Software Development',
+    'SaaS Product',
+    'Mobile App Development',
+    'Web Development',
+    'IT Services & Support',
+    'AI & Machine Learning Solutions',
+
+    'Consulting Services',
+    'Business Advisory',
+    'Financial Services',
+    'Legal Services',
+    'Compliance & Accounting',
+
+    'Marketing Services',
+    'Digital Marketing',
+    'SEO / SEM Services',
+    'Social Media Management',
+    'Content Creation',
+
+    'Design Services',
+    'UI/UX Design',
+    'Graphic Design',
+    'Branding & Identity',
+
+    'Education & Training',
+    'Coaching & Mentorship',
+    'Online Courses',
+
+    'E-commerce Store',
+    'Retail Store',
+    'Wholesale Supplier',
+
+    'Manufacturing',
+    'Product Manufacturing',
+    'OEM / ODM',
+
+    'Healthcare Services',
+    'Fitness & Wellness Services',
+
+    'Logistics & Delivery',
+    'Transportation Services',
+
+    'Food & Beverage Services',
+    'Restaurant / Cloud Kitchen',
+
+    'Real Estate Services',
+    'Property Management',
+
+    'Recruitment & HR Services',
+    'Staffing & Talent Solutions',
+
+    'Freelancer / Independent Services',
     'Other'
   ];
 
@@ -114,6 +199,7 @@ const BusinessSetup = () => {
           name: formData.businessName,
           business_type: formData.businessType,
           industry: formData.industry,
+          category: formData.category,
           description: formData.description,
           website: formData.website,
           email: formData.email,
@@ -169,7 +255,7 @@ const BusinessSetup = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="businessType">Business Type *</Label>
+                <Label htmlFor="businessType">Business-Type *</Label>
                 <select
                   id="businessType"
                   className="w-full border rounded-lg px-3 py-2"
@@ -197,12 +283,27 @@ const BusinessSetup = () => {
                   ))}
                 </select>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">Category *</Label>
+                <select
+                  id="category"
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={formData.category}
+                  onChange={(e) => handleInputChange('category', e.target.value)}
+                >
+                  <option value="">Select category</option>
+                  {businessCategories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
               
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="description">Business Description *</Label>
                 <Textarea
                   id="description"
-                  placeholder="Describe what your business does, your mission, and what makes you unique"
+                  placeholder="Describe what your business does, your mission, and what makes you unique..."
                   rows={4}
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
@@ -222,11 +323,11 @@ const BusinessSetup = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="website">Website URL</Label>
+                <Label htmlFor="website">Website URL :</Label>
                 <Input
                   id="website"
                   type="url"
-                  placeholder="https://yourbusiness.com"
+                  placeholder="https://yourbusiness.com/"
                   value={formData.website}
                   onChange={(e) => handleInputChange('website', e.target.value)}
                 />
@@ -244,18 +345,18 @@ const BusinessSetup = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="phone">Business Phone</Label>
+                <Label htmlFor="phone">Business Phone *</Label>
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+91 (123) 456-789"
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city">City *</Label>
                 <Input
                   id="city"
                   placeholder="New York"
@@ -265,7 +366,7 @@ const BusinessSetup = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
+                <Label htmlFor="country">Country *</Label>
                 <Input
                   id="country"
                   placeholder="United States"
@@ -275,7 +376,7 @@ const BusinessSetup = () => {
               </div>
               
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="address">Business Address</Label>
+                <Label htmlFor="address">Business Address *</Label>
                 <Textarea
                   id="address"
                   placeholder="123 Business Street, Suite 100"
@@ -335,12 +436,19 @@ const BusinessSetup = () => {
         formData.businessName.trim() &&
         formData.businessType &&
         formData.industry &&
+        formData.category &&
         formData.description.trim()
       );
     }
 
     if (currentStep === 2) {
-      return formData.email.trim();
+      return (
+        formData.email.trim() &&
+        formData.phone.trim() &&
+        formData.address.trim() && 
+        formData.city.trim() && 
+        formData.country.trim()
+      );
     }
 
     return true;
