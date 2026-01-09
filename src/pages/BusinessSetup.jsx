@@ -21,10 +21,13 @@ import {
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 const BusinessSetup = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     businessName: '',
@@ -86,19 +89,55 @@ const BusinessSetup = () => {
   };
 
   const handleSubmit = async () => {
-    try {
+    if (!user) {
       toast({
-        title: "Business Registration Submitted!",
-        description: "Your business profile is being reviewed. You'll hear from us within 24 hours."
+        title: "Not logged in",
+        description: "Please login to register a business",
+        variant: "destructive"
       });
-    } catch (error) {
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('businesses')
+        .insert({
+          owner_id: user.id,
+          name: formData.businessName,
+          business_type: formData.businessType,
+          industry: formData.industry,
+          description: formData.description,
+          website: formData.website,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          country: formData.country,
+          status: 'active'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
       toast({
-        title: "Error",
-        description: "Failed to submit business registration. Please try again.",
+        title: "Business Registered Successfully 🎉",
+        description: "Welcome to your business dashboard!"
+      });
+
+      // 👉 Redirect to business dashboard
+      navigate(`/business/${data.id}/dashboard`);
+
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Registration Failed",
+        description: "Something went wrong. Please try again.",
         variant: "destructive"
       });
     }
   };
+
 
   const renderStep = () => {
     switch (currentStep) {
