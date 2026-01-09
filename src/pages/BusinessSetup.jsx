@@ -164,7 +164,7 @@ const BusinessSetup = () => {
   const handleNext = () => {
     if (!validateStep()) {
       toast({
-        title: "Incomplete Information",
+        title: "Missing Information",
         description: "Please fill all required fields before continuing.",
         variant: "destructive"
       });
@@ -185,7 +185,7 @@ const BusinessSetup = () => {
     if (!user) {
       toast({
         title: "Not logged in",
-        description: "Please login to register a business",
+        description: "Please login to register your business",
         variant: "destructive"
       });
       return;
@@ -232,15 +232,14 @@ const BusinessSetup = () => {
     }
   };
 
-
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Basic Business Information</h2>
-              <p className="text-gray-600">Tell us about your business to get started</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Basic Business Information -</h2>
+              <p className="text-gray-600">Fill up basic business details to get started.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -248,7 +247,7 @@ const BusinessSetup = () => {
                 <Label htmlFor="businessName">Business Name *</Label>
                 <Input
                   id="businessName"
-                  placeholder="Enter your business name"
+                  placeholder="Enter your Business name"
                   value={formData.businessName}
                   onChange={(e) => handleInputChange('businessName', e.target.value)}
                 />
@@ -317,8 +316,8 @@ const BusinessSetup = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Information</h2>
-              <p className="text-gray-600">How can customers and partners reach you?</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Business Contact Information -</h2>
+              <p className="text-gray-600">How your customers and partners reach you?</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -349,7 +348,7 @@ const BusinessSetup = () => {
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="+91 (123) 456-789"
+                  placeholder="+91 (123) 456-7890"
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                 />
@@ -393,31 +392,51 @@ const BusinessSetup = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Submit</h2>
-              <p className="text-gray-600">Review your information and complete registration</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify & Submit -</h2>
+              <p className="text-gray-600">Verify your Business Details carefully and Submit Registration!</p>
             </div>
             
             <Card>
               <CardHeader>
-                <CardTitle>Business Summary</CardTitle>
+                <CardTitle>Business Details :</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium">Business Name:</span>
+                    <span className="font-medium">Business Name :</span>
                     <p className="text-gray-600">{formData.businessName || 'Not provided'}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Industry:</span>
+                    <span className="font-medium">Industry :</span>
                     <p className="text-gray-600">{formData.industry || 'Not provided'}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Business Type:</span>
+                    <span className="font-medium">Category :</span>
+                    <p className="text-gray-600">{formData.category || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Business-Type :</span>
                     <p className="text-gray-600">{formData.businessType || 'Not provided'}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Email:</span>
+                    <span className="font-medium">Email :</span>
                     <p className="text-gray-600">{formData.email || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Phone :</span>
+                    <p className="text-gray-600">{formData.phone || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">City :</span>
+                    <p className="text-gray-600">{formData.city || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Country :</span>
+                    <p className="text-gray-600">{formData.country || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Business Address :</span>
+                    <p className="text-gray-600">{formData.address || 'Not provided'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -464,7 +483,7 @@ const BusinessSetup = () => {
             <Building2 className="w-8 h-8 text-blue-600" />
             Register Your Business
           </h1>
-          <p className="text-gray-600 mt-2">Join thousands of businesses growing their network on BizBase AI</p>
+          <p className="text-gray-600 mt-2">Join thousands of Businesses Growing Network with BizBase!</p>
         </div>
 
         {/* Progress Bar */}
