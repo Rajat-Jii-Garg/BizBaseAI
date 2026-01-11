@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Settings, User, ArrowRightLeft, RefreshCw } from "lucide-react";
+import { LogOut, Settings, User, ArrowRightLeft, Building2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,7 +23,8 @@ const UserProfileDropdown = () => {
 
   // Fetch user's businesses
   const fetchBusinesses = React.useCallback(async () => {
-    if (!user) {
+    if (!user?.id) {
+      setBusinesses([]);
       setLoadingBusinesses(false);
       return;
     }
@@ -34,28 +35,37 @@ const UserProfileDropdown = () => {
         .from('businesses')
         .select('id, name, logo_url')
         .eq('owner_id', user.id)
-        .eq('status', 'active')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setBusinesses(data || []);
+      if (error) {
+        console.error('Error fetching businesses:', error);
+        setBusinesses([]);
+      } else {
+        console.log('UserProfileDropdown: Fetched businesses:', data);
+        setBusinesses(data || []);
+      }
     } catch (error) {
       console.error('Error fetching businesses:', error);
+      setBusinesses([]);
     } finally {
       setLoadingBusinesses(false);
     }
-  }, [user]);
+  }, [user?.id]);
 
+  // Initial fetch
   React.useEffect(() => {
-    fetchBusinesses();
-  }, [fetchBusinesses]);
+    if (user?.id) {
+      fetchBusinesses();
+    }
+  }, [user?.id, fetchBusinesses]);
 
-  // Subscribe to business changes
+  // Subscribe to business changes with proper cleanup
   React.useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
 
+    const channelName = `businesses-dropdown-${user.id}`;
     const channel = supabase
-      .channel('businesses-dropdown')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -64,16 +74,19 @@ const UserProfileDropdown = () => {
           table: 'businesses',
           filter: `owner_id=eq.${user.id}`
         },
-        () => {
+        (payload) => {
+          console.log('UserProfileDropdown: Business change detected:', payload);
           fetchBusinesses();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('UserProfileDropdown: Subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fetchBusinesses]);
+  }, [user?.id, fetchBusinesses]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -82,10 +95,8 @@ const UserProfileDropdown = () => {
 
   const handleSwitchBusiness = () => {
     if (businesses.length === 1) {
-      // Direct redirect to the only business
       navigate(`/business/${businesses[0].id}/dashboard`);
     } else {
-      // Go to business selector page
       navigate('/my-businesses');
     }
     setOpen(false);
@@ -143,12 +154,12 @@ const UserProfileDropdown = () => {
             </button>
             
             {/* Switch Business Mode - Only show if user has businesses */}
-            {!loadingBusinesses && hasBusinesses && (
+            {hasBusinesses && (
               <button 
                 className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
                 onClick={handleSwitchBusiness}
               >
-                <ArrowRightLeft className="w-4 h-4" /> 
+                <Building2 className="w-4 h-4" /> 
                 Switch to Business
                 {businesses.length > 1 && (
                   <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">

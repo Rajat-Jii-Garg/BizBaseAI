@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Menu, Search } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import GlobalSearchModal from "./GlobalSearchModal";
 import ThemeSwitcher from "./ThemeSwitcher";
@@ -40,38 +40,50 @@ const DashboardHeader = () => {
   const [loadingBusinessCheck, setLoadingBusinessCheck] = useState(true);
 
   // Check if user has any businesses
-  const checkBusinesses = React.useCallback(async () => {
-    if (!user) {
+  const checkBusinesses = useCallback(async () => {
+    if (!user?.id) {
+      setHasBusinesses(false);
       setLoadingBusinessCheck(false);
       return;
     }
 
     try {
-      const { count, error } = await supabase
+      const { data, error } = await supabase
         .from('businesses')
-        .select('id', { count: 'exact', head: true })
+        .select('id')
         .eq('owner_id', user.id)
-        .eq('status', 'active');
+        .limit(1);
 
-      if (error) throw error;
-      setHasBusinesses((count || 0) > 0);
+      if (error) {
+        console.error('DashboardHeader: Error checking businesses:', error);
+        setHasBusinesses(false);
+      } else {
+        const hasBiz = (data && data.length > 0);
+        console.log('DashboardHeader: Has businesses:', hasBiz, data);
+        setHasBusinesses(hasBiz);
+      }
     } catch (error) {
-      console.error('Error checking businesses:', error);
+      console.error('DashboardHeader: Error checking businesses:', error);
+      setHasBusinesses(false);
     } finally {
       setLoadingBusinessCheck(false);
     }
-  }, [user]);
+  }, [user?.id]);
 
+  // Initial check
   useEffect(() => {
-    checkBusinesses();
-  }, [checkBusinesses]);
+    if (user?.id) {
+      checkBusinesses();
+    }
+  }, [user?.id, checkBusinesses]);
 
   // Subscribe to business changes
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
 
+    const channelName = `businesses-header-${user.id}`;
     const channel = supabase
-      .channel('businesses-header')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -80,16 +92,19 @@ const DashboardHeader = () => {
           table: 'businesses',
           filter: `owner_id=eq.${user.id}`
         },
-        () => {
+        (payload) => {
+          console.log('DashboardHeader: Business change detected:', payload);
           checkBusinesses();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('DashboardHeader: Subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, checkBusinesses]);
+  }, [user?.id, checkBusinesses]);
 
   useEffect(() => {
     const handleCombo = (e) => {
@@ -112,7 +127,7 @@ const DashboardHeader = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               placeholder="Search people, communities, events, jobs... (Ctrl+K)"
-              className={`pl-10 bg-background border-border focus:ring-2 focus:ring-primary/20 focus:border-primary ${hasBusinesses ? 'w-96' : 'w-80'}`}
+              className={`pl-10 bg-background border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 ${hasBusinesses ? 'w-[420px]' : 'w-80'}`}
               onFocus={() => setSearchOpen(true)}
               readOnly
             />
