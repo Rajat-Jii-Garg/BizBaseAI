@@ -14,6 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      businesses: {
+        Row: {
+          address: string
+          banner_url: string | null
+          business_type: string
+          category: string
+          city: string | null
+          country: string | null
+          created_at: string
+          description: string
+          email: string
+          followers_count: number | null
+          id: string
+          industry: string
+          is_verified: boolean | null
+          logo_url: string | null
+          name: string
+          owner_id: string
+          phone: string
+          status: string
+          updated_at: string
+          views_count: number | null
+          website: string | null
+        }
+        Insert: {
+          address: string
+          banner_url?: string | null
+          business_type: string
+          category: string
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description: string
+          email: string
+          followers_count?: number | null
+          id?: string
+          industry: string
+          is_verified?: boolean | null
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          phone: string
+          status?: string
+          updated_at?: string
+          views_count?: number | null
+          website?: string | null
+        }
+        Update: {
+          address?: string
+          banner_url?: string | null
+          business_type?: string
+          category?: string
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string
+          email?: string
+          followers_count?: number | null
+          id?: string
+          industry?: string
+          is_verified?: boolean | null
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+          views_count?: number | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       call_signals: {
         Row: {
           conversation_id: string | null
