@@ -35,6 +35,7 @@ export type Database = {
           phone: string
           status: string
           updated_at: string
+          username: string | null
           views_count: number | null
           website: string | null
         }
@@ -58,6 +59,7 @@ export type Database = {
           phone: string
           status?: string
           updated_at?: string
+          username?: string | null
           views_count?: number | null
           website?: string | null
         }
@@ -81,6 +83,7 @@ export type Database = {
           phone?: string
           status?: string
           updated_at?: string
+          username?: string | null
           views_count?: number | null
           website?: string | null
         }
@@ -976,6 +979,7 @@ export type Database = {
           total_profile_views: number | null
           twitter_url: string | null
           updated_at: string | null
+          username: string | null
           website: string | null
         }
         Insert: {
@@ -1019,6 +1023,7 @@ export type Database = {
           total_profile_views?: number | null
           twitter_url?: string | null
           updated_at?: string | null
+          username?: string | null
           website?: string | null
         }
         Update: {
@@ -1062,6 +1067,7 @@ export type Database = {
           total_profile_views?: number | null
           twitter_url?: string | null
           updated_at?: string | null
+          username?: string | null
           website?: string | null
         }
         Relationships: []
@@ -1353,7 +1359,21 @@ export type Database = {
         Returns: string
       }
       generate_otp: { Args: never; Returns: string }
+      get_entity_by_username: {
+        Args: { search_username: string }
+        Returns: {
+          avatar_url: string
+          entity_data: Json
+          entity_id: string
+          entity_name: string
+          entity_type: string
+        }[]
+      }
       increment_job_views: { Args: { job_id: string }; Returns: undefined }
+      is_username_available: {
+        Args: { check_username: string }
+        Returns: boolean
+      }
       process_post_hashtags: {
         Args: { content: string; post_id: string }
         Returns: undefined

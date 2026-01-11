@@ -38,6 +38,8 @@ import ProfileDashboard from "./pages/ProfileDashboard";
 import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 // Business pages
 import { BusinessDashboard, MyBusinesses } from "./pages/Businesses";
+// Username profile resolver
+import UsernameProfile from "./pages/UsernameProfile";
 
 const queryClient = new QueryClient();
 
@@ -173,6 +175,8 @@ const App = () => (
                   <BusinessDashboard />
                 </ProtectedRoute>
               } />
+              {/* Username-based profile route - must be LAST to avoid conflicts */}
+              <Route path="/@:username" element={<UsernameProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
