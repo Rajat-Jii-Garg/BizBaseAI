@@ -36,6 +36,8 @@ import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import ProfileDashboard from "./pages/ProfileDashboard";
 import ProfilePreviewPage from "./pages/ProfilePreviewPage";
+// Business pages
+import { BusinessDashboard, MyBusinesses } from "./pages/Businesses";
 
 const queryClient = new QueryClient();
 
@@ -158,6 +160,17 @@ const App = () => (
               <Route path="/profile-dashboard" element={
                 <ProtectedRoute>
                   <ProfileDashboard />
+                </ProtectedRoute>
+              } />
+              {/* Business Routes */}
+              <Route path="/my-businesses" element={
+                <ProtectedRoute>
+                  <MyBusinesses />
+                </ProtectedRoute>
+              } />
+              <Route path="/business/:businessId/dashboard" element={
+                <ProtectedRoute>
+                  <BusinessDashboard />
                 </ProtectedRoute>
               } />
               <Route path="*" element={<NotFound />} />

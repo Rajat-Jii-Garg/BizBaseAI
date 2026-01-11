@@ -19,9 +19,9 @@ const DashboardSidebar = () => {
   
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Building2, label: 'My Businesses', path: '/my-businesses' },
     { icon: Users, label: 'My Network', path: '/network' },
     { icon: Users, label: 'CRM', path: '/dashboard/crm' },
-    { icon: Building2, label: 'Business Setup', path: '/dashboard/business-setup' },
     { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
   ];
 
@@ -64,10 +64,10 @@ const DashboardSidebar = () => {
 
       {/* Quick Setup Action */}
       <div className="p-4">
-        <Link to="/dashboard/business-setup">
+        <Link to="/business-setup">
           <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white">
             <Plus className="w-4 h-4 mr-2" />
-            Setup Your Business
+            Register Business
           </Button>
         </Link>
       </div>
