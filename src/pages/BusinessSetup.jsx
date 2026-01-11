@@ -29,8 +29,12 @@ const BusinessSetup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const [formData, setFormData] = useState({
     businessName: '',
+    businessUsername: '',
     businessType: '',
     industry: '',
     category: '',
@@ -154,11 +158,41 @@ const BusinessSetup = () => {
     'Other'
   ];
 
+  // Check username availability with debounce
+  const checkUsernameAvailability = async (username) => {
+    if (!username || username.length < 3) {
+      setUsernameAvailable(null);
+      return;
+    }
+    
+    setCheckingUsername(true);
+    try {
+      const { data, error } = await supabase.rpc('is_username_available', { 
+        check_username: username 
+      });
+      
+      if (error) throw error;
+      setUsernameAvailable(data);
+    } catch (error) {
+      console.error('Error checking username:', error);
+      setUsernameAvailable(null);
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Check username when it changes
+    if (field === 'businessUsername') {
+      const sanitized = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+      setFormData(prev => ({ ...prev, businessUsername: sanitized }));
+      checkUsernameAvailability(sanitized);
+    }
   };
 
   const handleNext = () => {
@@ -191,12 +225,23 @@ const BusinessSetup = () => {
       return;
     }
 
+    if (usernameAvailable === false) {
+      toast({
+        title: "Username Not Available",
+        description: "Please choose a different username for your business.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const { data, error } = await supabase
         .from('businesses')
         .insert({
           owner_id: user.id,
           name: formData.businessName,
+          username: formData.businessUsername,
           business_type: formData.businessType,
           industry: formData.industry,
           category: formData.category,
@@ -212,7 +257,19 @@ const BusinessSetup = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Handle specific errors
+        if (error.message.includes('businesses_email_unique') || error.message.includes('duplicate key') && error.message.includes('email')) {
+          throw new Error('This email is already registered with another business.');
+        }
+        if (error.message.includes('businesses_phone_unique') || error.message.includes('duplicate key') && error.message.includes('phone')) {
+          throw new Error('This phone number is already registered with another business.');
+        }
+        if (error.message.includes('businesses_username_unique') || error.message.includes('Username already taken')) {
+          throw new Error('This username is already taken. Please choose another.');
+        }
+        throw error;
+      }
 
       toast({
         title: "Business Registered Successfully 🎉",
@@ -226,11 +283,14 @@ const BusinessSetup = () => {
       console.error(error);
       toast({
         title: "Registration Failed",
-        description: "Something went wrong. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
 
   const renderStep = () => {
     switch (currentStep) {
@@ -251,6 +311,40 @@ const BusinessSetup = () => {
                   value={formData.businessName}
                   onChange={(e) => handleInputChange('businessName', e.target.value)}
                 />
+              </div>
+              
+              {/* Business Username Field */}
+              <div className="space-y-2">
+                <Label htmlFor="businessUsername">Business Username *</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">@</span>
+                  <Input
+                    id="businessUsername"
+                    placeholder="yourbusiness"
+                    value={formData.businessUsername}
+                    onChange={(e) => handleInputChange('businessUsername', e.target.value)}
+                    className={`pl-8 ${
+                      usernameAvailable === true ? 'border-green-500 focus:border-green-500' : 
+                      usernameAvailable === false ? 'border-red-500 focus:border-red-500' : ''
+                    }`}
+                  />
+                  {checkingUsername && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                      Checking...
+                    </span>
+                  )}
+                  {!checkingUsername && usernameAvailable === true && (
+                    <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                  )}
+                  {!checkingUsername && usernameAvailable === false && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 text-sm">
+                      Taken
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500">
+                  Your business URL: bizbase.com/@{formData.businessUsername || 'yourbusiness'}
+                </p>
               </div>
               
               <div className="space-y-2">
@@ -407,6 +501,10 @@ const BusinessSetup = () => {
                     <p className="text-gray-600">{formData.businessName || 'Not provided'}</p>
                   </div>
                   <div>
+                    <span className="font-medium">Username :</span>
+                    <p className="text-gray-600">@{formData.businessUsername || 'Not provided'}</p>
+                  </div>
+                  <div>
                     <span className="font-medium">Industry :</span>
                     <p className="text-gray-600">{formData.industry || 'Not provided'}</p>
                   </div>
@@ -434,7 +532,7 @@ const BusinessSetup = () => {
                     <span className="font-medium">Country :</span>
                     <p className="text-gray-600">{formData.country || 'Not provided'}</p>
                   </div>
-                  <div>
+                  <div className="md:col-span-2">
                     <span className="font-medium">Business Address :</span>
                     <p className="text-gray-600">{formData.address || 'Not provided'}</p>
                   </div>
@@ -453,6 +551,9 @@ const BusinessSetup = () => {
     if (currentStep === 1) {
       return (
         formData.businessName.trim() &&
+        formData.businessUsername.trim() &&
+        formData.businessUsername.length >= 3 &&
+        usernameAvailable === true &&
         formData.businessType &&
         formData.industry &&
         formData.category &&
@@ -528,10 +629,20 @@ const BusinessSetup = () => {
           ) : (
             <Button
               onClick={handleSubmit}
+              disabled={isSubmitting}
               className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
             >
-              <Rocket className="w-4 h-4" />
-              Submit Registration
+              {isSubmitting ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  Registering...
+                </>
+              ) : (
+                <>
+                  <Rocket className="w-4 h-4" />
+                  Submit Registration
+                </>
+              )}
             </Button>
           )}
         </div>

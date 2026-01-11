@@ -1,11 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Menu, Search } from 'lucide-react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import GlobalSearchModal from "./GlobalSearchModal";
 import ThemeSwitcher from "./ThemeSwitcher";
 import UserProfileDropdown from "./UserProfileDropdown";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const breadcrumbsMap = {
   "/dashboard": "Dashboard",
@@ -30,11 +32,41 @@ const breadcrumbsMap = {
 const DashboardHeader = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const segments = location.pathname.split("/").filter(Boolean);
+  
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [hasBusinesses, setHasBusinesses] = useState(false);
+  const [loadingBusinessCheck, setLoadingBusinessCheck] = useState(true);
 
-  // Global search modal
-  const [searchOpen, setSearchOpen] = React.useState(false);
-  React.useEffect(() => {
+  // Check if user has any businesses
+  useEffect(() => {
+    const checkBusinesses = async () => {
+      if (!user) {
+        setLoadingBusinessCheck(false);
+        return;
+      }
+
+      try {
+        const { count, error } = await supabase
+          .from('businesses')
+          .select('id', { count: 'exact', head: true })
+          .eq('owner_id', user.id)
+          .eq('status', 'active');
+
+        if (error) throw error;
+        setHasBusinesses((count || 0) > 0);
+      } catch (error) {
+        console.error('Error checking businesses:', error);
+      } finally {
+        setLoadingBusinessCheck(false);
+      }
+    };
+
+    checkBusinesses();
+  }, [user]);
+
+  useEffect(() => {
     const handleCombo = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         setSearchOpen(true);
@@ -45,7 +77,7 @@ const DashboardHeader = () => {
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <header className="bg-card border-b border-border px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="sm" className="md:hidden">
@@ -55,16 +87,16 @@ const DashboardHeader = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               placeholder="Search people, communities, events, jobs... (Ctrl+K)"
-              className="pl-10 w-80 bg-background border-border focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className={`pl-10 bg-background border-border focus:ring-2 focus:ring-primary/20 focus:border-primary ${hasBusinesses ? 'w-96' : 'w-80'}`}
               onFocus={() => setSearchOpen(true)}
               readOnly
             />
           </div>
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="ml-4">
-            <ol className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+            <ol className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
               <li>
-                <Link to="/dashboard" className="hover:underline font-bold text-blue-500">Home</Link>
+                <Link to="/dashboard" className="hover:underline font-bold text-primary">Home</Link>
               </li>
               {segments.slice(1).map((seg, i) => {
                 let path = "/dashboard" + (i > 0 ? "/" + segments.slice(1, i + 2).join("/") : seg ? "/" + seg : "");
@@ -94,6 +126,17 @@ const DashboardHeader = () => {
           >
             💼 Jobs
           </Button>
+          {/* Only show Register button if user has no businesses */}
+          {!loadingBusinessCheck && !hasBusinesses && (
+            <Button
+              variant="outline"
+              size="default"
+              onClick={() => navigate('/business-setup')}
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-4 py-2.5 font-semibold rounded-lg transition-all duration-200"
+            >
+              🏢 Register Business
+            </Button>
+          )}
           <UserProfileDropdown />
         </div>
       </div>

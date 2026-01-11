@@ -1,12 +1,15 @@
 
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User, Building2, ArrowRightLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const UserProfileDropdown = () => {
   const [open, setOpen] = React.useState(false);
+  const [businesses, setBusinesses] = React.useState([]);
+  const [loadingBusinesses, setLoadingBusinesses] = React.useState(true);
   const ref = React.useRef(null);
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
@@ -19,8 +22,47 @@ const UserProfileDropdown = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Fetch user's businesses
+  React.useEffect(() => {
+    const fetchBusinesses = async () => {
+      if (!user) {
+        setLoadingBusinesses(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('businesses')
+          .select('id, name, logo_url')
+          .eq('owner_id', user.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setBusinesses(data || []);
+      } catch (error) {
+        console.error('Error fetching businesses:', error);
+      } finally {
+        setLoadingBusinesses(false);
+      }
+    };
+
+    fetchBusinesses();
+  }, [user]);
+
   const handleSignOut = async () => {
     await signOut();
+    setOpen(false);
+  };
+
+  const handleSwitchBusiness = () => {
+    if (businesses.length === 1) {
+      // Direct redirect to the only business
+      navigate(`/business/${businesses[0].id}/dashboard`);
+    } else {
+      // Go to business selector page
+      navigate('/my-businesses');
+    }
     setOpen(false);
   };
 
@@ -36,6 +78,7 @@ const UserProfileDropdown = () => {
   const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
   const displayPosition = profile?.current_position || 'AI Enhanced';
   const displayEmail = user?.email || '';
+  const hasBusinesses = businesses.length > 0;
 
   return (
     <div className="relative" ref={ref}>
@@ -44,9 +87,8 @@ const UserProfileDropdown = () => {
         onClick={() => setOpen((v) => !v)}
       >
         <div className="text-right mr-2 hidden md:block">
-          <p className="text-sm font-medium text-gray-900">{displayName}</p>
-          <p className="text-xs text-gray-500">{displayPosition}</p>
-          <p className="text-xs text-gray-500">{displayEmail}</p>
+          <p className="text-sm font-medium text-foreground">{displayName}</p>
+          <p className="text-xs text-muted-foreground">{displayPosition}</p>
         </div>
         <Avatar>
           <AvatarImage src={profile?.avatar_url} />
@@ -56,17 +98,53 @@ const UserProfileDropdown = () => {
         </Avatar>
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black/5 z-50 animate-fade-in">
-          <button className="flex w-full px-4 py-2 gap-2 hover:bg-gray-50 items-center text-sm" onClick={() => { navigate('/profile-dashboard'); setOpen(false); }}>
-            <User className="w-4 h-4" /> Profile
-          </button>
-          <button className="flex w-full px-4 py-2 gap-2 hover:bg-gray-50 items-center text-sm" onClick={() => { navigate('/settings'); setOpen(false); }}>
-            <Settings className="w-4 h-4" /> Settings
-          </button>
-          <div className="border-t mx-2 my-1"/>
-          <button className="flex w-full px-4 py-2 gap-2 text-red-600 hover:bg-red-50 items-center text-sm" onClick={handleSignOut}>
-            <LogOut className="w-4 h-4" /> Logout
-          </button>
+        <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-card border border-border z-50 animate-fade-in">
+          {/* User info header */}
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+            <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
+          </div>
+          
+          <div className="py-1">
+            <button 
+              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+              onClick={() => { navigate('/profile-dashboard'); setOpen(false); }}
+            >
+              <User className="w-4 h-4" /> My Profile
+            </button>
+            
+            {/* Switch Business Mode - Only show if user has businesses */}
+            {hasBusinesses && (
+              <button 
+                className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+                onClick={handleSwitchBusiness}
+              >
+                <ArrowRightLeft className="w-4 h-4" /> 
+                Switch to Business
+                {businesses.length > 1 && (
+                  <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                    {businesses.length}
+                  </span>
+                )}
+              </button>
+            )}
+            
+            <button 
+              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+              onClick={() => { navigate('/settings'); setOpen(false); }}
+            >
+              <Settings className="w-4 h-4" /> Settings
+            </button>
+          </div>
+          
+          <div className="border-t border-border">
+            <button 
+              className="flex w-full px-4 py-2 gap-3 text-destructive hover:bg-destructive/10 items-center text-sm" 
+              onClick={handleSignOut}
+            >
+              <LogOut className="w-4 h-4" /> Logout
+            </button>
+          </div>
         </div>
       )}
     </div>

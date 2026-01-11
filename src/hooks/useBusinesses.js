@@ -52,7 +52,19 @@ export const useBusinesses = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Handle specific constraint violations
+        if (error.message.includes('businesses_email_unique')) {
+          throw new Error('This email is already registered with another business.');
+        }
+        if (error.message.includes('businesses_phone_unique')) {
+          throw new Error('This phone number is already registered with another business.');
+        }
+        if (error.message.includes('businesses_username_unique') || error.message.includes('Username already taken')) {
+          throw new Error('This username is already taken. Please choose another.');
+        }
+        throw error;
+      }
 
       setBusinesses(prev => [data, ...prev]);
       return data;
