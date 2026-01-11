@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Plus, Trash2, Edit3, Upload, Calendar, MapPin, 
   Briefcase, GraduationCap, Award, Languages as LanguagesIcon,
-  User, Mail, Phone, Globe, Linkedin, Camera
+  User, Mail, Phone, Globe, Linkedin, Camera, CheckCircle, XCircle, Loader2, AtSign
 } from 'lucide-react';
 
 const ProfileEditModal = ({ children, onProfileUpdate }) => {
@@ -24,10 +24,15 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
 
+  // Username availability state
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+  const [originalUsername, setOriginalUsername] = useState('');
+
   // Profile data states
   const [profile, setProfile] = useState({
     full_name: '',
-    nickname: '',
+    username: '',
     profession: '',
     bio: '',
     about: '',
@@ -87,6 +92,7 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
       
       if (profileData) {
         setProfile(profileData);
+        setOriginalUsername(profileData.username || '');
       }
 
       // Fetch all related data
@@ -113,7 +119,56 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
     }
   };
 
+  // Check username availability
+  const checkUsernameAvailability = async (username) => {
+    if (!username || username.trim().length < 3) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    // If same as original username, it's available for this user
+    if (username.toLowerCase() === originalUsername?.toLowerCase()) {
+      setUsernameAvailable(true);
+      return;
+    }
+
+    setCheckingUsername(true);
+    try {
+      const { data, error } = await supabase
+        .rpc('is_username_available', { check_username: username });
+
+      if (error) throw error;
+      setUsernameAvailable(data);
+    } catch (error) {
+      console.error('Error checking username:', error);
+      setUsernameAvailable(null);
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
+  // Debounced username check
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (profile.username) {
+        checkUsernameAvailability(profile.username);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [profile.username, originalUsername]);
+
   const handleSaveProfile = async () => {
+    // Check if username is being changed and is available
+    if (profile.username && profile.username !== originalUsername && usernameAvailable === false) {
+      toast({
+        title: "Error",
+        description: "Username is not available",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       
@@ -122,7 +177,18 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
         .update(profile)
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        // Handle unique constraint error
+        if (error.message?.includes('Username already taken')) {
+          toast({
+            title: "Error",
+            description: "This username is already taken",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
+      }
 
       toast({
         title: "Success",
@@ -138,7 +204,7 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
       console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: "Failed to update profile: " + error.message,
         variant: "destructive"
       });
     } finally {
@@ -379,14 +445,38 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
                   placeholder="Enter your full name"
                 />
               </div>
-              <div>
-                <Label htmlFor="nickname">Nickname</Label>
-                <Input
-                  id="nickname"
-                  value={profile.nickname || ''}
-                  onChange={(e) => setProfile({...profile, nickname: e.target.value})}
-                  placeholder="Enter your nickname"
-                />
+              <div className="md:col-span-2">
+                <Label htmlFor="username" className="flex items-center gap-2">
+                  <AtSign className="h-4 w-4" />
+                  Username
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="username"
+                    value={profile.username || ''}
+                    onChange={(e) => setProfile({...profile, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')})}
+                    placeholder="your_unique_username"
+                    className={`pr-10 ${
+                      usernameAvailable === true ? 'border-green-500 focus:ring-green-500' : 
+                      usernameAvailable === false ? 'border-destructive focus:ring-destructive' : ''
+                    }`}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {checkingUsername && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                    {!checkingUsername && usernameAvailable === true && <CheckCircle className="h-4 w-4 text-green-500" />}
+                    {!checkingUsername && usernameAvailable === false && <XCircle className="h-4 w-4 text-destructive" />}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {profile.username && (
+                    <>
+                      Your profile URL: <span className="font-medium">domain.com/@{profile.username}</span>
+                      {usernameAvailable === false && <span className="text-destructive ml-2">• Username not available</span>}
+                      {usernameAvailable === true && <span className="text-green-500 ml-2">• Username available</span>}
+                    </>
+                  )}
+                  {!profile.username && 'Choose a unique username (lowercase letters, numbers, underscores only)'}
+                </p>
               </div>
               <div>
                 <Label htmlFor="profession">Profession</Label>

@@ -40,31 +40,56 @@ const DashboardHeader = () => {
   const [loadingBusinessCheck, setLoadingBusinessCheck] = useState(true);
 
   // Check if user has any businesses
-  useEffect(() => {
-    const checkBusinesses = async () => {
-      if (!user) {
-        setLoadingBusinessCheck(false);
-        return;
-      }
+  const checkBusinesses = React.useCallback(async () => {
+    if (!user) {
+      setLoadingBusinessCheck(false);
+      return;
+    }
 
-      try {
-        const { count, error } = await supabase
-          .from('businesses')
-          .select('id', { count: 'exact', head: true })
-          .eq('owner_id', user.id)
-          .eq('status', 'active');
+    try {
+      const { count, error } = await supabase
+        .from('businesses')
+        .select('id', { count: 'exact', head: true })
+        .eq('owner_id', user.id)
+        .eq('status', 'active');
 
-        if (error) throw error;
-        setHasBusinesses((count || 0) > 0);
-      } catch (error) {
-        console.error('Error checking businesses:', error);
-      } finally {
-        setLoadingBusinessCheck(false);
-      }
-    };
-
-    checkBusinesses();
+      if (error) throw error;
+      setHasBusinesses((count || 0) > 0);
+    } catch (error) {
+      console.error('Error checking businesses:', error);
+    } finally {
+      setLoadingBusinessCheck(false);
+    }
   }, [user]);
+
+  useEffect(() => {
+    checkBusinesses();
+  }, [checkBusinesses]);
+
+  // Subscribe to business changes
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('businesses-header')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'businesses',
+          filter: `owner_id=eq.${user.id}`
+        },
+        () => {
+          checkBusinesses();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, checkBusinesses]);
 
   useEffect(() => {
     const handleCombo = (e) => {

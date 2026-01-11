@@ -1,7 +1,6 @@
-
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Settings, User, Building2, ArrowRightLeft } from "lucide-react";
+import { LogOut, Settings, User, ArrowRightLeft, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,32 +22,58 @@ const UserProfileDropdown = () => {
   }, []);
 
   // Fetch user's businesses
-  React.useEffect(() => {
-    const fetchBusinesses = async () => {
-      if (!user) {
-        setLoadingBusinesses(false);
-        return;
-      }
+  const fetchBusinesses = React.useCallback(async () => {
+    if (!user) {
+      setLoadingBusinesses(false);
+      return;
+    }
 
-      try {
-        const { data, error } = await supabase
-          .from('businesses')
-          .select('id, name, logo_url')
-          .eq('owner_id', user.id)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false });
+    try {
+      setLoadingBusinesses(true);
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('id, name, logo_url')
+        .eq('owner_id', user.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
 
-        if (error) throw error;
-        setBusinesses(data || []);
-      } catch (error) {
-        console.error('Error fetching businesses:', error);
-      } finally {
-        setLoadingBusinesses(false);
-      }
-    };
-
-    fetchBusinesses();
+      if (error) throw error;
+      setBusinesses(data || []);
+    } catch (error) {
+      console.error('Error fetching businesses:', error);
+    } finally {
+      setLoadingBusinesses(false);
+    }
   }, [user]);
+
+  React.useEffect(() => {
+    fetchBusinesses();
+  }, [fetchBusinesses]);
+
+  // Subscribe to business changes
+  React.useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('businesses-dropdown')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'businesses',
+          filter: `owner_id=eq.${user.id}`
+        },
+        () => {
+          fetchBusinesses();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchBusinesses]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -67,6 +92,7 @@ const UserProfileDropdown = () => {
   };
 
   const getInitials = (name) => {
+    if (!name) return 'U';
     return name
       .split(' ')
       .map(word => word[0])
@@ -103,6 +129,9 @@ const UserProfileDropdown = () => {
           <div className="px-4 py-3 border-b border-border">
             <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
             <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
+            {profile?.username && (
+              <p className="text-xs text-primary truncate">@{profile.username}</p>
+            )}
           </div>
           
           <div className="py-1">
@@ -114,7 +143,7 @@ const UserProfileDropdown = () => {
             </button>
             
             {/* Switch Business Mode - Only show if user has businesses */}
-            {hasBusinesses && (
+            {!loadingBusinesses && hasBusinesses && (
               <button 
                 className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
                 onClick={handleSwitchBusiness}

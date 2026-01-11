@@ -1,11 +1,10 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, Save, Loader2 } from 'lucide-react';
+import { Camera, Save, Loader2, CheckCircle, XCircle, AtSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -18,8 +17,15 @@ const ProfileEditor = ({ profile, onUpdate }) => {
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const fileInputRef = useRef(null);
   const bannerInputRef = useRef(null);
+  
+  // Username state
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+  const [originalUsername, setOriginalUsername] = useState(profile?.username || '');
+  
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
+    username: profile?.username || '',
     bio: profile?.bio || '',
     current_position: profile?.current_position || '',
     company_name: profile?.company_name || '',
@@ -28,6 +34,58 @@ const ProfileEditor = ({ profile, onUpdate }) => {
     linkedin_url: profile?.linkedin_url || '',
     banner_url: profile?.banner_url || '',
   });
+
+  // Check username availability
+  const checkUsernameAvailability = async (username) => {
+    if (!username || username.trim().length < 3) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    if (username.toLowerCase() === originalUsername?.toLowerCase()) {
+      setUsernameAvailable(true);
+      return;
+    }
+
+    setCheckingUsername(true);
+    try {
+      const { data, error } = await supabase
+        .rpc('is_username_available', { check_username: username });
+
+      if (error) throw error;
+      setUsernameAvailable(data);
+    } catch (error) {
+      console.error('Error checking username:', error);
+      setUsernameAvailable(null);
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.username) {
+        checkUsernameAvailability(formData.username);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.username]);
+
+  useEffect(() => {
+    setOriginalUsername(profile?.username || '');
+    setFormData({
+      full_name: profile?.full_name || '',
+      username: profile?.username || '',
+      bio: profile?.bio || '',
+      current_position: profile?.current_position || '',
+      company_name: profile?.company_name || '',
+      location: profile?.location || '',
+      website: profile?.website || '',
+      linkedin_url: profile?.linkedin_url || '',
+      banner_url: profile?.banner_url || '',
+    });
+  }, [profile]);
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -134,6 +192,16 @@ const ProfileEditor = ({ profile, onUpdate }) => {
     e.preventDefault();
     if (!user) return;
 
+    // Check username availability
+    if (formData.username && formData.username !== originalUsername && usernameAvailable === false) {
+      toast({
+        title: "Error",
+        description: "Username is not available",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase
@@ -141,12 +209,35 @@ const ProfileEditor = ({ profile, onUpdate }) => {
         .update(formData)
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        if (error.message?.includes('Username already taken')) {
+          toast({
+            title: "Error",
+            description: "This username is already taken",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
+      }
 
       toast({
         title: "Success",
         description: "Profile updated successfully!"
       });
+
+      onUpdate();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile: " + error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
       onUpdate();
     } catch (error) {
@@ -250,6 +341,35 @@ const ProfileEditor = ({ profile, onUpdate }) => {
                 onChange={(e) => handleInputChange('full_name', e.target.value)}
                 placeholder="Enter your full name"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                <AtSign className="h-4 w-4" />
+                Username
+              </label>
+              <div className="relative">
+                <Input
+                  value={formData.username}
+                  onChange={(e) => handleInputChange('username', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                  placeholder="your_unique_username"
+                  className={`pr-10 ${
+                    usernameAvailable === true ? 'border-green-500 focus:ring-green-500' : 
+                    usernameAvailable === false ? 'border-destructive focus:ring-destructive' : ''
+                  }`}
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {checkingUsername && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                  {!checkingUsername && usernameAvailable === true && <CheckCircle className="h-4 w-4 text-green-500" />}
+                  {!checkingUsername && usernameAvailable === false && <XCircle className="h-4 w-4 text-destructive" />}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {formData.username ? (
+                  <>Profile: domain.com/@{formData.username}</>
+                ) : (
+                  'Lowercase letters, numbers, underscores only'
+                )}
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Current Position</label>
