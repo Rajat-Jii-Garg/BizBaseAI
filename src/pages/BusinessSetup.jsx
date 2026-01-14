@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { BUSINESS_UPDATED_EVENT } from '@/components/DashboardHeader';
 
 const BusinessSetup = () => {
   const { user } = useAuth();
@@ -276,8 +277,14 @@ const BusinessSetup = () => {
         description: "Welcome to your business dashboard!"
       });
 
-      // 👉 Redirect to business dashboard
-      navigate(`/business/${data.id}/dashboard`);
+      // Dispatch custom event to notify header components
+      console.log('BusinessSetup: Dispatching business update event');
+      window.dispatchEvent(new CustomEvent(BUSINESS_UPDATED_EVENT));
+
+      // Small delay to ensure event is processed, then redirect
+      setTimeout(() => {
+        navigate(`/business/${data.id}/dashboard`);
+      }, 100);
 
     } catch (error) {
       console.error(error);

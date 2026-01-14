@@ -46,12 +46,14 @@ import { supabase } from '@/integrations/supabase/client';
 import WelcomeFlow from '@/components/WelcomeFlow';
 import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
 import NetworkSuggestions from '@/components/NetworkSuggestions';
-import QuickProfileActions from '@/components/QuickProfileActions'
+import QuickProfileActions from '@/components/QuickProfileActions';
+import UsernameSetupModal from '@/components/UsernameSetupModal';
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [performanceData, setPerformanceData] = useState(null);
@@ -262,8 +264,13 @@ const Dashboard = () => {
       fetchAllPosts();
       fetchPerformanceData();
       fetchSmartConnections();
+      
+      // Check if user needs to set username
+      if (profile && !profile.username) {
+        setShowUsernameModal(true);
+      }
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, profile]);
 
   const handleCreatePost = async (content, mediaUrl, mediaType) => {
     console.log('Dashboard: Creating post with content:', content, 'mediaUrl:', mediaUrl);
@@ -374,6 +381,10 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <WelcomeFlow />
+      <UsernameSetupModal 
+        open={showUsernameModal} 
+        onClose={() => setShowUsernameModal(false)} 
+      />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Profile Completion Banner */}

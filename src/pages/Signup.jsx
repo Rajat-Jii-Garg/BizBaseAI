@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Sparkles, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight, AtSign, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 const Signup = () => {
   const [signupData, setSignupData] = useState({
     fullName: '',
+    username: '',
     email: '',
     phone: '',
     password: '',
@@ -23,6 +24,8 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
   
   const navigate = useNavigate();
   const { signUp, user } = useAuth();
@@ -48,6 +51,50 @@ const Signup = () => {
     return password.length >= 8;
   };
 
+  const validateUsername = (username) => {
+    return username.length >= 3 && /^[a-z0-9_]+$/.test(username);
+  };
+
+  // Check username availability with debounce
+  const checkUsernameAvailability = useCallback(async (username) => {
+    if (!username || username.length < 3) {
+      setUsernameAvailable(null);
+      return;
+    }
+    
+    setCheckingUsername(true);
+    try {
+      const { data, error } = await supabase.rpc('is_username_available', { 
+        check_username: username 
+      });
+      
+      if (error) throw error;
+      setUsernameAvailable(data);
+    } catch (error) {
+      console.error('Error checking username:', error);
+      setUsernameAvailable(null);
+    } finally {
+      setCheckingUsername(false);
+    }
+  }, []);
+
+  // Debounced username check
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (signupData.username) {
+        checkUsernameAvailability(signupData.username);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [signupData.username, checkUsernameAvailability]);
+
+  const handleUsernameChange = (value) => {
+    const sanitized = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    setSignupData(prev => ({ ...prev, username: sanitized }));
+    if (errors.username) setErrors(prev => ({ ...prev, username: '' }));
+  };
+
   const clearErrors = () => setErrors({});
 
   const handleSignup = async (e) => {
@@ -60,6 +107,14 @@ const Signup = () => {
     
     if (!signupData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
+    }
+
+    if (!signupData.username) {
+      newErrors.username = 'Username is required';
+    } else if (!validateUsername(signupData.username)) {
+      newErrors.username = 'Username must be at least 3 characters (letters, numbers, underscore only)';
+    } else if (usernameAvailable === false) {
+      newErrors.username = 'This username is already taken';
     }
     
     if (!signupData.email) {
@@ -91,7 +146,7 @@ const Signup = () => {
     }
 
     try {
-      // direct user account create with Supabase (email verification auto)
+      // Create user account with Supabase (email verification auto)
       const { error } = await supabase.auth.signUp({
         email: signupData.email,
         password: signupData.password,
@@ -100,6 +155,7 @@ const Signup = () => {
           data: {
             full_name: signupData.fullName,
             phone: signupData.phone,
+            username: signupData.username,
           }
         }
       });
@@ -120,7 +176,7 @@ const Signup = () => {
         description: "Please check your inbox and verify your email before logging in.",
       });
       
-      // after signup, redirect to login page
+      // After signup, redirect to login page
       setTimeout(() => {
         navigate('/login');
       }, 1000);
@@ -179,7 +235,7 @@ const Signup = () => {
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name *</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="fullName"
                       type="text"
@@ -189,11 +245,42 @@ const Signup = () => {
                         setSignupData(prev => ({ ...prev, fullName: e.target.value }));
                         if (errors.fullName) setErrors(prev => ({ ...prev, fullName: '' }));
                       }}
-                      className={`pl-10 transition-all duration-200 ${errors.fullName ? 'border-red-500' : 'focus:border-blue-500'}`}
+                      className={`pl-10 transition-all duration-200 ${errors.fullName ? 'border-destructive' : 'focus:border-primary'}`}
                       required
                     />
                   </div>
-                  {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
+                  {errors.fullName && <p className="text-destructive text-xs mt-1">{errors.fullName}</p>}
+                </div>
+
+                {/* Username */}
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username *</Label>
+                  <div className="relative">
+                    <AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="Choose a unique username"
+                      value={signupData.username}
+                      onChange={(e) => handleUsernameChange(e.target.value)}
+                      className={`pl-10 pr-10 transition-all duration-200 ${
+                        errors.username ? 'border-destructive' : 
+                        usernameAvailable === true ? 'border-green-500' : 
+                        usernameAvailable === false ? 'border-destructive' : 
+                        'focus:border-primary'
+                      }`}
+                      required
+                    />
+                    <div className="absolute right-3 top-3">
+                      {checkingUsername && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                      {!checkingUsername && usernameAvailable === true && <CheckCircle className="h-4 w-4 text-green-500" />}
+                      {!checkingUsername && usernameAvailable === false && <XCircle className="h-4 w-4 text-destructive" />}
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Your profile URL: bizbase.com/@{signupData.username || 'username'}
+                  </p>
+                  {errors.username && <p className="text-destructive text-xs mt-1">{errors.username}</p>}
                 </div>
                 
                 {/* Email */}

@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Settings, User, ArrowRightLeft, Building2 } from "lucide-react";
+import { LogOut, Settings, User, Building2, Brain } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { BUSINESS_UPDATED_EVENT } from "./DashboardHeader";
 
 const UserProfileDropdown = () => {
   const [open, setOpen] = React.useState(false);
@@ -12,6 +13,7 @@ const UserProfileDropdown = () => {
   const ref = React.useRef(null);
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   React.useEffect(() => {
     const handler = (e) => {
@@ -63,7 +65,7 @@ const UserProfileDropdown = () => {
   React.useEffect(() => {
     if (!user?.id) return;
 
-    const channelName = `businesses-dropdown-${user.id}`;
+    const channelName = `businesses-dropdown-${user.id}-${Date.now()}`;
     const channel = supabase
       .channel(channelName)
       .on(
@@ -75,7 +77,7 @@ const UserProfileDropdown = () => {
           filter: `owner_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('UserProfileDropdown: Business change detected:', payload);
+          console.log('UserProfileDropdown: Business change detected via realtime:', payload);
           fetchBusinesses();
         }
       )
@@ -87,6 +89,40 @@ const UserProfileDropdown = () => {
       supabase.removeChannel(channel);
     };
   }, [user?.id, fetchBusinesses]);
+
+  // Listen for custom business update events
+  React.useEffect(() => {
+    const handleBusinessUpdate = () => {
+      console.log('UserProfileDropdown: Custom business update event received');
+      fetchBusinesses();
+    };
+
+    window.addEventListener(BUSINESS_UPDATED_EVENT, handleBusinessUpdate);
+    return () => {
+      window.removeEventListener(BUSINESS_UPDATED_EVENT, handleBusinessUpdate);
+    };
+  }, [fetchBusinesses]);
+
+  // Re-check on window focus
+  React.useEffect(() => {
+    const handleFocus = () => {
+      console.log('UserProfileDropdown: Window focused, refetching businesses');
+      fetchBusinesses();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchBusinesses]);
+
+  // Re-check when route changes
+  React.useEffect(() => {
+    if (location.pathname !== '/business-setup') {
+      console.log('UserProfileDropdown: Route changed, refetching businesses');
+      fetchBusinesses();
+    }
+  }, [location.pathname, fetchBusinesses]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -151,6 +187,13 @@ const UserProfileDropdown = () => {
               onClick={() => { navigate('/profile-dashboard'); setOpen(false); }}
             >
               <User className="w-4 h-4" /> My Profile
+            </button>
+
+            <button 
+              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+              onClick={() => { navigate('/ai-assistant'); setOpen(false); }}
+            >
+              <Brain className="w-4 h-4" /> AI Assistant
             </button>
             
             {/* Switch Business Mode - Only show if user has businesses */}
