@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 const UsernameSetupModal = ({ open, onClose }) => {
-  const { user, profile } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [username, setUsername] = useState('');
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
@@ -81,9 +81,9 @@ const UsernameSetupModal = ({ open, onClose }) => {
       if (error) throw error;
 
       toast.success('Username saved successfully!');
+      // Refresh profile in AuthContext to get updated username
+      await refreshProfile();
       onClose();
-      // Reload to refresh profile data
-      window.location.reload();
     } catch (error) {
       console.error('Error saving username:', error);
       toast.error('Failed to save username. Please try again.');
