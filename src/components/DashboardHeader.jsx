@@ -1,13 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Menu, Search } from 'lucide-react';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import GlobalSearchModal from "./GlobalSearchModal";
 import ThemeSwitcher from "./ThemeSwitcher";
 import UserProfileDropdown from "./UserProfileDropdown";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+
+// Custom event name for business updates
+export const BUSINESS_UPDATED_EVENT = 'bizbase-business-updated';
 
 const breadcrumbsMap = {
   "/dashboard": "Dashboard",
@@ -77,11 +80,11 @@ const DashboardHeader = () => {
     }
   }, [user?.id, checkBusinesses]);
 
-  // Subscribe to business changes
+  // Subscribe to business changes via Supabase realtime
   useEffect(() => {
     if (!user?.id) return;
 
-    const channelName = `businesses-header-${user.id}`;
+    const channelName = `businesses-header-${user.id}-${Date.now()}`;
     const channel = supabase
       .channel(channelName)
       .on(
@@ -93,7 +96,7 @@ const DashboardHeader = () => {
           filter: `owner_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('DashboardHeader: Business change detected:', payload);
+          console.log('DashboardHeader: Business change detected via realtime:', payload);
           checkBusinesses();
         }
       )
@@ -105,6 +108,40 @@ const DashboardHeader = () => {
       supabase.removeChannel(channel);
     };
   }, [user?.id, checkBusinesses]);
+
+  // Listen for custom business update events (fired after business registration)
+  useEffect(() => {
+    const handleBusinessUpdate = () => {
+      console.log('DashboardHeader: Custom business update event received');
+      checkBusinesses();
+    };
+
+    window.addEventListener(BUSINESS_UPDATED_EVENT, handleBusinessUpdate);
+    return () => {
+      window.removeEventListener(BUSINESS_UPDATED_EVENT, handleBusinessUpdate);
+    };
+  }, [checkBusinesses]);
+
+  // Re-check on window focus (in case user registered business in another tab)
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log('DashboardHeader: Window focused, rechecking businesses');
+      checkBusinesses();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [checkBusinesses]);
+
+  // Re-check when route changes (especially after coming from business-setup)
+  useEffect(() => {
+    if (location.pathname !== '/business-setup') {
+      console.log('DashboardHeader: Route changed, rechecking businesses');
+      checkBusinesses();
+    }
+  }, [location.pathname, checkBusinesses]);
 
   useEffect(() => {
     const handleCombo = (e) => {
