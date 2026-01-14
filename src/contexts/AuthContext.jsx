@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, current_position, email')
+        .select('id, full_name, avatar_url, current_position, email, username, profile_completion_score, bio, banner_url')
         .eq('id', userId)
         .maybeSingle();
       
@@ -46,6 +46,13 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Catch error fetching profile:', err);
       setProfile(null);
+    }
+  };
+
+  // Function to manually refresh profile (e.g., after username update)
+  const refreshProfile = async () => {
+    if (user?.id) {
+      await fetchUserProfile(user.id);
     }
   };
   // END NEW FUNCTION ---------------------------------------------------------------------------------------------------------------
@@ -282,6 +289,7 @@ export const AuthProvider = ({ children }) => {
     sendOTP,
     verifyOTP,
     completeSignup,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
