@@ -160,7 +160,7 @@ const ProfileDashboard = () => {
 
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, current_position, company_name')
+        .select('id, full_name, avatar_url, current_position, company_name, username')
         .eq('id', user.id)
         .single();
 
@@ -439,6 +439,9 @@ const ProfileDashboard = () => {
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
                       {profile?.full_name || 'Professional User'}
                     </h1>
+                    {profile?.username && (
+                      <p className="text-base text-primary font-medium">@{profile.username}</p>
+                    )}
                     <p className="text-base md:text-lg text-muted-foreground mt-1">
                       {profile?.profession || profile?.current_position || 'Professional'} 
                       {profile?.company_name && <span className="font-medium text-foreground"> & {profile.company_name}</span>}

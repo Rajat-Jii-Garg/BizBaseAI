@@ -168,6 +168,9 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
                 </h4>
                 <CheckCircle className="w-5 h-5 text-blue-500" />
               </div>
+              {post.profiles?.username && (
+                <p className="text-sm text-primary font-medium">@{post.profiles.username}</p>
+              )}
               <p className="text-sm text-gray-600 font-medium">
                 {post.profiles?.current_position || 'Professional Member'}
               </p>

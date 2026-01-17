@@ -195,7 +195,7 @@ const ProfilePage = () => {
 
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, current_position, company_name')
+        .select('id, full_name, avatar_url, current_position, company_name, username')
         .eq('id', userId)
         .single();
 
@@ -527,6 +527,9 @@ const ProfilePage = () => {
                         <BadgeCheck className="w-6 h-6 text-[#5B6CFF]" />
                       )}
                     </h1>
+                    {profile?.username && (
+                      <p className="text-base text-primary font-medium">@{profile.username}</p>
+                    )}
                     <p className="text-base md:text-lg text-muted-foreground">
                       {profile?.profession || profile?.current_position || 'Professional Member'}
                       {profile?.company_name && (
