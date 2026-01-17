@@ -191,7 +191,7 @@ const Dashboard = () => {
       // Fetch profiles separately
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, current_position, company_name')
+        .select('id, full_name, avatar_url, current_position, company_name, username')
         .in('id', userIds);
 
       if (profilesError) {
@@ -449,6 +449,9 @@ const Dashboard = () => {
                   >
                     {profile?.full_name || 'Professional User'}
                   </h3>
+                  {profile?.username && (
+                    <p className="text-sm text-primary font-medium mb-1">@{profile.username}</p>
+                  )}
                   <p className="text-xs sm:text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
                     AI-Enhanced Profile
