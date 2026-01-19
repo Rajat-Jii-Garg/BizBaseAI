@@ -1,10 +1,11 @@
-// Build version: v3
+// Build version: v4
 import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { BusinessProvider } from "@/contexts/BusinessContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -37,18 +38,27 @@ import FAQ from "./pages/FAQ";
 import ProfileDashboard from "./pages/ProfileDashboard";
 import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 // Business pages
-import { BusinessDashboard, MyBusinesses } from "./pages/Businesses";
+import { 
+  BusinessDashboard, 
+  MyBusinesses,
+  BusinessCRM,
+  BusinessFinance,
+  BusinessTeam,
+  BusinessServices,
+  BusinessProjects
+} from "./pages/Businesses";
 // Username profile resolver
 import UsernameProfile from "./pages/UsernameProfile";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-<QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-        <BrowserRouter>
-          <AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <BusinessProvider>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -164,6 +174,7 @@ const App = () => (
                   <ProfileDashboard />
                 </ProtectedRoute>
               } />
+              
               {/* Business Routes */}
               <Route path="/my-businesses" element={
                 <ProtectedRoute>
@@ -175,12 +186,39 @@ const App = () => (
                   <BusinessDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/business/:businessId/crm" element={
+                <ProtectedRoute>
+                  <BusinessCRM />
+                </ProtectedRoute>
+              } />
+              <Route path="/business/:businessId/finance" element={
+                <ProtectedRoute>
+                  <BusinessFinance />
+                </ProtectedRoute>
+              } />
+              <Route path="/business/:businessId/team" element={
+                <ProtectedRoute>
+                  <BusinessTeam />
+                </ProtectedRoute>
+              } />
+              <Route path="/business/:businessId/services" element={
+                <ProtectedRoute>
+                  <BusinessServices />
+                </ProtectedRoute>
+              } />
+              <Route path="/business/:businessId/projects" element={
+                <ProtectedRoute>
+                  <BusinessProjects />
+                </ProtectedRoute>
+              } />
+              
               {/* Username-based profile route - must be LAST to avoid conflicts */}
               <Route path="/@:username" element={<UsernameProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </AuthProvider>
-        </BrowserRouter>
+          </BusinessProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
