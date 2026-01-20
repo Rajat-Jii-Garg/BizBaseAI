@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import BusinessSidebar from './BusinessSidebar';
+import BusinessHeader from './BusinessHeader';
 import { useBusinessContext } from '@/contexts/BusinessContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -67,9 +68,12 @@ const BusinessLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-background">
       <BusinessSidebar />
-      <main className="ml-64 min-h-screen">
-        {children}
-      </main>
+      <div className="ml-64 flex flex-col min-h-screen">
+        <BusinessHeader />
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
     </div>
   );
 };
