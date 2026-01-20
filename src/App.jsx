@@ -45,7 +45,8 @@ import {
   BusinessFinance,
   BusinessTeam,
   BusinessServices,
-  BusinessProjects
+  BusinessProjects,
+  BusinessSettings
 } from "./pages/Businesses";
 // Username profile resolver
 import UsernameProfile from "./pages/UsernameProfile";
@@ -209,6 +210,11 @@ const App = () => (
               <Route path="/business/:businessId/projects" element={
                 <ProtectedRoute>
                   <BusinessProjects />
+                </ProtectedRoute>
+              } />
+              <Route path="/business/:businessId/settings" element={
+                <ProtectedRoute>
+                  <BusinessSettings />
                 </ProtectedRoute>
               } />
               
