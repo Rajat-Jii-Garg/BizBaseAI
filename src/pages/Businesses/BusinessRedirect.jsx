@@ -1,26 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Briefcase,
-  Plus,
-  Search,
-  MoreHorizontal,
-  Loader2,
-  DollarSign,
-  Image
-} from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import BusinessLayout from '@/components/BusinessLayout';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 
 const BusinessRedirect = () => {
   const { user } = useAuth();
@@ -28,13 +9,19 @@ const BusinessRedirect = () => {
   const [showSplash, setShowSplash] = useState(false);
 
   useEffect(() => {
+    if (!user?.id) return;
+    
     const checkBusiness = async () => {
-      // 🔑 BACKEND / DB CHECK
-      const business = await fetchUserBusiness(user.id);
+      // 🔑 BACKEND CHECK (single source of truth)
+      const { data: business, error } = await supabase
+        .from('businesses')
+        .select('id, slug, status')
+        .eq('owner_user_id', user.id)
+        .eq('status', 'active')
+        .single();
 
-      if (!business) {
-        // ❌ NO BUSINESS → DIRECT SETUP (NO SPLASH)
-        navigate('/business-setup');
+      if (error || !business) {
+        navigate('/business-setup', { replace: true });
         return;
       }
 
@@ -42,17 +29,14 @@ const BusinessRedirect = () => {
       setShowSplash(true);
 
       setTimeout(() => {
-        if (data?.id) {
           navigate(`/business/${data.id}/dashboard`);
-        } else {
-          navigate('/business-setup');
-        }
       }, 3000);
     };
 
     checkBusiness();
-  }, []);
+  }, [user, navigate]);
 
+  // ❌ NO SPLASH UNTIL BUSINESS CONFIRMED
   if (!showSplash) return null;
 
   return (
