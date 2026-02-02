@@ -189,37 +189,44 @@ const App = () => (
                   <BusinessRedirect />
                 </ProtectedRoute>
               } />
-              <Route path="/business/:businessId/dashboard" element={
+
+              <Route path="/business/:slug" element={
+                <ProtectedRoute>
+                  <BusinessLayout />
+                </ProtectedRoute>
+              }>
+
+              <Route path="/business/dashboard" element={
                 <ProtectedRoute>
                   <BusinessDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/business/:businessId/crm" element={
+              <Route path="/business/crm" element={
                 <ProtectedRoute>
                   <BusinessCRM />
                 </ProtectedRoute>
               } />
-              <Route path="/business/:businessId/finance" element={
+              <Route path="/business/finance" element={
                 <ProtectedRoute>
                   <BusinessFinance />
                 </ProtectedRoute>
               } />
-              <Route path="/business/:businessId/team" element={
+              <Route path="/business/team" element={
                 <ProtectedRoute>
                   <BusinessTeam />
                 </ProtectedRoute>
               } />
-              <Route path="/business/:businessId/services" element={
+              <Route path="/business/services" element={
                 <ProtectedRoute>
                   <BusinessServices />
                 </ProtectedRoute>
               } />
-              <Route path="/business/:businessId/projects" element={
+              <Route path="/business/projects" element={
                 <ProtectedRoute>
                   <BusinessProjects />
                 </ProtectedRoute>
               } />
-              <Route path="/business/:businessId/settings" element={
+              <Route path="/business/settings" element={
                 <ProtectedRoute>
                   <BusinessSettings />
                 </ProtectedRoute>

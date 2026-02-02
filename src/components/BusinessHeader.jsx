@@ -53,9 +53,9 @@ const BusinessHeader = () => {
     navigate('/dashboard');
   };
 
-  const handleSwitchBusiness = async (businessId) => {
-    await switchBusiness(businessId);
-    navigate(`/business/${businessId}/dashboard`);
+  const handleSwitchBusiness = async (business) => {
+    await switchBusiness(business.username);
+    navigate(`/business/${business.username}`);
   };
 
   const getInitials = (name) => {

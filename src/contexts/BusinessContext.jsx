@@ -44,52 +44,56 @@ export const BusinessProvider = ({ children }) => {
     }
   }, [user?.id]);
 
-  // Fetch a specific business by ID
-  const fetchBusiness = useCallback(async (businessId) => {
-    if (!businessId) return null;
+  // Fetch a specific business by SLUG -
+  const fetchBusinessBySlug = useCallback(async (slug) => {
+    if (!slug) return null;
 
     try {
       const { data, error } = await supabase
         .from('businesses')
         .select('*')
-        .eq('id', businessId)
+        .eq('username', slug)
         .single();
 
       if (error) throw error;
       return data;
-    } catch (error) {
-      console.error('Error fetching business:', error);
+    } catch (err) {
+      console.error('Error fetching businesses by slug:', err);
       return null;
     }
   }, []);
 
   // Switch to a different business
-  const switchBusiness = useCallback(async (businessId) => {
-    if (!businessId) {
+  const switchBusiness = useCallback(async (slug) => {
+    if (!slug) {
       setCurrentBusiness(null);
       setIsBusinessMode(false);
-      localStorage.removeItem('currentBusinessId');
+      localStorage.removeItem('currentBusinessSlug');
       return;
     }
 
-    const business = await fetchBusiness(businessId);
-    if (business) {
+    if (business && business.owner_id === user?.id) {
       setCurrentBusiness(business);
       setIsBusinessMode(true);
-      localStorage.setItem('currentBusinessId', businessId);
+      localStorage.setItem('currentBusinessSlug', slug);
+    } else {
+      // safety fallback
+      setCurrentBusiness(null);
+      setIsBusinessMode(false);
+      localStorage.removeItem('currentBusinessSlug');
     }
-  }, [fetchBusiness]);
+  }, [fetchBusinessBySlug, user?.id]);
 
   // Exit business mode
   const exitBusinessMode = useCallback(() => {
     setCurrentBusiness(null);
     setIsBusinessMode(false);
-    localStorage.removeItem('currentBusinessId');
+    localStorage.removeItem('currentBusinessSlug');
   }, []);
 
   // Check if user owns the business
-  const isBusinessOwner = useCallback((businessId) => {
-    return businesses.some(b => b.id === businessId);
+  const isBusinessOwner = useCallback((slug) => {
+    return businesses.some(b => b.username === slug);
   }, [businesses]);
 
   // Initialize - fetch businesses and restore last selected business
@@ -106,17 +110,17 @@ export const BusinessProvider = ({ children }) => {
 
   // Restore last selected business from localStorage
   useEffect(() => {
-    const storedBusinessId = localStorage.getItem('currentBusinessId');
-    if (storedBusinessId && businesses.length > 0) {
-      const business = businesses.find(b => b.id === storedBusinessId);
-      if (business) {
+    const storedSlug = localStorage.getItem('currentBSlug');
+    if (storedSlug && businesses.length > 0) {
+      const found = businesses.find(b => b.username === storedSlug);
+      if (found) {
         setCurrentBusiness(business);
         setIsBusinessMode(true);
       }
     }
   }, [businesses]);
 
-  // Subscribe to business changes
+  // Realtime updates Supabase -
   useEffect(() => {
     if (!user?.id) return;
 
@@ -141,7 +145,7 @@ export const BusinessProvider = ({ children }) => {
     loading,
     isBusinessMode,
     fetchBusinesses,
-    fetchBusiness,
+    fetchBusinessBySlug,
     switchBusiness,
     exitBusinessMode,
     isBusinessOwner,

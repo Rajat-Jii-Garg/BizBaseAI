@@ -283,7 +283,7 @@ const BusinessSetup = () => {
 
       // Small delay to ensure event is processed, then redirect
       setTimeout(() => {
-        navigate(`/business/${data.id}/dashboard`);
+        navigate(`/business/${data.username}/dashboard`);
       }, 100);
 
     } catch (error) {

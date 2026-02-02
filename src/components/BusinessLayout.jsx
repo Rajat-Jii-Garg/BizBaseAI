@@ -7,7 +7,7 @@ import { useBusinessContext } from '@/contexts/BusinessContext';
 import { useAuth } from '@/contexts/AuthContext';
 
 const BusinessLayout = ({ children }) => {
-  const { businessId } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { switchBusiness, currentBusiness, loading, isBusinessOwner } = useBusinessContext();
@@ -21,7 +21,7 @@ const BusinessLayout = ({ children }) => {
       }
 
       if (businessId && (!currentBusiness || currentBusiness.id !== businessId)) {
-        await switchBusiness(businessId);
+        await switchBusiness(slug);
       }
       setInitializing(false);
     };

@@ -20,17 +20,17 @@ import { useBusinessContext } from '@/contexts/BusinessContext';
 import { Link } from 'react-router-dom';
 
 const BusinessSidebar = () => {
-  const { businessId } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const { currentBusiness, exitBusinessMode } = useBusinessContext();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: `/business/${businessId}/dashboard` },
-    { icon: Briefcase, label: 'Services', path: `/business/${businessId}/services` },
-    { icon: FolderKanban, label: 'Projects', path: `/business/${businessId}/projects` },
-    { icon: Users, label: 'Team', path: `/business/${businessId}/team` },
-    { icon: UserPlus, label: 'CRM / Leads', path: `/business/${businessId}/crm` },
-    { icon: DollarSign, label: 'Finance', path: `/business/${businessId}/finance` },
+    { icon: LayoutDashboard, label: 'Dashboard', path: `/business/${slug}/dashboard` },
+    { icon: Briefcase, label: 'Services', path: `/business/${slug}/services` },
+    { icon: FolderKanban, label: 'Projects', path: `/business/${slug}/projects` },
+    { icon: Users, label: 'Team', path: `/business/${slug}/team` },
+    { icon: UserPlus, label: 'CRM / Leads', path: `/business/${slug}/crm` },
+    { icon: DollarSign, label: 'Finance', path: `/business/${slug}/finance` },
   ];
 
   const handleBackToPersonal = () => {
