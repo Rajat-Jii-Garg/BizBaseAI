@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -28,20 +28,21 @@ import {
   BookOpen,
   Lightbulb,
   RefreshCw,
-  Edit
+  Edit,
+  ArrowUp
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedPostComposer from '@/components/EnhancedPostComposer';
-import EnhancedPostCard from '@/components/EnhancedPostCard';
+import TrackedPostCard from '@/components/TrackedPostCard';
 import ConnectionsList from '@/components/ConnectionsList';
 import AINetworkingAssistant from '@/components/AINetworkingAssistant';
 import TrendingHashtags from '@/components/TrendingHashtags';
 import { usePosts } from '@/hooks/usePosts';
 import { useConnections } from '@/hooks/useConnections';
-import { useRealTimeEngagement } from '@/hooks/useRealTimeEngagement';
+import { usePersonalizedFeed } from '@/hooks/usePersonalizedFeed';
 import { supabase } from '@/integrations/supabase/client';
 import WelcomeFlow from '@/components/WelcomeFlow';
 import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
@@ -54,19 +55,27 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [showWelcome, setShowWelcome] = useState(true);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
-  const [allPosts, setAllPosts] = useState([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
   const [performanceData, setPerformanceData] = useState(null);
   const [smartConnections, setSmartConnections] = useState([]);
   const [loadingConnections, setLoadingConnections] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const feedContainerRef = React.useRef(null);
   
+  // Use personalized feed hook
   const {
-    posts: userPosts,
-    loading: userPostsLoading,
+    posts: personalizedPosts,
+    loading: loadingPosts,
+    refreshing,
+    hasMore,
+    refreshFeed,
+    loadMore,
+    refetch
+  } = usePersonalizedFeed();
+
+  const {
     createPost,
     editPost,
     deletePost,
-    refreshPosts
   } = usePosts();
   
   const {
@@ -80,6 +89,32 @@ const Dashboard = () => {
     rejectRequest,
     loading: connectionsLoading
   } = useConnections();
+
+  // Handle scroll for infinite loading and scroll-to-top button
+  const handleScroll = useCallback(() => {
+    const scrollTop = window.scrollY;
+    setShowScrollTop(scrollTop > 500);
+
+    // Infinite scroll - load more when near bottom
+    if (
+      window.innerHeight + scrollTop >= document.documentElement.scrollHeight - 1000 &&
+      hasMore &&
+      !loadingPosts &&
+      !refreshing
+    ) {
+      loadMore();
+    }
+  }, [hasMore, loadingPosts, refreshing, loadMore]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Fetch performance analytics (last 7 days)
   const fetchPerformanceData = async () => {
@@ -157,111 +192,8 @@ const Dashboard = () => {
     }
   };
 
-  const fetchAllPosts = async () => {
-    if (!user) return;
-    
-    try {
-      console.log('Dashboard: Fetching all posts...');
-      setLoadingPosts(true);
-      
-      // First get all posts
-      const { data: postsData, error: postsError } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (postsError) {
-        console.error('Dashboard: Error fetching posts:', postsError);
-        throw postsError;
-      }
-
-      console.log('Dashboard: Posts fetched:', postsData?.length || 0);
-
-      if (!postsData || postsData.length === 0) {
-        setAllPosts([]);
-        setLoadingPosts(false);
-        return;
-      }
-
-      // Get unique user IDs
-      const userIds = Array.from(new Set(postsData.map(post => post.user_id)));
-      console.log('Dashboard: Fetching profiles for user IDs:', userIds);
-
-      // Fetch profiles separately
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name, avatar_url, current_position, company_name, username')
-        .in('id', userIds);
-
-      if (profilesError) {
-        console.error('Dashboard: Error fetching profiles:', profilesError);
-      }
-
-      // Create profiles map
-      const profilesMap = new Map();
-      profilesData?.forEach(profile => {
-        profilesMap.set(profile.id, profile);
-      });
-
-      // Check likes and reposts for current user
-      let likedPostIds = new Set();
-      let repostedPostIds = new Set();
-      if (user) {
-        const postIds = postsData.map(post => post.id);
-        
-        // Check likes
-        const { data: likes } = await supabase
-          .from('post_likes')
-          .select('post_id')
-          .eq('user_id', user.id)
-          .in('post_id', postIds);
-
-        likedPostIds = new Set(likes?.map(like => like.post_id) || []);
-
-        // Check reposts
-        const { data: reposts } = await supabase
-          .from('post_reposts')
-          .select('post_id')
-          .eq('user_id', user.id)
-          .in('post_id', postIds);
-
-        repostedPostIds = new Set(reposts?.map(repost => repost.post_id) || []);
-      }
-
-      // Combine data
-      const enrichedPosts = postsData.map(post => ({
-        ...post,
-        likes_count: post.likes_count || 0,
-        comments_count: post.comments_count || 0,
-        shares_count: post.shares_count || 0,
-        reposts_count: post.reposts_count || 0,
-        profiles: profilesMap.get(post.user_id) || { 
-          full_name: 'Unknown User',
-          avatar_url: null,
-          current_position: null,
-          company_name: null
-        },
-        user_has_liked: likedPostIds.has(post.id),
-        user_has_reposted: repostedPostIds.has(post.id)
-      }));
-
-      console.log('Dashboard: Final enriched posts:', enrichedPosts);
-      setAllPosts(enrichedPosts);
-    } catch (error) {
-      console.error('Dashboard: Error fetching all posts:', error);
-      toast.error("Error", { description: "Failed to load posts" });
-    } finally {
-      setLoadingPosts(false);
-    }
-  };
-
-  // Real-time engagement hook
-  useRealTimeEngagement(fetchAllPosts);
-
   useEffect(() => {
     if (user && !authLoading) {
-      fetchAllPosts();
       fetchPerformanceData();
       fetchSmartConnections();
       
@@ -276,7 +208,7 @@ const Dashboard = () => {
     console.log('Dashboard: Creating post with content:', content, 'mediaUrl:', mediaUrl);
     try {
       await createPost(content, mediaUrl);
-      await fetchAllPosts(); // Refresh all posts after creation
+      await refetch(); // Refresh personalized feed after creation
     } catch (error) {
       console.error('Dashboard: Error creating post:', error);
     }
@@ -533,18 +465,46 @@ const Dashboard = () => {
             </div>
 
             {/* Main Content Feed */}
-            <div className="lg:col-span-6 space-y-6">
+            <div className="lg:col-span-6 space-y-6" ref={feedContainerRef}>
+              {/* Feed Header with Refresh */}
+              <Card className="bg-white shadow-lg border-0">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg">
+                        <Sparkles className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Your Personalized Feed</h3>
+                        <p className="text-xs text-gray-500">Content tailored for you based on your interests</p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={refreshFeed}
+                      disabled={refreshing}
+                      className="flex items-center gap-2"
+                    >
+                      <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                      {refreshing ? 'Refreshing...' : 'Refresh'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               <EnhancedPostComposer onCreatePost={handleCreatePost} />
 
               <div className="space-y-6">
-                {loadingPosts ? (
+                {loadingPosts && personalizedPosts.length === 0 ? (
                   <Card className="bg-white shadow-lg border-0">
                     <CardContent className="p-12 text-center">
                       <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-600" />
                       <p className="text-gray-600 text-lg">Loading your personalized feed...</p>
+                      <p className="text-gray-500 text-sm mt-2">Analyzing your interests and connections...</p>
                     </CardContent>
                   </Card>
-                ) : allPosts.length === 0 ? (
+                ) : personalizedPosts.length === 0 ? (
                   <Card className="bg-white shadow-lg border-0">
                     <CardContent className="p-12 text-center">
                       <div className="text-gray-400 mb-6">
@@ -567,15 +527,43 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  allPosts.map((post) => (
-                    <EnhancedPostCard
-                      key={post.id}
-                      post={post}
-                      onEngagementUpdate={fetchAllPosts}
-                      onEdit={editPost}
-                      onDelete={deletePost}
-                    />
-                  ))
+                  <>
+                    {personalizedPosts.map((post) => (
+                      <TrackedPostCard
+                        key={post.id}
+                        post={post}
+                        onEngagementUpdate={refetch}
+                        onEdit={editPost}
+                        onDelete={deletePost}
+                      />
+                    ))}
+                    
+                    {/* Load More / Loading Indicator */}
+                    {hasMore && (
+                      <div className="text-center py-6">
+                        {loadingPosts ? (
+                          <div className="flex items-center justify-center gap-3">
+                            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                            <span className="text-gray-600">Loading more posts...</span>
+                          </div>
+                        ) : (
+                          <Button variant="outline" onClick={loadMore}>
+                            Load More Posts
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                    
+                    {!hasMore && personalizedPosts.length > 0 && (
+                      <div className="text-center py-6">
+                        <p className="text-gray-500 text-sm">You've seen all the latest posts!</p>
+                        <Button variant="ghost" size="sm" className="mt-2" onClick={refreshFeed}>
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Refresh for new content
+                        </Button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -728,6 +716,17 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 rounded-full w-12 h-12 p-0 bg-blue-600 hover:bg-blue-700 shadow-lg"
+          size="icon"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
+      )}
     </DashboardLayout>
   );
 };

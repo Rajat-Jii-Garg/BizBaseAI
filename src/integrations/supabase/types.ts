@@ -1473,6 +1473,79 @@ export type Database = {
         }
         Relationships: []
       }
+      user_content_interactions: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_type: string
+          post_id: string
+          user_id: string
+          view_duration_seconds: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_type: string
+          post_id: string
+          user_id: string
+          view_duration_seconds?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_type?: string
+          post_id?: string
+          user_id?: string
+          view_duration_seconds?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_content_interactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_creator_affinity: {
+        Row: {
+          affinity_score: number | null
+          created_at: string
+          creator_id: string
+          id: string
+          last_interaction_at: string
+          total_interactions: number | null
+          user_id: string
+        }
+        Insert: {
+          affinity_score?: number | null
+          created_at?: string
+          creator_id: string
+          id?: string
+          last_interaction_at?: string
+          total_interactions?: number | null
+          user_id: string
+        }
+        Update: {
+          affinity_score?: number | null
+          created_at?: string
+          creator_id?: string
+          id?: string
+          last_interaction_at?: string
+          total_interactions?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_creator_affinity_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_education: {
         Row: {
           created_at: string
@@ -1557,6 +1630,72 @@ export type Database = {
         }
         Relationships: []
       }
+      user_feed_preferences: {
+        Row: {
+          created_at: string
+          discovery_ratio: number | null
+          id: string
+          last_feed_refresh_at: string | null
+          preferred_content_types: Json | null
+          preferred_post_length: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          discovery_ratio?: number | null
+          id?: string
+          last_feed_refresh_at?: string | null
+          preferred_content_types?: Json | null
+          preferred_post_length?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          discovery_ratio?: number | null
+          id?: string
+          last_feed_refresh_at?: string | null
+          preferred_content_types?: Json | null
+          preferred_post_length?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_interests: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_count: number | null
+          interest_type: string
+          interest_value: string
+          last_updated_at: string
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_count?: number | null
+          interest_type: string
+          interest_value: string
+          last_updated_at?: string
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_count?: number | null
+          interest_type?: string
+          interest_value?: string
+          last_updated_at?: string
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_languages: {
         Row: {
           created_at: string
@@ -1631,6 +1770,7 @@ export type Database = {
         }
         Returns: string
       }
+      decay_user_interests: { Args: never; Returns: undefined }
       generate_otp: { Args: never; Returns: string }
       get_entity_by_username: {
         Args: { search_username: string }
