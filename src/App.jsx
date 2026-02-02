@@ -37,7 +37,6 @@ import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import ProfileDashboard from "./pages/ProfileDashboard";
 import ProfilePreviewPage from "./pages/ProfilePreviewPage";
-import BusinessRedirect from "./pages/Businesses/BusinessRedirect";
 
 // Business pages
 import { 
@@ -45,6 +44,7 @@ import {
   MyBusinesses,
   BusinessCRM,
   BusinessFinance,
+  BusinessRedirect,
   BusinessTeam,
   BusinessServices,
   BusinessProjects,
