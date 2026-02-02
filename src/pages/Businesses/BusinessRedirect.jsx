@@ -29,7 +29,7 @@ const BusinessRedirect = () => {
       setShowSplash(true);
 
       setTimeout(() => {
-          navigate(`/business/${data.id}/dashboard`);
+          navigate(`/business/:businessId/dashboard`);
       }, 3000);
     };
 
