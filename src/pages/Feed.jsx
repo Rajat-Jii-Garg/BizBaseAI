@@ -1,128 +1,54 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Users, MessageSquare, Share2, Loader2 } from 'lucide-react';
+import { TrendingUp, Users, MessageSquare, Share2, Loader2, RefreshCw, Sparkles } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
-import EnhancedPostCard from '@/components/EnhancedPostCard';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import TrackedPostCard from '@/components/TrackedPostCard';
+import { usePersonalizedFeed } from '@/hooks/usePersonalizedFeed';
+import { usePosts } from '@/hooks/usePosts';
 
 const Feed = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    posts,
+    loading,
+    refreshing,
+    hasMore,
+    refreshFeed,
+    loadMore,
+    refetch
+  } = usePersonalizedFeed();
 
-  useEffect(() => {
-    if (user) {
-      fetchAllPosts();
-      setupRealTimeSubscription();
-    }
-  }, [user]);
-
-  const fetchAllPosts = async () => {
-    if (!user) return;
-    
-    try {
-      setLoading(true);
-      
-      const { data: posts, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          profiles!posts_user_id_fkey (
-            id,
-            full_name,
-            avatar_url,
-            current_position,
-            company_name
-          ),
-          post_likes!left (
-            user_id
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      const processedPosts = posts?.map(post => ({
-        ...post,
-        user_has_liked: post.post_likes?.some((like) => like.user_id === user.id) || false
-      })) || [];
-
-      setPosts(processedPosts);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load posts",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const setupRealTimeSubscription = () => {
-    const channel = supabase
-      .channel('posts_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'posts'
-        },
-        (payload) => {
-          console.log('Real-time post update:', payload);
-          fetchAllPosts(); // Refresh posts on any change
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'post_likes'
-        },
-        (payload) => {
-          console.log('Real-time like update:', payload);
-          fetchAllPosts(); // Refresh posts on like changes
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'post_comments'
-        },
-        (payload) => {
-          console.log('Real-time comment update:', payload);
-          fetchAllPosts(); // Refresh posts on comment changes
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
+  const { editPost, deletePost } = usePosts();
 
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
-              Professional Feed
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-blue-600" />
+                Professional Feed
+              </CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshFeed}
+                disabled={refreshing}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                {refreshing ? 'Refreshing...' : 'Refresh'}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-500" />
+                <span>Personalized for You</span>
+              </div>
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
                 <span>Your Network</span>
@@ -131,16 +57,12 @@ const Feed = () => {
                 <MessageSquare className="w-4 h-4" />
                 <span>Latest Updates</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Share2 className="w-4 h-4" />
-                <span>Trending Content</span>
-              </div>
             </div>
           </CardContent>
         </Card>
 
         <div className="space-y-6">
-          {loading ? (
+          {loading && posts.length === 0 ? (
             <div className="text-center py-12">
               <Loader2 className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
               <p className="text-gray-600">Loading your personalized feed...</p>
@@ -154,13 +76,42 @@ const Feed = () => {
               </CardContent>
             </Card>
           ) : (
-            posts.map((post) => (
-              <EnhancedPostCard
-                key={post.id}
-                post={post}
-                onEngagementUpdate={fetchAllPosts}
-              />
-            ))
+            <>
+              {posts.map((post) => (
+                <TrackedPostCard
+                  key={post.id}
+                  post={post}
+                  onEngagementUpdate={refetch}
+                  onEdit={editPost}
+                  onDelete={deletePost}
+                />
+              ))}
+              
+              {hasMore && (
+                <div className="text-center py-6">
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                      <span className="text-gray-600">Loading more posts...</span>
+                    </div>
+                  ) : (
+                    <Button variant="outline" onClick={loadMore}>
+                      Load More Posts
+                    </Button>
+                  )}
+                </div>
+              )}
+              
+              {!hasMore && posts.length > 0 && (
+                <div className="text-center py-6">
+                  <p className="text-gray-500 text-sm">You've seen all the latest posts!</p>
+                  <Button variant="ghost" size="sm" className="mt-2" onClick={refreshFeed}>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Refresh for new content
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
