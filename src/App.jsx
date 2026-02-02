@@ -4,8 +4,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { BusinessProvider } from "@/contexts/BusinessContext";
+import { useAuth } from '../contexts/AuthContext';
+import { useBusinessContext } from '../contexts/BusinessContext';
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -26,7 +26,7 @@ import Events from "./pages/Events";
 import Insights from "./pages/Insights";
 import AIAssistant from "./pages/AIAssistant";
 import BusinessSetup from "./pages/BusinessSetup";
-import BusinessLayout from "@/components/BusinessLayout";
+import BusinessLayout from "./components/BusinessLayout";
 import Jobs from "./pages/Jobs";
 import CRM from "./pages/CRM";
 import Projects from "./pages/Projects";
@@ -191,44 +191,14 @@ const App = () => (
                   <BusinessLayout />
                 </ProtectedRoute>
               }>
-
               <Route index element={<BusinessDashboard />} />
-
-              <Route path="dashboard" element={
-                <ProtectedRoute>
-                  <BusinessDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="crm" element={
-                <ProtectedRoute>
-                  <BusinessCRM />
-                </ProtectedRoute>
-              } />
-              <Route path="finance" element={
-                <ProtectedRoute>
-                  <BusinessFinance />
-                </ProtectedRoute>
-              } />
-              <Route path="team" element={
-                <ProtectedRoute>
-                  <BusinessTeam />
-                </ProtectedRoute>
-              } />
-              <Route path="services" element={
-                <ProtectedRoute>
-                  <BusinessServices />
-                </ProtectedRoute>
-              } />
-              <Route path="projects" element={
-                <ProtectedRoute>
-                  <BusinessProjects />
-                </ProtectedRoute>
-              } />
-              <Route path="settings" element={
-                <ProtectedRoute>
-                  <BusinessSettings />
-                </ProtectedRoute>
-              } />
+              <Route path="dashboard" element={<BusinessDashboard />} />
+              <Route path="crm" element={<BusinessCRM />} />
+              <Route path="finance" element={<BusinessFinance />} />
+              <Route path="team" element={<BusinessTeam />} />
+              <Route path="projects" element={<BusinessProjects />} />
+              <Route path="settings" element={<BusinessSettings />} />
+              <Route path="services" element={<BusinessServices />} />
               
               {/* Username-based profile route - must be LAST to avoid conflicts */}
               <Route path="/@:username" element={<UsernameProfile />} />

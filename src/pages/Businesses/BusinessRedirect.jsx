@@ -11,8 +11,10 @@ const BusinessRedirect = () => {
   const [showSplash, setShowSplash] = useState(false);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user) return;
     
+    let cancelled = false;
+
     const checkBusiness = async () => {
       // 🔑 BACKEND CHECK (single source of truth)
       const { data: business, error } = await supabase
@@ -21,6 +23,8 @@ const BusinessRedirect = () => {
         .eq('owner_id', user.id)
         .eq('status', 'active')
         .maybesingle();
+
+      if (cancelled) return;
 
       if (error || !business) {
         navigate('/business-setup', { replace: true });
@@ -36,6 +40,7 @@ const BusinessRedirect = () => {
     };
 
     checkBusiness();
+    return () => { cancelled = true; };
   }, [user, navigate]);
 
   // ❌ NO SPLASH UNTIL BUSINESS CONFIRMED
