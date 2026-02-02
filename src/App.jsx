@@ -26,6 +26,7 @@ import Events from "./pages/Events";
 import Insights from "./pages/Insights";
 import AIAssistant from "./pages/AIAssistant";
 import BusinessSetup from "./pages/BusinessSetup";
+import BusinessLayout from "@/components/BusinessLayout";
 import Jobs from "./pages/Jobs";
 import CRM from "./pages/CRM";
 import Projects from "./pages/Projects";
@@ -164,11 +165,6 @@ const App = () => (
                   <Settings />
                 </ProtectedRoute>
               } />
-              <Route path="/dashboard/business-setup" element={
-                <ProtectedRoute>
-                  <BusinessSetup />
-                </ProtectedRoute>
-              } />
               <Route path="/demo" element={<Demo />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
@@ -184,7 +180,7 @@ const App = () => (
                   <MyBusinesses />
                 </ProtectedRoute>
               } />
-              <Route path="/business-redirect" element={
+              <Route path="/business" element={
                 <ProtectedRoute>
                   <BusinessRedirect />
                 </ProtectedRoute>
@@ -196,37 +192,39 @@ const App = () => (
                 </ProtectedRoute>
               }>
 
-              <Route path="/business/dashboard" element={
+              <Route index element={<BusinessDashboard />} />
+
+              <Route path="dashboard" element={
                 <ProtectedRoute>
                   <BusinessDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/business/crm" element={
+              <Route path="crm" element={
                 <ProtectedRoute>
                   <BusinessCRM />
                 </ProtectedRoute>
               } />
-              <Route path="/business/finance" element={
+              <Route path="finance" element={
                 <ProtectedRoute>
                   <BusinessFinance />
                 </ProtectedRoute>
               } />
-              <Route path="/business/team" element={
+              <Route path="team" element={
                 <ProtectedRoute>
                   <BusinessTeam />
                 </ProtectedRoute>
               } />
-              <Route path="/business/services" element={
+              <Route path="services" element={
                 <ProtectedRoute>
                   <BusinessServices />
                 </ProtectedRoute>
               } />
-              <Route path="/business/projects" element={
+              <Route path="projects" element={
                 <ProtectedRoute>
                   <BusinessProjects />
                 </ProtectedRoute>
               } />
-              <Route path="/business/settings" element={
+              <Route path="settings" element={
                 <ProtectedRoute>
                   <BusinessSettings />
                 </ProtectedRoute>

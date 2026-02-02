@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Outlet, useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import BusinessSidebar from './BusinessSidebar';
 import BusinessHeader from './BusinessHeader';
 import { useBusinessContext } from '@/contexts/BusinessContext';
 import { useAuth } from '@/contexts/AuthContext';
 
-const BusinessLayout = ({ children }) => {
+const BusinessLayout = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -20,22 +20,22 @@ const BusinessLayout = ({ children }) => {
         return;
       }
 
-      if (businessId && (!currentBusiness || currentBusiness.id !== businessId)) {
+      if (slug && (!currentBusiness || currentBusiness.username !== slug)) {
         await switchBusiness(slug);
       }
       setInitializing(false);
     };
 
     initBusiness();
-  }, [businessId, user, currentBusiness, switchBusiness, navigate]);
+  }, [slug, user, currentBusiness, switchBusiness, navigate]);
 
   // Check if user owns this business
   useEffect(() => {
-    if (!loading && !initializing && businessId && !isBusinessOwner(businessId)) {
+    if (!loading && !initializing && slug && currentBusiness && !isBusinessOwner(slug)) {
       // User doesn't own this business - redirect
       navigate('/dashboard');
     }
-  }, [loading, initializing, businessId, isBusinessOwner, navigate]);
+  }, [loading, initializing, slug, isBusinessOwner, navigate]);
 
   if (loading || initializing) {
     return (
@@ -71,7 +71,7 @@ const BusinessLayout = ({ children }) => {
       <div className="ml-64 flex flex-col min-h-screen">
         <BusinessHeader />
         <main className="flex-1 overflow-auto">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>
