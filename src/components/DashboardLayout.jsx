@@ -193,6 +193,12 @@ const DashboardLayout = ({ children }) => {
                     <Brain className="mr-3 h-4 w-4" />
                     <span>AI Assistant</span>
                   </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => navigate('/business/${businessId}/dashboard')} className="cursor-pointer p-3">
+                    <Building2 className="mr-3 h-4 w-4 text-indigo-600" />
+                    <span>Go to Business Dashboard</span>
+                  </DropdownMenuItem>
+
                   {/* <DropdownMenuItem className="cursor-pointer p-3">
                     <Star className="mr-3 h-4 w-4" />
                     <span>Premium Features</span>
