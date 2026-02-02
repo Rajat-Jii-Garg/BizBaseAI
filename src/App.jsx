@@ -44,6 +44,7 @@ import {
   BusinessCRM,
   BusinessFinance,
   BusinessTeam,
+  BusinessRedirect,
   BusinessServices,
   BusinessProjects,
   BusinessSettings
