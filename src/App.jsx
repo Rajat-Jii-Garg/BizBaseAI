@@ -182,6 +182,11 @@ const App = () => (
                   <MyBusinesses />
                 </ProtectedRoute>
               } />
+              <Route path="/business-redirect" element={
+                <ProtectedRoute>
+                  <BusinessRedirect />
+                </ProtectedRoute>
+              } />
               <Route path="/business/:businessId/dashboard" element={
                 <ProtectedRoute>
                   <BusinessDashboard />
