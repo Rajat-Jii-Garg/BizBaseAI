@@ -25,17 +25,21 @@ import { toast } from 'sonner';
 const BusinessRedirect = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [showSplash, setShowSplash] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    const checkBusiness = async () => {
+      // 🔑 BACKEND / DB CHECK
+      const business = await fetchUserBusiness(user.id);
 
-    const resolveBusiness = async () => {
-      const { data, error } = await supabase
-        .from('businesses')
-        .select('id')
-        .eq('owner_user_id', user.id)
-        .limit(1)
-        .single();
+      if (!business) {
+        // ❌ NO BUSINESS → DIRECT SETUP (NO SPLASH)
+        navigate('/business-setup');
+        return;
+      }
+
+      // ✅ BUSINESS EXISTS → SHOW SPLASH
+      setShowSplash(true);
 
       setTimeout(() => {
         if (data?.id) {
@@ -46,17 +50,19 @@ const BusinessRedirect = () => {
       }, 3000);
     };
 
-    resolveBusiness();
-  }, [user]);
+    checkBusiness();
+  }, []);
+
+  if (!showSplash) return null;
 
   return (
     <div className="h-screen flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
       <div className="text-center animate-pulse">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold mb-2">
           Welcome to Business Dashboard
         </h1>
-        <p className="mt-2 text-sm opacity-90">
-          Setting up your business workspace...
+        <p className="text-sm opacity-90">
+          Loading your business workspace...
         </p>
       </div>
     </div>
