@@ -194,7 +194,7 @@ const DashboardLayout = ({ children }) => {
                     <span>AI Assistant</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem onClick={() => navigate('/business-redirect')} className="cursor-pointer p-3">
+                  <DropdownMenuItem onClick={() => navigate('/business')} className="cursor-pointer p-3">
                     <Building2 className="mr-3 h-4 w-4 text-indigo-600" />
                     <span>Go to Business Dashboard</span>
                   </DropdownMenuItem>
