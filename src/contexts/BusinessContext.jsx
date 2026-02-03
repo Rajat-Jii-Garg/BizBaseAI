@@ -64,7 +64,12 @@ export const BusinessProvider = ({ children }) => {
   }, []);
 
   // Switch to a different business
-  const switchBusiness = useCallback(async (slug) => {
+  const switchBusiness = useCallback(async (businessOrSlug) => {
+    // Handle both business object and slug string
+    const slug = typeof businessOrSlug === 'string' 
+      ? businessOrSlug 
+      : businessOrSlug?.username;
+    
     if (!slug) {
       setCurrentBusiness(null);
       setIsBusinessMode(false);
@@ -72,14 +77,19 @@ export const BusinessProvider = ({ children }) => {
       return;
     }
 
-    const business = await fetchBusinessBySlug(slug);
+    // If we already have the business object, use it directly
+    let business = typeof businessOrSlug === 'object' ? businessOrSlug : null;
+    
+    // Otherwise fetch it
+    if (!business) {
+      business = await fetchBusinessBySlug(slug);
+    }
 
     if (business && business.owner_id === user?.id) {
-      setCurrentBusiness(found);
+      setCurrentBusiness(business);
       setIsBusinessMode(true);
       localStorage.setItem('currentBusinessSlug', slug);
     } else {
-      // safety fallback
       setCurrentBusiness(null);
       setIsBusinessMode(false);
       localStorage.removeItem('currentBusinessSlug');
