@@ -156,12 +156,9 @@ const Login = () => {
                   />
                   <Label htmlFor="remember-me" className="text-sm text-gray-600">Remember me</Label>
                 </div>
-                <button
-                  type="button"
-                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                  Forgot password?
-                </button>
+                <Link to="/forget-password" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                  Forget password?
+                </Link>
               </div>
               
               <Button 
