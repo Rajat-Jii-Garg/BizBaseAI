@@ -142,9 +142,6 @@ export const usePersonalizedFeed = () => {
   // Refresh feed
   const refreshFeed = useCallback(async () => {
     await fetchPersonalizedFeed(true, 0);
-    toast.success('Feed refreshed!', { 
-      description: 'Showing latest personalized content'
-    });
   }, [fetchPersonalizedFeed]);
 
   // Load more posts
