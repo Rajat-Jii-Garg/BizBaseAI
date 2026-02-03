@@ -131,17 +131,15 @@ const UserProfileDropdown = () => {
 
   // Go to Business Dashboard - redirects based on whether user has businesses
   const handleGoToBusinessDashboard = () => {
+    setOpen(false);
+    
     if (businesses.length === 0) {
       // No business registered - go to setup page
       navigate('/business-setup');
-    } else if (businesses.length === 1) {
-      // Single business - go directly to its dashboard
-      navigate(`/business/${businesses[0].id}/dashboard`);
     } else {
-      // Multiple businesses - go to business selector
-      navigate('/my-businesses');
+      // Has business(es) - go to redirect page which shows splash and routes properly
+      navigate('/business');
     }
-    setOpen(false);
   };
 
   const getInitials = (name) => {
