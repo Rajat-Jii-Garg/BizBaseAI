@@ -95,6 +95,11 @@ const Dashboard = () => {
     const scrollTop = window.scrollY;
     setShowScrollTop(scrollTop > 500);
 
+    // 🔥 Auto refresh when user reaches top
+    if (scrollTop === 0 && !refreshing) {
+      refreshFeed();
+    }
+
     // Infinite scroll - load more when near bottom
     if (
       window.innerHeight + scrollTop >= document.documentElement.scrollHeight - 1000 &&
@@ -104,7 +109,11 @@ const Dashboard = () => {
     ) {
       loadMore();
     }
-  }, [hasMore, loadingPosts, refreshing, loadMore]);
+  }, [hasMore, loadingPosts, refreshing, loadMore, refreshFeed]);
+
+  useEffect(() => {
+    refreshFeed(); // always fetch latest feed on page open
+  }, []);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -382,7 +391,7 @@ const Dashboard = () => {
                     {profile?.full_name || 'Professional User'}
                   </h3>
                   {profile?.username && (
-                    <p className="text-sm text-primary font-medium mb-1">@{profile.username}</p>
+                    <p className="text-sm text-primary font-medium mb-1" onClick={() => navigate('/profile-dashboard')}>@{profile.username}</p>
                   )}
                   <p className="text-xs sm:text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
@@ -466,33 +475,6 @@ const Dashboard = () => {
 
             {/* Main Content Feed */}
             <div className="lg:col-span-6 space-y-6" ref={feedContainerRef}>
-              {/* Feed Header with Refresh */}
-              <Card className="bg-white shadow-lg border-0">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg">
-                        <Sparkles className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">Your Personalized Feed</h3>
-                        <p className="text-xs text-gray-500">Content tailored for you based on your interests</p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={refreshFeed}
-                      disabled={refreshing}
-                      className="flex items-center gap-2"
-                    >
-                      <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                      {refreshing ? 'Refreshing...' : 'Refresh'}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
               <EnhancedPostComposer onCreatePost={handleCreatePost} />
 
               <div className="space-y-6">
