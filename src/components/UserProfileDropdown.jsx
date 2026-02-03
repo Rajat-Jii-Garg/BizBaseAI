@@ -129,10 +129,16 @@ const UserProfileDropdown = () => {
     setOpen(false);
   };
 
-  const handleSwitchBusiness = () => {
-    if (businesses.length === 1) {
+  // Go to Business Dashboard - redirects based on whether user has businesses
+  const handleGoToBusinessDashboard = () => {
+    if (businesses.length === 0) {
+      // No business registered - go to setup page
+      navigate('/business-setup');
+    } else if (businesses.length === 1) {
+      // Single business - go directly to its dashboard
       navigate(`/business/${businesses[0].id}/dashboard`);
     } else {
+      // Multiple businesses - go to business selector
       navigate('/my-businesses');
     }
     setOpen(false);
@@ -196,21 +202,28 @@ const UserProfileDropdown = () => {
               <Brain className="w-4 h-4" /> AI Assistant
             </button>
             
-            {/* Switch Business Mode - Only show if user has businesses */}
-            {hasBusinesses && (
-              <button 
-                className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
-                onClick={handleSwitchBusiness}
-              >
-                <Building2 className="w-4 h-4" /> 
-                Switch to Business
-                {businesses.length > 1 && (
-                  <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                    {businesses.length}
-                  </span>
-                )}
-              </button>
-            )}
+            {/* Go to Business Dashboard - Always visible */}
+            <button 
+              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+              onClick={handleGoToBusinessDashboard}
+              disabled={loadingBusinesses}
+            >
+              <Building2 className="w-4 h-4" /> 
+              {loadingBusinesses ? (
+                'Loading...'
+              ) : hasBusinesses ? (
+                <>
+                  Go to Business Dashboard
+                  {businesses.length > 1 && (
+                    <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                      {businesses.length}
+                    </span>
+                  )}
+                </>
+              ) : (
+                'Register Business'
+              )}
+            </button>
             
             <button 
               className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
