@@ -391,7 +391,7 @@ const Dashboard = () => {
                     {profile?.full_name || 'Professional User'}
                   </h3>
                   {profile?.username && (
-                    <p className="text-sm text-primary font-medium mb-1" onClick={() => navigate('/profile-dashboard')}>@{profile.username}</p>
+                    <p className="text-sm text-primary font-medium mb-1 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => navigate('/profile-dashboard')}>@{profile.username}</p>
                   )}
                   <p className="text-xs sm:text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
