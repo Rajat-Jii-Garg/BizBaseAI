@@ -1,8 +1,7 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Users, MessageSquare, Share2, Loader2, RefreshCw, Sparkles } from 'lucide-react';
+import { MessageSquare, Loader2 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import TrackedPostCard from '@/components/TrackedPostCard';
 import { usePersonalizedFeed } from '@/hooks/usePersonalizedFeed';
@@ -23,43 +22,7 @@ const Feed = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-                Professional Feed
-              </CardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={refreshFeed}
-                disabled={refreshing}
-                className="flex items-center gap-2"
-              >
-                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                {refreshing ? 'Refreshing...' : 'Refresh'}
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-500" />
-                <span>Personalized for You</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                <span>Your Network</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" />
-                <span>Latest Updates</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-4">
 
         <div className="space-y-6">
           {loading && posts.length === 0 ? (
@@ -104,11 +67,7 @@ const Feed = () => {
               
               {!hasMore && posts.length > 0 && (
                 <div className="text-center py-6">
-                  <p className="text-gray-500 text-sm">You've seen all the latest posts!</p>
-                  <Button variant="ghost" size="sm" className="mt-2" onClick={refreshFeed}>
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Refresh for new content
-                  </Button>
+                  <p className="text-muted-foreground text-sm">You've seen all the latest posts!</p>
                 </div>
               )}
             </>
