@@ -4,8 +4,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useAuth } from '../contexts/AuthContext';
-import { useBusinessContext } from '../contexts/BusinessContext';
+import { useAuth, AuthProvider } from '../contexts/AuthContext';
+import { useBusinessContext, BusinessProvider } from '../contexts/BusinessContext';
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -191,15 +191,15 @@ const App = () => (
                   <BusinessLayout />
                 </ProtectedRoute>
               }>
-              <Route index element={<BusinessDashboard />} />
-              <Route path="dashboard" element={<BusinessDashboard />} />
-              <Route path="crm" element={<BusinessCRM />} />
-              <Route path="finance" element={<BusinessFinance />} />
-              <Route path="team" element={<BusinessTeam />} />
-              <Route path="projects" element={<BusinessProjects />} />
-              <Route path="settings" element={<BusinessSettings />} />
-              <Route path="services" element={<BusinessServices />} />
-              
+                <Route index element={<BusinessDashboard />} />
+                <Route path="dashboard" element={<BusinessDashboard />} />
+                <Route path="crm" element={<BusinessCRM />} />
+                <Route path="finance" element={<BusinessFinance />} />
+                <Route path="team" element={<BusinessTeam />} />
+                <Route path="projects" element={<BusinessProjects />} />
+                <Route path="settings" element={<BusinessSettings />} />
+                <Route path="services" element={<BusinessServices />} />
+              </Route>
               {/* Username-based profile route - must be LAST to avoid conflicts */}
               <Route path="/@:username" element={<UsernameProfile />} />
               <Route path="*" element={<NotFound />} />

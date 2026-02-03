@@ -136,7 +136,7 @@ const BusinessHeader = () => {
                     {businesses.filter(b => b.id !== currentBusiness?.id).map((business) => (
                       <DropdownMenuItem 
                         key={business.id}
-                        onClick={() => handleSwitchBusiness(business.id)}
+                        onClick={() => handleSwitchBusiness(business)}
                         className="cursor-pointer"
                       >
                         <Avatar className="w-6 h-6 mr-2">

@@ -72,8 +72,10 @@ export const BusinessProvider = ({ children }) => {
       return;
     }
 
+    const business = await fetchBusinessBySlug(slug);
+
     if (business && business.owner_id === user?.id) {
-      setCurrentBusiness(business);
+      setCurrentBusiness(found);
       setIsBusinessMode(true);
       localStorage.setItem('currentBusinessSlug', slug);
     } else {
@@ -110,11 +112,11 @@ export const BusinessProvider = ({ children }) => {
 
   // Restore last selected business from localStorage
   useEffect(() => {
-    const storedSlug = localStorage.getItem('currentBSlug');
+    const storedSlug = localStorage.getItem('currentBusinessSlug');
     if (storedSlug && businesses.length > 0) {
       const found = businesses.find(b => b.username === storedSlug);
       if (found) {
-        setCurrentBusiness(business);
+        setCurrentBusiness(found);
         setIsBusinessMode(true);
       }
     }
