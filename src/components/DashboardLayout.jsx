@@ -86,8 +86,8 @@ const DashboardLayout = ({ children }) => {
             {/* Logo & Brand */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl">
-                  <Network className="w-7 h-7 text-white" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl">
+                  <Network className="w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <div className="hidden md:block">
                   <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
@@ -102,14 +102,14 @@ const DashboardLayout = ({ children }) => {
             </div>
 
             {/* Enhanced Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+            <div className="hidden md:flex flex-1 max-w-2xl mx-6">
               <SearchBar />
             </div>
 
             {/* Right Section */}
             <div className="flex items-center space-x-2 sm:space-x-3">
               {/* Search - Mobile */}
-              <div className="lg:hidden">
+              <div className="md:hidden">
                 <SearchBar />
               </div>
 
