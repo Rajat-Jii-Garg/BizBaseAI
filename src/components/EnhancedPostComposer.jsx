@@ -255,9 +255,9 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
 
   return (
     <Card className="bg-white shadow-lg border-0 overflow-hidden">
-      <CardContent className="p-6">
+      <CardContent className="p-3 sm:p-4 lg:p-6">
         <div className="flex items-start space-x-4 mb-4">
-          <Avatar className="h-12 w-12 ring-2 ring-blue-100">
+          <Avatar className="h-9 w-9 sm:h-10 sm:w-10 lg:h-12 lg:w-12 ring-2 ring-blue-100">
 
             <AvatarImage src={profile?.avatar_url || "/default-avatar.png"} />
             <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
@@ -269,8 +269,8 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
               ref={textareaRef}
               value={content}
               onChange={handleTextChange}
-              placeholder="What's on your mind? Use @ to mention users and # for hashtags..."
-              className="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none min-h-[120px] text-base leading-relaxed"
+              placeholder="What's on your mind?"
+              className="w-full p-3 sm:p-4 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none min-h-[90px] sm:min-h-[100px] lg:min-h-[120px] text-sm sm:text-base leading-relaxed"
             />
             
             {/* Mentions Dropdown */}

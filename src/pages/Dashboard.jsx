@@ -369,7 +369,7 @@ const Dashboard = () => {
           {/* Main Dashboard Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
             {/* Left Sidebar - Profile & Stats */}
-            <div className="lg:col-span-3 space-y-4 sm:space-y-6">
+            <div className="hidden lg:block lg:col-span-3 space-y-6">
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
                 <div className="h-16 sm:h-20 bg-gradient-to-r from-blue-600 to-purple-600 bg-cover bg-center" 
                      style={profile?.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : {}}>
@@ -474,7 +474,7 @@ const Dashboard = () => {
             </div>
 
             {/* Main Content Feed */}
-            <div className="lg:col-span-6 space-y-6" ref={feedContainerRef}>
+            <div className="col-span-1 lg:col-span-6 space-y-6" ref={feedContainerRef}>
               <EnhancedPostComposer onCreatePost={handleCreatePost} />
 
               <div className="space-y-6">
@@ -551,7 +551,7 @@ const Dashboard = () => {
             </div>
 
             {/* Right Sidebar - Connections & Insights */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="hidden lg:block lg:col-span-3 space-y-6">
 
               {/* Smart Connections */}
               <Card className="bg-white shadow-lg border-0 overflow-hidden">
