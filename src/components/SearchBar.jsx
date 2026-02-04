@@ -148,16 +148,16 @@ const SearchBar = () => {
   return (
     <div className="relative w-full" ref={searchRef}>
       <div className="relative w-full">
-        <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
           <Search className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400" />
         </div>
         <Input
           type="text"
-          placeholder="Search professionals, companies, jobs, events..."
+          placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchQuery.length > 2 && setShowResults(true)}
-          className="block w-full pl-8 lg:pl-11 pr-10 lg:pr-12 py-2 sm:py-2.5 lg:py-3 border border-gray-200 rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus:border-blue-300 focus:border-transparent transition-all text-sm sm:text-sm lg:text-base"
+          className="block w-full pl-7 sm:pl-9 lg:pl-11 pr-8 sm:pr-10 lg:pr-12 py-1.5 sm:py-2 lg:py-3 border border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus:border-blue-300 focus:border-transparent transition-all text-xs sm:text-sm lg:text-base"
         />
         {searchQuery && (
           <Button
