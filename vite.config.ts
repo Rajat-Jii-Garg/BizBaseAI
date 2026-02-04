@@ -12,8 +12,8 @@ export default defineConfig(({ mode }) => ({
       'Cache-Control': 'no-store',
     },
   },
-  // Force completely new cache
-  cacheDir: 'node_modules/.vite-v3',
+  // Force completely new cache - v4
+  cacheDir: 'node_modules/.vite-v4',
   plugins: [
     react(),
     mode === 'development' &&
@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => ({
     dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react/jsx-runtime'],
+    include: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
     force: true,
   },
 }));
