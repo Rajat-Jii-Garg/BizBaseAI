@@ -474,8 +474,11 @@ const Dashboard = () => {
             </div>
 
             {/* Main Content Feed */}
-            <div className="col-span-1 lg:col-span-6 space-y-6" ref={feedContainerRef}>
-              <EnhancedPostComposer onCreatePost={handleCreatePost} />
+            <div className="col-span-1 lg:col-span-6 space-y-4 sm:space-y-6" ref={feedContainerRef}>
+              {/* Post Composer - Hidden on small screens */}
+              <div className="hidden lg:block">
+                <EnhancedPostComposer onCreatePost={handleCreatePost} />
+              </div>
 
               <div className="space-y-6">
                 {loadingPosts && personalizedPosts.length === 0 ? (
