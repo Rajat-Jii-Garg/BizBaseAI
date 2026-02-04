@@ -157,7 +157,7 @@ const SearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchQuery.length > 2 && setShowResults(true)}
-          className="block w-full pl-9 lg:pl-12 pr-10 lg:pr-12 py-2 sm:py-2.5 lg:py-3 border border-gray-200 rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-sm lg:text-base"
+          className="block w-full pl-8 lg:pl-11 pr-10 lg:pr-12 py-2 sm:py-2.5 lg:py-3 border border-gray-200 rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus:border-blue-300 focus:border-transparent transition-all text-sm sm:text-sm lg:text-base"
         />
         {searchQuery && (
           <Button

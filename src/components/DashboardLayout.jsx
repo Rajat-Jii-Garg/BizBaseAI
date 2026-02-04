@@ -85,7 +85,7 @@ const DashboardLayout = ({ children }) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo & Brand */}
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3 ml-2">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl">
                   <Network className="w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 text-white" />
                 </div>
@@ -107,9 +107,9 @@ const DashboardLayout = ({ children }) => {
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 ml-2">
               {/* Search - Mobile */}
-              <div className="md:hidden">
+              <div className="md:hidden flex-1 mx-2">
                 <SearchBar />
               </div>
 
