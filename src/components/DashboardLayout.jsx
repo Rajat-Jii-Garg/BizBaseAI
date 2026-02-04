@@ -212,10 +212,10 @@ const DashboardLayout = ({ children }) => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </div>
             </div>
           </div>
         </div>
-
       </nav>
 
       {/* Navigation Bar - All screens with horizontal scroll */}
