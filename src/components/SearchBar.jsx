@@ -147,7 +147,7 @@ const SearchBar = () => {
 
   return (
     <div className="relative w-full" ref={searchRef}>
-      <form onSubmit={handleSearch} className="relative w-full">
+      <div className="relative w-full">
         <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
           <Search className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400" />
         </div>
@@ -157,7 +157,7 @@ const SearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchQuery.length > 2 && setShowResults(true)}
-          className="block w-full pl-9 lg:pl-12 pr-14 lg:pr-20 py-2 sm:py-2.5 lg:py-3 border border-gray-200 rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-sm lg:text-base"
+          className="block w-full pl-9 lg:pl-12 pr-10 lg:pr-12 py-2 sm:py-2.5 lg:py-3 border border-gray-200 rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-sm lg:text-base"
         />
         {searchQuery && (
           <Button
@@ -170,14 +170,14 @@ const SearchBar = () => {
             <X className="h-4 w-4" />
           </Button>
         )}
-        <Button 
+        {/* <Button 
           type="submit"
           size="sm"
           className="absolute right-1 top-1 bottom-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg lg:rounded-xl px-3 lg:px-5 shadow-sm"
         >
           <Search className="h-4 w-4" />
-        </Button>
-      </form>
+        </Button> */}
+      </div>
 
       {/* Search Results Dropdown */}
       {showResults && (
