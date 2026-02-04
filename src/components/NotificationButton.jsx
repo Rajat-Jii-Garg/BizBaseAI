@@ -57,12 +57,12 @@ const NotificationButton = () => {
     <Button
       variant="ghost"
       size="icon"
-      className="relative hover:bg-gray-100 rounded-xl h-8 w-8 sm:h-9 sm:w-9"
+      className="relative hover:bg-gray-100 rounded-lg sm:rounded-xl h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9"
       onClick={() => navigate('/notifications')}
     >
-      <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+      <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-gray-600" />
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 min-w-5 h-5 bg-red-500 rounded-full text-xs text-white flex items-center justify-center px-1 font-medium">
+        <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 min-w-4 h-4 sm:min-w-5 sm:h-5 bg-red-500 rounded-full text-[10px] sm:text-xs text-white flex items-center justify-center px-0.5 sm:px-1 font-medium">
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}

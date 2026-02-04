@@ -107,9 +107,9 @@ const DashboardLayout = ({ children }) => {
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center space-x-2 sm:space-x-3 ml-2">
+            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 mr-1 sm:mr-2">
               {/* Search - Mobile */}
-              <div className="md:hidden flex-1 mx-2">
+              <div className="md:hidden flex-1 min-w-0 mr-1">
                 <SearchBar />
               </div>
 
@@ -126,22 +126,24 @@ const DashboardLayout = ({ children }) => {
                 </Button>
               </div>
 
-              {/* Notifications */}
-              <NotificationButton />
+              {/* Icons Container - Compact on mobile */}
+              <div className="flex items-center space-x-0.5 sm:space-x-1 md:space-x-2">
+                {/* Notifications */}
+                <NotificationButton />
 
-              {/* Messages */}
-              <MessagesButton />
+                {/* Messages */}
+                <MessagesButton />
 
-              {/* Profile Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2 sm:space-x-3 hover:bg-gray-50 px-2 sm:px-3 py-2 rounded-xl border-2 border-transparent hover:border-gray-200">
-                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-blue-200 shadow-lg">
-                      <AvatarImage src={profile?.avatar_url} />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold text-sm">
-                        {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
+                {/* Profile Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center space-x-1 sm:space-x-2 hover:bg-gray-50 px-1 sm:px-2 md:px-3 py-1.5 sm:py-2 rounded-xl border-2 border-transparent hover:border-gray-200">
+                      <Avatar className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 ring-2 ring-blue-200 shadow-lg">
+                        <AvatarImage src={profile?.avatar_url} />
+                        <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-bold text-xs sm:text-sm">
+                          {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
                     <div className="hidden lg:block text-left">
                       <p className="text-sm font-semibold text-gray-900">
                         {profile?.full_name || 'Professional User'}
