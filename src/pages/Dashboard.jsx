@@ -37,6 +37,11 @@ import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedPostComposer from '@/components/EnhancedPostComposer';
 import TrackedPostCard from '@/components/TrackedPostCard';
+import MobileCreatorFAB from '@/components/MobileCreatorFAB';
+import FullPagePostCreator from '@/components/FullPagePostCreator';
+import FullPageCommunityCreator from '@/components/FullPageCommunityCreator';
+import FullPageEventCreator from '@/components/FullPageEventCreator';
+import FullPageJobCreator from '@/components/FullPageJobCreator';
 import ConnectionsList from '@/components/ConnectionsList';
 import AINetworkingAssistant from '@/components/AINetworkingAssistant';
 import TrendingHashtags from '@/components/TrendingHashtags';
@@ -60,6 +65,10 @@ const Dashboard = () => {
   const [loadingConnections, setLoadingConnections] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const feedContainerRef = React.useRef(null);
+  const [showPostCreator, setShowPostCreator] = useState(false);
+  const [showCommunityCreator, setShowCommunityCreator] = useState(false);
+  const [showEventCreator, setShowEventCreator] = useState(false);
+  const [showJobCreator, setShowJobCreator] = useState(false);
   
   // Use personalized feed hook
   const {
@@ -703,7 +712,7 @@ const Dashboard = () => {
       </div>
       
       {/* Scroll to Top Button */}
-      {showScrollTop && (
+      {showScrollTop && window.innerWidth >= 1024 && (
         <Button
           onClick={scrollToTop}
           className="fixed bottom-6 right-6 z-50 rounded-full w-12 h-12 p-0 bg-blue-600 hover:bg-blue-700 shadow-lg"
@@ -712,6 +721,35 @@ const Dashboard = () => {
           <ArrowUp className="w-5 h-5" />
         </Button>
       )}
+
+      {/* Mobile/Tablet FAB */}
+      <MobileCreatorFAB
+        onCreatePost={() => setShowPostCreator(true)}
+        onCreateCommunity={() => setShowCommunityCreator(true)}
+        onCreateEvent={() => setShowEventCreator(true)}
+        onCreateJob={() => setShowJobCreator(true)}
+      />
+
+      {/* Full Page Creators */}
+      <FullPagePostCreator 
+        isOpen={showPostCreator} 
+        onClose={() => setShowPostCreator(false)} 
+      />
+      <FullPageCommunityCreator 
+        isOpen={showCommunityCreator} 
+        onClose={() => setShowCommunityCreator(false)}
+        onSuccess={() => refetch()}
+      />
+      <FullPageEventCreator 
+        isOpen={showEventCreator} 
+        onClose={() => setShowEventCreator(false)}
+        onSuccess={() => {}}
+      />
+      <FullPageJobCreator 
+        isOpen={showJobCreator} 
+        onClose={() => setShowJobCreator(false)}
+        onSuccess={() => {}}
+      />
     </DashboardLayout>
   );
 };
