@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Plus, 
@@ -58,67 +58,84 @@ const MobileCreatorFAB = ({
     onClick?.();
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [isOpen]);
+
   return (
     <>
       {/* Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden pointer-events-auto"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* FAB Container */}
       <div className="fixed bottom-6 right-6 z-50 lg:hidden">
-        {/* Menu Items - Dropup */}
-        
 
-
-      {/* Action Sheet */}
-      <div
-        className={cn(
-          "fixed bottom-24 right-6 z-50 transition-all duration-300 lg:hidden",
-          "w-[320px] sm:w-[360px]",
-          isOpen
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-4 pointer-events-none"
-        )}
-      >
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 ring-1 ring-black/5">
-          {/* Header */}
-          <div className="px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 bg-gray-50">
-            Create
-          </div>
-
-          {/* Items */}
-          {menuItems.map((item, index) => (
-            <div
-              key={item.label}
-              onClick={() => handleItemClick(item.onClick)}
-              className={cn(
-                "flex items-center justify-between px-4 py-4 cursor-pointer select-none",
-                "active:bg-gray-100 transition-colors",
-                index !== menuItems.length - 1 && "border-b border-gray-200"
-              )}
-            >
-              {/* Left */}
-              <div>
-                <p className="text-sm font-semibold text-gray-900">
-                  {item.label}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {item.description}
-                </p>
-              </div>
-
-              {/* Right Icon */}
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                <item.icon className="w-5 h-5 text-gray-700" />
-              </div>
+        {/* Action Sheet */}
+        <div
+          className={cn(
+            "fixed bottom-24 right-6 z-50 transition-all duration-300 lg:hidden",
+            "w-[320px] sm:w-[360px]",
+            isOpen
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4 pointer-events-none"
+          )}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 ring-1 ring-black/5">
+            {/* Header */}
+            <div className="px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 bg-gray-50">
+              Create
             </div>
-          ))}
+
+            {/* Items */}
+            {menuItems.map((item, index) => (
+              <div
+                key={item.label}
+                onClick={() => handleItemClick(item.onClick)}
+                className={cn(
+                  "flex items-center justify-between px-4 py-4 cursor-pointer select-none",
+                  "hover:bg-gray-50 active:bg-gray-100 transition-colors",
+                  index !== menuItems.length - 1 && "border-b border-gray-200"
+                )}
+              >
+                {/* Left */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {item.label}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Right Icon */}
+                <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                  "bg-gradient-to-br",
+                  item.gradient
+                )}
+                >
+                  <item.icon className="w-5 h-5 text-white" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
 
 
@@ -133,15 +150,14 @@ const MobileCreatorFAB = ({
             "bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600",
             "hover:shadow-blue-500/40 hover:shadow-xl",
             "active:scale-95",
-            "border-2 border-white/20",
-            isOpen && "rotate-45"
+            "border-2 border-white/20"
           )}
           size="icon"
         >
           {isOpen ? (
-            <X className="w-6 h-6 text-white" />
+            <X className="w-7 h-7 text-white transition-transform duration-300" />
           ) : (
-            <Plus className="w-6 h-6 text-white" />
+            <Plus className="w-7 h-7 text-white transition-transform duration-300" />
           )}
           
           {/* Pulse animation when closed */}
