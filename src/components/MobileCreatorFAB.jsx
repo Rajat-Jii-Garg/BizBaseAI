@@ -21,32 +21,32 @@ const MobileCreatorFAB = ({
   const menuItems = [
     { 
       icon: FileText, 
-      label: 'Post', 
-      description: 'Share your thoughts',
+      label: 'Create Post', 
+      description: 'Most used by professionals',
       onClick: onCreatePost,
       gradient: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50'
     },
     { 
       icon: Users, 
-      label: 'Community', 
-      description: 'Build your tribe',
+      label: 'Post in Community', 
+      description: 'Write posts in communities',
       onClick: onCreateCommunity,
       gradient: 'from-green-500 to-emerald-600',
       bgColor: 'bg-green-50'
     },
     { 
       icon: Calendar, 
-      label: 'Event', 
-      description: 'Host an event',
+      label: 'Plan for Event', 
+      description: 'Host webinars, meetups, or live sessions',
       onClick: onCreateEvent,
       gradient: 'from-purple-500 to-violet-600',
       bgColor: 'bg-purple-50'
     },
     { 
       icon: Briefcase, 
-      label: 'Job', 
-      description: 'Post opportunity',
+      label: 'Post a free Job', 
+      description: 'Hire talent or share job opportunities',
       onClick: onCreateJob,
       gradient: 'from-orange-500 to-red-500',
       bgColor: 'bg-orange-50'
@@ -109,16 +109,17 @@ const MobileCreatorFAB = ({
                 onClick={() => handleItemClick(item.onClick)}
                 className={cn(
                   "flex items-center justify-between px-4 py-4 cursor-pointer select-none",
-                  "hover:bg-gray-50 active:bg-gray-100 transition-colors",
+                  "group transition-colors",
+                  "hover:bg-gray-100 active:bg-gray-200",
                   index !== menuItems.length - 1 && "border-b border-gray-200"
                 )}
               >
                 {/* Left */}
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-gray-900 group-hover:text-gray-950">
                     {item.label}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 group-hover:text-gray-700">
                     {item.description}
                   </p>
                 </div>
