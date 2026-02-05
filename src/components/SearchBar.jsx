@@ -181,7 +181,7 @@ const SearchBar = () => {
 
       {/* Search Results Dropdown */}
       {showResults && (
-        <div className="absolute top-full left-0 md:left-1/2  md:-translate-x-1/2 mt-3 w-full md:w-[520px] lg:w-[640px] max-h-[calc(100vh-140px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-y-auto scrollbar-hide z-50">
+        <div className="absolute top-full left-1/3 md:left-1/2  md:-translate-x-1/2 mt-3 w-full md:w-[520px] lg:w-[640px] max-h-[calc(100vh-140px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-y-auto scrollbar-hide z-50">
           {loading ? (
             <div className="p-4 text-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
