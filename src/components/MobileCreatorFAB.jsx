@@ -77,15 +77,16 @@ const MobileCreatorFAB = ({
       {/* Action Sheet */}
       <div
         className={cn(
-          "fixed bottom-24 right-4 left-4 z-50 transition-all duration-300 lg:hidden",
+          "fixed bottom-24 right-6 z-50 transition-all duration-300 lg:hidden",
+          "w-[320px] sm:w-[360px]",
           isOpen
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-4 pointer-events-none"
         )}
       >
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200 ring-1 ring-black/5">
           {/* Header */}
-          <div className="px-4 py-3 text-sm font-semibold text-gray-900 bg-gray-50">
+          <div className="px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 bg-gray-50">
             Create
           </div>
 
@@ -95,7 +96,7 @@ const MobileCreatorFAB = ({
               key={item.label}
               onClick={() => handleItemClick(item.onClick)}
               className={cn(
-                "flex items-center justify-between px-4 py-4 cursor-pointer",
+                "flex items-center justify-between px-4 py-4 cursor-pointer select-none",
                 "active:bg-gray-100 transition-colors",
                 index !== menuItems.length - 1 && "border-b border-gray-200"
               )}
@@ -111,7 +112,7 @@ const MobileCreatorFAB = ({
               </div>
 
               {/* Right Icon */}
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
                 <item.icon className="w-5 h-5 text-gray-700" />
               </div>
             </div>
