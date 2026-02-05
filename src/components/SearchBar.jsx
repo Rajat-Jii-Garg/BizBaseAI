@@ -157,7 +157,7 @@ const SearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchQuery.length > 2 && setShowResults(true)}
-          className="block w-full pl-7 sm:pl-9 lg:pl-11 pr-8 sm:pr-10 lg:pr-12 py-1.5 sm:py-2 lg:py-3 border border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus:border-blue-300 focus:border-transparent transition-all text-xs sm:text-sm lg:text-base"
+          className="block w-full pl-7 sm:pl-9 lg:pl-11 pr-10 sm:pr-12 lg:pr-14 py-1.5 sm:py-2 lg:py-3 border border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus:border-gray-200 transition-all text-sm sm:text-base lg:text-lg"
         />
         {searchQuery && (
           <Button
@@ -165,7 +165,7 @@ const SearchBar = () => {
             variant="ghost"
             size="sm"
             onClick={clearSearch}
-            className="absolute right-9 lg:right-12 top-1 bottom-1 px-1 hover:bg-gray-100 rounded-lg"
+            className="absolute right-2 sm:right-3 lg:right-4 top-1/2 -translate-y-1/2 px-1 hover:bg-gray-100 rounded-lg"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -181,13 +181,13 @@ const SearchBar = () => {
 
       {/* Search Results Dropdown */}
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 max-h-96 overflow-y-auto z-50">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[95vw] sm:w-[520px] lg:w-[640px] max-h-[70vh] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-y-auto z-50">
           {loading ? (
             <div className="p-4 text-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
             </div>
           ) : hasResults ? (
-            <div className="py-2">
+            <div className="py-3 px-1 sm:px-2">
               {/* Users */}
               {searchResults.users.length > 0 && (
                 <div className="px-4 py-2">
