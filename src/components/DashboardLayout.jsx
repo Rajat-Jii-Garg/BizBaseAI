@@ -109,7 +109,7 @@ const DashboardLayout = ({ children }) => {
             {/* Right Section */}
             <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 mr-1 sm:mr-2">
               {/* Search - Mobile */}
-              <div className="md:hidden flex-[1.4] min-w-0 mx-2">
+              <div className="lg:hidden flex-[1.4] min-w-0 mx-2">
                 <SearchBar />
               </div>
 

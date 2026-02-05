@@ -157,7 +157,7 @@ const SearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchQuery.length > 2 && setShowResults(true)}
-          className="block w-full pl-7 sm:pl-9 lg:pl-11 pr-10 sm:pr-12 lg:pr-14 py-1.5 sm:py-2 lg:py-3 border border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus:border-gray-200 transition-all text-sm sm:text-base lg:text-lg"
+          className="block w-full pl-7 sm:pl-9 lg:pl-11 pr-10 sm:pr-12 lg:pr-14 py-1.5 sm:py-2 lg:py-3 border border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-gray-200 transition-all text-sm sm:text-base lg:text-lg"
         />
         {searchQuery && (
           <Button
@@ -181,7 +181,7 @@ const SearchBar = () => {
 
       {/* Search Results Dropdown */}
       {showResults && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[95vw] sm:w-[520px] lg:w-[640px] max-h-[70vh] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-y-auto z-50">
+        <div className="absolute top-full left-0 md:left-1/2  md:-translate-x-1/2 mt-3 w-full md:w-[520px] lg:w-[640px] max-h-[calc(100vh-140px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-y-auto scrollbar-hide z-50">
           {loading ? (
             <div className="p-4 text-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
