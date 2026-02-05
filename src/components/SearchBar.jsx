@@ -3,9 +3,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, Briefcase, Calendar, Hash, Building2, MapPin, X } from 'lucide-react';
+import { Search, User, Briefcase, Calendar, Hash, Building2, MapPin, X, TrendingUp, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -181,33 +182,43 @@ const SearchBar = () => {
 
       {/* Search Results Dropdown */}
       {showResults && (
-        {/*<div className="absolute top-full left-1/3 md:left-1/2  md:-translate-x-1/2 mt-3 w-full md:w-[520px] lg:w-[640px] max-h-[calc(100vh-140px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-y-auto scrollbar-hide z-50">*/}
-        <div className="fixed md:absolute top-[72px] md:top-full left-0 right-0 md:left-1/2 md:-translate-x-1/2 mx-3 sm:mx-4 md:mx-0 w-auto md:w-[520px] lg:w-[640px] mt-0 md:mt-3 max-h-[calc(100vh-96px)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-y-auto scrollbar-hide z-50">
+        <div className="fixed md:absolute top-[68px] md:top-full left-0 right-0 md:left-1/2 md:-translate-x-1/2 mx-2 sm:mx-3 md:mx-0 w-auto md:w-[480px] lg:w-[560px] mt-0 md:mt-2 max-h-[70vh] md:max-h-[65vh] bg-white/95 backdrop-blur-xl rounded-xl md:rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100]">
+          {/* Premium Header */}
+          <div className="px-3 py-2 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100 flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+            <span className="text-xs font-medium text-gray-600">Search Results</span>
+          </div>
+          
+          <ScrollArea className="max-h-[calc(70vh-40px)] md:max-h-[calc(65vh-40px)]">
           {loading ? (
-            <div className="p-4 text-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="p-6 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto"></div>
+              <p className="text-xs text-gray-500 mt-2">Searching...</p>
             </div>
           ) : hasResults ? (
-            <div className="py-3 px-1 sm:px-2">
+            <div className="py-2">
               {/* Users */}
               {searchResults.users.length > 0 && (
-                <div className="px-4 py-2">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">People</h3>
+                <div className="px-2 sm:px-3 py-1.5">
+                  <div className="flex items-center gap-1.5 px-1 mb-1.5">
+                    <User className="w-3 h-3 text-blue-500" />
+                    <h3 className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">People</h3>
+                  </div>
                   {searchResults.users.map((user) => (
                     <div
                       key={user.id}
                       onClick={() => handleResultClick('user', user)}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
                     >
-                      <Avatar className="h-8 w-8">
+                      <Avatar className="h-8 w-8 sm:h-9 sm:w-9 ring-2 ring-white shadow-sm">
                         <AvatarImage src={user.avatar_url} />
-                        <AvatarFallback className="bg-blue-100 text-blue-600">
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-xs font-medium">
                           {user.full_name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{user.full_name}</p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">{user.full_name}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 truncate">
                           {user.current_position && user.company_name 
                             ? `${user.current_position} at ${user.company_name}`
                             : user.current_position || user.company_name || 'Professional'
@@ -215,7 +226,7 @@ const SearchBar = () => {
                         </p>
                       </div>
                       {user.location && (
-                        <div className="flex items-center text-xs text-gray-400">
+                        <div className="hidden sm:flex items-center text-[10px] text-gray-400">
                           <MapPin className="w-3 h-3 mr-1" />
                           {user.location}
                         </div>
@@ -227,25 +238,28 @@ const SearchBar = () => {
 
               {/* Jobs */}
               {searchResults.jobs.length > 0 && (
-                <div className="px-4 py-2 border-t border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Jobs</h3>
+                <div className="px-2 sm:px-3 py-1.5 border-t border-gray-50">
+                  <div className="flex items-center gap-1.5 px-1 mb-1.5">
+                    <Briefcase className="w-3 h-3 text-green-500" />
+                    <h3 className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Jobs</h3>
+                  </div>
                   {searchResults.jobs.map((job) => (
                     <div
                       key={job.id}
                       onClick={() => handleResultClick('job', job)}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-green-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
                     >
-                      <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Briefcase className="w-4 h-4 text-green-600" />
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
+                        <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{job.title}</p>
-                        <p className="text-xs text-gray-500 truncate">{job.company_name}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-green-600 transition-colors">{job.title}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 truncate">{job.company_name}</p>
                       </div>
                       <div className="text-right">
-                        <Badge variant="outline" className="text-xs">{job.job_type}</Badge>
+                        <Badge variant="outline" className="text-[9px] sm:text-[10px] px-1.5 py-0 h-4 sm:h-5 bg-green-50 border-green-200 text-green-700">{job.job_type}</Badge>
                         {job.location && (
-                          <div className="flex items-center text-xs text-gray-400 mt-1">
+                          <div className="hidden sm:flex items-center text-[10px] text-gray-400 mt-1 justify-end">
                             <MapPin className="w-3 h-3 mr-1" />
                             {job.location}
                           </div>
@@ -258,22 +272,25 @@ const SearchBar = () => {
 
               {/* Events */}
               {searchResults.events.length > 0 && (
-                <div className="px-4 py-2 border-t border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Events</h3>
+                <div className="px-2 sm:px-3 py-1.5 border-t border-gray-50">
+                  <div className="flex items-center gap-1.5 px-1 mb-1.5">
+                    <Calendar className="w-3 h-3 text-purple-500" />
+                    <h3 className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Events</h3>
+                  </div>
                   {searchResults.events.map((event) => (
                     <div
                       key={event.id}
                       onClick={() => handleResultClick('event', event)}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
                     >
-                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <Calendar className="w-4 h-4 text-purple-600" />
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
+                        <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{event.title}</p>
-                        <p className="text-xs text-gray-500 truncate">{new Date(event.date).toLocaleDateString()}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-purple-600 transition-colors">{event.title}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 truncate">{new Date(event.date).toLocaleDateString()}</p>
                       </div>
-                      <Badge variant="outline" className="text-xs">{event.type}</Badge>
+                      <Badge variant="outline" className="text-[9px] sm:text-[10px] px-1.5 py-0 h-4 sm:h-5 bg-purple-50 border-purple-200 text-purple-700">{event.type}</Badge>
                     </div>
                   ))}
                 </div>
@@ -281,20 +298,23 @@ const SearchBar = () => {
 
               {/* Hashtags */}
               {searchResults.hashtags.length > 0 && (
-                <div className="px-4 py-2 border-t border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Hashtags</h3>
+                <div className="px-2 sm:px-3 py-1.5 border-t border-gray-50">
+                  <div className="flex items-center gap-1.5 px-1 mb-1.5">
+                    <TrendingUp className="w-3 h-3 text-blue-500" />
+                    <h3 className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Trending</h3>
+                  </div>
                   {searchResults.hashtags.map((hashtag) => (
                     <div
                       key={hashtag.id}
                       onClick={() => handleResultClick('hashtag', hashtag)}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
                     >
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Hash className="w-4 h-4 text-blue-600" />
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-sm">
+                        <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">#{hashtag.name}</p>
-                        <p className="text-xs text-gray-500">{hashtag.usage_count} posts</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">#{hashtag.name}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">{hashtag.usage_count} posts</p>
                       </div>
                     </div>
                   ))}
@@ -303,20 +323,23 @@ const SearchBar = () => {
 
               {/* Companies */}
               {searchResults.companies.length > 0 && (
-                <div className="px-4 py-2 border-t border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Companies</h3>
+                <div className="px-2 sm:px-3 py-1.5 border-t border-gray-50">
+                  <div className="flex items-center gap-1.5 px-1 mb-1.5">
+                    <Building2 className="w-3 h-3 text-orange-500" />
+                    <h3 className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Companies</h3>
+                  </div>
                   {searchResults.companies.map((company) => (
                     <div
                       key={company.id}
                       onClick={() => handleResultClick('company', company)}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
                     >
-                      <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <Building2 className="w-4 h-4 text-orange-600" />
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-orange-400 to-amber-500 rounded-lg flex items-center justify-center shadow-sm">
+                        <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{company.name}</p>
-                        <p className="text-xs text-gray-500">Company</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">{company.name}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">Company</p>
                       </div>
                     </div>
                   ))}
@@ -324,11 +347,15 @@ const SearchBar = () => {
               )}
             </div>
           ) : searchQuery.length > 2 && (
-            <div className="p-4 text-center text-gray-500">
-              <Search className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-              <p>No results found for "{searchQuery}"</p>
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+                <Search className="w-5 h-5 text-gray-400" />
+              </div>
+              <p className="text-sm text-gray-600 font-medium">No results found</p>
+              <p className="text-xs text-gray-400 mt-1">Try searching for "{searchQuery}"</p>
             </div>
           )}
+          </ScrollArea>
         </div>
       )}
     </div>
