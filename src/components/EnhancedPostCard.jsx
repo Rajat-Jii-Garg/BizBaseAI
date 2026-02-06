@@ -148,7 +148,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
         {/* Post Header */}
         <div className="flex items-start justify-between mb-3 sm:mb-4">
-          <div className="flex items-start space-x-3 sm:space-x-4">
+          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
             <Avatar 
               className="h-9 w-9 sm:h-12 sm:w-12 ring-1 sm:ring-2 ring-gray-100 cursor-pointer hover:ring-blue-200 transition-all"
               onClick={handleProfileClick}
@@ -158,19 +158,22 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
                 {post.profiles?.full_name?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center space-x-2">
                 <h4 
-                  className="font-semibold text-gray-900 text-sm sm:text-base cursor-pointer hover:text-blue-600 transition-colors"
+                  className="font-semibold text-gray-900 text-sm sm:text-base truncate max-w-[180px] sm:max-w-none cursor-pointer hover:text-blue-600 transition-colors"
                   onClick={handleProfileClick}
                 >
                   {post.profiles?.full_name || 'Professional User'}
                 </h4>
                 <CheckCircle className="w-5 h-5 text-blue-500" />
               </div>
+              
+              {/* post card mei username show karna -- 
               {post.profiles?.username && (
                 <p className="text-sm text-primary font-medium">@{post.profiles.username}</p>
-              )}
+              )} */}
+              
               <p className="text-xs sm:text-sm text-gray-600 font-medium">
                 {post.profiles?.current_position || 'Professional Member'}
               </p>
