@@ -44,73 +44,73 @@ const PostEngagementActions = ({
   };
 
   return (
-    <div className="border-t border-gray-100 pt-3">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center space-x-4 text-xs text-gray-600">
+    <div className="border-t border-gray-100 pt-2 sm:pt-3">
+      <div className="flex items-center justify-between mb-1 sm:mb-2">
+        <div className="flex items-center gap-3 text-[11px] sm:text-xs text-gray-500">
           <span className="flex items-center gap-1">
-            <ArrowBigUp className="w-3 h-3" />
+            <ArrowBigUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             {likesCount} upvotes
           </span>
           <span className="flex items-center gap-1">
-            <MessageSquare className="w-3 h-3" />
+            <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             {commentsCount} feedback
           </span>
           <span className="flex items-center gap-1">
-            <Repeat2 className="w-3 h-3" />
+            <Repeat2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             {repostsCount} reposts
           </span>
           <span className="flex items-center gap-1">
-            <Share2 className="w-3 h-3" />
+            <Share2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             {sharesCount} shares
           </span>
         </div>
       </div>
       
-      <div className="flex items-center justify-around border-t border-gray-100 pt-2">
+      <div className="flex items-center justify-between border-t border-gray-100 mt-1 pt-1">
         <Button 
           variant="ghost" 
           size="sm" 
-          className={`flex-1 h-8 hover:bg-gray-50 ${
+          className={`flex-1 h-8 sm:h-9 hover:bg-gray-50 ${
             userHasLiked ? 'text-blue-600' : 'text-gray-600'
           }`}
           onClick={handleUpvote}
           disabled={loading}
         >
-          <ArrowBigUp className={`w-5 h-5 mr-1 ${userHasLiked ? 'fill-current' : ''}`} />
+          <ArrowBigUp className={`w-4 h-4 sm:w-5 sm:h-5 mr-1 ${userHasLiked ? 'fill-current' : ''}`} />
           <span className="text-xs font-medium">Upvote</span>
         </Button>
         
         <Button 
           variant="ghost" 
           size="sm" 
-          className="flex-1 h-8 hover:bg-gray-50 text-gray-600"
+          className="flex-1 h-8 sm:h-9 hover:bg-gray-50 text-gray-600"
           onClick={() => setShowCommentInput(!showCommentInput)}
         >
-          <MessageSquare className="w-4 h-4 mr-1" />
+          <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
           <span className="text-xs font-medium">Feedback</span>
         </Button>
 
         <Button 
           variant="ghost" 
           size="sm" 
-          className={`flex-1 h-8 hover:bg-gray-50 ${
+          className={`flex-1 h-8 sm:h-9 hover:bg-gray-50 ${
             userHasReposted ? 'text-green-600' : 'text-gray-600'
           }`}
           onClick={handleRepost}
           disabled={loading || userHasReposted}
         >
-          <Repeat2 className={`w-4 h-4 mr-1 ${userHasReposted ? 'text-green-600' : ''}`} />
+          <Repeat2 className={`w-4 h-4 sm:w-5 sm:h-5 mr-1 ${userHasReposted ? 'text-green-600' : ''}`} />
           <span className="text-xs font-medium">{userHasReposted ? 'Reposted' : 'Repost'}</span>
         </Button>
         
         <Button 
           variant="ghost" 
           size="sm" 
-          className="flex-1 h-8 hover:bg-gray-50 text-gray-600"
+          className="flex-1 h-8 sm:h-9 hover:bg-gray-50 text-gray-600"
           onClick={handleShare}
           disabled={loading}
         >
-          <Share2 className="w-4 h-4 mr-1" />
+          <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
           <span className="text-xs font-medium">Share</span>
         </Button>
       </div>

@@ -483,13 +483,13 @@ const Dashboard = () => {
             </div>
 
             {/* Main Content Feed */}
-            <div className="col-span-1 lg:col-span-6 space-y-4 sm:space-y-6" ref={feedContainerRef}>
+            <div className="col-span-1 lg:col-span-6 space-y-1 sm:space-y-2 overflow-x-hidden scrollbar-hide" ref={feedContainerRef}>
               {/* Post Composer - Hidden on small screens */}
               <div className="hidden lg:block">
                 <EnhancedPostComposer onCreatePost={handleCreatePost} />
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-2 sm:space-y-4">
                 {loadingPosts && personalizedPosts.length === 0 ? (
                   <Card className="bg-white shadow-lg border-0">
                     <CardContent className="p-12 text-center">

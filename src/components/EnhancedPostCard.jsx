@@ -136,8 +136,8 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const isRepost = !!post.repost_of_post_id;
 
   return (
-    <Card className="bg-white shadow-lg border-0 hover:shadow-xl transition-all duration-300 overflow-hidden">
-      <CardContent className="p-6">
+    <Card className="bg-white border border-gray-100 overflow-hidden shadow-none sm:shadow-lg hover:shadow-none sm:hover:shadow-xl">
+      <CardContent className="p-3 sm:p-6">
         {/* Repost indicator */}
         {isRepost && (
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-3 pb-2 border-b border-gray-100">
@@ -147,10 +147,10 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
         )}
 
         {/* Post Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-start space-x-4">
+        <div className="flex items-start justify-between mb-3 sm:mb-4">
+          <div className="flex items-start space-x-3 sm:space-x-4">
             <Avatar 
-              className="h-12 w-12 ring-2 ring-gray-100 cursor-pointer hover:ring-blue-200 transition-all"
+              className="h-9 w-9 sm:h-12 sm:w-12 ring-1 sm:ring-2 ring-gray-100 cursor-pointer hover:ring-blue-200 transition-all"
               onClick={handleProfileClick}
             >
               <AvatarImage src={post.profiles?.avatar_url} />
@@ -161,7 +161,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
             <div>
               <div className="flex items-center space-x-2">
                 <h4 
-                  className="font-bold text-gray-900 text-base cursor-pointer hover:text-blue-600 transition-colors"
+                  className="font-semibold text-gray-900 text-sm sm:text-base cursor-pointer hover:text-blue-600 transition-colors"
                   onClick={handleProfileClick}
                 >
                   {post.profiles?.full_name || 'Professional User'}
@@ -171,20 +171,32 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
               {post.profiles?.username && (
                 <p className="text-sm text-primary font-medium">@{post.profiles.username}</p>
               )}
-              <p className="text-sm text-gray-600 font-medium">
+              <p className="text-xs sm:text-sm text-gray-600 font-medium">
                 {post.profiles?.current_position || 'Professional Member'}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-[11px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
                 {formatTimeAgo(post.created_at)}
               </p>
             </div>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            {/* <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
                 <MoreHorizontal className="w-5 h-5" />
               </Button>
-            </DropdownMenuTrigger>
+            </DropdownMenuTrigger> */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Button size="sm" variant="outline" className="h-7 px-2 text-[11px] sm:text-xs" >
+                + Connect
+              </Button>
+
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-gray-100" >
+                  <MoreHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+            </div>
+
             <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
               {isOwnPost && (
                 <>
@@ -229,7 +241,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
                 onClick={() => setShowFullContent(!showFullContent)}
                 className="text-blue-600 hover:text-blue-700 font-medium ml-2"
               >
-                {showFullContent ? 'Show less' : 'Read more'}
+                {showFullContent ? 'Show less' : 'Show more'}
               </button>
             )}
           </div>
@@ -260,11 +272,11 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
           {/* Post Image */}
           {post.image_url && (
-            <div className="rounded-xl overflow-hidden border border-gray-200">
+            <div className="mt-2 -mx-3 sm:mx-0 sm:rounded-xl overflow-hidden border-t border-b sm:border">
               <img 
                 src={post.image_url} 
                 alt="Post image" 
-                className="w-full h-auto hover:scale-105 transition-transform duration-300"
+                className="w-full h-auto object-cover"
               />
             </div>
           )}
