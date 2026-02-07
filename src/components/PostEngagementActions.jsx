@@ -142,44 +142,6 @@ const PostEngagementActions = ({
           >
             <Send className="w-4 h-4" />
           </Button>
-
-          {/* Feedback List */}
-          <div className="space-y-3">
-            {comments.map((comment) => (
-              <Card key={comment.id} className="p-3">
-                <div className="flex items-start gap-3">
-                  <Avatar 
-                    className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all"
-                    onClick={() => navigate(`/profile/${comment.user_id}`)}
-                  >
-                    <AvatarImage src={comment.profiles?.avatar_url} />
-                    <AvatarFallback className="text-xs">
-                      {comment.profiles?.full_name?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p 
-                        className="font-medium text-sm cursor-pointer hover:text-primary transition-colors"
-                        onClick={() => navigate(`/profile/${comment.user_id}`)}
-                      >
-                        {comment.profiles?.full_name || 'User'}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(comment.created_at).toLocaleDateString()}
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                          <MoreVertical className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                    <p className="text-sm mt-1">{comment.content}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
         </div>
       )}
     </div>
