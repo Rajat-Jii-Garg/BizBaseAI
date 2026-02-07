@@ -81,14 +81,14 @@ const CommentsSection = ({ postId, commentsCount, onCommentUpdate }) => {
 
   return (
     <div className="space-y-4">
-      <Button
+      {/* <Button
         variant="ghost"
         onClick={() => setShowComments(!showComments)}
         className="text-sm text-muted-foreground p-0 h-auto flex items-center gap-1"
       >
         <MessageSquare className="w-4 h-4" />
         {commentsCount} feedback
-      </Button>
+      </Button> */}
 
       {showComments && (
         <div className="space-y-4">
