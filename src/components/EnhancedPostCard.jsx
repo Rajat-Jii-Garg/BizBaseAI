@@ -8,7 +8,7 @@ import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import PostEngagementActions from './PostEngagementActions';
-import CommentsSection from './CommentsSection';
+
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -285,7 +285,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
           )}
         </div>
 
-        {/* Post Engagement */}
+        {/* Post Engagement + Inline Comments */}
         <PostEngagementActions
           postId={post.id}
           likesCount={post.likes_count || 0}
@@ -296,13 +296,6 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
           userHasReposted={userHasReposted}
           onEngagementUpdate={onEngagementUpdate}
           originalPost={post}
-        />
-
-        {/* Feedback Section */}
-        <CommentsSection
-          postId={post.id}
-          commentsCount={post.comments_count || 0}
-          onCommentUpdate={onEngagementUpdate}
         />
       </CardContent>
 
