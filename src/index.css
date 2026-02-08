@@ -70,6 +70,20 @@
     border-color: hsl(var(--border));
   }
 
+  /* Hide scrollbars globally for app-like feel */
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    overflow-x: hidden;
+  }
+  
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+    width: 0;
+    height: 0;
+  }
+
   body {
     background: linear-gradient(135deg,
       #fefefe 0%,
@@ -83,6 +97,7 @@
     font-family: 'Inter', 'system-ui', 'sans-serif';
     min-height: 100vh;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   }
 }
 
