@@ -133,6 +133,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   };
 
   const isOwnPost = user?.id === post.user_id;
+  const isConnected = post.is_connected === true;
   const isRepost = !!post.repost_of_post_id;
 
   return (
@@ -189,9 +190,26 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
               </Button>
             </DropdownMenuTrigger> */}
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <Button size="sm" variant="outline" className="h-7 px-2 text-[11px] sm:text-xs" >
-                + Connect
-              </Button>
+              {!isOwnPost && (
+                isConnected ? (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled
+                    className="h-7 px-2 text-[11px] sm:text-xs text-green-600 font-medium cursor-default"
+                  >
+                    Following
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-[11px] sm:text-xs"
+                  >
+                    + Connect
+                  </Button>
+                )
+              )}
 
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-gray-100" >

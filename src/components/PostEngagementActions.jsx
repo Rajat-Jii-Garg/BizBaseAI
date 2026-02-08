@@ -107,7 +107,7 @@ const PostEngagementActions = ({
   return (
     <div className="border-t border-border/50 pt-2 sm:pt-3">
       {/* Stats Row */}
-      <div className="flex items-center justify-between mb-1 sm:mb-2">
+      {/* <div className="flex items-center justify-between mb-1 sm:mb-2">
         <div className="flex items-center gap-3 text-[11px] sm:text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <ArrowBigUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -117,6 +117,32 @@ const PostEngagementActions = ({
             <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             {commentsCount} feedback
           </span>
+          <span className="flex items-center gap-1">
+            <Repeat2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            {repostsCount} reposts
+          </span>
+          <span className="flex items-center gap-1">
+            <Share2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            {sharesCount} shares
+          </span>
+        </div>
+      </div> */}
+
+      <div className="flex items-center justify-between mb-1 sm:mb-2 text-[11px] sm:text-xs text-muted-foreground">
+        {/* LEFT: Likes + Comments */}
+        <div className="flex items-center gap-3 text-[11px] sm:text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <ArrowBigUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            {likesCount} upvotes
+          </span>
+          <span className="flex items-center gap-1">
+            <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            {commentsCount} feedback
+          </span>
+        </div>
+
+        {/* RIGHT: Reposts + Shares */}
+        <div className="flex items-center gap-3 text-[11px] sm:text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Repeat2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             {repostsCount} reposts
