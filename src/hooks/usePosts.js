@@ -52,6 +52,7 @@ export const usePosts = () => {
 
       let likedPostIds = new Set();
       let repostedPostIds = new Set();
+      let connectedUserIds = new Set();
       if (user) {
         const postIds = postsData.map(post => post.id);
         
@@ -72,6 +73,18 @@ export const usePosts = () => {
           .in('post_id', postIds);
 
         repostedPostIds = new Set(reposts?.map(repost => repost.post_id) || []);
+
+        // Get connected user IDs
+        const { data: connections } = await supabase
+          .from('connections')
+          .select('requester_id, addressee_id')
+          .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+          .eq('status', 'accepted');
+
+        connections?.forEach(conn => {
+          if (conn.requester_id !== user.id) connectedUserIds.add(conn.requester_id);
+          if (conn.addressee_id !== user.id) connectedUserIds.add(conn.addressee_id);
+        });
       }
 
       const enrichedPosts = postsData.map(post => ({
@@ -87,7 +100,8 @@ export const usePosts = () => {
           company_name: null
         },
         user_has_liked: likedPostIds.has(post.id),
-        user_has_reposted: repostedPostIds.has(post.id)
+        user_has_reposted: repostedPostIds.has(post.id),
+        is_connected: connectedUserIds.has(post.user_id)
       }));
 
       console.log('Final enriched posts:', enrichedPosts);

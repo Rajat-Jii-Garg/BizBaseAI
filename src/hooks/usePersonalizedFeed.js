@@ -93,7 +93,7 @@ export const usePersonalizedFeed = () => {
 
       const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
-      // Get user's likes and reposts
+      // Get user's likes, reposts, and connections
       const postIds = postsData.map(p => p.id);
       
       const { data: likes } = await supabase
@@ -112,6 +112,19 @@ export const usePersonalizedFeed = () => {
 
       const repostedPosts = new Set(reposts?.map(r => r.post_id) || []);
 
+      // Get connected user IDs
+      const { data: connections } = await supabase
+        .from('connections')
+        .select('requester_id, addressee_id')
+        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+        .eq('status', 'accepted');
+
+      const connectedUserIds = new Set();
+      connections?.forEach(conn => {
+        if (conn.requester_id !== user.id) connectedUserIds.add(conn.requester_id);
+        if (conn.addressee_id !== user.id) connectedUserIds.add(conn.addressee_id);
+      });
+
       const enrichedPosts = postsData.map(post => ({
         ...post,
         profiles: profilesMap.get(post.user_id) || {
@@ -122,6 +135,7 @@ export const usePersonalizedFeed = () => {
         },
         user_has_liked: likedPosts.has(post.id),
         user_has_reposted: repostedPosts.has(post.id),
+        is_connected: connectedUserIds.has(post.user_id),
         feed_reasons: []
       }));
 
