@@ -18,8 +18,8 @@ const PostCard = ({ post, onEngagementUpdate }) => {
   };
 
   return (
-    <Card className="bg-white shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
+    <Card className="bg-white border border-gray-200 transition-shadow rounded-none sm:rounded-xl shadow-none sm:shadow-sm hover:shadow-none sm:hover:shadow-md">
+      <CardContent className="px-3 py-2 sm:p-4">
         {/* Post Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-start space-x-3">

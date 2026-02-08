@@ -222,12 +222,12 @@ const PostEngagementActions = ({
               <div className="h-5 w-5 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
             </div>
           ) : comments.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3 sm:space-y-3">
               {/* Scrollable container with hidden scrollbar */}
               <div
                 className={`space-y-3 ${
                   showAllComments && comments.length > MAX_VISIBLE_COMMENTS
-                    ? 'max-h-[320px] overflow-y-auto scrollbar-hide'
+                    ? 'max-h-[260px] sm:max-h-[320px] overflow-y-auto scrollbar-hide'
                     : ''
                 }`}
                 style={{

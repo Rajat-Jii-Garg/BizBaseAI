@@ -136,8 +136,8 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const isRepost = !!post.repost_of_post_id;
 
   return (
-    <Card className="bg-white border border-gray-100 overflow-hidden shadow-none sm:shadow-lg hover:shadow-none sm:hover:shadow-xl">
-      <CardContent className="p-3 sm:p-6">
+    <Card className="bg-white border border-gray-100 overflow-hidden rounded-none sm:rounded-xl shadow-none sm:shadow-lg hover:shadow-none sm:hover:shadow-xl">
+      <CardContent className="px-3 py-2 sm:p-6">
         {/* Repost indicator */}
         {isRepost && (
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-3 pb-2 border-b border-gray-100">
@@ -236,7 +236,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
         </div>
 
         {/* Post Content */}
-        <div className="mb-4">
+        <div className="mb-2 sm:mb-4">
           <div className="text-base text-gray-800 leading-relaxed mb-3 whitespace-pre-line">
             {renderContent(displayContent)}
             {shouldTruncate && (

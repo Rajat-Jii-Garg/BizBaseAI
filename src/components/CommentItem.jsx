@@ -80,7 +80,7 @@ const CommentItem = ({ comment, postId, onUpdate, isReply = false }) => {
 
         <div className="flex-1 min-w-0">
           {/* Comment Bubble */}
-          <div className="bg-muted/50 rounded-xl px-3.5 py-2.5 inline-block max-w-full">
+          <div className="bg-muted/50 rounded-xl px-3 py-2 sm:px-3.5 sm:py-2.5 inline-block max-w-full">
             <div className="flex items-center gap-2 mb-0.5">
               <span
                 className="font-semibold text-xs text-foreground cursor-pointer hover:text-blue-600 transition-colors truncate"
@@ -100,13 +100,13 @@ const CommentItem = ({ comment, postId, onUpdate, isReply = false }) => {
           </div>
 
           {/* Comment Actions */}
-          <div className="flex items-center gap-3 mt-1 pl-1">
+          <div className="flex items-center gap-2 mt-0.5 sm:mt-1 pl-1">
             <span className="text-[11px] text-muted-foreground">
               {formatTimeAgo(comment.created_at)}
             </span>
             <button
               onClick={handleLike}
-              className={`text-[11px] font-semibold transition-colors ${
+              className={`text-[11px] font-semibold py-0.5 transition-colors ${
                 isLiked
                   ? 'text-blue-600'
                   : 'text-muted-foreground hover:text-blue-600'
@@ -117,7 +117,7 @@ const CommentItem = ({ comment, postId, onUpdate, isReply = false }) => {
             {!isReply && (
               <button
                 onClick={() => setShowReplyInput(!showReplyInput)}
-                className="text-[11px] font-semibold text-muted-foreground hover:text-blue-600 transition-colors"
+                className="text-[11px] font-semibold py-0.5 text-muted-foreground hover:text-blue-600 transition-colors"
               >
                 Reply
               </button>
@@ -126,14 +126,14 @@ const CommentItem = ({ comment, postId, onUpdate, isReply = false }) => {
 
           {/* Reply Input */}
           {showReplyInput && (
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-2 mt-1.5 sm:mt-2">
               <Avatar className="h-6 w-6 shrink-0">
                 <AvatarImage src={profile?.avatar_url} />
                 <AvatarFallback className="text-[10px] bg-blue-50 text-blue-700">
                   {profile?.full_name?.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1 flex items-center gap-1.5 bg-muted/40 rounded-full px-3 py-1.5 border border-border/50 focus-within:border-blue-300 focus-within:ring-1 focus-within:ring-blue-100 transition-all">
+              <div className="flex-1 flex items-center gap-1 bg-muted/40 rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5 border border-border/50 focus-within:border-blue-300 focus-within:ring-1 focus-within:ring-blue-100 transition-all">
                 <Input
                   placeholder={`Reply to ${comment.profiles?.full_name || 'User'}...`}
                   value={replyText}
