@@ -64,7 +64,6 @@ const PostEngagementActions = ({
     }
   }, [postId]);
 
-  // Fetch comments when section opens
   useEffect(() => {
     if (showCommentInput) {
       fetchComments();
@@ -80,7 +79,6 @@ const PostEngagementActions = ({
     if (commentText.trim()) {
       await addComment(postId, commentText);
       setCommentText('');
-      // Refetch comments to show the new one
       await fetchComments();
       onEngagementUpdate();
     }
@@ -106,55 +104,31 @@ const PostEngagementActions = ({
 
   return (
     <div className="border-t border-border/50 pt-2 sm:pt-3">
-      {/* Stats Row */}
-      {/* <div className="flex items-center justify-between mb-1 sm:mb-2">
-        <div className="flex items-center gap-3 text-[11px] sm:text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <ArrowBigUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {likesCount} upvotes
-          </span>
-          <span className="flex items-center gap-1">
-            <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {commentsCount} feedback
-          </span>
-          <span className="flex items-center gap-1">
-            <Repeat2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {repostsCount} reposts
-          </span>
-          <span className="flex items-center gap-1">
-            <Share2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {sharesCount} shares
-          </span>
-        </div>
-      </div> */}
-
+      {/* Stats Row - mobile: left (upvotes, feedback) right (reposts, shares) */}
       <div className="flex items-center justify-between mb-1 sm:mb-2 text-[11px] sm:text-xs text-muted-foreground">
-        {/* LEFT: Likes + Comments */}
-        <div className="flex items-center gap-3 text-[11px] sm:text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 sm:gap-3">
           <span className="flex items-center gap-1">
             <ArrowBigUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {likesCount} upvotes
+            {likesCount} <span className="hidden sm:inline">upvotes</span>
           </span>
           <span className="flex items-center gap-1">
             <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {commentsCount} feedback
+            {commentsCount} <span className="hidden sm:inline">feedback</span>
           </span>
         </div>
-
-        {/* RIGHT: Reposts + Shares */}
-        <div className="flex items-center gap-3 text-[11px] sm:text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 sm:gap-3">
           <span className="flex items-center gap-1">
             <Repeat2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {repostsCount} reposts
+            {repostsCount} <span className="hidden sm:inline">reposts</span>
           </span>
           <span className="flex items-center gap-1">
             <Share2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {sharesCount} shares
+            {sharesCount} <span className="hidden sm:inline">shares</span>
           </span>
         </div>
       </div>
 
-      {/* Action Buttons Row */}
+      {/* Action Buttons Row - mobile: icon only, centered, equal space */}
       <div className="flex items-center justify-between border-t border-border/50 mt-1 pt-1">
         <Button
           variant="ghost"
@@ -165,8 +139,8 @@ const PostEngagementActions = ({
           onClick={handleUpvote}
           disabled={loading}
         >
-          <ArrowBigUp className={`w-4 h-4 sm:w-5 sm:h-5 mr-1 ${userHasLiked ? 'fill-current' : ''}`} />
-          <span className="text-xs font-medium">Upvote</span>
+          <ArrowBigUp className={`w-4 h-4 sm:w-5 sm:h-5 ${userHasLiked ? 'fill-current' : ''}`} />
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">Upvote</span>
         </Button>
 
         <Button
@@ -177,8 +151,8 @@ const PostEngagementActions = ({
           }`}
           onClick={() => setShowCommentInput(!showCommentInput)}
         >
-          <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-          <span className="text-xs font-medium">Feedback</span>
+          <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">Feedback</span>
         </Button>
 
         <Button
@@ -190,8 +164,8 @@ const PostEngagementActions = ({
           onClick={handleRepost}
           disabled={loading || userHasReposted}
         >
-          <Repeat2 className={`w-4 h-4 sm:w-5 sm:h-5 mr-1 ${userHasReposted ? 'text-green-600' : ''}`} />
-          <span className="text-xs font-medium">{userHasReposted ? 'Reposted' : 'Repost'}</span>
+          <Repeat2 className={`w-4 h-4 sm:w-5 sm:h-5 ${userHasReposted ? 'text-green-600' : ''}`} />
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">{userHasReposted ? 'Reposted' : 'Repost'}</span>
         </Button>
 
         <Button
@@ -201,8 +175,8 @@ const PostEngagementActions = ({
           onClick={handleShare}
           disabled={loading}
         >
-          <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-          <span className="text-xs font-medium">Share</span>
+          <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">Share</span>
         </Button>
       </div>
 
@@ -210,19 +184,19 @@ const PostEngagementActions = ({
       {showCommentInput && (
         <div className="mt-3 space-y-3">
           {/* Comment Input */}
-          <div className="flex items-center gap-2.5">
-            <Avatar className="h-8 w-8 shrink-0 ring-1 ring-border/30">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <Avatar className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 ring-1 ring-border/30">
               <AvatarImage src={profile?.avatar_url} />
-              <AvatarFallback className="bg-gradient-to-br from-blue-50 to-purple-50 text-blue-700 text-xs font-semibold">
+              <AvatarFallback className="bg-gradient-to-br from-blue-50 to-purple-50 text-blue-700 text-[10px] sm:text-xs font-semibold">
                 {profile?.full_name?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1 flex items-center gap-1.5 bg-muted/40 rounded-full px-3.5 py-1.5 border border-border/50 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+            <div className="flex-1 flex items-center gap-1.5 bg-muted/40 rounded-full px-3 py-1 sm:px-3.5 sm:py-1.5 border border-border/50 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
               <Input
                 placeholder="Write your feedback..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                className="border-0 bg-transparent h-8 text-sm p-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
+                className="border-0 bg-transparent h-7 sm:h-8 text-xs sm:text-sm p-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -233,11 +207,11 @@ const PostEngagementActions = ({
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-7 w-7 p-0 shrink-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full disabled:opacity-40"
+                className="h-6 w-6 sm:h-7 sm:w-7 p-0 shrink-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full disabled:opacity-40"
                 onClick={handleFeedback}
                 disabled={!commentText.trim() || loading}
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Button>
             </div>
           </div>
@@ -248,10 +222,9 @@ const PostEngagementActions = ({
               <div className="h-5 w-5 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
             </div>
           ) : comments.length > 0 ? (
-            <div className="space-y-3 sm:space-y-3">
-              {/* Scrollable container with hidden scrollbar */}
+            <div className="space-y-2 sm:space-y-3">
               <div
-                className={`space-y-3 ${
+                className={`space-y-2 sm:space-y-3 ${
                   showAllComments && comments.length > MAX_VISIBLE_COMMENTS
                     ? 'max-h-[260px] sm:max-h-[320px] overflow-y-auto scrollbar-hide'
                     : ''
@@ -271,11 +244,10 @@ const PostEngagementActions = ({
                 ))}
               </div>
 
-              {/* Show more / Show less */}
               {hasMoreComments && (
                 <button
                   onClick={() => setShowAllComments(!showAllComments)}
-                  className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors pl-10"
+                  className="text-[10px] sm:text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors pl-9 sm:pl-10"
                 >
                   {showAllComments
                     ? 'Show less'
@@ -285,7 +257,7 @@ const PostEngagementActions = ({
               )}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground text-center py-2">
+            <p className="text-[10px] sm:text-xs text-muted-foreground text-center py-2">
               No feedback yet. Be the first to share your thoughts!
             </p>
           )}

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2, X, Save, Repeat2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import PostEngagementActions from './PostEngagementActions';
 
 import { useNavigate } from 'react-router-dom';
@@ -19,12 +19,10 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [showFullContent, setShowFullContent] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [userHasReposted, setUserHasReposted] = useState(post.user_has_reposted || false);
 
-  // Update repost status when post changes
   useEffect(() => {
     setUserHasReposted(post.user_has_reposted || false);
   }, [post.user_has_reposted]);
@@ -39,23 +37,18 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
     return `${Math.floor(diffInHours / 24)}d`;
   };
 
-  // Extract hashtags from content
   const extractHashtags = (content) => {
     const matches = content.match(/#[\w]+/g);
     return matches || [];
   };
 
-  // Extract mentions from content
   const extractMentions = (content) => {
     const matches = content.match(/@[\w\s]+/g);
     return matches || [];
   };
 
-  // Render content with highlighted hashtags and mentions
   const renderContent = (content) => {
     if (!content) return null;
-
-    // Split content and highlight hashtags and mentions
     const parts = content.split(/(\s+)/);
     
     return parts.map((part, index) => {
@@ -87,49 +80,30 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
   const handleEdit = async () => {
     if (!onEdit || !editContent.trim()) return;
-    
     try {
       await onEdit(post.id, editContent);
       setIsEditDialogOpen(false);
-      toast({
-        title: "Success",
-        description: "Post updated successfully!"
-      });
+      toast({ title: "Success", description: "Post updated successfully!" });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update post",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Failed to update post", variant: "destructive" });
     }
   };
 
   const handleDelete = async () => {
     if (!onDelete) return;
-    
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
         await onDelete(post.id);
-        toast({
-          title: "Success",
-          description: "Post deleted successfully!"
-        });
+        toast({ title: "Success", description: "Post deleted successfully!" });
       } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to delete post",
-          variant: "destructive"
-        });
+        toast({ title: "Error", description: "Failed to delete post", variant: "destructive" });
       }
     }
   };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
-    toast({
-      title: "Success",
-      description: "Post link copied to clipboard!"
-    });
+    toast({ title: "Success", description: "Post link copied to clipboard!" });
   };
 
   const isOwnPost = user?.id === post.user_id;
@@ -137,11 +111,11 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const isRepost = !!post.repost_of_post_id;
 
   return (
-    <Card className="bg-white border border-gray-100 overflow-hidden rounded-none sm:rounded-xl shadow-none sm:shadow-lg hover:shadow-none sm:hover:shadow-xl">
+    <Card className="bg-card border border-border/50 overflow-hidden rounded-none sm:rounded-xl shadow-none sm:shadow-lg hover:shadow-none sm:hover:shadow-xl transition-shadow">
       <CardContent className="px-3 py-2 sm:p-6">
         {/* Repost indicator */}
         {isRepost && (
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-3 pb-2 border-b border-gray-100">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3 pb-2 border-b border-border/50">
             <Repeat2 className="w-4 h-4" />
             <span>Reposted by {post.profiles?.full_name || 'User'}</span>
           </div>
@@ -149,54 +123,44 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
         {/* Post Header */}
         <div className="flex items-start justify-between mb-3 sm:mb-4">
-          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+          <div className="flex items-start gap-2.5 sm:gap-4 min-w-0">
             <Avatar 
-              className="h-9 w-9 sm:h-12 sm:w-12 ring-1 sm:ring-2 ring-gray-100 cursor-pointer hover:ring-blue-200 transition-all"
+              className="h-9 w-9 sm:h-12 sm:w-12 ring-1 sm:ring-2 ring-border/30 cursor-pointer hover:ring-primary/30 transition-all"
               onClick={handleProfileClick}
             >
               <AvatarImage src={post.profiles?.avatar_url} />
-              <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
+              <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-base sm:text-lg">
                 {post.profiles?.full_name?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <h4 
-                  className="font-semibold text-gray-900 text-sm sm:text-base truncate max-w-[180px] sm:max-w-none cursor-pointer hover:text-blue-600 transition-colors"
+                  className="font-semibold text-foreground text-sm sm:text-base truncate max-w-[180px] sm:max-w-none cursor-pointer hover:text-blue-600 transition-colors"
                   onClick={handleProfileClick}
                 >
                   {post.profiles?.full_name || 'Professional User'}
                 </h4>
-                <CheckCircle className="w-5 h-5 text-blue-500" />
+                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 shrink-0" />
               </div>
-              
-              {/* post card mei username show karna -- 
-              {post.profiles?.username && (
-                <p className="text-sm text-primary font-medium">@{post.profiles.username}</p>
-              )} */}
-              
-              <p className="text-xs sm:text-sm text-gray-600 font-medium">
+              <p className="text-[11px] sm:text-sm text-muted-foreground font-medium">
                 {post.profiles?.current_position || 'Professional Member'}
               </p>
-              <p className="text-[11px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+              <p className="text-[10px] sm:text-sm text-muted-foreground/70 mt-0.5">
                 {formatTimeAgo(post.created_at)}
               </p>
             </div>
           </div>
           <DropdownMenu>
-            {/* <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
-                <MoreHorizontal className="w-5 h-5" />
-              </Button>
-            </DropdownMenuTrigger> */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Connect/Following button logic */}
               {!isOwnPost && (
                 isConnected ? (
                   <Button
                     size="sm"
                     variant="ghost"
                     disabled
-                    className="h-7 px-2 text-[11px] sm:text-xs text-green-600 font-medium cursor-default"
+                    className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs text-green-600 font-medium cursor-default"
                   >
                     Following
                   </Button>
@@ -204,7 +168,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-7 px-2 text-[11px] sm:text-xs"
+                    className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs"
                   >
                     + Connect
                   </Button>
@@ -212,20 +176,20 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
               )}
 
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-gray-100" >
+                <Button variant="ghost" size="sm" className="h-6 w-6 sm:h-8 sm:w-8 p-0 hover:bg-muted/50">
                   <MoreHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </DropdownMenuTrigger>
             </div>
 
-            <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
+            <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
               {isOwnPost && (
                 <>
                   <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                     <Edit className="w-4 h-4 mr-2" />
                     Edit Post
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                  <DropdownMenuItem onClick={handleDelete} className="text-destructive">
                     <Trash2 className="w-4 h-4 mr-2" />
                     Delete Post
                   </DropdownMenuItem>
@@ -243,7 +207,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
               {!isOwnPost && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600">
+                  <DropdownMenuItem className="text-destructive">
                     <Flag className="w-4 h-4 mr-2" />
                     Report Post
                   </DropdownMenuItem>
@@ -255,7 +219,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
         {/* Post Content */}
         <div className="mb-2 sm:mb-4">
-          <div className="text-base text-gray-800 leading-relaxed mb-3 whitespace-pre-line">
+          <div className="text-sm sm:text-base text-foreground leading-relaxed mb-3 whitespace-pre-line">
             {renderContent(displayContent)}
             {shouldTruncate && (
               <button
@@ -268,14 +232,14 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
           </div>
 
           {/* Hashtags and Mentions */}
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3">
             {extractHashtags(post.content).map((hashtag, index) => (
               <Badge 
                 key={`hashtag-${index}`} 
                 variant="secondary" 
-                className="bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer transition-colors"
+                className="bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer transition-colors text-[10px] sm:text-xs"
               >
-                <Hash className="w-3 h-3 mr-1" />
+                <Hash className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                 {hashtag.substring(1)}
               </Badge>
             ))}
@@ -283,9 +247,9 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
               <Badge 
                 key={`mention-${index}`} 
                 variant="secondary" 
-                className="bg-green-50 text-green-700 hover:bg-green-100 cursor-pointer transition-colors"
+                className="bg-green-50 text-green-700 hover:bg-green-100 cursor-pointer transition-colors text-[10px] sm:text-xs"
               >
-                <AtSign className="w-3 h-3 mr-1" />
+                <AtSign className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                 {mention.substring(1)}
               </Badge>
             ))}
@@ -293,7 +257,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
           {/* Post Image */}
           {post.image_url && (
-            <div className="mt-2 -mx-3 sm:mx-0 sm:rounded-xl overflow-hidden border-t border-b sm:border">
+            <div className="mt-2 -mx-3 sm:mx-0 sm:rounded-xl overflow-hidden border-t border-b sm:border border-border/50">
               <img 
                 src={post.image_url} 
                 alt="Post image" 
@@ -303,7 +267,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
           )}
         </div>
 
-        {/* Post Engagement + Inline Comments */}
+        {/* Post Engagement */}
         <PostEngagementActions
           postId={post.id}
           likesCount={post.likes_count || 0}
@@ -319,7 +283,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="bg-white">
+        <DialogContent className="bg-background">
           <DialogHeader>
             <DialogTitle>Edit Post</DialogTitle>
           </DialogHeader>
