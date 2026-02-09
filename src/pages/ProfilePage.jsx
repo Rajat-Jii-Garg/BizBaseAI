@@ -142,18 +142,23 @@ const ProfilePage = () => {
   }, [connections, sentRequests, receivedRequests, userId]);
 
   const fetchProfile = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (!data) {
+        navigate('/not-found', { replace: true });
+        return;
+      }
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
-      toast({ title: 'Error', description: 'Failed to load profile data', variant: 'destructive' });
+      toast({ title: 'Profile not available', description: 'This profile does not exist or is private', variant: 'destructive' });
+      navigate('/connections');
     } finally {
       setLoading(false);
     }

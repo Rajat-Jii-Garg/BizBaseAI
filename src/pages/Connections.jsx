@@ -65,6 +65,7 @@ const Connections = () => {
       conn.requester_profile?.id === user?.id
         ? conn.addressee_profile
         : conn.requester_profile;
+    if (!profile) return null;
 
     return (
       profile?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -116,7 +117,9 @@ const Connections = () => {
                     <div className="text-center mb-4">
                       <Avatar
                         className="h-16 w-16 mx-auto mb-3 cursor-pointer ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all" 
-                        onClick={() => navigate(`/profile/${profile.id}`)}
+                        onClick={() => {
+                          if (profile?.id) navigate(`/profile/${profile.id}`);
+                        }}
                       >
                         <AvatarImage src={profile.avatar_url} />
                         <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 font-semibold text-lg">
@@ -302,6 +305,7 @@ const Connections = () => {
                           </CardContent>
                         </Card>
                       );
+                      if (!profile) return null;
                     })}
                   </div>
                 )}

@@ -51,11 +51,17 @@ export const useConnections = () => {
 
       if (profilesError) throw profilesError;
 
+    // ----------------------------------------------------------------------
       // Create a map for quick profile lookup
-      const profilesMap = {};
-      profilesData?.forEach(profile => {
-        profilesMap[profile.id] = profile;
-      });
+      // const profilesMap = {};
+      // profilesData?.forEach(profile => {
+      //   profilesMap[profile.id] = profile;
+      // });
+    // ----------------------------------------------------------------------
+
+      const profilesMap = Object.fromEntries(
+        (profilesData || []).map(p => [p.id, p])
+      );
 
       // Enrich connections with profile data
       const enrichedConnections = connectionsData.map(conn => ({
