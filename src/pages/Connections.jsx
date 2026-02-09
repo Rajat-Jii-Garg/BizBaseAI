@@ -65,7 +65,6 @@ const Connections = () => {
       conn.requester_profile?.id === user?.id
         ? conn.addressee_profile
         : conn.requester_profile;
-    if (!profile) return null;
 
     return (
       profile?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -305,7 +304,6 @@ const Connections = () => {
                           </CardContent>
                         </Card>
                       );
-                      if (!profile) return null;
                     })}
                   </div>
                 )}
