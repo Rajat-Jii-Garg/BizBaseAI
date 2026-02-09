@@ -46,7 +46,7 @@ export const useConnections = () => {
       // Fetch profiles for all connected users
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, current_position, location, skills')
+        .select('id, username, full_name, avatar_url, current_position, company_name, industry, location, skills')
         .in('id', Array.from(userIds));
 
       if (profilesError) throw profilesError;
