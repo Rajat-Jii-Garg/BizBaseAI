@@ -80,7 +80,7 @@ const DashboardLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50" style={{ overflowX: 'clip' }}>
       {/* Enhanced Header */}
-      <nav className="bg-white shadow-lg border-b-2 border-blue-100 sticky top-0 z-50">
+      <nav className="bg-white shadow-lg border-b-2 border-blue-100 fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo & Brand */}
@@ -219,7 +219,7 @@ const DashboardLayout = ({ children }) => {
       </nav>
 
       {/* Navigation Bar - All screens with horizontal scroll */}
-      <div className="bg-white border-b border-gray-100 shadow-sm sticky top-16 z-40">
+      <div className="bg-white border-b border-gray-100 shadow-sm fixed top-16 left-0 right-0 z-40">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
           <div className="flex items-center justify-start lg:justify-center py-2 overflow-x-auto scrollbar-hide">
             <div className="flex items-center space-x-1 px-1">
@@ -245,7 +245,7 @@ const DashboardLayout = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1" style={{ overflowX: 'clip' }}>
+      <main className="flex-1 pt-[128px]" style={{ overflowX: 'clip' }}>
         {children}
       </main>
     </div>

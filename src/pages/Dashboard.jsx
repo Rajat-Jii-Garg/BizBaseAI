@@ -494,8 +494,8 @@ const Dashboard = () => {
                   <Card className="bg-white shadow-lg border-0">
                     <CardContent className="p-12 text-center">
                       <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-600" />
-                      <p className="text-gray-600 text-lg">Loading your personalized feed...</p>
-                      <p className="text-gray-500 text-sm mt-2">Analyzing your interests and connections...</p>
+                      <p className="text-gray-600 text-lg">Top Latest Posts...</p>
+                      <p className="text-gray-500 text-sm mt-2">Refreshing latest content posts...</p>
                     </CardContent>
                   </Card>
                 ) : personalizedPosts.length === 0 ? (
