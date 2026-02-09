@@ -10,7 +10,7 @@ export const usePersonalizedFeed = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
-  const limit = 20;
+  const limit = 50;
   const lastFetchTime = useRef(null);
   const isFetching = useRef(false);
 
@@ -68,6 +68,7 @@ export const usePersonalizedFeed = () => {
     try {
       console.log('Using fallback feed...');
       
+      // Fetch all posts without date limit
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select('*')

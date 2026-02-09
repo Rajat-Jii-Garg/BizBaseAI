@@ -78,7 +78,7 @@ const DashboardLayout = ({ children }) => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <div className="min-h-screen bg-gray-50" style={{ overflowX: 'clip' }}>
       {/* Enhanced Header */}
       <nav className="bg-white shadow-lg border-b-2 border-blue-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -245,7 +245,7 @@ const DashboardLayout = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-x-hidden scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <main className="flex-1" style={{ overflowX: 'clip' }}>
         {children}
       </main>
     </div>
