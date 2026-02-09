@@ -101,9 +101,7 @@ serve(async (req) => {
 
     const recentlyViewedPosts = new Set(recentInteractions?.map((i) => i.post_id) || []);
 
-    // 6. Fetch candidate posts (last 7 days, more than limit to allow scoring)
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    
+    // 6. Fetch ALL candidate posts (no date filter - show all posts from DB)
     const { data: candidatePosts, error: postsError } = await supabaseClient
       .from("posts")
       .select(`
@@ -118,9 +116,8 @@ serve(async (req) => {
         created_at,
         updated_at
       `)
-      .gte("created_at", sevenDaysAgo)
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(1000);
 
     if (postsError) {
       console.error("Error fetching posts:", postsError);

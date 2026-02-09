@@ -335,7 +335,7 @@ const Dashboard = () => {
         open={showUsernameModal} 
         onClose={() => setShowUsernameModal(false)} 
       />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-x-hidden scrollbar-hide">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ overflowX: 'clip' }}>
         <div className="max-w-7xl mx-auto px-0 sm:px-4 lg:px-8 py-0 sm:py-6">
           {/* Profile Completion Banner */}
           <ProfileCompletionBanner />
