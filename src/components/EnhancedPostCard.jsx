@@ -22,7 +22,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const [editContent, setEditContent] = useState(post.content);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [userHasReposted, setUserHasReposted] = useState(post.user_has_reposted || false);
-  const [connectionStatus, setConnectionStatus] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('none');
   const [loadingConnection, setLoadingConnection] = useState(true);
 
   useEffect(() => {
@@ -32,27 +32,38 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   useEffect(() => {
     const checkConnectionStatus = async () => {
       if (!user || !post.user_id || user.id === post.user_id) {
+        setConnectionStatus('none');
         setLoadingConnection(false);
         return;
       }
 
-      const { data } = await supabase
-        .from('connections')
-        .select('status')
-        .or(
-          `and(requester_id.eq.${user.id},addressee_id.eq.${post.user_id}),and(requester_id.eq.${post.user_id},addressee_id.eq.${user.id})`
-        )
-        .maybeSingle();
+      try {
+        const { data, error } = await supabase
+          .from('connections')
+          .select('status')
+          .or(
+            `and(requester_id.eq.${user.id},addressee_id.eq.${post.user_id}),and(requester_id.eq.${post.user_id},addressee_id.eq.${user.id})`
+          )
+          .limit(1);
 
-      if (data) {
-        setConnectionStatus(data.status);
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setConnectionStatus(data[0].status); // pending / accepted
+        } else {
+          setConnectionStatus('none');
+        }
+
+      } catch (err) {
+        console.error("Connection check error:", err);
+        setConnectionStatus('none');
       }
 
       setLoadingConnection(false);
     };
 
     checkConnectionStatus();
-  }, [user, post.user_id]);
+  }, [user?.id, post.user_id]);
 
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
