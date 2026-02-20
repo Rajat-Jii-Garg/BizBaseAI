@@ -7,6 +7,14 @@ import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import CommentItem from './CommentItem';
+import {
+  Link,
+  Users,
+  Mail,
+  Instagram,
+  Linkedin,
+  Facebook
+} from "lucide-react";
 
 const MAX_VISIBLE_COMMENTS = 3;
 
@@ -348,11 +356,10 @@ const PostEngagementActions = ({
           onClick={() => setShowShareModal(false)}
         >
           <div
-            className="bg-[#f4f6f8] w-full rounded-t-3xl p-5 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-[#f4f6f8] w-full rounded-t-3xl p-5 space-y-7 shadow-2xl max-h-[90vh] overflow-y-auto animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag Handle */}
-            <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto"></div>
             <h3 className="text-base font-semibold text-center">Share Post</h3>
 
             {/* 🔥 SEND TO SECTION */}
@@ -393,103 +400,102 @@ const PostEngagementActions = ({
               </p>
 
               <div className="flex gap-6 overflow-x-auto scrollbar-hide text-center">
-                
-                {/* Copy */}
+                {/* Copy Link */}
                 <div
-                  className="min-w-[70px] cursor-pointer"
+                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                     setShowShareModal(false);
                   }}
                 >
-                  <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow">
-                    🔗
+                  <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow-md">
+                    <Link size={22} />
                   </div>
-                  <p className="text-xs mt-2">Copy Link</p>
+                  <p className="text-xs mt-2">Copy</p>
                 </div>
 
                 {/* Community */}
-                <div className="min-w-[70px] cursor-pointer">
-                  <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow">
-                    👥
+                <div className="min-w-[80px] flex flex-col items-center cursor-pointer">
+                  <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow-md">
+                    <Users size={22} />
                   </div>
                   <p className="text-xs mt-2">Community</p>
                 </div>
 
                 {/* WhatsApp */}
                 <div
-                  className="min-w-[70px] cursor-pointer"
+                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
                     window.open(`https://wa.me/?text=${window.location.href}`);
                     setShowShareModal(false);
                   }}
                 >
-                  <div className="h-14 w-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow">
-                    🟢
+                  <div className="h-14 w-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-md">
+                    <MessageSquare size={22} />
                   </div>
                   <p className="text-xs mt-2">WhatsApp</p>
                 </div>
 
                 {/* Twitter */}
                 <div
-                  className="min-w-[70px] cursor-pointer"
+                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
                     window.open(`https://twitter.com/intent/tweet?url=${window.location.href}`);
                     setShowShareModal(false);
                   }}
                 >
-                  <div className="h-14 w-14 bg-blue-400 text-white rounded-full flex items-center justify-center shadow">
-                    🐦
+                  <div className="h-14 w-14 bg-blue-400 text-white rounded-full flex items-center justify-center shadow-md">
+                    <Send size={22} />
                   </div>
                   <p className="text-xs mt-2">Twitter</p>
                 </div>
 
                 {/* Gmail */}
                 <div
-                  className="min-w-[70px] cursor-pointer"
+                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
                     window.open(`mailto:?subject=Check this out&body=${window.location.href}`);
                     setShowShareModal(false);
                   }}
                 >
-                  <div className="h-14 w-14 bg-red-500 text-white rounded-full flex items-center justify-center shadow">
-                    ✉️
+                  <div className="h-14 w-14 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md">
+                    <Mail size={22} />
                   </div>
                   <p className="text-xs mt-2">Gmail</p>
                 </div>
 
                 {/* Instagram */}
-                <div className="min-w-[70px] cursor-pointer">
-                  <div className="h-14 w-14 bg-pink-500 text-white rounded-full flex items-center justify-center shadow">
-                    📸
+                <div className="min-w-[80px] flex flex-col items-center cursor-pointer">
+                  <div className="h-14 w-14 bg-gradient-to-tr from-pink-500 to-yellow-400 text-white rounded-full flex items-center justify-center shadow-md">
+                    <Instagram size={22} />
                   </div>
                   <p className="text-xs mt-2">Instagram</p>
                 </div>
 
                 {/* LinkedIn */}
                 <div
-                  className="min-w-[70px] cursor-pointer"
+                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
                     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${window.location.href}`);
                     setShowShareModal(false);
                   }}
                 >
-                  <div className="h-14 w-14 bg-blue-700 text-white rounded-full flex items-center justify-center shadow">
-                    💼
+                  <div className="h-14 w-14 bg-blue-700 text-white rounded-full flex items-center justify-center shadow-md">
+                    <Linkedin size={22} />
                   </div>
                   <p className="text-xs mt-2">LinkedIn</p>
                 </div>
 
                 {/* Facebook */}
                 <div
-                  className="min-w-[70px] cursor-pointer"
+                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
                     window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`);
                     setShowShareModal(false);
                   }}
                 >
-                  <div className="h-14 w-14 bg-blue-600 text-white rounded-full flex items-center justify-center shadow">
-                    📘
+                  <div className="h-14 w-14 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md">
+                    <Facebook size={22} />
                   </div>
                   <p className="text-xs mt-2">Facebook</p>
                 </div>
