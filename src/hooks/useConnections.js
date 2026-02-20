@@ -257,7 +257,7 @@ export const useConnections = () => {
     fetchConnections().then(fetchSuggestions);
 
     const channel = supabase
-      .channel(`connections_${user.id}_${Date.now()}`)
+      .channel(`connections_${user.id}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'connections' },

@@ -12,13 +12,12 @@ import PostEngagementActions from './PostEngagementActions';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useConnections } from '@/hooks/useConnections';
+import { supabase } from '@/integrations/supabase/client';
 
 const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { connect } = useConnections();
   const [showFullContent, setShowFullContent] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -113,12 +112,32 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
   const handleConnect = async () => {
     try {
-      await connect(post.user_id);
-      toast({
-        title: "Request Sent",
-        description: "Connection request sent successfully!",
-      });
-    } catch (error) {
+      const { error } = await supabase
+        .from('connections')
+        .insert({
+          requester_id: user.id,
+          addressee_id: post.user_id,
+          status: 'pending'
+        });
+
+      if (error) {
+        if (error.code === '23505') {
+          toast({
+            title: "Already Sent",
+            description: "Connection request already exists.",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Request Sent",
+          description: "Connection request sent successfully!",
+        });
+      }
+
+    } catch (err) {
+      console.error(err);
       toast({
         title: "Error",
         description: "Unable to send request.",
