@@ -20,7 +20,7 @@ export const usePostEngagement = () => {
         .select('id')
         .eq('post_id', postId)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (existingLike) {
         await supabase
@@ -92,7 +92,7 @@ export const usePostEngagement = () => {
 
       if (existingShare) {
         toast("Already Shared", { description: "You have already shared this post" });
-        return;
+        return false;
       }
 
       const { error } = await supabase
@@ -114,6 +114,8 @@ export const usePostEngagement = () => {
     } finally {
       setLoading(false);
     }
+    if (error) return false;
+    return true;
   };
 
   const repostPost = async (postId, originalPost = null) => {

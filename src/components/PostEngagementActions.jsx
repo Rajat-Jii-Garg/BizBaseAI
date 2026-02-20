@@ -29,6 +29,13 @@ const PostEngagementActions = ({
   const [loadingComments, setLoadingComments] = useState(false);
   const [showAllComments, setShowAllComments] = useState(false);
 
+  const [localLikes, setLocalLikes] = useState(likesCount || 0);
+  const [localComments, setLocalComments] = useState(commentsCount || 0);
+  const [localShares, setLocalShares] = useState(sharesCount || 0);
+  const [localReposts, setLocalReposts] = useState(repostsCount || 0);
+  const [localUserHasLiked, setLocalUserHasLiked] = useState(userHasLiked);
+  const [localUserHasReposted, setLocalUserHasReposted] = useState(userHasReposted);
+
   const fetchComments = useCallback(async () => {
     setLoadingComments(true);
     try {
@@ -70,9 +77,24 @@ const PostEngagementActions = ({
     }
   }, [showCommentInput, fetchComments]);
 
+  useEffect(() => {
+    setLocalLikes(likesCount || 0);
+    setLocalComments(commentsCount || 0);
+    setLocalShares(sharesCount || 0);
+    setLocalReposts(repostsCount || 0);
+    setLocalUserHasLiked(userHasLiked);
+    setLocalUserHasReposted(userHasReposted);
+  }, [likesCount, commentsCount, sharesCount, repostsCount, userHasLiked, userHasReposted]);
+
   const handleUpvote = async () => {
+    const wasLiked = localUserHasLiked;
     await toggleLike(postId);
-    onEngagementUpdate();
+    if (wasLiked) {
+      setLocalLikes(prev => (prev > 0 ? prev - 1 : 0));
+    } else {
+      setLocalLikes(prev => prev + 1);
+    }
+    setLocalUserHasLiked(!wasLiked);
   };
 
   const handleFeedback = async () => {
@@ -80,23 +102,26 @@ const PostEngagementActions = ({
       await addComment(postId, commentText);
       setCommentText('');
       await fetchComments();
-      onEngagementUpdate();
+      setLocalComments(prev => prev + 1);
     }
   };
 
   const handleShare = async () => {
-    await sharePost(postId);
-    onEngagementUpdate();
+    const result = await sharePost(postId);
+    if (result !== false) {
+      setLocalShares(prev => prev + 1);
+    }
   };
 
   const handleRepost = async () => {
+    if (localUserHasReposted) return;
     await repostPost(postId, originalPost);
-    onEngagementUpdate();
+    setLocalReposts(prev => prev + 1);
+    setLocalUserHasReposted(true);
   };
 
   const handleCommentUpdate = () => {
     fetchComments();
-    onEngagementUpdate();
   };
 
   const visibleComments = showAllComments ? comments : comments.slice(0, MAX_VISIBLE_COMMENTS);
@@ -109,21 +134,21 @@ const PostEngagementActions = ({
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="flex items-center gap-1">
             <ArrowBigUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {likesCount} <span className="hidden sm:inline">upvotes</span>
+            {localLikes} <span className="hidden sm:inline">upvotes</span>
           </span>
           <span className="flex items-center gap-1">
             <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {commentsCount} <span className="hidden sm:inline">feedback</span>
+            {localComments} <span className="hidden sm:inline">feedback</span>
           </span>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="flex items-center gap-1">
             <Repeat2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {repostsCount} <span className="hidden sm:inline">reposts</span>
+            {localReposts} <span className="hidden sm:inline">reposts</span>
           </span>
           <span className="flex items-center gap-1">
             <Share2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {sharesCount} <span className="hidden sm:inline">shares</span>
+            {localShares} <span className="hidden sm:inline">shares</span>
           </span>
         </div>
       </div>
@@ -134,12 +159,12 @@ const PostEngagementActions = ({
           variant="ghost"
           size="sm"
           className={`flex-1 h-8 sm:h-9 hover:bg-muted/50 ${
-            userHasLiked ? 'text-blue-600' : 'text-muted-foreground'
+            localUserHasLiked ? 'text-blue-600' : 'text-muted-foreground'
           }`}
           onClick={handleUpvote}
           disabled={loading}
         >
-          <ArrowBigUp className={`w-4 h-4 sm:w-5 sm:h-5 ${userHasLiked ? 'fill-current' : ''}`} />
+          <ArrowBigUp className={`w-4 h-4 sm:w-5 sm:h-5 ${localUserHasLiked ? 'fill-current' : ''}`} />
           <span className="text-xs font-medium hidden sm:inline sm:ml-1">Upvote</span>
         </Button>
 
@@ -159,13 +184,13 @@ const PostEngagementActions = ({
           variant="ghost"
           size="sm"
           className={`flex-1 h-8 sm:h-9 hover:bg-muted/50 ${
-            userHasReposted ? 'text-green-600' : 'text-muted-foreground'
+            localUserHasReposted ? 'text-green-600' : 'text-muted-foreground'
           }`}
           onClick={handleRepost}
-          disabled={loading || userHasReposted}
+          disabled={loading || localUserHasReposted}
         >
-          <Repeat2 className={`w-4 h-4 sm:w-5 sm:h-5 ${userHasReposted ? 'text-green-600' : ''}`} />
-          <span className="text-xs font-medium hidden sm:inline sm:ml-1">{userHasReposted ? 'Reposted' : 'Repost'}</span>
+          <Repeat2 className={`w-4 h-4 sm:w-5 sm:h-5 ${localUserHasReposted ? 'text-green-600' : ''}`} />
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">{localUserHasReposted ? 'Reposted' : 'Repost'}</span>
         </Button>
 
         <Button
