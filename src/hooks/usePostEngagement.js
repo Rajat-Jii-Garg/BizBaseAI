@@ -68,7 +68,7 @@ export const usePostEngagement = () => {
         .select('id')
         .eq('post_id', postId)
         .eq('user_id', user.id)
-        .maybesingle();
+        .maybeSingle();
 
       if (existingShare) {
         // toast("Already Shared", { description: "You have already shared this post" });
@@ -94,71 +94,70 @@ export const usePostEngagement = () => {
     } finally {
       setLoading(false);
     }
-    if (error) return false;
     return true;
   };
 
   const repostPost = async (postId, originalPost = null) => {
-  if (!user) return false;
-  setLoading(true);
-  try {
-    const { data: existingRepost } = await supabase
-      .from('post_reposts')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_id', user.id)
-      .maybeSingle();
+    if (!user) return false;
+    setLoading(true);
+    try {
+      const { data: existingRepost } = await supabase
+        .from('post_reposts')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-    // 🔁 IF ALREADY REPOSTED → UNDO
-    if (existingRepost) {
+      // 🔁 IF ALREADY REPOSTED → UNDO
+      if (existingRepost) {
+        await supabase
+          .from('post_reposts')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+
+        await supabase
+          .from('posts')
+          .delete()
+          .eq('repost_of_post_id', postId)
+          .eq('user_id', user.id);
+        return "removed";
+      }
+
+      // 🆕 IF NOT REPOSTED → CREATE
+      let postData = originalPost;
+      if (!postData) {
+        const { data } = await supabase
+          .from('posts')
+          .select('*, profiles:user_id(full_name, avatar_url)')
+          .eq('id', postId)
+          .single();
+        postData = data;
+      }
+
+      if (!postData) return false;
       await supabase
         .from('post_reposts')
-        .delete()
-        .eq('post_id', postId)
-        .eq('user_id', user.id);
-
+        .insert({ post_id: postId, user_id: user.id });
+      const repostContent = `🔄 Reposted from @${postData.profiles?.full_name || 'User'}\n\n${postData.content}`;
       await supabase
         .from('posts')
-        .delete()
-        .eq('repost_of_post_id', postId)
-        .eq('user_id', user.id);
-      return "removed";
+        .insert({
+          user_id: user.id,
+          content: repostContent,
+          image_url: postData.image_url,
+          repost_of_post_id: postId,
+          repost_of_user_id: postData.user_id
+        });
+
+      return "added";
+    } catch (error) {
+      console.error('Error reposting:', error);
+      return false;
+    } finally {
+      setLoading(false);
     }
-
-    // 🆕 IF NOT REPOSTED → CREATE
-    let postData = originalPost;
-    if (!postData) {
-      const { data } = await supabase
-        .from('posts')
-        .select('*, profiles:user_id(full_name, avatar_url)')
-        .eq('id', postId)
-        .single();
-      postData = data;
-    }
-
-    if (!postData) return false;
-    await supabase
-      .from('post_reposts')
-      .insert({ post_id: postId, user_id: user.id });
-    const repostContent = `🔄 Reposted from @${postData.profiles?.full_name || 'User'}\n\n${postData.content}`;
-    await supabase
-      .from('posts')
-      .insert({
-        user_id: user.id,
-        content: repostContent,
-        image_url: postData.image_url,
-        repost_of_post_id: postId,
-        repost_of_user_id: postData.user_id
-      });
-
-    return "added";
-  } catch (error) {
-    console.error('Error reposting:', error);
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return {
     toggleLike,
