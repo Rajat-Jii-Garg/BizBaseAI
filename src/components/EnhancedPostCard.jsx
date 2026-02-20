@@ -18,7 +18,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { sendRequest } = useConnections();
+  const { connect } = useConnections();
   const [showFullContent, setShowFullContent] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
