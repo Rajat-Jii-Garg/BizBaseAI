@@ -22,10 +22,37 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const [editContent, setEditContent] = useState(post.content);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [userHasReposted, setUserHasReposted] = useState(post.user_has_reposted || false);
+  const [connectionStatus, setConnectionStatus] = useState(null);
+  const [loadingConnection, setLoadingConnection] = useState(true);
 
   useEffect(() => {
     setUserHasReposted(post.user_has_reposted || false);
   }, [post.user_has_reposted]);
+
+  useEffect(() => {
+    const checkConnectionStatus = async () => {
+      if (!user || !post.user_id || user.id === post.user_id) {
+        setLoadingConnection(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('connections')
+        .select('status')
+        .or(
+          `and(requester_id.eq.${user.id},addressee_id.eq.${post.user_id}),and(requester_id.eq.${post.user_id},addressee_id.eq.${user.id})`
+        )
+        .maybeSingle();
+
+      if (data) {
+        setConnectionStatus(data.status);
+      }
+
+      setLoadingConnection(false);
+    };
+
+    checkConnectionStatus();
+  }, [user, post.user_id]);
 
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
@@ -111,6 +138,8 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const isRepost = !!post.repost_of_post_id;
 
   const handleConnect = async () => {
+    if (!user) return;
+
     try {
       const { error } = await supabase
         .from('connections')
@@ -126,6 +155,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
             title: "Already Sent",
             description: "Connection request already exists.",
           });
+          setConnectionStatus('pending');
         } else {
           throw error;
         }
@@ -134,10 +164,12 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
           title: "Request Sent",
           description: "Connection request sent successfully!",
         });
+
+        // 🔥 Immediately change button
+        setConnectionStatus('pending');
       }
 
     } catch (err) {
-      console.error(err);
       toast({
         title: "Error",
         description: "Unable to send request.",
@@ -190,27 +222,36 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
           <DropdownMenu>
             <div className="flex items-center gap-1 sm:gap-2">
               {/* Connect/Following button logic */}
-              {!isOwnPost && (
-                isConnected ? (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled
-                    className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs text-green-600 font-medium cursor-default"
-                  >
-                    Following
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleConnect}
-                    className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs"
-                  >
-                    + Connect
-                  </Button>
-                )
-              )}
+              {!isOwnPost && !loadingConnection && (
+                  connectionStatus === 'accepted' ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled
+                      className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs text-green-600 font-medium cursor-default opacity-70"
+                    >
+                      Following
+                    </Button>
+                  ) : connectionStatus === 'pending' ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled
+                      className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs opacity-60 cursor-not-allowed"
+                    >
+                      Request Sent
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleConnect}
+                      className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs"
+                    >
+                      + Connect
+                    </Button>
+                  )
+                )}
 
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-6 w-6 sm:h-8 sm:w-8 p-0 hover:bg-muted/50">
