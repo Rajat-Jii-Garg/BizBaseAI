@@ -114,10 +114,15 @@ const PostEngagementActions = ({
   };
 
   const handleRepost = async () => {
-    if (localUserHasReposted) return;
-    await repostPost(postId, originalPost);
-    setLocalReposts(prev => prev + 1);
-    setLocalUserHasReposted(true);
+    const result = await repostPost(postId, originalPost);
+    if (result === "added") {
+      setLocalReposts(prev => prev + 1);
+      setLocalUserHasReposted(true);
+    }
+    if (result === "removed") {
+      setLocalReposts(prev => (prev > 0 ? prev - 1 : 0));
+      setLocalUserHasReposted(false);
+    }
   };
 
   const handleCommentUpdate = () => {
@@ -187,7 +192,7 @@ const PostEngagementActions = ({
             localUserHasReposted ? 'text-green-600' : 'text-muted-foreground'
           }`}
           onClick={handleRepost}
-          disabled={loading || localUserHasReposted}
+          disabled={loading}
         >
           <Repeat2 className={`w-4 h-4 sm:w-5 sm:h-5 ${localUserHasReposted ? 'text-green-600' : ''}`} />
           <span className="text-xs font-medium hidden sm:inline sm:ml-1">{localUserHasReposted ? 'Reposted' : 'Repost'}</span>
