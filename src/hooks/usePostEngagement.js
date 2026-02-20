@@ -68,7 +68,7 @@ export const usePostEngagement = () => {
         .select('id')
         .eq('post_id', postId)
         .eq('user_id', user.id)
-        .single();
+        .maybesingle();
 
       if (existingShare) {
         // toast("Already Shared", { description: "You have already shared this post" });

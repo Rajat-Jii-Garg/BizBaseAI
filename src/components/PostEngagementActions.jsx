@@ -35,6 +35,7 @@ const PostEngagementActions = ({
   const [localReposts, setLocalReposts] = useState(repostsCount || 0);
   const [localUserHasLiked, setLocalUserHasLiked] = useState(userHasLiked);
   const [localUserHasReposted, setLocalUserHasReposted] = useState(userHasReposted);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const fetchComments = useCallback(async () => {
     setLoadingComments(true);
@@ -107,6 +108,7 @@ const PostEngagementActions = ({
   };
 
   const handleShare = async () => {
+    setShowShareModal(true);
     const result = await sharePost(postId);
     if (result !== false) {
       setLocalShares(prev => prev + 1);
@@ -293,6 +295,58 @@ const PostEngagementActions = ({
           )}
         </div>
       )}
+
+      {/* Share Popup Screen */}
+      {showShareModal && (
+      <div className="fixed inset-0 bg-black/40 flex items-end z-50">
+        <div className="bg-white w-full rounded-t-2xl p-4 space-y-4 animate-slide-up">
+          <h3 className="text-sm font-semibold text-center">Share Post</h3>
+
+          <div className="flex justify-around text-sm">
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                setShowShareModal(false);
+              }}
+              className="flex flex-col items-center"
+            >
+              🔗
+              <span>Copy Link</span>
+            </button>
+
+            <button
+              onClick={() => {
+                window.open(`https://wa.me/?text=${window.location.href}`);
+                setShowShareModal(false);
+              }}
+              className="flex flex-col items-center"
+            >
+              🟢
+              <span>WhatsApp</span>
+            </button>
+
+            <button
+              onClick={() => {
+                window.open(`https://twitter.com/intent/tweet?url=${window.location.href}`);
+                setShowShareModal(false);
+              }}
+              className="flex flex-col items-center"
+            >
+              🐦
+              <span>Twitter</span>
+            </button>
+          </div>
+
+          <Button
+            variant="ghost"
+            onClick={() => setShowShareModal(false)}
+            className="w-full"
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    )}
     </div>
   );
 };
