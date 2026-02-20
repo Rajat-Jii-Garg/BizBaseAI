@@ -12,12 +12,13 @@ import PostEngagementActions from './PostEngagementActions';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useConnections } from '@/hooks/useConnections';
 
 const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { sendRequest } = useConnections();
   const [showFullContent, setShowFullContent] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -110,6 +111,22 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const isConnected = post.is_connected === true;
   const isRepost = !!post.repost_of_post_id;
 
+  const handleConnect = async () => {
+    try {
+      await connect(post.user_id);
+      toast({
+        title: "Request Sent",
+        description: "Connection request sent successfully!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Unable to send request.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="bg-card border border-border/50 overflow-hidden rounded-none sm:rounded-xl shadow-none sm:shadow-lg hover:shadow-none sm:hover:shadow-xl transition-shadow">
       <CardContent className="px-3 py-2 sm:p-6">
@@ -168,6 +185,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
                   <Button
                     size="sm"
                     variant="outline"
+                    onClick={handleConnect}
                     className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs"
                   >
                     + Connect
