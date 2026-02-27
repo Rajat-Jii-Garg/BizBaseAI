@@ -311,7 +311,9 @@ const Dashboard = () => {
   };
 
   const handleViewProfile = () => {
-    navigate('/${profile?.username}');
+    if (profile?.username) {
+      navigate(`/${profile.username}`);
+    }
   };
 
   // Show loader while auth is loading
@@ -386,7 +388,7 @@ const Dashboard = () => {
                 <CardContent className="p-4 sm:p-6 text-center relative">
                   <Avatar 
                     className="h-16 w-16 sm:h-20 sm:w-20 mx-auto -mt-10 sm:-mt-12 mb-3 sm:mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
-                    onClick={() => navigate('/${profile?.username}')}
+                    onClick={() => navigate(`/${profile?.username}`)}
                   >
                     <AvatarImage src={profile?.avatar_url} />
                     <AvatarFallback className="text-base sm:text-lg">
@@ -395,12 +397,12 @@ const Dashboard = () => {
                   </Avatar>
                   <h3 
                     className="font-bold text-gray-900 mb-1 text-base sm:text-lg cursor-pointer hover:text-blue-600 transition-colors"
-                    onClick={() => navigate('/${profile?.username}')}
+                    onClick={() => navigate(`/${profile?.username}`)}
                   >
                     {profile?.full_name || 'Professional User'}
                   </h3>
                   {profile?.username && (
-                    <p className="text-sm text-primary font-medium mb-1 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => navigate('/${profile?.username}')}>@{profile.username}</p>
+                    <p className="text-sm text-primary font-medium mb-1 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => navigate(`/${profile?.username}`)}>@{profile.username}</p>
                   )}
                   <p className="text-xs sm:text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
@@ -420,7 +422,7 @@ const Dashboard = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full text-xs sm:text-sm"
-                    onClick={() => navigate('/${profile?.username}')}
+                    onClick={() => navigate(`/${profile?.username}`)}
                   >
                     <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     View Profile
