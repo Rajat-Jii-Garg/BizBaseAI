@@ -132,7 +132,11 @@ const CommentItem = ({ comment, postId, onUpdate, isReply = false }) => {
         {/* Avatar */}
         <Avatar
           className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 cursor-pointer ring-1 ring-border/30 hover:ring-primary/30 transition-all"
-          onClick={() => navigate(`/profile/${comment.user_id}`)}
+          onClick={() => {
+            if (comment.profiles?.username) {
+              navigate(`/${comment.profiles.username}`);
+            }
+          }}
         >
           <AvatarImage src={comment.profiles?.avatar_url} />
           <AvatarFallback className="bg-gradient-to-br from-blue-50 to-purple-50 text-blue-700 text-[10px] sm:text-xs font-semibold">
@@ -147,7 +151,11 @@ const CommentItem = ({ comment, postId, onUpdate, isReply = false }) => {
               <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
                 <span
                   className="font-semibold text-[11px] sm:text-xs text-foreground cursor-pointer hover:text-blue-600 transition-colors truncate"
-                  onClick={() => navigate(`/profile/${comment.user_id}`)}
+                  onClick={() => {
+                    if (comment.profiles?.username) {
+                      navigate(`/${comment.profiles.username}`);
+                    }
+                  }}
                 >
                   {comment.profiles?.full_name || 'User'}
                 </span>

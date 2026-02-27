@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MoreHorizontal, CheckCircle } from 'lucide-react';
 import PostEngagementActions from './PostEngagementActions';
+import { useNavigate } from 'react-router-dom';
 
 const PostCard = ({ post, onEngagementUpdate }) => {
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
+    const navigate = useNavigate();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
     
     if (diffInHours < 1) return 'now';
@@ -23,7 +25,13 @@ const PostCard = ({ post, onEngagementUpdate }) => {
         {/* Post Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-start space-x-3">
-            <Avatar className="h-10 w-10">
+            <Avatar className="h-10 w-10 cursor-pointer"
+              onClick={() => {
+                if (post.profiles?.username) {
+                  navigate(`/${post.profiles.username}`);
+                }
+              }}
+            >
               <AvatarImage src={post.profiles?.avatar_url} />
               <AvatarFallback className="bg-gray-100 text-gray-600 font-semibold">
                 {post.profiles?.full_name?.charAt(0) || 'U'}
@@ -31,7 +39,13 @@ const PostCard = ({ post, onEngagementUpdate }) => {
             </Avatar>
             <div>
               <div className="flex items-center space-x-1">
-                <h4 className="font-semibold text-gray-900 text-sm">
+                <h4 className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600"
+                  onClick={() => {
+                    if (post.profiles?.username) {
+                      navigate(`/${post.profiles.username}`);
+                    }
+                  }}
+                >
                   {post.profiles?.full_name || 'Unknown User'}
                 </h4>
                 <CheckCircle className="w-4 h-4 text-blue-500" />

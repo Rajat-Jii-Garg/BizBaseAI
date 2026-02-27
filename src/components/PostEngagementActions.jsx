@@ -67,7 +67,7 @@ const PostEngagementActions = ({
 
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, current_position')
+        .select('id, username, full_name, avatar_url, current_position')
         .in('id', userIds);
 
       const commentsWithProfiles = data?.map(comment => ({

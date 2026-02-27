@@ -186,9 +186,13 @@ const UserProfileDropdown = () => {
           </div>
           
           <div className="py-1">
-            <button 
-              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
-              onClick={() => { navigate('/profile-dashboard'); setOpen(false); }}
+            <button className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+              onClick={() => {
+                if (profile?.username) {
+                  navigate(`/${profile.username}`);
+                }
+                setOpen(false);
+              }}
             >
               <User className="w-4 h-4" /> My Profile
             </button>
