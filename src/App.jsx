@@ -55,6 +55,7 @@ import {
 } from "./pages/Businesses";
 // Username profile resolver
 import UsernameProfile from "./pages/UsernameProfile";
+import SinglePostPage from "./pages/SinglePostPage";
 
 const queryClient = new QueryClient();
 
