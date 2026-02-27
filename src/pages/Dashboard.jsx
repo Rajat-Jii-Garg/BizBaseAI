@@ -194,7 +194,7 @@ const Dashboard = () => {
 
       const { data: suggestions } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, current_position, company_name, industry')
+        .select('id, username, full_name, avatar_url, current_position, company_name, industry')
         .neq('id', user.id)
         .limit(10);
 
@@ -311,7 +311,7 @@ const Dashboard = () => {
   };
 
   const handleViewProfile = () => {
-    navigate('/profile-dashboard');
+    navigate('/${profile?.username}');
   };
 
   // Show loader while auth is loading
@@ -381,12 +381,12 @@ const Dashboard = () => {
             <div className="hidden lg:block lg:col-span-3 space-y-6">
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
                 <div className="h-16 sm:h-20 bg-gradient-to-r from-blue-600 to-purple-600 bg-cover bg-center" 
-                     style={profile?.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : {}}>
+                    style={profile?.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : {}}>
                 </div>
                 <CardContent className="p-4 sm:p-6 text-center relative">
                   <Avatar 
                     className="h-16 w-16 sm:h-20 sm:w-20 mx-auto -mt-10 sm:-mt-12 mb-3 sm:mb-4 ring-4 ring-white shadow-xl cursor-pointer hover:ring-blue-200 transition-all"
-                    onClick={() => navigate('/profile-dashboard')}
+                    onClick={() => navigate('/${profile?.username}')}
                   >
                     <AvatarImage src={profile?.avatar_url} />
                     <AvatarFallback className="text-base sm:text-lg">
@@ -395,12 +395,12 @@ const Dashboard = () => {
                   </Avatar>
                   <h3 
                     className="font-bold text-gray-900 mb-1 text-base sm:text-lg cursor-pointer hover:text-blue-600 transition-colors"
-                    onClick={() => navigate('/profile-dashboard')}
+                    onClick={() => navigate('/${profile?.username}')}
                   >
                     {profile?.full_name || 'Professional User'}
                   </h3>
                   {profile?.username && (
-                    <p className="text-sm text-primary font-medium mb-1 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => navigate('/profile-dashboard')}>@{profile.username}</p>
+                    <p className="text-sm text-primary font-medium mb-1 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => navigate('/${profile?.username}')}>@{profile.username}</p>
                   )}
                   <p className="text-xs sm:text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
@@ -420,7 +420,7 @@ const Dashboard = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full text-xs sm:text-sm"
-                    onClick={() => navigate('/profile-dashboard')}
+                    onClick={() => navigate('/${profile?.username}')}
                   >
                     <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     View Profile
@@ -601,7 +601,7 @@ const Dashboard = () => {
                         <div className="flex items-center gap-3">
                           <Avatar 
                             className="h-10 w-10 shrink-0 cursor-pointer hover:ring-2 hover:ring-blue-200 transition-all"
-                            onClick={() => navigate(`/profile/${connection.id}`)}
+                            onClick={() => navigate(`/${connection.username}`)}
                           >
                             <AvatarImage src={connection.avatar_url} />
                             <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold text-sm">
@@ -611,7 +611,7 @@ const Dashboard = () => {
                           <div className="flex-1 min-w-0">
                             <h4 
                               className="font-semibold text-sm text-gray-900 cursor-pointer hover:text-blue-600 transition-colors truncate"
-                              onClick={() => navigate(`/profile/${connection.id}`)}
+                              onClick={() => navigate(`/${connection.username}`)}
                             >
                               {connection.full_name || 'Professional User'}
                             </h4>

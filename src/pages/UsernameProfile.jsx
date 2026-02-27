@@ -19,13 +19,13 @@ const UsernameProfile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('id')
         .eq('username', username)
-        .single();
+        .maybeSingle();
 
-      if (!data) {
+      if (!data || error) {
         setNotFound(true);
       } else {
         setProfileId(data.id);

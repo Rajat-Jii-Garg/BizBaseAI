@@ -172,11 +172,11 @@ const App = () => (
               <Route path="/demo" element={<Demo />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
-              <Route path="/profile-dashboard" element={
+              {/* <Route path="/profile-dashboard" element={
                 <ProtectedRoute>
                   <ProfileDashboard />
                 </ProtectedRoute>
-              } />
+              } /> */}
               
               {/* Business Routes */}
               <Route path="/my-businesses" element={
