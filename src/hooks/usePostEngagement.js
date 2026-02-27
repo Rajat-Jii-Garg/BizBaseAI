@@ -81,7 +81,32 @@ export const usePostEngagement = () => {
 
       if (error) throw error;
 
-      const postUrl = `${window.location.origin}/post/${postId}`;
+      // Fetch post owner's username
+      const { data: postData, error: postError } = await supabase
+        .from("posts")
+        .select(`
+          id,
+          profiles:user_id (
+            username
+          )
+        `)
+        .eq("id", postId)
+        .single();
+
+      if (postError || !postData) {
+        console.error("Error fetching post for share:", postError);
+        return false;
+      }
+
+      const username = postData.profiles?.username;
+
+      if (!username) {
+        console.error("Username not found for post");
+        return false;
+      }
+      // Create correct share URL
+      const postUrl = `${window.location.origin}/${username}/${postId}`;
+      
       try {
         await navigator.clipboard.writeText(postUrl);
         // toast("Post Shared", { description: "Post link copied to clipboard and shared to your network" });

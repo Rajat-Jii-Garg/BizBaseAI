@@ -8,10 +8,10 @@ import PostEngagementActions from './PostEngagementActions';
 import { useNavigate } from 'react-router-dom';
 
 const PostCard = ({ post, onEngagementUpdate }) => {
+  const navigate = useNavigate();
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
-    const navigate = useNavigate();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
     
     if (diffInHours < 1) return 'now';
@@ -60,7 +60,13 @@ const PostCard = ({ post, onEngagementUpdate }) => {
         </div>
 
         {/* Post Content */}
-        <div className="mb-4">
+        <div className="mb-4 cursor-pointer"
+          onClick={() => {
+            if (post.profiles?.username) {
+              navigate(`/${post.profiles.username}/${post.id}`);
+            }
+          }}
+        >
           <p className="text-sm text-gray-800 leading-relaxed">{post.content}</p>
           {post.image_url && (
             <img 
