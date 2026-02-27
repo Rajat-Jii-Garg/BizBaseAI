@@ -79,16 +79,16 @@ const App = () => (
                 </ProtectedRoute>
               } />
               {/* View other user profile */}
-              <Route path="/profile/:userId" element={
+              {/* <Route path="/profile/:userId" element={
                 <ProtectedRoute>
                   <ProfilePage />
                 </ProtectedRoute>
-              } />
-              <Route path="/profile/preview/:userId" element={
+              } /> */}
+              {/* <Route path="/profile/preview/:userId" element={
                 <ProtectedRoute>
                   <ProfilePreviewPage />
                 </ProtectedRoute>
-              }/>
+              }/> */}
               <Route path="/messages" element={
                 <ProtectedRoute>
                   <Messages />
@@ -205,7 +205,7 @@ const App = () => (
                 <Route path="services" element={<BusinessServices />} />
               </Route>
               {/* Username-based profile route - must be LAST to avoid conflicts */}
-              <Route path="/@:username" element={<UsernameProfile />} />
+              <Route path="/:username" element={<UsernameProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BusinessProvider>

@@ -18,7 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useConnections } from '@/hooks/useConnections';
 import { supabase } from '@/integrations/supabase/client';
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import {
   Camera,
   CheckCircle,
@@ -57,7 +57,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ProfilePage = () => {
+const ProfilePage = ({ userId }) => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -68,7 +68,7 @@ const ProfilePage = () => {
   const [experience, setExperience] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
-  const { userId } = useParams();
+  // const { userId } = useParams();
   const [stats, setStats] = useState({
     connections: 0,
     posts: 0,
@@ -324,7 +324,7 @@ const ProfilePage = () => {
   };
 
   const handleShare = () => {
-    const profileUrl = `${window.location.origin}/profile/${userId}`;
+    const profileUrl = `${window.location.origin}/${profile.username}`;
     navigator.clipboard.writeText(profileUrl);
     toast({ title: 'Link copied!', description: 'Profile link copied to clipboard' });
   };

@@ -1,67 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import ProfilePage from './ProfilePage';
+import ProfileDashboard from './ProfileDashboard';
 import { BusinessDashboard } from './Businesses';
 
 const UsernameProfile = () => {
   const { username } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [profileId, setProfileId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [entityType, setEntityType] = useState(null);
   const [entityId, setEntityId] = useState(null);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    const fetchEntity = async () => {
-      if (!username) {
+    const fetchProfile = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', username)
+        .single();
+
+      if (!data) {
         setNotFound(true);
-        setLoading(false);
-        return;
+      } else {
+        setProfileId(data.id);
       }
-
-      try {
-        // First check profiles
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .ilike('username', username)
-          .single();
-
-        if (profile) {
-          setEntityType('user');
-          setEntityId(profile.id);
-          setLoading(false);
-          return;
-        }
-
-        // Then check businesses
-        const { data: business } = await supabase
-          .from('businesses')
-          .select('id')
-          .ilike('username', username)
-          .eq('status', 'active')
-          .single();
-
-        if (business) {
-          setEntityType('business');
-          setEntityId(business.id);
-          setLoading(false);
-          return;
-        }
-
-        // Not found
-        setNotFound(true);
         setLoading(false);
-      } catch (error) {
-        console.error('Error fetching entity:', error);
-        setNotFound(true);
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchEntity();
+      fetchProfile();
   }, [username]);
 
   if (loading) {
@@ -89,19 +61,11 @@ const UsernameProfile = () => {
     );
   }
 
-  if (entityType === 'user') {
-    // Redirect to profile page with userId
-    navigate(`/profile/${entityId}`, { replace: true });
-    return null;
-  }
+  const isOwnProfile = user?.id === profileId;
 
-  if (entityType === 'business') {
-    // Redirect to business public page
-    navigate(`/business/${entityId}/dashboard`, { replace: true });
-    return null;
-  }
-
-  return null;
+  return isOwnProfile
+    ? <ProfileDashboard />
+    : <ProfilePage userId={profileId} />;
 };
 
 export default UsernameProfile;

@@ -284,7 +284,7 @@ const ProfileDashboard = () => {
   };
 
   const handleShare = () => {
-    const profileUrl = `${window.location.origin}/profile/${user.id}`;
+    const profileUrl = `${window.location.origin}/${profile.username}`;
     navigator.clipboard.writeText(profileUrl);
     toast({ title: 'Link copied!', description: 'Profile link copied to clipboard' });
   };
@@ -463,7 +463,7 @@ const ProfileDashboard = () => {
                       <Share2 className="w-4 h-4" />
                       Share
                     </Button>
-                    <Button variant="outline" className="gap-2" onClick={() => navigate(`/profile/${user.id}`)}>
+                    <Button variant="outline" className="gap-2" onClick={() => navigate(`/${authProfile.username}`)}>
                       <Eye className="w-4 h-4" />
                       Preview
                     </Button>
