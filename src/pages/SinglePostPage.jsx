@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import PostCard from "@/components/PostCard";
-import LoginModal from "@/components/LoginModal"; // create this
+import LoginModal from "@/components/LoginModal";
+import { NotFound } from "@/pages/NotFound";
 
 const SinglePostPage = () => {
   const { username, postId } = useParams();
@@ -36,13 +37,15 @@ const SinglePostPage = () => {
         .single();
 
       if (error || !postData) {
-        navigate("/404");
+        setLoading(false);
+        navigate("/NotFound", { replace: true });
         return;
       }
 
       // Validate username matches post owner
-      if (postData.profiles?.username !== username) {
-        navigate("/404");
+      if (!postData.profiles || postData.profiles?.username !== username) {
+        setLoading(false);
+        navigate("/NotFound", { replace: true });
         return;
       }
 

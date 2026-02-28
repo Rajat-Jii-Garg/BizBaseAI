@@ -89,14 +89,10 @@ const PostEngagementActions = ({
   useEffect(() => {
     if (!showShareModal) return;
 
-    const generatePostUrl = () => {
-      if (originalPost?.profiles?.username) {
-        const url = `${window.location.origin}/${originalPost.profiles.username}/posts/${postId}`;
-        setPostShareUrl(url);
-      }
-    };
-
-    generatePostUrl();
+    if (originalPost?.profiles?.username) {
+      const url = `${window.location.origin}/${originalPost.profiles.username}/post/${postId}`;
+      setPostShareUrl(url);
+    }
   }, [showShareModal, originalPost, postId]);
 
 
@@ -421,7 +417,11 @@ const PostEngagementActions = ({
                 <div className="min-w-[70px] flex flex-col items-center cursor-pointer"
                   onClick={async (e) => {
                     e.stopPropagation();
-                    if (!postShareUrl) return;
+                    if (!postShareUrl) {
+                      const fallbackUrl = window.location.href;
+                      await navigator.clipboard.writeText(fallbackUrl);
+                      return;
+                    }
 
                     await navigator.clipboard.writeText(postShareUrl);
                     setCopied(true);
@@ -462,7 +462,7 @@ const PostEngagementActions = ({
                 {/* Twitter */}
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={() => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(postShareUrl)}`, "_blank");
                     setShowShareModal(false);
@@ -477,7 +477,7 @@ const PostEngagementActions = ({
                 {/* Gmail */}
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={() => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     window.open(`mailto:?subject=Check this out&body=${encodeURIComponent(postShareUrl)}`);
                     setShowShareModal(false);
@@ -500,7 +500,7 @@ const PostEngagementActions = ({
                 {/* LinkedIn */}
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={() => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postShareUrl)}`, "_blank");
                     setShowShareModal(false);
@@ -515,7 +515,7 @@ const PostEngagementActions = ({
                 {/* Facebook */}
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={() => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postShareUrl)}`, "_blank");
                     setShowShareModal(false);
