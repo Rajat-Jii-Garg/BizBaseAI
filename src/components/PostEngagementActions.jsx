@@ -87,28 +87,17 @@ const PostEngagementActions = ({
   }, [postId]);
 
   useEffect(() => {
-    const generatePostUrl = async () => {
-      if (!showShareModal) return;
+    if (!showShareModal) return;
 
-      const { data } = await supabase
-        .from("posts")
-        .select(`
-          id,
-          profiles:user_id (
-            username
-          )
-        `)
-        .eq("id", postId)
-        .single();
-
-      if (data?.profiles?.username) {
-        const url = `${window.location.origin}/${data.profiles.username}/${postId}`;
+    const generatePostUrl = () => {
+      if (originalPost?.profiles?.username) {
+        const url = `${window.location.origin}/${originalPost.profiles.username}/posts/${postId}`;
         setPostShareUrl(url);
       }
     };
 
     generatePostUrl();
-  }, [showShareModal, postId]);
+  }, [showShareModal, originalPost, postId]);
 
 
   useEffect(() => {
@@ -216,7 +205,7 @@ const PostEngagementActions = ({
   const hasMoreComments = comments.length > MAX_VISIBLE_COMMENTS;
 
   return (
-    <div className="border-t border-border/50 pt-2 sm:pt-3">
+    <div className="border-t border-border/50 pt-2 sm:pt-3" onClick={(e) => e.stopPropagation()}>
       {/* Stats Row - mobile: left (upvotes, feedback) right (reposts, shares) */}
       <div className="flex items-center justify-between mb-1 sm:mb-2 text-[11px] sm:text-xs text-muted-foreground">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -430,7 +419,8 @@ const PostEngagementActions = ({
               <div className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide text-center">
                 {/* Copy Link */}
                 <div className="min-w-[70px] flex flex-col items-center cursor-pointer"
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    e.stopPropagation();
                     if (!postShareUrl) return;
 
                     await navigator.clipboard.writeText(postShareUrl);
@@ -457,8 +447,9 @@ const PostEngagementActions = ({
                 {/* WhatsApp */}
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={() => {
-                    window.open(`https://wa.me/?text=${postShareUrl}`);
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(`https://wa.me/?text=${encodeURIComponent(postShareUrl)}`, "_blank");
                     setShowShareModal(false);
                   }}
                 >
@@ -472,7 +463,8 @@ const PostEngagementActions = ({
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
-                    window.open(`https://twitter.com/intent/tweet?url=${postShareUrl}`);
+                    e.stopPropagation();
+                    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(postShareUrl)}`, "_blank");
                     setShowShareModal(false);
                   }}
                 >
@@ -486,7 +478,8 @@ const PostEngagementActions = ({
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
-                    window.open(`mailto:?subject=Check this out&body=${postShareUrl}`);
+                    e.stopPropagation();
+                    window.open(`mailto:?subject=Check this out&body=${encodeURIComponent(postShareUrl)}`);
                     setShowShareModal(false);
                   }}
                 >
@@ -508,7 +501,8 @@ const PostEngagementActions = ({
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
-                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${postShareUrl}`);
+                    e.stopPropagation();
+                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postShareUrl)}`, "_blank");
                     setShowShareModal(false);
                   }}
                 >
@@ -522,7 +516,8 @@ const PostEngagementActions = ({
                 <div
                   className="min-w-[80px] flex flex-col items-center cursor-pointer"
                   onClick={() => {
-                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${postShareUrl}`);
+                    e.stopPropagation();
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postShareUrl)}`, "_blank");
                     setShowShareModal(false);
                   }}
                 >

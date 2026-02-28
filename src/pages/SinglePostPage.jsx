@@ -19,20 +19,8 @@ const SinglePostPage = () => {
     const fetchPost = async () => {
       setLoading(true);
 
-      // Validate username
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("username", username)
-        .single();
-
-      if (!profileData) {
-        navigate("/404");
-        return;
-      }
-
-      // Fetch post
-      const { data: postData } = await supabase
+      // Fetch post with profile
+      const { data: postData, error } = await supabase
         .from("posts")
         .select(`
           *,
@@ -40,13 +28,20 @@ const SinglePostPage = () => {
             id,
             username,
             full_name,
-            avatar_url
+            avatar_url,
+            current_position
           )
         `)
         .eq("id", postId)
         .single();
 
-      if (!postData) {
+      if (error || !postData) {
+        navigate("/404");
+        return;
+      }
+
+      // Validate username matches post owner
+      if (postData.profiles?.username !== username) {
         navigate("/404");
         return;
       }

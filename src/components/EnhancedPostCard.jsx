@@ -75,6 +75,12 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
     return `${Math.floor(diffInHours / 24)}d`;
   };
 
+  const handlePostClick = () => {
+    if (post.profiles?.username) {
+      navigate(`/${post.profiles.username}/post/${post.id}`);
+    }
+  };
+
   const extractHashtags = (content) => {
     const matches = content.match(/#[\w]+/g);
     return matches || [];
@@ -140,10 +146,12 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
       }
     }
   };
-
+  
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
-    toast({ title: "Success", description: "Post link copied to clipboard!" });
+    if (!post.profiles?.username) return;
+
+    const postUrl = `${window.location.origin}/${post.profiles.username}/post/${post.id}`;
+    navigator.clipboard.writeText(postUrl);
   };
 
   const isOwnPost = user?.id === post.user_id;
@@ -309,7 +317,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
         </div>
 
         {/* Post Content */}
-        <div className="mb-2 sm:mb-4">
+        <div className="mb-2 sm:mb-4 cursor-pointer" onClick={handlePostClick}>
           <div className="text-sm sm:text-base text-foreground leading-relaxed mb-3 whitespace-pre-line">
             {renderContent(displayContent)}
             {shouldTruncate && (
@@ -359,17 +367,19 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
         </div>
 
         {/* Post Engagement */}
-        <PostEngagementActions
-          postId={post.id}
-          likesCount={post.likes_count || 0}
-          commentsCount={post.comments_count || 0}
-          sharesCount={post.shares_count || 0}
-          repostsCount={post.reposts_count || 0}
-          userHasLiked={post.user_has_liked || false}
-          userHasReposted={userHasReposted}
-          onEngagementUpdate={onEngagementUpdate}
-          originalPost={post}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <PostEngagementActions
+            postId={post.id}
+            likesCount={post.likes_count || 0}
+            commentsCount={post.comments_count || 0}
+            sharesCount={post.shares_count || 0}
+            repostsCount={post.reposts_count || 0}
+            userHasLiked={post.user_has_liked || false}
+            userHasReposted={userHasReposted}
+            onEngagementUpdate={onEngagementUpdate}
+            originalPost={post}
+          />
+        </div>
       </CardContent>
 
       {/* Edit Dialog */}

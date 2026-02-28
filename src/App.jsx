@@ -206,7 +206,7 @@ const App = () => (
                 <Route path="services" element={<BusinessServices />} />
               </Route>
               {/* Username-based profile route - must be LAST to avoid conflicts */}
-              <Route path="/:username/:postId" element={<SinglePostPage />} />
+              <Route path="/:username/post/:postId" element={<SinglePostPage />} />
               <Route path="/:username" element={<UsernameProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
