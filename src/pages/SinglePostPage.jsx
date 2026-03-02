@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import PostCard from "@/components/PostCard";
+// import PostCard from "@/components/PostCard";
 import LoginModal from "@/components/LoginModal";
-import { NotFound } from "@/pages/NotFound";
+import NotFound from "@/pages/NotFound";
+import EnhancedPostCard from "@/components/EnhancedPostCard";
 
 const SinglePostPage = () => {
   const { username, postId } = useParams();
@@ -38,14 +39,18 @@ const SinglePostPage = () => {
 
       if (error || !postData) {
         setLoading(false);
-        navigate("/NotFound", { replace: true });
+        // navigate("/NotFound", { replace: true });
+        setPost(null);
         return;
       }
 
       // Validate username matches post owner
-      if (!postData.profiles || postData.profiles?.username !== username) {
+      if (
+        !postData.profiles ||
+        postData.profiles.username?.toLowerCase() !== username?.toLowerCase()
+      ) {
         setLoading(false);
-        navigate("/NotFound", { replace: true });
+        setPost(null);
         return;
       }
 
@@ -68,12 +73,12 @@ const SinglePostPage = () => {
   }, [user]);
 
   if (loading) return <div className="p-6 text-center">Loading...</div>;
-  if (!post) return null;
+  if (!post) return <NotFound />;
 
   return (
     <>
       <div className={`max-w-2xl mx-auto py-6 ${showLoginModal ? "blur-sm pointer-events-none" : ""}`}>
-        <PostCard post={post} />
+        <EnhancedPostCard post={post} />
       </div>
 
       {showLoginModal && (
