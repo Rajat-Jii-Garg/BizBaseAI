@@ -56,6 +56,7 @@ import {
 // Username profile resolver
 import UsernameProfile from "./pages/UsernameProfile";
 import SinglePostPage from "./pages/SinglePostPage";
+import Sitemap from "./pages/Sitemap";
 
 const queryClient = new QueryClient();
 
@@ -173,6 +174,7 @@ const App = () => (
               <Route path="/demo" element={<Demo />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/sitemap" element={<Sitemap />} />
               {/* <Route path="/profile-dashboard" element={
                 <ProtectedRoute>
                   <ProfileDashboard />
