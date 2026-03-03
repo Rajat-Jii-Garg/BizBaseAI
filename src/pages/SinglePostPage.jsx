@@ -18,6 +18,7 @@ const SinglePostPage = () => {
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
@@ -25,60 +26,61 @@ const SinglePostPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const loginTimerRef = useRef(null);
 
-  // Fetch Post
+  // Fetch Post - separate queries to avoid FK join issues
   useEffect(() => {
     const fetchPost = async () => {
       setLoading(true);
-      const { data: postData, error } = await supabase
-        .from("posts")
-        .select(`
-          *,
-          profiles:user_id (
-            id, username, full_name, avatar_url, current_position, is_verified
-          )
-        `)
-        .eq("id", postId)
-        .single();
+      setNotFound(false);
 
-      if (error || !postData) {
-        setLoading(false);
-        setPost(null);
-        return;
-      }
-
-      if (
-        !postData.profiles ||
-        postData.profiles.username?.toLowerCase() !== username?.toLowerCase()
-      ) {
-        setLoading(false);
-        setPost(null);
-        return;
-      }
-
-      // Check if current user has liked
-      if (user) {
-        const { data: likeData } = await supabase
-          .from("post_likes")
-          .select("id")
-          .eq("post_id", postId)
-          .eq("user_id", user.id)
+      try {
+        // Fetch post first
+        const { data: postData, error } = await supabase
+          .from("posts")
+          .select("*")
+          .eq("id", postId)
           .maybeSingle();
-        postData.user_has_liked = !!likeData;
 
-        const { data: repostData } = await supabase
-          .from("post_reposts")
-          .select("id")
-          .eq("post_id", postId)
-          .eq("user_id", user.id)
+        if (error || !postData) {
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch profile separately
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("id, username, full_name, avatar_url, current_position, is_verified")
+          .eq("id", postData.user_id)
           .maybeSingle();
-        postData.user_has_reposted = !!repostData;
-      }
 
-      setPost(postData);
-      setLoading(false);
+        if (!profileData || profileData.username?.toLowerCase() !== username?.toLowerCase()) {
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
+
+        postData.profiles = profileData;
+
+        // Check if current user has liked/reposted
+        if (user) {
+          const [likeRes, repostRes] = await Promise.all([
+            supabase.from("post_likes").select("id").eq("post_id", postId).eq("user_id", user.id).maybeSingle(),
+            supabase.from("post_reposts").select("id").eq("post_id", postId).eq("user_id", user.id).maybeSingle(),
+          ]);
+          postData.user_has_liked = !!likeRes.data;
+          postData.user_has_reposted = !!repostRes.data;
+        }
+
+        setPost(postData);
+      } catch (err) {
+        console.error("Error fetching post:", err);
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchPost();
+    if (postId && username) fetchPost();
   }, [username, postId, user?.id]);
 
   // Fetch comments
@@ -104,13 +106,12 @@ const SinglePostPage = () => {
         .select("id, username, full_name, avatar_url, current_position")
         .in("id", userIds);
 
-      const commentsWithProfiles =
+      setComments(
         data?.map((comment) => ({
           ...comment,
           profiles: profiles?.find((p) => p.id === comment.user_id),
-        })) || [];
-
-      setComments(commentsWithProfiles);
+        })) || []
+      );
     } catch (err) {
       console.error("Error fetching comments:", err);
     } finally {
@@ -131,9 +132,7 @@ const SinglePostPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!user) {
-      startLoginTimer();
-    }
+    if (!user) startLoginTimer();
     return () => {
       if (loginTimerRef.current) clearTimeout(loginTimerRef.current);
     };
@@ -141,7 +140,6 @@ const SinglePostPage = () => {
 
   const handleCloseLogin = () => {
     setShowLoginModal(false);
-    // Restart 30s timer
     startLoginTimer();
   };
 
@@ -156,7 +154,6 @@ const SinglePostPage = () => {
       });
       setCommentText("");
       await fetchComments();
-      // Update post comment count locally
       setPost((prev) =>
         prev ? { ...prev, comments_count: (prev.comments_count || 0) + 1 } : prev
       );
@@ -174,7 +171,7 @@ const SinglePostPage = () => {
       </div>
     );
 
-  if (!post) return <NotFound />;
+  if (notFound) return <NotFound />;
 
   return (
     <>
@@ -215,11 +212,11 @@ const SinglePostPage = () => {
               <div className="flex items-center gap-2 mb-4">
                 <Avatar className="h-8 w-8 shrink-0 ring-1 ring-border/30">
                   <AvatarImage src={profile?.avatar_url} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-50 to-purple-50 text-blue-700 text-xs font-semibold">
+                  <AvatarFallback className="bg-gradient-to-br from-primary/10 to-accent/10 text-primary text-xs font-semibold">
                     {profile?.full_name?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1 flex items-center gap-1.5 bg-muted/40 rounded-full px-3 py-1.5 border border-border/50 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                <div className="flex-1 flex items-center gap-1.5 bg-muted/40 rounded-full px-3 py-1.5 border border-border/50 focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
                   <Input
                     placeholder="Write your feedback..."
                     value={commentText}
@@ -235,7 +232,7 @@ const SinglePostPage = () => {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-7 w-7 p-0 shrink-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full disabled:opacity-40"
+                    className="h-7 w-7 p-0 shrink-0 text-primary hover:text-primary/80 hover:bg-primary/10 rounded-full disabled:opacity-40"
                     onClick={handleSubmitComment}
                     disabled={!commentText.trim() || submitting}
                   >
