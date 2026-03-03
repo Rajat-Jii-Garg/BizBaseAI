@@ -7,15 +7,7 @@ import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import CommentItem from './CommentItem';
-import {
-  Link,
-  Users,
-  Mail,
-  Instagram,
-  Linkedin,
-  Facebook,
-  Check
-} from "lucide-react";
+import ShareModal from './ShareModal';
 
 const MAX_VISIBLE_COMMENTS = 3;
 
@@ -46,10 +38,7 @@ const PostEngagementActions = ({
   const [localUserHasReposted, setLocalUserHasReposted] = useState(userHasReposted);
 
   const [showShareModal, setShowShareModal] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [postShareUrl, setPostShareUrl] = useState("");
-  const [connectedUsers, setConnectedUsers] = useState([]);
-  const [messageUsers, setMessageUsers] = useState([]);
 
   const fetchComments = useCallback(async () => {
     setLoadingComments(true);
@@ -87,16 +76,6 @@ const PostEngagementActions = ({
   }, [postId]);
 
   useEffect(() => {
-    if (!showShareModal) return;
-
-    if (originalPost?.profiles?.username) {
-      const url = `${window.location.origin}/${originalPost.profiles.username}/post/${postId}`;
-      setPostShareUrl(url);
-    }
-  }, [showShareModal, originalPost, postId]);
-
-
-  useEffect(() => {
     if (showCommentInput) {
       fetchComments();
     }
@@ -111,47 +90,12 @@ const PostEngagementActions = ({
     setLocalUserHasReposted(userHasReposted);
   }, [likesCount, commentsCount, sharesCount, repostsCount, userHasLiked, userHasReposted]);
 
+  // Build share URL
   useEffect(() => {
-    const fetchConnections = async () => {
-      if (!user) return;
-
-      const { data } = await supabase
-        .from('connections')
-        .select('addressee_id, profiles:addressee_id(id, full_name, avatar_url)')
-        .eq('requester_id', user.id)
-        .eq('status', 'accepted')
-        .limit(8);
-
-      if (data) {
-        setConnectedUsers(data.map(item => item.profiles));
-      }
-    };
-
-    if (showShareModal) {
-      fetchConnections();
+    if (originalPost?.profiles?.username) {
+      setPostShareUrl(`${window.location.origin}/${originalPost.profiles.username}/post/${postId}`);
     }
-  }, [showShareModal]);
-
-  useEffect(() => {
-    const fetchMessageUsers = async () => {
-      if (!user) return;
-
-      const { data } = await supabase
-        .from('connections')
-        .select('addressee_id, profiles:addressee_id(id, full_name, avatar_url)')
-        .eq('requester_id', user.id)
-        .eq('status', 'accepted')
-        .limit(12);
-
-      if (data) {
-        setMessageUsers(data.map(item => item.profiles));
-      }
-    };
-
-    if (showShareModal) {
-      fetchMessageUsers();
-    }
-  }, [showShareModal]);
+  }, [originalPost, postId]);
 
   const handleUpvote = async () => {
     const wasLiked = localUserHasLiked;
@@ -202,7 +146,7 @@ const PostEngagementActions = ({
 
   return (
     <div className="border-t border-border/50 pt-2 sm:pt-3" onClick={(e) => e.stopPropagation()}>
-      {/* Stats Row - mobile: left (upvotes, feedback) right (reposts, shares) */}
+      {/* Stats Row */}
       <div className="flex items-center justify-between mb-1 sm:mb-2 text-[11px] sm:text-xs text-muted-foreground">
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="flex items-center gap-1">
@@ -226,7 +170,7 @@ const PostEngagementActions = ({
         </div>
       </div>
 
-      {/* Action Buttons Row - mobile: icon only, centered, equal space */}
+      {/* Action Buttons Row */}
       <div className="flex items-center justify-between border-t border-border/50 mt-1 pt-1">
         <Button
           variant="ghost"
@@ -281,7 +225,6 @@ const PostEngagementActions = ({
       {/* Comments Section */}
       {showCommentInput && (
         <div className="mt-3 space-y-3">
-          {/* Comment Input */}
           <div className="flex items-center gap-2 sm:gap-2.5">
             <Avatar className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 ring-1 ring-border/30">
               <AvatarImage src={profile?.avatar_url} />
@@ -314,7 +257,6 @@ const PostEngagementActions = ({
             </div>
           </div>
 
-          {/* Comments List */}
           {loadingComments ? (
             <div className="flex items-center justify-center py-3">
               <div className="h-5 w-5 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
@@ -327,10 +269,7 @@ const PostEngagementActions = ({
                     ? 'max-h-[260px] sm:max-h-[320px] overflow-y-auto scrollbar-hide'
                     : ''
                 }`}
-                style={{
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none'
-                }}
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
                 {visibleComments.map((comment) => (
                   <CommentItem
@@ -362,183 +301,12 @@ const PostEngagementActions = ({
         </div>
       )}
 
-      {/* Share Popup Screen */}
+      {/* Share Modal */}
       {showShareModal && (
-        <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end justify-center z-[9999]"
-          onClick={() => setShowShareModal(false)}
-        >
-          <div
-            className="bg-[#f4f6f8] w-full rounded-t-3xl p-5 space-y-7 shadow-2xl max-h-[90vh] overflow-y-auto animate-slide-up"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Drag Handle */}
-            <h3 className="text-base font-semibold text-center">Share Post</h3>
-
-            {/* 🔥 SEND TO SECTION */}
-            {messageUsers.length > 0 && (
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-3">Send to</p>
-
-                <div className="flex gap-4 overflow-x-auto scrollbar-hide">
-                  {messageUsers.map((person) => (
-                    <div
-                      key={person.id}
-                      className="flex flex-col items-center text-center min-w-[72px] cursor-pointer"
-                      onClick={() => {
-                        navigator.clipboard.writeText(postShareUrl);
-                        setShowShareModal(false);
-                      }}
-                    >
-                      <Avatar className="h-12 w-12 sm:h-14 sm:w-14 ring-2 ring-white shadow-md">
-                        <AvatarImage src={person.avatar_url} />
-                        <AvatarFallback>
-                          {person.full_name?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      <span className="text-[11px] mt-2 truncate w-16">
-                        {person.full_name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 🔥 SHARE TO PLATFORMS */}
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-3">
-                Share to
-              </p>
-
-              <div className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide text-center">
-                {/* Copy Link */}
-                <div className="min-w-[70px] flex flex-col items-center cursor-pointer"
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    if (!postShareUrl) {
-                      const fallbackUrl = window.location.href;
-                      await navigator.clipboard.writeText(fallbackUrl);
-                      return;
-                    }
-
-                    await navigator.clipboard.writeText(postShareUrl);
-                    setCopied(true);
-
-                    setTimeout(() => {
-                      setCopied(false);
-                    }, 2000);
-                  }}
-                >
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-white rounded-full flex items-center justify-center shadow-md transition-all">
-                    {copied ? (
-                      <Check size={20} className="text-green-600" />
-                    ) : (
-                      <Link size={20} />
-                    )}
-                  </div>
-
-                  <p className="text-xs mt-1">
-                    {copied ? "Copied" : "Copy"}
-                  </p>
-                </div>
-
-                {/* WhatsApp */}
-                <div
-                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`https://wa.me/?text=${encodeURIComponent(postShareUrl)}`, "_blank");
-                    setShowShareModal(false);
-                  }}
-                >
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-green-500 text-white rounded-full flex items-center justify-center shadow-md">
-                    <MessageSquare size={22} />
-                  </div>
-                  <p className="text-xs mt-1">WhatsApp</p>
-                </div>
-
-                {/* Twitter */}
-                <div
-                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(postShareUrl)}`, "_blank");
-                    setShowShareModal(false);
-                  }}
-                >
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-blue-400 text-white rounded-full flex items-center justify-center shadow-md">
-                    <Send size={22} />
-                  </div>
-                  <p className="text-xs mt-1">Twitter</p>
-                </div>
-
-                {/* Gmail */}
-                <div
-                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`mailto:?subject=Check this out&body=${encodeURIComponent(postShareUrl)}`);
-                    setShowShareModal(false);
-                  }}
-                >
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md">
-                    <Mail size={22} />
-                  </div>
-                  <p className="text-xs mt-1">Gmail</p>
-                </div>
-
-                {/* Instagram */}
-                <div className="min-w-[80px] flex flex-col items-center cursor-pointer">
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-gradient-to-tr from-pink-500 to-yellow-400 text-white rounded-full flex items-center justify-center shadow-md">
-                    <Instagram size={22} />
-                  </div>
-                  <p className="text-xs mt-1">Instagram</p>
-                </div>
-
-                {/* LinkedIn */}
-                <div
-                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postShareUrl)}`, "_blank");
-                    setShowShareModal(false);
-                  }}
-                >
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-blue-700 text-white rounded-full flex items-center justify-center shadow-md">
-                    <Linkedin size={22} />
-                  </div>
-                  <p className="text-xs mt-1">LinkedIn</p>
-                </div>
-
-                {/* Facebook */}
-                <div
-                  className="min-w-[80px] flex flex-col items-center cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postShareUrl)}`, "_blank");
-                    setShowShareModal(false);
-                  }}
-                >
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md">
-                    <Facebook size={22} />
-                  </div>
-                  <p className="text-xs mt-1">Facebook</p>
-                </div>
-
-              </div>
-            </div>
-
-            {/* <Button
-              variant="ghost"
-              className="w-full mt-4"
-              onClick={() => setShowShareModal(false)}
-            >
-              Cancel
-            </Button> */}
-          </div>
-        </div>
+        <ShareModal
+          postShareUrl={postShareUrl}
+          onClose={() => setShowShareModal(false)}
+        />
       )}
     </div>
   );
