@@ -7,47 +7,15 @@
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/dashboard</loc>
-  </url>
-
-  <url>
     <loc>https://bizbase-ai.lovable.app/demo</loc>
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/login</loc>
+    <loc>https://bizbase-ai.lovable.app/contact</loc>
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/signup</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/communities</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/connections</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/feed</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/messages</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/network</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/notfound</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/notifications</loc>
+    <loc>https://bizbase-ai.lovable.app/faq</loc>
   </url>
 
   <url>
@@ -59,39 +27,15 @@
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/insights</loc>
+    <loc>https://bizbase-ai.lovable.app/communities</loc>
   </url>
 
-  <url>
-    <loc>https://bizbase-ai.lovable.app/ai-assistant</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/business-setup</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/business</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/dashboard/settings</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/contact</loc>
-  </url>
-
-  <url>
-    <loc>https://bizbase-ai.lovable.app/faq</loc>
-  </url>
-
-  <!-- Example Profile -->
+  <!-- Public Profile -->
   <url>
     <loc>https://bizbase-ai.lovable.app/rajat_aggarwal</loc>
   </url>
 
-  <!-- Example Post -->
+  <!-- Public Post -->
   <url>
     <loc>https://bizbase-ai.lovable.app/rajat_aggarwal/post/f2ef61d6-76ea-43c3-8994-6dbddc6d0726</loc>
   </url>
