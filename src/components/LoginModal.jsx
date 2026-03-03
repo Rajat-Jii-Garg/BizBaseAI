@@ -1,38 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from "react-router-dom";
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { X } from 'lucide-react';
 
 const LoginModal = ({ onClose }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999]">
-      <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-xl">
-        <h2 className="text-xl font-semibold mb-3">
-          Join BizBase to continue
-        </h2>
-        <p className="text-sm text-gray-500 mb-6">
-          Create your professional presence and engage with posts.
-        </p>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+      <div className="bg-card rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl relative border border-border/50">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 h-8 w-8 flex items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        <div className="mb-5">
+          <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl font-bold text-primary">B</span>
+          </div>
+          <h2 className="text-lg sm:text-xl font-bold text-foreground mb-1.5">
+            Join BizBase to continue
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Create your professional presence and engage with posts.
+          </p>
+        </div>
 
         <button
           onClick={() => navigate("/login")}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg mb-3 hover:bg-blue-700 transition"
+          className="w-full bg-primary text-primary-foreground py-2.5 rounded-xl mb-3 hover:opacity-90 transition font-medium text-sm"
         >
           Login
         </button>
 
         <button
-          onClick={() => navigate("/register")}
-          className="w-full border border-gray-300 py-2 rounded-lg hover:bg-gray-100 transition"
+          onClick={() => navigate("/signup")}
+          className="w-full border border-border py-2.5 rounded-xl hover:bg-muted/50 transition font-medium text-sm text-foreground"
         >
           Create Account
         </button>
 
         <button
           onClick={onClose}
-          className="text-xs text-gray-400 mt-4 hover:text-gray-600"
+          className="text-xs text-muted-foreground mt-4 hover:text-foreground transition-colors"
         >
           Continue Browsing
         </button>
