@@ -1,29 +1,32 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useBizCoins } from '@/hooks/useBizCoins';
 
 export const useReferrals = () => {
   const { user, profile } = useAuth();
-  const { awardCoins } = useBizCoins();
   const [referrals, setReferrals] = useState([]);
   const [referralCode, setReferralCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, coinsEarned: 0 });
 
+  // Generate a stable referral code once, then reuse it forever
   const generateCode = useCallback(async () => {
     if (!user) return '';
-    // Check if user already has a referral code
+    
+    // If profile already has a referral_code, use it
     if (profile?.referral_code) {
       setReferralCode(profile.referral_code);
       return profile.referral_code;
     }
-    // Generate unique code
-    const code = `BIZ${user.id.substring(0, 6).toUpperCase()}${Date.now().toString(36).toUpperCase()}`;
+    
+    // Generate a stable code from user ID (deterministic, never changes)
+    const code = `BIZ${user.id.substring(0, 8).toUpperCase()}`;
+    
+    // Save to profile
     await supabase.from('profiles').update({ referral_code: code }).eq('id', user.id);
     setReferralCode(code);
     return code;
-  }, [user, profile]);
+  }, [user, profile?.referral_code]);
 
   const fetchReferrals = useCallback(async () => {
     if (!user) return;
@@ -42,7 +45,7 @@ export const useReferrals = () => {
         total: data?.length || 0,
         completed,
         pending,
-        coinsEarned: completed * 100 // 100 coins per successful referral
+        coinsEarned: completed * 10 // 10 BizCoins per successful referral
       });
     } catch (err) {
       console.error('Error fetching referrals:', err);
@@ -58,16 +61,17 @@ export const useReferrals = () => {
     return `${window.location.origin}/signup?ref=${code}`;
   }, [user, referralCode, generateCode]);
 
+  // Called during signup to track a referral
   const trackReferral = useCallback(async (code, newUserId) => {
     try {
       // Find referrer by code
       const { data: referrer } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, bizcoins')
         .eq('referral_code', code)
         .single();
 
-      if (!referrer) return;
+      if (!referrer || referrer.id === newUserId) return;
 
       // Create referral record
       await supabase.from('referrals').insert({
@@ -79,19 +83,13 @@ export const useReferrals = () => {
         completed_at: new Date().toISOString()
       });
 
-      // Award coins to referrer
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('bizcoins')
-        .eq('id', referrer.id)
-        .single();
-      
+      // Award 10 BizCoins to referrer
       await supabase
         .from('profiles')
-        .update({ bizcoins: (profile?.bizcoins || 0) + 100 })
+        .update({ bizcoins: (referrer.bizcoins || 0) + 10 })
         .eq('id', referrer.id);
 
-      // Update referred user
+      // Mark referred user
       await supabase
         .from('profiles')
         .update({ referred_by: referrer.id })

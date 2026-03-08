@@ -28,9 +28,9 @@ const Referrals = () => {
   };
 
   const rewards = [
-    { coins: 100, label: 'Per successful referral', icon: Gift },
-    { coins: 500, label: 'Refer 5 users bonus', icon: Star },
-    { coins: 1000, label: 'Refer 10 users - Premium Free', icon: Crown },
+    { coins: 10, label: 'Per successful referral', icon: Gift },
+    { coins: 50, label: 'Refer 5 users bonus', icon: Star },
+    { coins: 100, label: 'Refer 10 users - Premium Free', icon: Crown },
   ];
 
   return (
@@ -47,7 +47,7 @@ const Referrals = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-black">Invite & Earn</h1>
-                  <p className="text-white/80">Earn 100 BizCoins for every friend who joins!</p>
+                  <p className="text-white/80">Earn 10 BizCoins for every friend who joins!</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-3 mt-6">
