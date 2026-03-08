@@ -203,12 +203,15 @@ export default function ProfilePreviewPage() {
               </p>
 
               <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mt-2">
-                {profile?.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {profile.location}
-                  </span>
-                )}
+                {(() => {
+                  const privacy = JSON.parse(localStorage.getItem(`privacy_${userId}`) || '{}');
+                  return privacy.showLocation && profile?.location ? (
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {profile.location}
+                    </span>
+                  ) : null;
+                })()}
 
                 {profile?.company_name && (
                   <span className="flex items-center gap-1">
@@ -228,45 +231,44 @@ export default function ProfilePreviewPage() {
               </div>
             </div>
 
-            {/* CONTACT INFO */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-muted/30 rounded-lg mt-4">
-              {profile?.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  <span>{profile.email}</span>
+            {/* CONTACT INFO - Privacy aware */}
+            {(() => {
+              const privacy = JSON.parse(localStorage.getItem(`privacy_${userId}`) || '{}');
+              const hasVisibleContact = (privacy.showEmail && profile?.email) || (privacy.showPhone && profile?.phone) || profile?.website || profile?.linkedin_url;
+              if (!hasVisibleContact) return null;
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-muted/30 rounded-lg mt-4">
+                  {privacy.showEmail && profile?.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <span>{profile.email}</span>
+                    </div>
+                  )}
+                  {privacy.showPhone && profile?.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-muted-foreground" />
+                      <span>{profile.phone}</span>
+                    </div>
+                  )}
+                  {profile?.website && (
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-muted-foreground" />
+                      <a href={profile.website} target="_blank" className="text-primary underline">
+                        {profile.website}
+                      </a>
+                    </div>
+                  )}
+                  {profile?.linkedin_url && (
+                    <div className="flex items-center gap-2">
+                      <Linkedin className="w-4 h-4 text-muted-foreground" />
+                      <a href={profile.linkedin_url} target="_blank" className="text-primary underline">
+                        LinkedIn
+                      </a>
+                    </div>
+                  )}
                 </div>
-              )}
-              {profile?.phone && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  <span>{profile.phone}</span>
-                </div>
-              )}
-              {profile?.website && (
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-muted-foreground" />
-                  <a
-                    href={profile.website}
-                    target="_blank"
-                    className="text-primary underline"
-                  >
-                    {profile.website}
-                  </a>
-                </div>
-              )}
-              {profile?.linkedin_url && (
-                <div className="flex items-center gap-2">
-                  <Linkedin className="w-4 h-4 text-muted-foreground" />
-                  <a
-                    href={profile.linkedin_url}
-                    target="_blank"
-                    className="text-primary underline"
-                  >
-                    LinkedIn
-                  </a>
-                </div>
-              )}
-            </div>
+              );
+            })()}
           </div>
         </Card>
 

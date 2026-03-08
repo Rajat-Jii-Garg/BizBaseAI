@@ -55,7 +55,7 @@ const ProfileDashboard = () => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('posts');
   const [activeNav, setActiveNav] = useState('overview');
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(false);
@@ -305,11 +305,11 @@ const ProfileDashboard = () => {
   const profileCompletionScore = profile?.profile_completion_score || 0;
 
   const navItems = [
-    { id: 'overview', label: 'Overview', icon: User },
+    { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
     { id: 'projects', label: 'Projects', icon: FolderOpen, count: certificates.length },
     { id: 'services', label: 'Services', icon: Briefcase, count: skills.length },
     { id: 'case-studies', label: 'Case Studies', icon: Target },
-    { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
+    { id: 'overview', label: 'Overview', icon: User },
   ];
 
   if (loading) {
@@ -454,19 +454,20 @@ const ProfileDashboard = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
                     <ProfileEditModal onProfileUpdate={fetchProfile}>
-                      <Button className="gap-2 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white">
-                        <Edit3 className="w-4 h-4" />
-                        Edit Profile
+                      <Button size="sm" className="gap-1.5 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white text-xs md:text-sm md:size-default">
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Edit Profile</span>
+                        <span className="sm:hidden">Edit</span>
                       </Button>
                     </ProfileEditModal>
-                    <Button variant="outline" className="gap-2" onClick={handleShare}>
-                      <Share2 className="w-4 h-4" />
+                    <Button variant="outline" size="sm" className="gap-1.5 text-xs md:text-sm md:size-default" onClick={handleShare}>
+                      <Share2 className="w-3.5 h-3.5" />
                       Share
                     </Button>
-                    <Button variant="outline" className="gap-2" onClick={() => navigate(`/${authProfile.username}`)}>
-                      <Eye className="w-4 h-4" />
+                    <Button variant="outline" size="sm" className="gap-1.5 text-xs md:text-sm md:size-default" onClick={() => navigate(`/profile-preview/${user?.id}`)}>
+                      <Eye className="w-3.5 h-3.5" />
                       Preview
                     </Button>
                   </div>
@@ -474,26 +475,8 @@ const ProfileDashboard = () => {
               </div>
             </div>
 
-            {/* Contact Info */}
+            {/* Contact Info - respects privacy settings */}
             <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-6 text-sm text-muted-foreground border-t border-border pt-4">
-              {profile?.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span>{profile.email}</span>
-                </div>
-              )}
-              {profile?.location && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span>{profile.location}</span>
-                </div>
-              )}
-              {profile?.phone && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  <span>{profile.phone}</span>
-                </div>
-              )}
               {profile?.website && (
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4" />
@@ -510,44 +493,51 @@ const ProfileDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Profile Navigation */}
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
-                <p className="text-xs text-muted-foreground">Explore content sections</p>
-              </CardHeader>
-              <CardContent className="p-2">
-                <div className="space-y-1">
-                  {navItems.map((item) => (
-                    <Button
-                      key={item.id}
-                      variant={activeNav === item.id ? 'default' : 'ghost'}
-                      className={`w-full justify-start text-sm ${activeNav === item.id ? 'bg-[#5B6CFF] text-white' : ''}`}
-                      onClick={() => {
-                        setActiveNav(item.id);
-                        setActiveTab(item.id);
-                      }}
-                    >
-                      <item.icon className="w-4 h-4 mr-2" />
-                      {item.label}
-                      {item.count !== undefined && item.count > 0 && (
-                        <Badge variant="secondary" className="ml-auto text-xs">{item.count}</Badge>
-                      )}
-                    </Button>
-                  ))}
-                  <Separator className="my-2" />
-                  <ProfileEditModal onProfileUpdate={fetchProfile}>
-                    <Button variant="ghost" className="w-full justify-start text-sm">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  </ProfileEditModal>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Profile Navigation - hidden on mobile/tablet */}
+            <div className="hidden lg:block">
+              <Card className="bg-card border-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
+                  <p className="text-xs text-muted-foreground">Explore content sections</p>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <div className="space-y-1">
+                    {navItems.map((item) => (
+                      <Button
+                        key={item.id}
+                        variant={activeNav === item.id ? 'default' : 'ghost'}
+                        className={`w-full justify-start text-sm ${activeNav === item.id ? 'bg-[#5B6CFF] text-white' : ''}`}
+                        onClick={() => {
+                          setActiveNav(item.id);
+                          setActiveTab(item.id);
+                        }}
+                      >
+                        <item.icon className="w-4 h-4 mr-2" />
+                        {item.label}
+                        {item.count !== undefined && item.count > 0 && (
+                          <Badge variant="secondary" className="ml-auto text-xs">{item.count}</Badge>
+                        )}
+                      </Button>
+                    ))}
+                    <Separator className="my-2" />
+                    <ProfileEditModal onProfileUpdate={fetchProfile}>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    </ProfileEditModal>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            {/* Power Score */}
+            {/* Power Score - shown on mobile before Invite */}
             <PowerScoreCard />
+
+            {/* Invite & Earn - shown on mobile too */}
+            <div className="lg:hidden">
+              <ReferralWidget />
+            </div>
           </div>
 
           {/* Middle Content */}
@@ -558,10 +548,10 @@ const ProfileDashboard = () => {
                 <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveNav(val); }} className="w-full">
                   <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none overflow-x-auto">
                     <TabsTrigger 
-                      value="overview" 
+                      value="posts"
                       className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
                     >
-                      Overview
+                      Posts
                     </TabsTrigger>
                     <TabsTrigger 
                       value="projects"
@@ -582,10 +572,10 @@ const ProfileDashboard = () => {
                       Case Studies
                     </TabsTrigger>
                     <TabsTrigger 
-                      value="posts"
+                      value="overview" 
                       className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
                     >
-                      Posts
+                      Overview
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>

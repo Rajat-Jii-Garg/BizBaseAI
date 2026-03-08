@@ -36,6 +36,7 @@ const Settings = () => {
     profileVisibility: 'public',
     showEmail: false,
     showPhone: false,
+    showLocation: false,
     allowSearchEngines: true,
     actively_looking_for_work: false,
   });
@@ -64,12 +65,17 @@ const Settings = () => {
         company_name: profile.company_name || '',
         industry: profile.industry || '',
       });
+      // Load privacy settings from localStorage
+      const savedPrivacy = user?.id ? JSON.parse(localStorage.getItem(`privacy_${user.id}`) || '{}') : {};
       setPrivacySettings(prev => ({
         ...prev,
         actively_looking_for_work: profile.actively_looking_for_work || false,
+        showEmail: savedPrivacy.showEmail || false,
+        showPhone: savedPrivacy.showPhone || false,
+        showLocation: savedPrivacy.showLocation || false,
       }));
     }
-  }, [profile]);
+  }, [profile, user]);
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -99,6 +105,12 @@ const Settings = () => {
         .update({ actively_looking_for_work: privacySettings.actively_looking_for_work })
         .eq('id', user.id);
       if (error) throw error;
+      // Save privacy settings to localStorage for client-side use
+      localStorage.setItem(`privacy_${user.id}`, JSON.stringify({
+        showEmail: privacySettings.showEmail,
+        showPhone: privacySettings.showPhone,
+        showLocation: privacySettings.showLocation,
+      }));
       toast.success('Privacy settings saved!');
     } catch (error) {
       toast.error('Failed to save privacy settings');

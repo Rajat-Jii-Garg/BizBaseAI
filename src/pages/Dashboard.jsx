@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -434,28 +435,38 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white shadow-lg border-0">
+              <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-blue-600" />
+                  <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+                    <div className="p-1.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
+                      <BarChart3 className="w-4 h-4 text-white" />
+                    </div>
                     Performance Analytics
+                    <Badge variant="secondary" className="ml-auto text-[10px] bg-green-100 text-green-700 border-0">Live</Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   {profileStats.map((stat, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 rounded-xl bg-white/80 border border-border/50 hover:shadow-md transition-all">
                       <div className="flex items-center space-x-3">
-                        <div className="p-2 rounded-lg bg-white shadow-sm">
-                          <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                        <div className={`p-2.5 rounded-xl shadow-sm ${
+                          index === 0 ? 'bg-gradient-to-br from-green-400 to-green-600' :
+                          index === 1 ? 'bg-gradient-to-br from-purple-400 to-purple-600' :
+                          'bg-gradient-to-br from-orange-400 to-orange-600'
+                        }`}>
+                          <stat.icon className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{stat.label}</p>
-                          <p className="text-xs text-gray-500">Last 7 days</p>
+                          <p className="text-sm font-semibold text-foreground">{stat.label}</p>
+                          <p className="text-[11px] text-muted-foreground">Last 7 days</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-gray-900">{stat.value}</p>
-                        <p className="text-xs text-green-600 font-medium">{stat.change}</p>
+                        <p className="text-xl font-black text-foreground">{stat.value}</p>
+                        <div className="flex items-center justify-end gap-1">
+                          <ArrowUp className="w-3 h-3 text-green-600" />
+                          <p className="text-xs text-green-600 font-bold">{stat.change}</p>
+                        </div>
                       </div>
                     </div>
                   ))}
