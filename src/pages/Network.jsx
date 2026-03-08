@@ -15,6 +15,7 @@ import {
   Star,
   Loader2
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useConnections } from '@/hooks/useConnections';
 // import { supabase } from '@/integrations/supabase/client';
