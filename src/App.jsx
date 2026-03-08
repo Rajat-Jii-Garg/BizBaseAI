@@ -41,6 +41,8 @@ import FAQ from "./pages/FAQ";
 import ProfileDashboard from "./pages/ProfileDashboard";
 import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 import Leaderboard from "./pages/Leaderboard";
+import Referrals from "./pages/Referrals";
+import Blog from "./pages/Blog";
 
 // Business pages
 import { 
