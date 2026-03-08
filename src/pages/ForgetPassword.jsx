@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { Sparkles, Mail, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import SEOHead from '@/components/SEOHead';
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
