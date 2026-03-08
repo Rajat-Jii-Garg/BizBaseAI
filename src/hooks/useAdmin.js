@@ -32,11 +32,14 @@ export const useAdmin = () => {
 
   const invoke = useCallback(async (method, extra = {}) => {
     try {
-      const { data, error } = await supabase.functions.invoke('admin-verify', {
+      const response = await supabase.functions.invoke('admin-verify', {
         body: { method, ...extra }
       });
-      if (error) throw error;
-      return data;
+      if (response.error) {
+        console.error(`Admin ${method} error:`, response.error);
+        return null;
+      }
+      return response.data;
     } catch (err) {
       console.error(`Admin ${method} failed:`, err);
       return null;
