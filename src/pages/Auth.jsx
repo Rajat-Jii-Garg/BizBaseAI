@@ -20,6 +20,7 @@ import {
   Building2,
   ArrowLeft
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
