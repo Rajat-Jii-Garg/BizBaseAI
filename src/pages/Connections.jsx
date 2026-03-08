@@ -310,11 +310,11 @@ const Connections = () => {
           <TabsContent value="suggestions" className="mt-4">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[#5B6CFF]" />
+                <h2 className="text-lg lg:text-xl font-semibold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 text-[#5B6CFF]" />
                   People You May Know
                 </h2>
-                <p className="text-xs text-muted-foreground">Expand your professional network</p>
+                <p className="text-xs lg:text-sm text-muted-foreground">Expand your professional network</p>
               </div>
               <Button
                 variant="outline"
