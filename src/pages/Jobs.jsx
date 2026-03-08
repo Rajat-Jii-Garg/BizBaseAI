@@ -203,34 +203,34 @@ const Jobs = () => {
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-muted/50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-4 lg:space-y-6">
 
           {/* Header - Title + Post Job button */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Trending Jobs</h1>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Discover opportunities that match your skills</p>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Trending Jobs</h1>
+              <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mt-0.5 lg:mt-1">Discover opportunities that match your skills</p>
             </div>
             <CreateJobModal onJobCreated={fetchJobs} />
           </div>
 
-          {/* Stats row - compact with gradient backgrounds */}
-          <div className="grid grid-cols-4 gap-2">
-            <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-lg px-2 py-2 text-center">
-              <p className="text-base sm:text-lg font-bold text-primary">{totalJobs}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Total</p>
+          {/* Stats row - compact on mobile, spacious on desktop */}
+          <div className="grid grid-cols-4 gap-2 lg:gap-4">
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-lg px-2 py-2 lg:px-4 lg:py-4 text-center">
+              <p className="text-base sm:text-lg lg:text-2xl font-bold text-primary">{totalJobs}</p>
+              <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground leading-tight">Total Jobs</p>
             </div>
-            <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-lg px-2 py-2 text-center">
-              <p className="text-base sm:text-lg font-bold text-green-600">{activeJobs}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Active</p>
+            <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-lg px-2 py-2 lg:px-4 lg:py-4 text-center">
+              <p className="text-base sm:text-lg lg:text-2xl font-bold text-green-600">{activeJobs}</p>
+              <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground leading-tight">Active</p>
             </div>
-            <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 rounded-lg px-2 py-2 text-center">
-              <p className="text-base sm:text-lg font-bold text-amber-600">{remoteJobs}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Remote</p>
+            <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 rounded-lg px-2 py-2 lg:px-4 lg:py-4 text-center">
+              <p className="text-base sm:text-lg lg:text-2xl font-bold text-amber-600">{remoteJobs}</p>
+              <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground leading-tight">Remote</p>
             </div>
-            <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-lg px-2 py-2 text-center">
-              <p className="text-base sm:text-lg font-bold text-purple-600">{savedCount}</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Saved</p>
+            <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-lg px-2 py-2 lg:px-4 lg:py-4 text-center">
+              <p className="text-base sm:text-lg lg:text-2xl font-bold text-purple-600">{savedCount}</p>
+              <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground leading-tight">Saved</p>
             </div>
           </div>
 
