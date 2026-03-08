@@ -19,12 +19,14 @@ Deno.serve(async (req) => {
       })
     }
 
+    const body = await req.json().catch(() => ({}))
+    const { method = 'verify', search = '', postId, userId } = body
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get user from token
     const token = authHeader.replace('Bearer ', '')
     const { data: { user }, error: userError } = await supabase.auth.getUser(token)
 
@@ -35,21 +37,10 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Check admin role using the has_role function
-    const { data: isAdmin, error: roleError } = await supabase.rpc('has_role', {
+    const { data: isAdmin } = await supabase.rpc('has_role', {
       _user_id: user.id,
       _role: 'admin'
     })
-
-    if (roleError) {
-      console.error('Role check error:', roleError)
-      return new Response(JSON.stringify({ error: 'Role check failed' }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-
-    const { method } = await req.json().catch(() => ({ method: 'verify' }))
 
     if (method === 'verify') {
       return new Response(JSON.stringify({ isAdmin: !!isAdmin }), {
@@ -57,7 +48,6 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Admin-only operations below
     if (!isAdmin) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 403,
@@ -84,24 +74,17 @@ Deno.serve(async (req) => {
           totalCommunities: communities.count || 0,
           totalEvents: events.count || 0,
         }
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     if (method === 'getUsers') {
-      const { page = 1, limit = 20, search = '' } = await req.json().catch(() => ({}))
-      let query = supabase.from('profiles').select('*').order('created_at', { ascending: false })
-        .range((page - 1) * limit, page * limit - 1)
-      
+      let query = supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(50)
       if (search) {
         query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,username.ilike.%${search}%`)
       }
-
-      const { data, error, count } = await query
+      const { data, error } = await query
       if (error) throw error
-
-      return new Response(JSON.stringify({ users: data, total: count }), {
+      return new Response(JSON.stringify({ users: data }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
@@ -111,7 +94,6 @@ Deno.serve(async (req) => {
         .select('*, profiles:user_id(full_name, avatar_url, username)')
         .order('created_at', { ascending: false })
         .limit(50)
-
       if (error) throw error
       return new Response(JSON.stringify({ posts: data }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -119,7 +101,7 @@ Deno.serve(async (req) => {
     }
 
     if (method === 'deletePost') {
-      const { postId } = await req.json().catch(() => ({}))
+      if (!postId) throw new Error('postId required')
       const { error } = await supabase.from('posts').delete().eq('id', postId)
       if (error) throw error
       return new Response(JSON.stringify({ success: true }), {
@@ -128,7 +110,7 @@ Deno.serve(async (req) => {
     }
 
     if (method === 'deleteUser') {
-      const { userId } = await req.json().catch(() => ({}))
+      if (!userId) throw new Error('userId required')
       const { error } = await supabase.auth.admin.deleteUser(userId)
       if (error) throw error
       return new Response(JSON.stringify({ success: true }), {
@@ -141,7 +123,6 @@ Deno.serve(async (req) => {
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50)
-
       if (error) throw error
       return new Response(JSON.stringify({ businesses: data }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -154,7 +135,7 @@ Deno.serve(async (req) => {
     })
 
   } catch (error) {
-    console.error('Admin verify error:', error)
+    console.error('Admin error:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
