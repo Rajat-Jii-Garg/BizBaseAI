@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -12,10 +12,7 @@ import {
   Users,
   Search,
   MessageSquare,
-  UserMinus,
   UserPlus,
-  MapPin,
-  Briefcase,
   Loader2,
   RefreshCw,
   Check,
@@ -56,6 +53,7 @@ const Connections = () => {
     acceptRequest,
     rejectRequest,
     disconnect,
+    withdrawRequest,
     refreshSuggestions,
     removeSuggestion,
     refreshAllConnections
@@ -74,11 +72,48 @@ const Connections = () => {
     );
   });
 
-  // Suggestion Card Component
+  // Shared profile card shell used by Connect, Received, and Sent tabs
+  const ProfileCard = ({ profile, bannerUrl, bannerGradient, ringClass, fallbackGradient, badge, actions }) => (
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-border bg-card">
+      <div 
+        className="h-10 bg-cover bg-center"
+        style={{
+          backgroundImage: bannerUrl 
+            ? `url(${bannerUrl})`
+            : bannerGradient || 'linear-gradient(135deg, rgba(91,108,255,0.3), rgba(139,92,246,0.3), rgba(6,182,212,0.3))'
+        }}
+      />
+      <CardContent className="p-3 pt-0 -mt-5">
+        <div className="text-center">
+          <Avatar 
+            className={`h-10 w-10 mx-auto border-2 border-background cursor-pointer ${ringClass || 'ring-2 ring-primary/20'}`}
+            onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
+          >
+            <AvatarImage src={profile?.avatar_url} />
+            <AvatarFallback className={`${fallbackGradient || 'bg-gradient-to-br from-primary to-primary/80'} text-white text-sm font-semibold`}>
+              {profile?.full_name?.[0] || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <h3 
+            className="font-semibold text-sm mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
+            onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
+          >
+            {profile?.full_name || 'Unknown User'}
+          </h3>
+          {profile?.bio && (
+            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
+          )}
+          {badge}
+        </div>
+        {actions}
+      </CardContent>
+    </Card>
+  );
+
+  // Suggestion Card
   const SuggestionCard = ({ profile }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-border bg-card">
-      {/* Mini Banner */}
-      <div className="h-12 bg-gradient-to-r from-[#5B6CFF]/30 via-[#8B5CF6]/30 to-[#06B6D4]/30" />
+      <div className="h-12 bg-gradient-to-r from-[hsl(var(--primary))]/30 via-[#8B5CF6]/30 to-[#06B6D4]/30" />
       <CardContent className="p-3 pt-0 -mt-6">
         <div className="text-center">
           <Avatar
@@ -127,48 +162,25 @@ const Connections = () => {
     </Card>
   );
 
-  // Connected User Card Component
+  // Connected User Card
   const ConnectedCard = ({ conn }) => {
     const profile = conn.requester_profile?.id === user?.id
       ? conn.addressee_profile
       : conn.requester_profile;
 
     return (
-      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-border bg-card">
-        {/* Mini Banner */}
-        <div 
-          className="h-10 bg-cover bg-center"
-          style={{
-            backgroundImage: profile?.banner_url 
-              ? `url(${profile.banner_url})`
-              : 'linear-gradient(135deg, rgba(91,108,255,0.3), rgba(139,92,246,0.3), rgba(6,182,212,0.3))'
-          }}
-        />
-        <CardContent className="p-3 pt-0 -mt-5">
-          <div className="text-center">
-            <Avatar 
-              className="h-10 w-10 mx-auto border-2 border-background cursor-pointer ring-2 ring-green-500/30"
-              onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
-            >
-              <AvatarImage src={profile?.avatar_url} />
-              <AvatarFallback className="bg-gradient-to-br from-[#10B981] to-[#059669] text-white text-sm font-semibold">
-                {profile?.full_name?.[0] || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <h3 
-              className="font-semibold text-sm mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
-              onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
-            >
-              {profile?.full_name || 'Unknown User'}
-            </h3>
-            {profile?.bio && (
-              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
-            )}
-            <Badge className="mt-2 text-[10px] bg-green-500/10 text-green-600 border-green-500/20">
-              <UserCheck className="w-2.5 h-2.5 mr-1" />
-              Connected
-            </Badge>
-          </div>
+      <ProfileCard
+        profile={profile}
+        bannerUrl={profile?.banner_url}
+        ringClass="ring-2 ring-green-500/30"
+        fallbackGradient="bg-gradient-to-br from-[#10B981] to-[#059669]"
+        badge={
+          <Badge className="mt-2 text-[10px] bg-green-500/10 text-green-600 border-green-500/20">
+            <UserCheck className="w-2.5 h-2.5 mr-1" />
+            Connected
+          </Badge>
+        }
+        actions={
           <Button
             className="w-full mt-3 h-7 text-xs"
             variant="outline"
@@ -178,45 +190,36 @@ const Connections = () => {
             <MessageSquare className="w-3 h-3 mr-1" />
             Message
           </Button>
-        </CardContent>
-      </Card>
+        }
+      />
     );
   };
 
-  // Request Card Component
+  // Request Card - same visual as ConnectedCard
   const RequestCard = ({ req, type }) => {
     const profile = type === 'received' ? req.requester_profile : req.addressee_profile;
     
     return (
-      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-border bg-card">
-        <div className="h-10 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20" />
-        <CardContent className="p-3 pt-0 -mt-5">
-          <div className="text-center">
-            <Avatar 
-              className="h-10 w-10 mx-auto border-2 border-background cursor-pointer"
-              onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
-            >
-              <AvatarImage src={profile?.avatar_url} />
-              <AvatarFallback className="bg-gradient-to-br from-amber-500 to-orange-500 text-white text-sm font-semibold">
-                {profile?.full_name?.[0] || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <h3 className="font-semibold text-sm mt-2 line-clamp-1">
-              {profile?.full_name || 'Unknown User'}
-            </h3>
-            {profile?.current_position && (
-              <p className="text-xs text-muted-foreground line-clamp-1">{profile.current_position}</p>
+      <ProfileCard
+        profile={profile}
+        bannerUrl={profile?.banner_url}
+        bannerGradient={type === 'received' 
+          ? 'linear-gradient(135deg, rgba(245,158,11,0.25), rgba(249,115,22,0.25), rgba(239,68,68,0.25))'
+          : 'linear-gradient(135deg, rgba(91,108,255,0.25), rgba(139,92,246,0.25), rgba(6,182,212,0.25))'
+        }
+        ringClass={type === 'received' ? 'ring-2 ring-amber-500/30' : 'ring-2 ring-blue-500/30'}
+        fallbackGradient={type === 'received' ? 'bg-gradient-to-br from-amber-500 to-orange-500' : 'bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6]'}
+        badge={
+          <Badge className={`mt-2 text-[10px] ${type === 'received' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-blue-500/10 text-blue-600 border-blue-500/20'}`} variant="outline">
+            {type === 'received' ? (
+              <><Clock className="w-2.5 h-2.5 mr-1" />Pending</>
+            ) : (
+              <><Send className="w-2.5 h-2.5 mr-1" />Sent</>
             )}
-            <Badge className="mt-2 text-[10px]" variant="outline">
-              {type === 'received' ? (
-                <><Clock className="w-2.5 h-2.5 mr-1" />Pending</>
-              ) : (
-                <><Send className="w-2.5 h-2.5 mr-1" />Sent</>
-              )}
-            </Badge>
-          </div>
-          
-          {type === 'received' ? (
+          </Badge>
+        }
+        actions={
+          type === 'received' ? (
             <div className="flex gap-1.5 mt-3">
               <Button
                 className="flex-1 h-7 text-xs bg-[#10B981] hover:bg-[#059669] text-white"
@@ -237,18 +240,28 @@ const Connections = () => {
               </Button>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full mt-3 h-7 text-xs text-muted-foreground"
-              disabled
-            >
-              <Clock className="w-3 h-3 mr-1" />
-              Awaiting Response
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+            <div className="flex gap-1.5 mt-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 h-7 text-xs text-muted-foreground"
+                disabled
+              >
+                <Clock className="w-3 h-3 mr-1" />
+                Awaiting
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 w-7 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200"
+                onClick={() => withdrawRequest(req.id)}
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
+          )
+        }
+      />
     );
   };
 
@@ -257,37 +270,37 @@ const Connections = () => {
       <div className="max-w-7xl mx-auto p-3 sm:p-4 space-y-4">
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          {/* Compact Tab Buttons */}
-          <TabsList className="grid w-full grid-cols-3 h-10 p-1 bg-muted/50 rounded-xl">
+          {/* Compact Tab Buttons - smaller on mobile */}
+          <TabsList className="grid w-full grid-cols-3 h-8 sm:h-10 p-0.5 sm:p-1 bg-muted/50 rounded-xl">
             <TabsTrigger 
               value="suggestions"
-              className="text-xs sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#5B6CFF] data-[state=active]:to-[#8B5CF6] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#5B6CFF] data-[state=active]:to-[#8B5CF6] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+              <Sparkles className="w-3 h-3 mr-0.5 sm:mr-1" />
               <span className="hidden sm:inline">Suggestions</span>
               <span className="sm:hidden">Suggest</span>
             </TabsTrigger>
 
             <TabsTrigger 
               value="connections"
-              className="text-xs sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#10B981] data-[state=active]:to-[#059669] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#10B981] data-[state=active]:to-[#059669] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <UserCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+              <UserCheck className="w-3 h-3 mr-0.5 sm:mr-1" />
               <span className="hidden sm:inline">Connected</span>
               <span className="sm:hidden">Connect</span>
-              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
+              <Badge variant="secondary" className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-3.5 sm:h-4">
                 {connections.length}
               </Badge>
             </TabsTrigger>
 
             <TabsTrigger 
               value="requests"
-              className="text-xs sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+              <UserPlus className="w-3 h-3 mr-0.5 sm:mr-1" />
               <span className="hidden sm:inline">Requests</span>
               <span className="sm:hidden">Req</span>
-              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
+              <Badge variant="secondary" className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-3.5 sm:h-4">
                 {receivedRequests.length + sentRequests.length}
               </Badge>
             </TabsTrigger>
@@ -337,23 +350,18 @@ const Connections = () => {
 
           {/* CONNECTIONS TAB */}
           <TabsContent value="connections" className="mt-4">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-[#10B981]" />
-                  My Connections
-                </h2>
-                <p className="text-xs text-muted-foreground">{connections.length} professionals connected</p>
-              </div>
-              <div className="relative w-48">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                <Input
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="pl-8 h-8 text-xs"
-                />
-              </div>
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-[#10B981]" />
+              My Connections
+            </h2>
+            <div className="relative mt-2 mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search connections..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-9 h-9 text-sm rounded-[10px] w-full"
+              />
             </div>
 
             {connectionsLoading ? (
@@ -393,24 +401,24 @@ const Connections = () => {
                 <Button
                   size="sm"
                   variant={requestsSubTab === 'received' ? 'default' : 'outline'}
-                  className={`h-7 text-xs ${requestsSubTab === 'received' ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
+                  className={`h-6 sm:h-7 text-[10px] sm:text-xs px-2 sm:px-3 ${requestsSubTab === 'received' ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
                   onClick={() => setRequestsSubTab('received')}
                 >
-                  <Clock className="w-3 h-3 mr-1" />
+                  <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
                   Received
-                  <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
+                  <Badge variant="secondary" className="ml-1 text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-3.5 sm:h-4">
                     {receivedRequests.length}
                   </Badge>
                 </Button>
                 <Button
                   size="sm"
                   variant={requestsSubTab === 'sent' ? 'default' : 'outline'}
-                  className={`h-7 text-xs ${requestsSubTab === 'sent' ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''}`}
+                  className={`h-6 sm:h-7 text-[10px] sm:text-xs px-2 sm:px-3 ${requestsSubTab === 'sent' ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''}`}
                   onClick={() => setRequestsSubTab('sent')}
                 >
-                  <Send className="w-3 h-3 mr-1" />
+                  <Send className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
                   Sent
-                  <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
+                  <Badge variant="secondary" className="ml-1 text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-3.5 sm:h-4">
                     {sentRequests.length}
                   </Badge>
                 </Button>
