@@ -644,51 +644,53 @@ const ProfilePage = ({ userId }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Profile Navigation */}
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold text-foreground">Profile Navigation</CardTitle>
-                <p className="text-xs text-muted-foreground">Explore content sections</p>
-              </CardHeader>
-              <CardContent className="p-2">
-                <div className="space-y-1">
-                  {[
-                    { id: 'overview', label: 'Overview', icon: User },
-                    { id: 'projects', label: 'Projects', icon: FolderOpen, count: certificates.length },
-                    { id: 'services', label: 'Services', icon: Briefcase, count: 0 },
-                    { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
-                    { id: 'mentions', label: 'Mentions', icon: MessageSquare, count: 0 },
-                  ].map((item) => (
-                    <Button
-                      key={item.id}
-                      variant={activeTab === item.id ? 'default' : 'ghost'}
-                      className={`w-full justify-start ${activeTab === item.id ? 'bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white' : 'hover:bg-[#5B6CFF]/10'}`}
-                      onClick={() => setActiveTab(item.id)}
-                    >
-                      <item.icon className="w-4 h-4 mr-2" />
-                      {item.label}
-                      {item.count !== undefined && item.count > 0 && (
-                        <Badge variant={activeTab === item.id ? 'outline' : 'secondary'} className={`ml-auto ${activeTab === item.id ? 'border-white/50 text-white' : 'bg-[#5B6CFF]/10 text-[#5B6CFF]'}`}>
-                          {item.count}
-                        </Badge>
-                      )}
-                    </Button>
-                  ))}
-                  
-                  {isOwnProfile && (
-                    <>
-                      <Separator className="my-2" />
-                      <ProfileEditModal onProfileUpdate={fetchProfile}>
-                        <Button variant="ghost" className="w-full justify-start hover:bg-[#5B6CFF]/10">
-                          <Settings className="w-4 h-4 mr-2" />
-                          Edit Profile
-                        </Button>
-                      </ProfileEditModal>
-                    </>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Profile Navigation - hidden on mobile/tablet */}
+            <div className="hidden lg:block">
+              <Card className="bg-card border-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold text-foreground">Profile Navigation</CardTitle>
+                  <p className="text-xs text-muted-foreground">Explore content sections</p>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <div className="space-y-1">
+                    {[
+                      { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
+                      { id: 'overview', label: 'Overview', icon: User },
+                      { id: 'projects', label: 'Projects', icon: FolderOpen, count: certificates.length },
+                      { id: 'services', label: 'Services', icon: Briefcase, count: 0 },
+                      { id: 'mentions', label: 'Mentions', icon: MessageSquare, count: 0 },
+                    ].map((item) => (
+                      <Button
+                        key={item.id}
+                        variant={activeTab === item.id ? 'default' : 'ghost'}
+                        className={`w-full justify-start ${activeTab === item.id ? 'bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white' : 'hover:bg-[#5B6CFF]/10'}`}
+                        onClick={() => setActiveTab(item.id)}
+                      >
+                        <item.icon className="w-4 h-4 mr-2" />
+                        {item.label}
+                        {item.count !== undefined && item.count > 0 && (
+                          <Badge variant={activeTab === item.id ? 'outline' : 'secondary'} className={`ml-auto ${activeTab === item.id ? 'border-white/50 text-white' : 'bg-[#5B6CFF]/10 text-[#5B6CFF]'}`}>
+                            {item.count}
+                          </Badge>
+                        )}
+                      </Button>
+                    ))}
+                    
+                    {isOwnProfile && (
+                      <>
+                        <Separator className="my-2" />
+                        <ProfileEditModal onProfileUpdate={fetchProfile}>
+                          <Button variant="ghost" className="w-full justify-start hover:bg-[#5B6CFF]/10">
+                            <Settings className="w-4 h-4 mr-2" />
+                            Edit Profile
+                          </Button>
+                        </ProfileEditModal>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* BizScore Card */}
             <Card className="bg-gradient-to-br from-[#5B6CFF]/5 via-card to-[#8B5CF6]/5 border-border overflow-hidden">
