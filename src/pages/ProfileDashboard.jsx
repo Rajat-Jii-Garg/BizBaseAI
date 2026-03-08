@@ -48,7 +48,9 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import PowerScoreCard from '@/components/PowerScoreCard';
+import AchievementBadges from '@/components/AchievementBadges';
+import ReferralWidget from '@/components/ReferralWidget';
 const ProfileDashboard = () => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -544,21 +546,8 @@ const ProfileDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* BizScore Card */}
-            <Card className="bg-gradient-to-br from-[#5B6CFF]/10 to-[#8B5CF6]/10 border-[#5B6CFF]/20">
-              <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="text-[#5B6CFF] font-semibold text-sm">Bizcenta</span>
-                  <BadgeCheck className="w-4 h-4 text-[#5B6CFF]" />
-                </div>
-                <div className="text-4xl font-bold text-[#5B6CFF] mb-1">
-                  {profile?.bizcoins || 0}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {profile?.bizcoins >= 500 ? 'Expert' : profile?.bizcoins >= 100 ? 'Experienced' : 'Beginner'}
-                </p>
-              </CardContent>
-            </Card>
+            {/* Power Score */}
+            <PowerScoreCard />
           </div>
 
           {/* Middle Content */}
@@ -874,49 +863,11 @@ const ProfileDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {recentActivity.length > 0 ? (
-                  <div className="space-y-4">
-                    {recentActivity.map((activity) => (
-                      <div key={activity.id} className="flex items-start gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={profile?.avatar_url} />
-                          <AvatarFallback className="bg-[#5B6CFF] text-white text-xs">
-                            {profile?.full_name?.charAt(0) || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-muted-foreground">{getTimeAgo(activity.created_at)}</p>
-                          <p className="text-sm text-foreground truncate">
-                            Posted "{activity.content?.substring(0, 50)}..."
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
-                )}
-              </CardContent>
-            </Card>
+            {/* Achievement Badges */}
+            <AchievementBadges />
 
-            {/* Explore Opportunities */}
-            <Card className="bg-gradient-to-br from-[#1E293B] to-[#334155] text-white border-0">
-              <CardContent className="p-6 text-center">
-                <h3 className="font-bold text-lg mb-2">Explore Opportunities Together</h3>
-                <div className="w-20 h-20 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
-                  <Handshake className="w-10 h-10 text-white/80" />
-                </div>
-                <Button className="w-full bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white">
-                  Let's Connect
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Invite & Earn */}
+            <ReferralWidget />
           </div>
         </div>
       </div>
