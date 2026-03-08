@@ -692,26 +692,26 @@ const ProfilePage = ({ userId }) => {
               </Card>
             </div>
 
-            {/* BizScore Card */}
-            <Card className="bg-gradient-to-br from-[#5B6CFF]/5 via-card to-[#8B5CF6]/5 border-border overflow-hidden">
+            {/* BizCoins Card */}
+            <Card className="bg-gradient-to-br from-amber-500/5 via-card to-orange-500/5 border-border overflow-hidden">
               <CardContent className="p-6 text-center relative">
                 <div className="relative inline-flex items-center justify-center">
-                  <div className="w-28 h-28 rounded-full bg-gradient-to-r from-[#5B6CFF] to-[#8B5CF6] p-1">
+                  <div className="w-28 h-28 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 p-1">
                     <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
                       <div className="text-center">
-                        <span className="text-3xl font-bold bg-gradient-to-r from-[#5B6CFF] to-[#8B5CF6] bg-clip-text text-transparent">
+                        <span className="text-3xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
                           {profile?.bizcoins || 0}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="absolute -top-1 -right-1 bg-[#5B6CFF] rounded-full p-1">
+                  <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-1">
                     <BadgeCheck className="w-5 h-5 text-white" />
                   </div>
                 </div>
-                <p className="text-sm font-medium text-[#5B6CFF] mt-4">Bizcenta</p>
+                <p className="text-sm font-medium text-amber-600 mt-4">BizCoins</p>
                 <p className="text-xs text-muted-foreground">
-                  {profile?.bizcoins >= 1000 ? 'Expert' : profile?.bizcoins >= 500 ? 'Experienced' : profile?.bizcoins >= 100 ? 'Rising' : 'Beginner'}
+                  {profile?.bizcoins >= 1000 ? '👑 Elite' : profile?.bizcoins >= 500 ? '⚡ Power User' : profile?.bizcoins >= 100 ? '🌟 Rising Star' : '🚀 Getting Started'}
                 </p>
               </CardContent>
             </Card>

@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { useBizCoins } from '@/hooks/useBizCoins';
 
 export const usePosts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { awardCoins } = useBizCoins();
 
   const fetchPosts = async () => {
     try {
@@ -159,7 +157,7 @@ export const usePosts = () => {
         }
       }
 
-      awardCoins('post');
+      // BizCoins awarded automatically by DB trigger
       await fetchPosts();
     } catch (error) {
       console.error('Error creating post:', error);

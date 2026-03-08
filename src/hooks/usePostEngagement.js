@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useBizCoins } from '@/hooks/useBizCoins';
 
 export const usePostEngagement = () => {
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(false);
-  const { awardCoins } = useBizCoins();
 
   const toggleLike = async (postId) => {
     setLoading(true);
@@ -24,17 +22,14 @@ export const usePostEngagement = () => {
           .delete()
           .eq('post_id', postId)
           .eq('user_id', user.id);
-        
-        // toast("Upvote Removed", { description: "You've removed your upvote from this post" });
       } else {
         await supabase
           .from('post_likes')
           .insert({ post_id: postId, user_id: user.id });
-        awardCoins('like');
+        // BizCoins awarded automatically by DB trigger
       }
     } catch (error) {
       console.error('Error toggling upvote:', error);
-      // toast.error("Error", { description: "Failed to update upvote status" });
     } finally {
       setLoading(false);
     }
@@ -50,10 +45,9 @@ export const usePostEngagement = () => {
           user_id: user.id,
           content: content.trim()
         });
-      awardCoins('comment');
+      // BizCoins awarded automatically by DB trigger
     } catch (error) {
       console.error('Error adding feedback:', error);
-      // toast.error("Error", { description: "Failed to add feedback" });
     } finally {
       setLoading(false);
     }
@@ -70,7 +64,6 @@ export const usePostEngagement = () => {
         .maybeSingle();
 
       if (existingShare) {
-        // toast("Already Shared", { description: "You have already shared this post" });
         return false;
       }
 
@@ -80,7 +73,6 @@ export const usePostEngagement = () => {
 
       if (error) throw error;
 
-      // Fetch post owner's username
       const { data: postData, error: postError } = await supabase
         .from("posts")
         .select(`
@@ -103,18 +95,16 @@ export const usePostEngagement = () => {
         console.error("Username not found for post");
         return false;
       }
-      // Create correct share URL
       const postUrl = `${window.location.origin}/${username}/${postId}`;
       
       try {
         await navigator.clipboard.writeText(postUrl);
-        // toast("Post Shared", { description: "Post link copied to clipboard and shared to your network" });
       } catch (clipboardError) {
-        // toast("Post Shared", { description: "Post has been shared to your network" });
+        // clipboard not available
       }
+      // BizCoins awarded automatically by DB trigger
     } catch (error) {
       console.error('Error sharing post:', error);
-      // toast.error("Error", { description: "Failed to share post" });
     } finally {
       setLoading(false);
     }
@@ -132,7 +122,6 @@ export const usePostEngagement = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      // 🔁 IF ALREADY REPOSTED → UNDO
       if (existingRepost) {
         await supabase
           .from('post_reposts')
@@ -148,7 +137,6 @@ export const usePostEngagement = () => {
         return "removed";
       }
 
-      // 🆕 IF NOT REPOSTED → CREATE
       let postData = originalPost;
       if (!postData) {
         const { data } = await supabase
@@ -174,7 +162,7 @@ export const usePostEngagement = () => {
           repost_of_user_id: postData.user_id
         });
 
-      awardCoins('repost');
+      // BizCoins awarded automatically by DB trigger
       return "added";
     } catch (error) {
       console.error('Error reposting:', error);

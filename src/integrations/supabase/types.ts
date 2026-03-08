@@ -1936,6 +1936,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      award_bizcoins: {
+        Args: { _amount: number; _reason?: string; _user_id: string }
+        Returns: undefined
+      }
       calculate_profile_completion: {
         Args: { profile_id: string }
         Returns: number
