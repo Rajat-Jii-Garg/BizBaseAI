@@ -65,6 +65,13 @@ const UsernameProfile = () => {
 
   const isOwnProfile = user?.id === profileId;
 
+  // Record profile view for other users
+  useEffect(() => {
+    if (profileId && !isOwnProfile) {
+      recordView(profileId);
+    }
+  }, [profileId, isOwnProfile, recordView]);
+
   return isOwnProfile
     ? <ProfileDashboard />
     : <ProfilePage userId={profileId} />;
