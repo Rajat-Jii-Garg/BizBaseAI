@@ -15,6 +15,11 @@ import { Button } from '@/components/ui/button';
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="AI Powered Professional Networking & Business Platform"
+        description="BizBase AI - Build professional connections, grow your career, manage businesses, and unlock opportunities with AI-driven insights. Join the next-gen networking platform."
+        path="/"
+      />
       <Navbar variant="hero" />
       <Hero />
       <Features />

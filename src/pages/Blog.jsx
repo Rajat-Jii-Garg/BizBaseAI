@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { BookOpen, Clock, Eye, ArrowRight, Search, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import SEOHead from '@/components/SEOHead';
 
 const Blog = () => {
   const [posts, setPosts] = useState([]);

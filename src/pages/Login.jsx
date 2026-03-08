@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import SEOHead from '@/components/SEOHead';
 
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '', rememberMe: false });

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
+import SEOHead from '@/components/SEOHead';
 
 const FAQ = () => {
   const [openItems, setOpenItems] = useState({});

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Play, ArrowRight, CheckCircle, Star, Users, Building2, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SEOHead from '@/components/SEOHead';
 
 const Demo = () => {
   const demoVideos = [

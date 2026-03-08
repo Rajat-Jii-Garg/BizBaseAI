@@ -11,6 +11,7 @@ import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
+import SEOHead from '@/components/SEOHead';
 
 const Signup = () => {
   const [signupData, setSignupData] = useState({
