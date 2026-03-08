@@ -493,44 +493,51 @@ const ProfileDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Profile Navigation */}
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
-                <p className="text-xs text-muted-foreground">Explore content sections</p>
-              </CardHeader>
-              <CardContent className="p-2">
-                <div className="space-y-1">
-                  {navItems.map((item) => (
-                    <Button
-                      key={item.id}
-                      variant={activeNav === item.id ? 'default' : 'ghost'}
-                      className={`w-full justify-start text-sm ${activeNav === item.id ? 'bg-[#5B6CFF] text-white' : ''}`}
-                      onClick={() => {
-                        setActiveNav(item.id);
-                        setActiveTab(item.id);
-                      }}
-                    >
-                      <item.icon className="w-4 h-4 mr-2" />
-                      {item.label}
-                      {item.count !== undefined && item.count > 0 && (
-                        <Badge variant="secondary" className="ml-auto text-xs">{item.count}</Badge>
-                      )}
-                    </Button>
-                  ))}
-                  <Separator className="my-2" />
-                  <ProfileEditModal onProfileUpdate={fetchProfile}>
-                    <Button variant="ghost" className="w-full justify-start text-sm">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  </ProfileEditModal>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Profile Navigation - hidden on mobile/tablet */}
+            <div className="hidden lg:block">
+              <Card className="bg-card border-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
+                  <p className="text-xs text-muted-foreground">Explore content sections</p>
+                </CardHeader>
+                <CardContent className="p-2">
+                  <div className="space-y-1">
+                    {navItems.map((item) => (
+                      <Button
+                        key={item.id}
+                        variant={activeNav === item.id ? 'default' : 'ghost'}
+                        className={`w-full justify-start text-sm ${activeNav === item.id ? 'bg-[#5B6CFF] text-white' : ''}`}
+                        onClick={() => {
+                          setActiveNav(item.id);
+                          setActiveTab(item.id);
+                        }}
+                      >
+                        <item.icon className="w-4 h-4 mr-2" />
+                        {item.label}
+                        {item.count !== undefined && item.count > 0 && (
+                          <Badge variant="secondary" className="ml-auto text-xs">{item.count}</Badge>
+                        )}
+                      </Button>
+                    ))}
+                    <Separator className="my-2" />
+                    <ProfileEditModal onProfileUpdate={fetchProfile}>
+                      <Button variant="ghost" className="w-full justify-start text-sm">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    </ProfileEditModal>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            {/* Power Score */}
+            {/* Power Score - shown on mobile before Invite */}
             <PowerScoreCard />
+
+            {/* Invite & Earn - shown on mobile too */}
+            <div className="lg:hidden">
+              <ReferralWidget />
+            </div>
           </div>
 
           {/* Middle Content */}
