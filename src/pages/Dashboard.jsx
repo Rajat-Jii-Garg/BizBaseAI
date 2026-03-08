@@ -742,10 +742,9 @@ const Dashboard = () => {
         isOpen={showPostCreator} 
         onClose={() => setShowPostCreator(false)} 
       />
-      <FullPageCommunityCreator 
+      <FullPageCommunityPostCreator 
         isOpen={showCommunityCreator} 
         onClose={() => setShowCommunityCreator(false)}
-        onSuccess={() => refetch()}
       />
       <FullPageEventCreator 
         isOpen={showEventCreator} 
