@@ -30,6 +30,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import DashboardLayout from '@/components/DashboardLayout';
 import CallModal from '@/components/CallModal';
+import SEOHead from '@/components/SEOHead';
 import { WebRTCManager } from '@/utils/webrtc';
 
 const Messages = () => {
