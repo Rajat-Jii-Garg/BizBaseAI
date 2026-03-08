@@ -50,8 +50,7 @@ export const usePostEngagement = () => {
           user_id: user.id,
           content: content.trim()
         });
-
-      // toast("Feedback Added", { description: "Your feedback has been posted" });
+      awardCoins('comment');
     } catch (error) {
       console.error('Error adding feedback:', error);
       // toast.error("Error", { description: "Failed to add feedback" });
