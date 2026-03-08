@@ -475,26 +475,8 @@ const ProfileDashboard = () => {
               </div>
             </div>
 
-            {/* Contact Info */}
+            {/* Contact Info - respects privacy settings */}
             <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-6 text-sm text-muted-foreground border-t border-border pt-4">
-              {profile?.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span>{profile.email}</span>
-                </div>
-              )}
-              {profile?.location && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span>{profile.location}</span>
-                </div>
-              )}
-              {profile?.phone && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  <span>{profile.phone}</span>
-                </div>
-              )}
               {profile?.website && (
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4" />
