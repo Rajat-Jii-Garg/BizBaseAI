@@ -29,6 +29,8 @@ const Signup = () => {
   const [checkingUsername, setCheckingUsername] = useState(false);
   
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get('ref');
   const { signUp, user } = useAuth();
 
   // Redirect if already logged in
