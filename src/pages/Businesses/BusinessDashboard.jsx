@@ -135,10 +135,10 @@ const BusinessDashboard = () => {
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-5 max-w-[1400px] mx-auto">
+    <div className="p-3 md:p-5 space-y-4 max-w-[1400px] mx-auto text-[13px]">
       {/* Business Profile Card */}
       <Card className="overflow-hidden border-0 shadow-md">
-        <div className="h-24 sm:h-32 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative">
+        <div className="h-20 sm:h-28 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative">
           {currentBusiness?.banner_url && (
             <img src={currentBusiness.banner_url} alt="Banner" className="w-full h-full object-cover" />
           )}
@@ -147,20 +147,20 @@ const BusinessDashboard = () => {
         
         <CardContent className="relative pt-10 sm:pt-12 pb-4 px-4 sm:px-6">
           <div className="absolute -top-8 sm:-top-10 left-4 sm:left-6">
-            <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-background shadow-lg">
+            <Avatar className="w-14 h-14 sm:w-16 sm:h-16 border-3 border-background shadow-lg">
               <AvatarImage src={currentBusiness?.logo_url} />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl sm:text-2xl font-bold">
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-lg sm:text-xl font-bold">
                 {currentBusiness?.name?.charAt(0)?.toUpperCase() || 'B'}
               </AvatarFallback>
             </Avatar>
           </div>
           
           <div className="absolute top-2 sm:top-4 right-4 sm:right-6 flex gap-2">
-            <Button variant="secondary" size="sm" className="text-xs sm:text-sm h-8">
+            <Button variant="secondary" size="sm" className="text-[10px] sm:text-xs h-7">
               <Share2 className="w-3.5 h-3.5 mr-1.5" />
               <span className="hidden sm:inline">Share</span>
             </Button>
-            <Button variant="secondary" size="sm" className="text-xs sm:text-sm h-8"
+            <Button variant="secondary" size="sm" className="text-[10px] sm:text-xs h-7"
               onClick={() => navigate(`/business/${slug}/settings`)}>
               <Edit className="w-3.5 h-3.5 sm:mr-1.5" />
               <span className="hidden sm:inline">Edit</span>
@@ -169,7 +169,7 @@ const BusinessDashboard = () => {
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg sm:text-xl font-bold text-foreground">{currentBusiness?.name}</h1>
+              <h1 className="text-base sm:text-lg font-bold text-foreground">{currentBusiness?.name}</h1>
               {currentBusiness?.is_verified && (
                 <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs">
                   <CheckCircle className="w-3 h-3 mr-1" />Verified
@@ -193,24 +193,24 @@ const BusinessDashboard = () => {
       </Card>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {overviewCards.map((card, i) => (
           <Card key={i} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className={`p-2 rounded-lg bg-gradient-to-br ${card.color} text-white`}>
-                  <card.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <CardContent className="p-3">
+              <div className="flex items-start justify-between mb-2">
+                <div className={`p-1.5 rounded-lg bg-gradient-to-br ${card.color} text-white`}>
+                  <card.icon className="w-3.5 h-3.5" />
                 </div>
                 {card.trend && (
-                  <span className={`text-xs font-medium flex items-center gap-0.5 ${card.trendUp ? 'text-green-600' : 'text-red-600'}`}>
-                    {card.trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                  <span className={`text-[10px] font-medium flex items-center gap-0.5 ${card.trendUp ? 'text-green-600' : 'text-red-600'}`}>
+                    {card.trendUp ? <ArrowUpRight className="w-2.5 h-2.5" /> : <ArrowDownRight className="w-2.5 h-2.5" />}
                     {card.trend}
                   </span>
                 )}
               </div>
-              <p className="text-xl sm:text-2xl font-bold text-foreground">{card.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{card.label}</p>
-              {card.sub && <p className="text-xs text-primary mt-1">{card.sub}</p>}
+              <p className="text-lg sm:text-xl font-bold text-foreground">{card.value}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{card.label}</p>
+              {card.sub && <p className="text-[10px] text-primary mt-0.5">{card.sub}</p>}
             </CardContent>
           </Card>
         ))}
