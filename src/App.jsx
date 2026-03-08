@@ -217,8 +217,8 @@ const App = () => (
                 <Route path="services" element={<BusinessServices />} />
               </Route>
               {/* Admin Panel Routes */}
-              <Route path="/admin-panel" element={<AdminLogin />} />
               <Route path="/admin-panel" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="posts" element={<AdminPosts />} />
@@ -227,6 +227,7 @@ const App = () => (
                 <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
+              <Route path="/admin-login" element={<AdminLogin />} />
 
               {/* Username-based profile route - must be LAST to avoid conflicts */}
               <Route path="/:username/post/:postId" element={<SinglePostPage />} />
