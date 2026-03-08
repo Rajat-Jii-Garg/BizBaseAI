@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { Sparkles, Mail, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import SEOHead from '@/components/SEOHead';
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
@@ -35,6 +36,7 @@ const ForgetPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <SEOHead title="Forgot Password" description="Reset your BizBase AI account password." path="/forget-password" noIndex />
       <div className="w-full max-w-md">
         {/* Logo + Heading */}
         <div className="text-center mb-8">

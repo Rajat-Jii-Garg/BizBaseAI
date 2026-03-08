@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SEOHead from '@/components/SEOHead';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
@@ -14,6 +15,11 @@ import { Button } from '@/components/ui/button';
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="AI Powered Professional Networking & Business Platform"
+        description="BizBase AI - Build professional connections, grow your career, manage businesses, and unlock opportunities with AI-driven insights. Join the next-gen networking platform."
+        path="/"
+      />
       <Navbar variant="hero" />
       <Hero />
       <Features />

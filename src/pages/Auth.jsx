@@ -20,6 +20,7 @@ import {
   Building2,
   ArrowLeft
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -171,6 +172,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <SEOHead title="Authentication" description="Sign in or create your BizBase AI account." path="/auth" noIndex />
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">

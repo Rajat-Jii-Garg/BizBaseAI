@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import SEOHead from '@/components/SEOHead';
 
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '', rememberMe: false });
@@ -73,6 +74,9 @@ const Login = () => {
   };
 
   return (
+    <>
+      <SEOHead title="Login" description="Sign in to your BizBase AI account. Access your professional network, manage businesses, and grow your career." path="/login" noIndex />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
@@ -192,6 +196,7 @@ const Login = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 

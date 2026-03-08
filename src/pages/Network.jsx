@@ -15,6 +15,7 @@ import {
   Star,
   Loader2
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useConnections } from '@/hooks/useConnections';
 // import { supabase } from '@/integrations/supabase/client';
@@ -195,6 +196,7 @@ const Network = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Network - Professional Connections" description="Build and grow your professional network on BizBase AI. Connect with industry experts and peers." path="/network" />
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
           <CardHeader>

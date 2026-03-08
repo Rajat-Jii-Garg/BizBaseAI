@@ -11,6 +11,7 @@ import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
 import { supabase } from '@/integrations/supabase/client';
 import { useSearchParams } from 'react-router-dom';
+import SEOHead from '@/components/SEOHead';
 
 const Signup = () => {
   const [signupData, setSignupData] = useState({
@@ -221,6 +222,7 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex">
+      <SEOHead title="Sign Up - Create Your Account" description="Join BizBase AI - the AI-powered professional networking platform. Create your free account and start building your career." path="/signup" />
       {/* Feature Highlight Sidebar - Hidden on mobile */}
       <div className="hidden lg:flex lg:w-1/2">
         <FeatureHighlight />

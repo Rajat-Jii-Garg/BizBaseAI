@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import SEOHead from '@/components/SEOHead';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from '@/components/ui/badge';
@@ -337,6 +338,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Dashboard" description="Your BizBase AI dashboard - manage connections, track analytics, and grow your professional network." path="/dashboard" noIndex />
       <WelcomeFlow />
       <UsernameSetupModal 
         open={showUsernameModal} 

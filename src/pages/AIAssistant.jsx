@@ -17,6 +17,7 @@ import {
   Target,
   Lightbulb,
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import { useState, useRef, useEffect } from 'react';
 
 const AIAssistant = () => {
@@ -95,6 +96,7 @@ const AIAssistant = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="AI Assistant" description="Get AI-powered career coaching and business advice on BizBase AI." path="/ai-assistant" noIndex />
       <div className="max-w-6xl mx-auto px-3 sm:px-6 py-0 flex flex-col" style={{ height: 'calc(100vh - 100px)' }}>
         
         {/* Chat Card - takes all available space */}
