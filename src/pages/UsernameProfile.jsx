@@ -21,10 +21,12 @@ const UsernameProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
+      // Strip @ prefix if present
+      const cleanUsername = username.startsWith('@') ? username.slice(1) : username;
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
-        .eq('username', username)
+        .eq('username', cleanUsername)
         .maybeSingle();
 
       if (!data || error) {
