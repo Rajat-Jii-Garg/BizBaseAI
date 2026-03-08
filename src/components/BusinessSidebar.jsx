@@ -1,28 +1,20 @@
 import React from 'react';
 import { NavLink, useParams, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
-  Briefcase, 
-  FolderKanban, 
-  Users, 
-  UserPlus, 
-  DollarSign, 
-  BarChart3, 
-  Settings,
-  ArrowLeft,
-  Building2,
-  Sparkles,
-  Plus
+  LayoutDashboard, Briefcase, FolderKanban, Users, UserPlus, 
+  DollarSign, Settings, ArrowLeft, Building2, Sparkles, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useBusinessContext } from '@/contexts/BusinessContext';
 import { Link } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-const BusinessSidebar = () => {
+const BusinessSidebar = ({ onClose }) => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { currentBusiness, exitBusinessMode } = useBusinessContext();
+  const isMobile = useIsMobile();
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: `/business/${slug}/dashboard` },
@@ -38,10 +30,14 @@ const BusinessSidebar = () => {
     navigate('/dashboard');
   };
 
+  const handleNavClick = () => {
+    if (isMobile && onClose) onClose();
+  };
+
   return (
-    <div className="w-64 bg-card border-r border-border h-screen fixed left-0 top-0 z-40 flex flex-col">
+    <div className="w-64 bg-card border-r border-border h-screen flex flex-col">
       {/* Logo */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-border flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
@@ -50,6 +46,11 @@ const BusinessSidebar = () => {
             BizBase
           </span>
         </Link>
+        {isMobile && (
+          <Button variant="ghost" size="icon" onClick={onClose} className="md:hidden">
+            <X className="w-5 h-5" />
+          </Button>
+        )}
       </div>
 
       {/* Business Header */}
@@ -81,6 +82,7 @@ const BusinessSidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={handleNavClick}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                 isActive
@@ -100,6 +102,7 @@ const BusinessSidebar = () => {
           </p>
           <NavLink
             to={`/business/${slug}/settings`}
+            onClick={handleNavClick}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                 isActive
@@ -117,9 +120,7 @@ const BusinessSidebar = () => {
       {/* Footer Actions */}
       <div className="p-3 border-t border-border space-y-2">
         <Button 
-          variant="outline" 
-          size="sm" 
-          className="w-full justify-start"
+          variant="outline" size="sm" className="w-full justify-start"
           onClick={handleBackToPersonal}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
