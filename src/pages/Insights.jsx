@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Users
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import { useEffect, useState } from 'react';
 
 const Insights = () => {
