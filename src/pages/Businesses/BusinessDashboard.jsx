@@ -160,7 +160,7 @@ const BusinessDashboard = () => {
               <Share2 className="w-3.5 h-3.5 mr-1.5" />
               <span className="hidden sm:inline">Share</span>
             </Button>
-            <Button variant="secondary" size="sm" className="text-xs sm:text-sm h-8"
+            <Button variant="secondary" size="sm" className="text-[10px] sm:text-xs h-7"
               onClick={() => navigate(`/business/${slug}/settings`)}>
               <Edit className="w-3.5 h-3.5 sm:mr-1.5" />
               <span className="hidden sm:inline">Edit</span>
