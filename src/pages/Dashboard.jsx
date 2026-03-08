@@ -486,6 +486,9 @@ const Dashboard = () => {
                   ))}
                 </CardContent>
               </Card>
+
+              {/* Invite & Earn */}
+              <ReferralWidget />
             </div>
 
             {/* Main Content Feed */}
