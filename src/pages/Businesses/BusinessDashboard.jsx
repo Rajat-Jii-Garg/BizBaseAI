@@ -193,24 +193,24 @@ const BusinessDashboard = () => {
       </Card>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {overviewCards.map((card, i) => (
           <Card key={i} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className={`p-2 rounded-lg bg-gradient-to-br ${card.color} text-white`}>
-                  <card.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <CardContent className="p-3">
+              <div className="flex items-start justify-between mb-2">
+                <div className={`p-1.5 rounded-lg bg-gradient-to-br ${card.color} text-white`}>
+                  <card.icon className="w-3.5 h-3.5" />
                 </div>
                 {card.trend && (
-                  <span className={`text-xs font-medium flex items-center gap-0.5 ${card.trendUp ? 'text-green-600' : 'text-red-600'}`}>
-                    {card.trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                  <span className={`text-[10px] font-medium flex items-center gap-0.5 ${card.trendUp ? 'text-green-600' : 'text-red-600'}`}>
+                    {card.trendUp ? <ArrowUpRight className="w-2.5 h-2.5" /> : <ArrowDownRight className="w-2.5 h-2.5" />}
                     {card.trend}
                   </span>
                 )}
               </div>
-              <p className="text-xl sm:text-2xl font-bold text-foreground">{card.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{card.label}</p>
-              {card.sub && <p className="text-xs text-primary mt-1">{card.sub}</p>}
+              <p className="text-lg sm:text-xl font-bold text-foreground">{card.value}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{card.label}</p>
+              {card.sub && <p className="text-[10px] text-primary mt-0.5">{card.sub}</p>}
             </CardContent>
           </Card>
         ))}
