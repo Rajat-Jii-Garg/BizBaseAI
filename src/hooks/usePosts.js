@@ -8,6 +8,7 @@ export const usePosts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { awardCoins } = useBizCoins();
 
   const fetchPosts = async () => {
     try {
