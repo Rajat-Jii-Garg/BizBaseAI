@@ -305,11 +305,11 @@ const ProfileDashboard = () => {
   const profileCompletionScore = profile?.profile_completion_score || 0;
 
   const navItems = [
-    { id: 'overview', label: 'Overview', icon: User },
+    { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
     { id: 'projects', label: 'Projects', icon: FolderOpen, count: certificates.length },
     { id: 'services', label: 'Services', icon: Briefcase, count: skills.length },
     { id: 'case-studies', label: 'Case Studies', icon: Target },
-    { id: 'posts', label: 'Posts', icon: FileText, count: stats.posts },
+    { id: 'overview', label: 'Overview', icon: User },
   ];
 
   if (loading) {
