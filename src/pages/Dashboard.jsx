@@ -54,6 +54,8 @@ import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
 import NetworkSuggestions from '@/components/NetworkSuggestions';
 import QuickProfileActions from '@/components/QuickProfileActions';
 import UsernameSetupModal from '@/components/UsernameSetupModal';
+import WhoViewedProfile from '@/components/WhoViewedProfile';
+import AchievementBadges from '@/components/AchievementBadges';
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
