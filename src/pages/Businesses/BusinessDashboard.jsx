@@ -156,7 +156,7 @@ const BusinessDashboard = () => {
           </div>
           
           <div className="absolute top-2 sm:top-4 right-4 sm:right-6 flex gap-2">
-            <Button variant="secondary" size="sm" className="text-xs sm:text-sm h-8">
+            <Button variant="secondary" size="sm" className="text-[10px] sm:text-xs h-7">
               <Share2 className="w-3.5 h-3.5 mr-1.5" />
               <span className="hidden sm:inline">Share</span>
             </Button>
