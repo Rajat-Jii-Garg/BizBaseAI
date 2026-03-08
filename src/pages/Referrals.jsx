@@ -47,7 +47,7 @@ const Referrals = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-black">Invite & Earn</h1>
-                  <p className="text-white/80">Earn 100 BizCoins for every friend who joins!</p>
+                  <p className="text-white/80">Earn 10 BizCoins for every friend who joins!</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-3 mt-6">
