@@ -909,8 +909,8 @@ const ProfileDashboard = () => {
             </CardContent>
           </Card>
           <AchievementBadges />
-          <PowerScoreCard />
           <BizCoinsCard />
+          <PowerScoreCard />
           <ReferralWidget />
         </div>
       </div>
