@@ -79,7 +79,7 @@ const AdminLayout = () => {
             className="w-full justify-start text-muted-foreground"
             onClick={async () => {
               await supabase.auth.signOut();
-              navigate('/admin-panel');
+              navigate('/admin-login');
             }}
           >
             <LogOut className="h-4 w-4 mr-2" />
