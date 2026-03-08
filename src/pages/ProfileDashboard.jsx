@@ -573,8 +573,8 @@ const ProfileDashboard = () => {
 
           {/* Middle Content */}
           <div className="lg:col-span-6 space-y-6">
-            {/* Tabs */}
-            <Card className="bg-card border-border">
+            {/* Tabs - Desktop only (mobile uses the nav bar above) */}
+            <Card className="hidden lg:block bg-card border-border">
               <CardContent className="p-0">
                 <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveNav(val); }} className="w-full">
                   <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none overflow-x-auto">
