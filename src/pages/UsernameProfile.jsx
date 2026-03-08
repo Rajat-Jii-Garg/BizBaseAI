@@ -73,6 +73,11 @@ const UsernameProfile = () => {
 
   const isOwnProfile = user?.id === profileId;
 
+  // If preview mode, always show public view (ProfilePage) even for own profile
+  if (isPreview && isOwnProfile) {
+    return <ProfilePage userId={profileId} isPreview />;
+  }
+
   return isOwnProfile
     ? <ProfileDashboard />
     : <ProfilePage userId={profileId} />;
