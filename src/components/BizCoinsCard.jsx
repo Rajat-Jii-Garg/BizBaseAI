@@ -1,43 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { BadgeCheck, Coins } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 const BizCoinsCard = () => {
-  const { user } = useAuth();
-  const [bizcoins, setBizcoins] = useState(0);
+  const { user, profile } = useAuth();
+  const [bizcoins, setBizcoins] = useState(profile?.bizcoins || 0);
 
   useEffect(() => {
     if (!user?.id) return;
 
+    let cancelled = false;
+
     const fetchCoins = async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('bizcoins')
-        .eq('id', user.id)
-        .single();
-      setBizcoins(data?.bizcoins || 0);
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('bizcoins')
+          .eq('id', user.id)
+          .single();
+        if (!cancelled) setBizcoins(data?.bizcoins || 0);
+      } catch (e) {
+        // silently fail
+      }
     };
 
     fetchCoins();
 
-    const channel = supabase
-      .channel(`bizcoins_${user.id}_${Date.now()}`)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'profiles',
-        filter: `id=eq.${user.id}`
-      }, (payload) => {
-        if (payload.new?.bizcoins !== undefined) {
-          setBizcoins(payload.new.bizcoins || 0);
-        }
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
+    return () => { cancelled = true; };
   }, [user?.id]);
+
+  // Also sync from auth profile when it updates
+  useEffect(() => {
+    if (profile?.bizcoins !== undefined) {
+      setBizcoins(profile.bizcoins || 0);
+    }
+  }, [profile?.bizcoins]);
 
   const getLabel = (coins) => {
     if (coins >= 1000) return '👑 Elite';
