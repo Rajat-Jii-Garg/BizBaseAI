@@ -17,6 +17,7 @@ const UsernameProfile = () => {
   const [entityType, setEntityType] = useState(null);
   const [entityId, setEntityId] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const { recordView } = useProfileViews();
 
   useEffect(() => {
     const fetchProfile = async () => {
