@@ -207,25 +207,28 @@ const Jobs = () => {
 
           {/* Header - Title + Post Job button */}
           <div className="flex items-center justify-between">
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Jobs</h1>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Trending Jobs</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Discover opportunities that match your skills</p>
+            </div>
             <CreateJobModal onJobCreated={fetchJobs} />
           </div>
 
-          {/* Stats row - compact single line */}
+          {/* Stats row - compact with gradient backgrounds */}
           <div className="grid grid-cols-4 gap-2">
-            <div className="bg-card border border-border/50 rounded-lg px-2 py-2 text-center">
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-lg px-2 py-2 text-center">
               <p className="text-base sm:text-lg font-bold text-primary">{totalJobs}</p>
               <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Total</p>
             </div>
-            <div className="bg-card border border-border/50 rounded-lg px-2 py-2 text-center">
+            <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-lg px-2 py-2 text-center">
               <p className="text-base sm:text-lg font-bold text-green-600">{activeJobs}</p>
               <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Active</p>
             </div>
-            <div className="bg-card border border-border/50 rounded-lg px-2 py-2 text-center">
+            <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 rounded-lg px-2 py-2 text-center">
               <p className="text-base sm:text-lg font-bold text-amber-600">{remoteJobs}</p>
               <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Remote</p>
             </div>
-            <div className="bg-card border border-border/50 rounded-lg px-2 py-2 text-center">
+            <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-lg px-2 py-2 text-center">
               <p className="text-base sm:text-lg font-bold text-purple-600">{savedCount}</p>
               <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">Saved</p>
             </div>

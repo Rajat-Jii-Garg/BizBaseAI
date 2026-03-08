@@ -324,55 +324,35 @@ const Events = () => {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
-              <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-              Professional Events
-            </h1>
-            <p className="text-sm sm:text-base text-gray-600 mt-2">Discover networking events, workshops, and conferences</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fetchEvents()}
-              disabled={loading}
-              className="flex-1 sm:flex-none"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Refresh</span>
-            </Button>
-            <Button
-              size="sm"
-              className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              onClick={() => setIsCreateModalOpen(true)}
-            >
-              <Plus className="w-4 h-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Create Event</span>
-              <span className="sm:hidden">Create</span>
-            </Button>
-          </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Trending Events</h1>
+          <Button
+            size="sm"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-[10px] h-9"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            <span className="hidden sm:inline">Event</span>
+          </Button>
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg overflow-x-auto">
-        {['discover', 'my-events', 'saved-events'].map((tab) => (
+        <div className="flex space-x-1 bg-muted p-1 rounded-lg">
+          {[
+            { id: 'discover', label: 'Discover' },
+            { id: 'my-events', label: 'My Events' },
+            { id: 'saved-events', label: 'Saved' }
+          ].map((tab) => (
             <button
-              key={tab}
-              onClick={() => setSelectedTab(tab)}
-              className={`flex-1 py-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                selectedTab === tab
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+              key={tab.id}
+              onClick={() => setSelectedTab(tab.id)}
+              className={`flex-1 py-1.5 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                selectedTab === tab.id
+                  ? 'bg-background text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {tab === 'discover' && <span className="hidden sm:inline">Discover Events</span>}
-              {tab === 'discover' && <span className="sm:hidden">Discover</span>}
-              {tab === 'my-events' && <span className="hidden sm:inline">My Events</span>}
-              {tab === 'my-events' && <span className="sm:hidden">My Events</span>}
-              {tab === 'saved-events' && <span className="hidden sm:inline">Saved Events</span>}
-              {tab === 'saved-events' && <span className="sm:hidden">Saved</span>}
+              {tab.label}
             </button>
           ))}
         </div>

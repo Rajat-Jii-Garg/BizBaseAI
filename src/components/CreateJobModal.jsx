@@ -208,9 +208,9 @@ const CreateJobModal = ({ onJobCreated }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full h-9 px-3 sm:px-4 text-xs sm:text-sm">
-          <Plus className="w-4 h-4 sm:mr-1" />
-          <span className="hidden sm:inline">Post Job</span>
+        <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-[10px] h-9 px-3 sm:px-4 text-xs sm:text-sm">
+          <Plus className="w-4 h-4 mr-1" />
+          Post Job
         </Button>
       </DialogTrigger>
       
