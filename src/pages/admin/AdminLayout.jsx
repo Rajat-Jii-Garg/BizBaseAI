@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/hooks/useAdmin';
-import { Loader2, LayoutDashboard, Users, FileText, Building2, Briefcase, Shield, LogOut, BarChart3, Settings } from 'lucide-react';
+import { Loader2, LayoutDashboard, Users, FileText, Building2, Briefcase, Shield, LogOut, BarChart3, Settings, Globe, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,8 @@ const navItems = [
   { path: '/admin-panel/posts', label: 'Posts', icon: FileText },
   { path: '/admin-panel/businesses', label: 'Businesses', icon: Building2 },
   { path: '/admin-panel/jobs', label: 'Jobs', icon: Briefcase },
+  { path: '/admin-panel/communities', label: 'Communities', icon: Globe },
+  { path: '/admin-panel/events', label: 'Events', icon: Calendar },
   { path: '/admin-panel/analytics', label: 'Analytics', icon: BarChart3 },
   { path: '/admin-panel/settings', label: 'Settings', icon: Settings },
 ];
@@ -43,8 +45,7 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen flex bg-background">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-border bg-card flex flex-col">
+      <aside className="w-64 border-r border-border bg-card flex flex-col shrink-0">
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
@@ -55,7 +56,7 @@ const AdminLayout = () => {
           </div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map(({ path, label, icon: Icon }) => (
             <Link
               key={path}
@@ -88,7 +89,6 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>

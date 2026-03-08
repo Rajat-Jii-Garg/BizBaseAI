@@ -241,6 +241,8 @@ const App = () => (
                 <Route path="posts" element={<AdminPosts />} />
                 <Route path="businesses" element={<AdminBusinesses />} />
                 <Route path="jobs" element={<AdminJobs />} />
+                <Route path="communities" element={<AdminCommunities />} />
+                <Route path="events" element={<AdminEvents />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
