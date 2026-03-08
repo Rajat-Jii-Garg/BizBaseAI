@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfileViews } from '@/hooks/useProfileViews';
@@ -11,6 +11,8 @@ const UsernameProfile = () => {
   const { username } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get('preview') === 'true';
   const [profileId, setProfileId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -19,10 +21,12 @@ const UsernameProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
+      // Strip @ prefix if present
+      const cleanUsername = username.startsWith('@') ? username.slice(1) : username;
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
-        .eq('username', username)
+        .eq('username', cleanUsername)
         .maybeSingle();
 
       if (!data || error) {
@@ -70,6 +74,11 @@ const UsernameProfile = () => {
   }
 
   const isOwnProfile = user?.id === profileId;
+
+  // If preview mode, always show public view (ProfilePage) even for own profile
+  if (isPreview && isOwnProfile) {
+    return <ProfilePage userId={profileId} isPreview />;
+  }
 
   return isOwnProfile
     ? <ProfileDashboard />
