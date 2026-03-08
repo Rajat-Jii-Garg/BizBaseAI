@@ -495,55 +495,106 @@ const ProfileDashboard = () => {
           </div>
         </Card>
 
+        {/* Mobile/Tablet Navigation Bar - shown only on smaller screens */}
+        <div className="lg:hidden">
+          <Card className="bg-card border-border">
+            <CardContent className="p-2">
+              <div className="flex overflow-x-auto gap-1 scrollbar-hide">
+                {navItems.map((item) => (
+                  <Button
+                    key={item.id}
+                    variant={activeNav === item.id ? 'default' : 'ghost'}
+                    size="sm"
+                    className={`flex-shrink-0 text-xs ${activeNav === item.id ? 'bg-[#5B6CFF] text-white' : ''}`}
+                    onClick={() => {
+                      setActiveNav(item.id);
+                      setActiveTab(item.id);
+                    }}
+                  >
+                    <item.icon className="w-3 h-3 mr-1" />
+                    {item.label}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Mobile Profile Completion Card */}
+        <div className="lg:hidden">
+          <Card className="bg-card border-border">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-semibold text-sm text-foreground">Your Profile is {profileCompletionScore}%</h3>
+                  <p className="text-xs text-muted-foreground">Complete your profile to unlock more opportunities</p>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B6CFF]/20 to-[#8B5CF6]/20 flex items-center justify-center">
+                  <span className="text-sm font-bold text-[#5B6CFF]">{profileCompletionScore}%</span>
+                </div>
+              </div>
+              <Progress value={profileCompletionScore} className="h-2" />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Mobile Achievements */}
+        <div className="lg:hidden">
+          <AchievementBadges />
+        </div>
+
+        {/* Mobile Power Score */}
+        <div className="lg:hidden">
+          <PowerScoreCard />
+        </div>
+
+        {/* Mobile Invite & Earn */}
+        <div className="lg:hidden">
+          <ReferralWidget />
+        </div>
+
         {/* Main Content - 3 Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Profile Navigation - hidden on mobile/tablet */}
-            <div className="hidden lg:block">
-              <Card className="bg-card border-border">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
-                  <p className="text-xs text-muted-foreground">Explore content sections</p>
-                </CardHeader>
-                <CardContent className="p-2">
-                  <div className="space-y-1">
-                    {navItems.map((item) => (
-                      <Button
-                        key={item.id}
-                        variant={activeNav === item.id ? 'default' : 'ghost'}
-                        className={`w-full justify-start text-sm ${activeNav === item.id ? 'bg-[#5B6CFF] text-white' : ''}`}
-                        onClick={() => {
-                          setActiveNav(item.id);
-                          setActiveTab(item.id);
-                        }}
-                      >
-                        <item.icon className="w-4 h-4 mr-2" />
-                        {item.label}
-                        {item.count !== undefined && item.count > 0 && (
-                          <Badge variant="secondary" className="ml-auto text-xs">{item.count}</Badge>
-                        )}
-                      </Button>
-                    ))}
-                    <Separator className="my-2" />
-                    <ProfileEditModal onProfileUpdate={fetchProfile}>
-                      <Button variant="ghost" className="w-full justify-start text-sm">
-                        <Settings className="w-4 h-4 mr-2" />
-                        Edit Profile
-                      </Button>
-                    </ProfileEditModal>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Left Sidebar - Desktop Only */}
+          <div className="hidden lg:block lg:col-span-3 space-y-6">
+            {/* Profile Navigation */}
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Profile Navigation</CardTitle>
+                <p className="text-xs text-muted-foreground">Explore content sections</p>
+              </CardHeader>
+              <CardContent className="p-2">
+                <div className="space-y-1">
+                  {navItems.map((item) => (
+                    <Button
+                      key={item.id}
+                      variant={activeNav === item.id ? 'default' : 'ghost'}
+                      className={`w-full justify-start text-sm ${activeNav === item.id ? 'bg-[#5B6CFF] text-white' : ''}`}
+                      onClick={() => {
+                        setActiveNav(item.id);
+                        setActiveTab(item.id);
+                      }}
+                    >
+                      <item.icon className="w-4 h-4 mr-2" />
+                      {item.label}
+                      {item.count !== undefined && item.count > 0 && (
+                        <Badge variant="secondary" className="ml-auto text-xs">{item.count}</Badge>
+                      )}
+                    </Button>
+                  ))}
+                  <Separator className="my-2" />
+                  <ProfileEditModal onProfileUpdate={fetchProfile}>
+                    <Button variant="ghost" className="w-full justify-start text-sm">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Button>
+                  </ProfileEditModal>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Power Score - shown on mobile before Invite */}
+            {/* Power Score - Desktop */}
             <PowerScoreCard />
-
-            {/* Invite & Earn - shown on mobile too */}
-            <div className="lg:hidden">
-              <ReferralWidget />
-            </div>
           </div>
 
           {/* Middle Content */}
