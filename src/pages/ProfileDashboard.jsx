@@ -541,10 +541,10 @@ const ProfileDashboard = () => {
                 <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setActiveNav(val); }} className="w-full">
                   <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-border rounded-none overflow-x-auto">
                     <TabsTrigger 
-                      value="overview" 
+                      value="posts"
                       className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
                     >
-                      Overview
+                      Posts
                     </TabsTrigger>
                     <TabsTrigger 
                       value="projects"
@@ -565,10 +565,10 @@ const ProfileDashboard = () => {
                       Case Studies
                     </TabsTrigger>
                     <TabsTrigger 
-                      value="posts"
+                      value="overview" 
                       className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#5B6CFF] data-[state=active]:bg-transparent px-4 py-3"
                     >
-                      Posts
+                      Overview
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
