@@ -322,40 +322,45 @@ const Events = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Trending Events</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Discover networking events, workshops, and conferences</p>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2 lg:gap-3">
+              <Calendar className="w-6 h-6 lg:w-8 lg:h-8 text-blue-600 hidden lg:block" />
+              Trending Events
+            </h1>
+            <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mt-0.5 lg:mt-1">Discover networking events, workshops, and conferences</p>
           </div>
           <Button
             size="sm"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-[10px] h-9 px-3"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-[10px] h-9 lg:h-10 px-3 lg:px-4"
             onClick={() => setIsCreateModalOpen(true)}
           >
-            <Plus className="w-4 h-4 mr-1" />
-            Event
+            <Plus className="w-4 h-4 mr-1 lg:mr-2" />
+            <span className="hidden lg:inline">Create Event</span>
+            <span className="lg:hidden">Event</span>
           </Button>
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 bg-muted p-1 rounded-lg">
+        <div className="flex space-x-1 bg-muted p-1 rounded-lg lg:w-fit">
           {[
-            { id: 'discover', label: 'Discover' },
-            { id: 'my-events', label: 'My Events' },
-            { id: 'saved-events', label: 'Saved' }
+            { id: 'discover', label: 'Discover', fullLabel: 'Discover Events' },
+            { id: 'my-events', label: 'My Events', fullLabel: 'My Events' },
+            { id: 'saved-events', label: 'Saved', fullLabel: 'Saved Events' }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setSelectedTab(tab.id)}
-              className={`flex-1 py-1.5 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+              className={`flex-1 lg:flex-none py-1.5 lg:py-2 px-2 sm:px-4 lg:px-6 rounded-md text-xs sm:text-sm lg:text-base font-medium transition-all whitespace-nowrap ${
                 selectedTab === tab.id
                   ? 'bg-background text-primary shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {tab.label}
+              <span className="lg:hidden">{tab.label}</span>
+              <span className="hidden lg:inline">{tab.fullLabel}</span>
             </button>
           ))}
         </div>
