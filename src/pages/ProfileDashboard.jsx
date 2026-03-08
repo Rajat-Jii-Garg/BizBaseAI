@@ -454,19 +454,20 @@ const ProfileDashboard = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
                     <ProfileEditModal onProfileUpdate={fetchProfile}>
-                      <Button className="gap-2 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white">
-                        <Edit3 className="w-4 h-4" />
-                        Edit Profile
+                      <Button size="sm" className="gap-1.5 bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white text-xs md:text-sm md:size-default">
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Edit Profile</span>
+                        <span className="sm:hidden">Edit</span>
                       </Button>
                     </ProfileEditModal>
-                    <Button variant="outline" className="gap-2" onClick={handleShare}>
-                      <Share2 className="w-4 h-4" />
+                    <Button variant="outline" size="sm" className="gap-1.5 text-xs md:text-sm md:size-default" onClick={handleShare}>
+                      <Share2 className="w-3.5 h-3.5" />
                       Share
                     </Button>
-                    <Button variant="outline" className="gap-2" onClick={() => navigate(`/${authProfile.username}`)}>
-                      <Eye className="w-4 h-4" />
+                    <Button variant="outline" size="sm" className="gap-1.5 text-xs md:text-sm md:size-default" onClick={() => navigate(`/profile-preview/${user?.id}`)}>
+                      <Eye className="w-3.5 h-3.5" />
                       Preview
                     </Button>
                   </div>
