@@ -6,6 +6,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import TrackedPostCard from '@/components/TrackedPostCard';
 import { usePersonalizedFeed } from '@/hooks/usePersonalizedFeed';
 import { usePosts } from '@/hooks/usePosts';
+import SEOHead from '@/components/SEOHead';
 
 const Feed = () => {
   const {
