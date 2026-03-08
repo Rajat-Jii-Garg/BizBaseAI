@@ -76,32 +76,32 @@ const Connections = () => {
   const ProfileCard = ({ profile, bannerUrl, bannerGradient, ringClass, fallbackGradient, badge, actions }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-border bg-card">
       <div 
-        className="h-10 bg-cover bg-center"
+        className="h-10 lg:h-16 bg-cover bg-center"
         style={{
           backgroundImage: bannerUrl 
             ? `url(${bannerUrl})`
             : bannerGradient || 'linear-gradient(135deg, rgba(91,108,255,0.3), rgba(139,92,246,0.3), rgba(6,182,212,0.3))'
         }}
       />
-      <CardContent className="p-3 pt-0 -mt-5">
+      <CardContent className="p-3 lg:p-4 pt-0 -mt-5 lg:-mt-7">
         <div className="text-center">
           <Avatar 
-            className={`h-10 w-10 mx-auto border-2 border-background cursor-pointer ${ringClass || 'ring-2 ring-primary/20'}`}
+            className={`h-10 w-10 lg:h-14 lg:w-14 mx-auto border-2 border-background cursor-pointer ${ringClass || 'ring-2 ring-primary/20'}`}
             onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
           >
             <AvatarImage src={profile?.avatar_url} />
-            <AvatarFallback className={`${fallbackGradient || 'bg-gradient-to-br from-primary to-primary/80'} text-white text-sm font-semibold`}>
+            <AvatarFallback className={`${fallbackGradient || 'bg-gradient-to-br from-primary to-primary/80'} text-white text-sm lg:text-base font-semibold`}>
               {profile?.full_name?.[0] || 'U'}
             </AvatarFallback>
           </Avatar>
           <h3 
-            className="font-semibold text-sm mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
+            className="font-semibold text-sm lg:text-base mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
             onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
           >
             {profile?.full_name || 'Unknown User'}
           </h3>
           {profile?.bio && (
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
+            <p className="text-xs lg:text-sm text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
           )}
           {badge}
         </div>
