@@ -311,6 +311,7 @@ export const useConnections = () => {
     acceptRequest,
     rejectRequest,
     disconnect,
+    withdrawRequest,
     removeSuggestion,
     refreshAllConnections: fetchConnections,
     refreshSuggestions: fetchSuggestions
