@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import CreateCommunityModal from '@/components/CreateCommunityModal';
+import SEOHead from '@/components/SEOHead';
 import { useNavigate } from 'react-router-dom';
 
 const Communities = () => {
