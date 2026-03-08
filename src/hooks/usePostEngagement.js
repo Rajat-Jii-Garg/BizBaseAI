@@ -30,8 +30,7 @@ export const usePostEngagement = () => {
         await supabase
           .from('post_likes')
           .insert({ post_id: postId, user_id: user.id });
-        
-        // toast("Post Upvoted", { description: "You've upvoted this post" });
+        awardCoins('like');
       }
     } catch (error) {
       console.error('Error toggling upvote:', error);
