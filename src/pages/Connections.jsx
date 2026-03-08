@@ -271,36 +271,36 @@ const Connections = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Compact Tab Buttons - smaller on mobile */}
-          <TabsList className="grid w-full grid-cols-3 h-8 sm:h-10 p-0.5 sm:p-1 bg-muted/50 rounded-xl">
+          <TabsList className="grid w-full grid-cols-3 h-8 sm:h-9 lg:h-11 p-0.5 sm:p-1 bg-muted/50 rounded-xl">
             <TabsTrigger 
               value="suggestions"
-              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#5B6CFF] data-[state=active]:to-[#8B5CF6] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-xs lg:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#5B6CFF] data-[state=active]:to-[#8B5CF6] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <Sparkles className="w-3 h-3 mr-0.5 sm:mr-1" />
+              <Sparkles className="w-3 h-3 lg:w-4 lg:h-4 mr-0.5 sm:mr-1 lg:mr-2" />
               <span className="hidden sm:inline">Suggestions</span>
               <span className="sm:hidden">Suggest</span>
             </TabsTrigger>
 
             <TabsTrigger 
               value="connections"
-              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#10B981] data-[state=active]:to-[#059669] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-xs lg:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#10B981] data-[state=active]:to-[#059669] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <UserCheck className="w-3 h-3 mr-0.5 sm:mr-1" />
+              <UserCheck className="w-3 h-3 lg:w-4 lg:h-4 mr-0.5 sm:mr-1 lg:mr-2" />
               <span className="hidden sm:inline">Connected</span>
               <span className="sm:hidden">Connect</span>
-              <Badge variant="secondary" className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-3.5 sm:h-4">
+              <Badge variant="secondary" className="ml-0.5 sm:ml-1 lg:ml-2 text-[9px] sm:text-[10px] lg:text-xs px-1 sm:px-1.5 py-0 h-3.5 sm:h-4 lg:h-5">
                 {connections.length}
               </Badge>
             </TabsTrigger>
 
             <TabsTrigger 
               value="requests"
-              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-xs lg:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <UserPlus className="w-3 h-3 mr-0.5 sm:mr-1" />
+              <UserPlus className="w-3 h-3 lg:w-4 lg:h-4 mr-0.5 sm:mr-1 lg:mr-2" />
               <span className="hidden sm:inline">Requests</span>
               <span className="sm:hidden">Req</span>
-              <Badge variant="secondary" className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-3.5 sm:h-4">
+              <Badge variant="secondary" className="ml-0.5 sm:ml-1 lg:ml-2 text-[9px] sm:text-[10px] lg:text-xs px-1 sm:px-1.5 py-0 h-3.5 sm:h-4 lg:h-5">
                 {receivedRequests.length + sentRequests.length}
               </Badge>
             </TabsTrigger>
