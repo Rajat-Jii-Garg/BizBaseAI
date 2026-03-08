@@ -157,7 +157,7 @@ export const usePosts = () => {
         }
       }
 
-      awardCoins('post');
+      // BizCoins awarded automatically by DB trigger
       await fetchPosts();
     } catch (error) {
       console.error('Error creating post:', error);
