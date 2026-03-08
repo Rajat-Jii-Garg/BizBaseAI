@@ -41,7 +41,7 @@ const BusinessHeader = ({ onToggleSidebar }) => {
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : 'B';
 
   return (
-    <header className="bg-card border-b border-border px-3 md:px-5 py-2 sticky top-0 z-30 w-full">
+    <header className="bg-card border-b border-border px-3 md:px-5 py-2 fixed top-0 left-0 right-0 z-30 w-full">
       <div className="flex items-center justify-between">
         {/* Left */}
         <div className="flex items-center gap-2">
