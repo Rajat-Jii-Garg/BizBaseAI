@@ -17,6 +17,7 @@ import {
   Target,
   Lightbulb,
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import { useState, useRef, useEffect } from 'react';
 
 const AIAssistant = () => {
