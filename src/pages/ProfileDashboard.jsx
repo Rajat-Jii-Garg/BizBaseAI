@@ -51,6 +51,7 @@ import { useNavigate } from 'react-router-dom';
 import PowerScoreCard from '@/components/PowerScoreCard';
 import AchievementBadges from '@/components/AchievementBadges';
 import ReferralWidget from '@/components/ReferralWidget';
+import BizCoinsCard from '@/components/BizCoinsCard';
 const ProfileDashboard = () => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -520,38 +521,8 @@ const ProfileDashboard = () => {
           </Card>
         </div>
 
-        {/* Mobile Profile Completion Card */}
-        <div className="lg:hidden">
-          <Card className="bg-card border-border">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-sm text-foreground">Your Profile is {profileCompletionScore}%</h3>
-                  <p className="text-xs text-muted-foreground">Complete your profile to unlock more opportunities</p>
-                </div>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B6CFF]/20 to-[#8B5CF6]/20 flex items-center justify-center">
-                  <span className="text-sm font-bold text-[#5B6CFF]">{profileCompletionScore}%</span>
-                </div>
-              </div>
-              <Progress value={profileCompletionScore} className="h-2" />
-            </CardContent>
-          </Card>
-        </div>
 
-        {/* Mobile Achievements */}
-        <div className="lg:hidden">
-          <AchievementBadges />
-        </div>
 
-        {/* Mobile Power Score */}
-        <div className="lg:hidden">
-          <PowerScoreCard />
-        </div>
-
-        {/* Mobile Invite & Earn */}
-        <div className="lg:hidden">
-          <ReferralWidget />
-        </div>
 
         {/* Main Content - 3 Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -595,7 +566,9 @@ const ProfileDashboard = () => {
 
             {/* Power Score - Desktop */}
             <PowerScoreCard />
-          </div>
+
+            {/* BizCoins - Desktop */}
+            <BizCoinsCard />
 
           {/* Middle Content */}
           <div className="lg:col-span-6 space-y-6">
@@ -916,6 +889,28 @@ const ProfileDashboard = () => {
             {/* Invite & Earn */}
             <ReferralWidget />
           </div>
+        </div>
+
+        {/* Mobile/Tablet Widgets - shown after tab content */}
+        <div className="lg:hidden space-y-4">
+          <Card className="bg-card border-border">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-semibold text-sm text-foreground">Your Profile is {profileCompletionScore}%</h3>
+                  <p className="text-xs text-muted-foreground">Complete your profile to unlock more opportunities</p>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B6CFF]/20 to-[#8B5CF6]/20 flex items-center justify-center">
+                  <span className="text-sm font-bold text-[#5B6CFF]">{profileCompletionScore}%</span>
+                </div>
+              </div>
+              <Progress value={profileCompletionScore} className="h-2" />
+            </CardContent>
+          </Card>
+          <AchievementBadges />
+          <PowerScoreCard />
+          <BizCoinsCard />
+          <ReferralWidget />
         </div>
       </div>
     </DashboardLayout>
