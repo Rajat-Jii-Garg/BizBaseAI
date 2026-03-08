@@ -890,6 +890,28 @@ const ProfileDashboard = () => {
             <ReferralWidget />
           </div>
         </div>
+
+        {/* Mobile/Tablet Widgets - shown after tab content */}
+        <div className="lg:hidden space-y-4">
+          <Card className="bg-card border-border">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-semibold text-sm text-foreground">Your Profile is {profileCompletionScore}%</h3>
+                  <p className="text-xs text-muted-foreground">Complete your profile to unlock more opportunities</p>
+                </div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B6CFF]/20 to-[#8B5CF6]/20 flex items-center justify-center">
+                  <span className="text-sm font-bold text-[#5B6CFF]">{profileCompletionScore}%</span>
+                </div>
+              </div>
+              <Progress value={profileCompletionScore} className="h-2" />
+            </CardContent>
+          </Card>
+          <AchievementBadges />
+          <PowerScoreCard />
+          <BizCoinsCard />
+          <ReferralWidget />
+        </div>
       </div>
     </DashboardLayout>
   );
