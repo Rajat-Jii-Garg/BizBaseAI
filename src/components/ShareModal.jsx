@@ -31,6 +31,7 @@ const ShareModal = ({ postShareUrl, onClose }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const shareText = encodeURIComponent(`Check this out on BizBase - the next-gen professional network! 🚀`);
   const shareUrl = encodeURIComponent(postShareUrl || window.location.href);
 
   const platforms = [
