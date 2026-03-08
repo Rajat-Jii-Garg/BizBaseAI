@@ -808,7 +808,7 @@ const ProfileDashboard = () => {
             {/* Posts Tab Content */}
             {activeTab === 'posts' && (
               <Card className="bg-card border-border">
-                <CardHeader>
+                <CardHeader className="hidden lg:block">
                   <CardTitle className="text-lg font-semibold">Recent Posts ({stats.posts})</CardTitle>
                 </CardHeader>
                 <CardContent>
