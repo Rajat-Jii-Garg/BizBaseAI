@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Loader2, RefreshCw, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { Trash2, Loader2, RefreshCw, Heart, MessageCircle, Share2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 const AdminPosts = () => {
   const { fetchPosts, deletePost } = useAdmin();
   const [posts, setPosts] = useState([]);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const loadPosts = async () => {
+  const loadPosts = async (s = '') => {
     setLoading(true);
-    const data = await fetchPosts();
+    const data = await fetchPosts(s);
     setPosts(data);
     setLoading(false);
   };
 
   useEffect(() => { loadPosts(); }, []);
+
+  const handleSearch = (e) => { e.preventDefault(); loadPosts(search); };
 
   const handleDelete = async (postId) => {
     if (!confirm('Delete this post permanently?')) return;
@@ -40,15 +44,21 @@ const AdminPosts = () => {
           <h1 className="text-2xl font-bold text-foreground">Posts</h1>
           <p className="text-muted-foreground">{posts.length} posts</p>
         </div>
-        <Button variant="outline" size="sm" onClick={loadPosts}>
+        <Button variant="outline" size="sm" onClick={() => loadPosts(search)}>
           <RefreshCw className="h-4 w-4 mr-1" /> Refresh
         </Button>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search post content..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
+        <Button type="submit">Search</Button>
+      </form>
+
+      {loading ? (
+        <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : (
         <div className="space-y-3">
           {posts.map((post) => (
@@ -69,36 +79,21 @@ const AdminPosts = () => {
                       </div>
                     </div>
                     <p className="text-sm text-foreground line-clamp-3">{post.content}</p>
-                    {post.image_url && (
-                      <img src={post.image_url} alt="" className="mt-2 rounded-lg max-h-32 object-cover" />
-                    )}
+                    {post.image_url && <img src={post.image_url} alt="" className="mt-2 rounded-lg max-h-32 object-cover" />}
                     <div className="flex items-center gap-4 mt-2">
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Heart className="h-3 w-3" /> {post.likes_count || 0}
-                      </span>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <MessageCircle className="h-3 w-3" /> {post.comments_count || 0}
-                      </span>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Share2 className="h-3 w-3" /> {post.shares_count || 0}
-                      </span>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground"><Heart className="h-3 w-3" /> {post.likes_count || 0}</span>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground"><MessageCircle className="h-3 w-3" /> {post.comments_count || 0}</span>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground"><Share2 className="h-3 w-3" /> {post.shares_count || 0}</span>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:text-destructive shrink-0"
-                    onClick={() => handleDelete(post.id)}
-                  >
+                  <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={() => handleDelete(post.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
-          {posts.length === 0 && (
-            <p className="text-center py-8 text-muted-foreground">No posts found</p>
-          )}
+          {posts.length === 0 && <p className="text-center py-8 text-muted-foreground">No posts found</p>}
         </div>
       )}
     </div>
