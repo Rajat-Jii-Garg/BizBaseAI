@@ -68,6 +68,8 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPosts from "./pages/admin/AdminPosts";
 import AdminBusinesses from "./pages/admin/AdminBusinesses";
 import AdminJobs from "./pages/admin/AdminJobs";
+import AdminCommunities from "./pages/admin/AdminCommunities";
+import AdminEvents from "./pages/admin/AdminEvents";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminSettings from "./pages/admin/AdminSettings";
 
