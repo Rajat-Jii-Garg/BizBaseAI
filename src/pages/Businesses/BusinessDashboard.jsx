@@ -147,9 +147,9 @@ const BusinessDashboard = () => {
         
         <CardContent className="relative pt-10 sm:pt-12 pb-4 px-4 sm:px-6">
           <div className="absolute -top-8 sm:-top-10 left-4 sm:left-6">
-            <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-background shadow-lg">
+            <Avatar className="w-14 h-14 sm:w-16 sm:h-16 border-3 border-background shadow-lg">
               <AvatarImage src={currentBusiness?.logo_url} />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl sm:text-2xl font-bold">
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-lg sm:text-xl font-bold">
                 {currentBusiness?.name?.charAt(0)?.toUpperCase() || 'B'}
               </AvatarFallback>
             </Avatar>
