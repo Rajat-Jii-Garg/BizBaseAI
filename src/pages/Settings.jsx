@@ -36,6 +36,7 @@ const Settings = () => {
     profileVisibility: 'public',
     showEmail: false,
     showPhone: false,
+    showLocation: false,
     allowSearchEngines: true,
     actively_looking_for_work: false,
   });
