@@ -51,6 +51,7 @@ import { useNavigate } from 'react-router-dom';
 import PowerScoreCard from '@/components/PowerScoreCard';
 import AchievementBadges from '@/components/AchievementBadges';
 import ReferralWidget from '@/components/ReferralWidget';
+import BizCoinsCard from '@/components/BizCoinsCard';
 const ProfileDashboard = () => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
