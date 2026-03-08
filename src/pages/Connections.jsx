@@ -350,17 +350,17 @@ const Connections = () => {
 
           {/* CONNECTIONS TAB */}
           <TabsContent value="connections" className="mt-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-[#10B981]" />
+            <h2 className="text-lg lg:text-xl font-semibold flex items-center gap-2">
+              <UserCheck className="w-5 h-5 lg:w-6 lg:h-6 text-[#10B981]" />
               My Connections
             </h2>
-            <div className="relative mt-2 mb-4">
+            <div className="relative mt-2 lg:mt-3 mb-4 lg:mb-6">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search connections..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="pl-9 h-9 text-sm rounded-[10px] w-full"
+                className="pl-9 h-9 lg:h-10 text-sm lg:text-base rounded-[10px] w-full lg:max-w-md"
               />
             </div>
 
