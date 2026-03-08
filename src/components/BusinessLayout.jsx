@@ -62,11 +62,11 @@ const BusinessLayout = () => {
   return (
     <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
       <div className="min-h-screen bg-background flex flex-col">
-        {/* Header - full width on top */}
+        {/* Header - fixed full width on top */}
         <BusinessHeader onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
 
-        {/* Below header: sidebar + content */}
-        <div className="flex flex-1 overflow-hidden">
+        {/* Below header: sidebar + content with top padding for fixed header */}
+        <div className="flex flex-1 pt-[41px]">
           {/* Mobile overlay */}
           {isMobile && sidebarOpen && (
             <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />
@@ -76,14 +76,14 @@ const BusinessLayout = () => {
           <div className={`
             ${isMobile
               ? `fixed top-0 left-0 z-50 h-full transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
-              : 'relative flex-shrink-0'
+              : 'sticky top-[41px] h-[calc(100vh-41px)] flex-shrink-0'
             }
           `}>
             <BusinessSidebar onClose={() => setSidebarOpen(false)} />
           </div>
 
           {/* Main Content */}
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-x-clip overflow-y-auto h-[calc(100vh-41px)]">
             <Outlet />
           </main>
         </div>
