@@ -57,6 +57,17 @@ import {
 import UsernameProfile from "./pages/UsernameProfile";
 import SinglePostPage from "./pages/SinglePostPage";
 
+// Admin pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminPosts from "./pages/admin/AdminPosts";
+import AdminBusinesses from "./pages/admin/AdminBusinesses";
+import AdminJobs from "./pages/admin/AdminJobs";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminSettings from "./pages/admin/AdminSettings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -205,6 +216,19 @@ const App = () => (
                 <Route path="settings" element={<BusinessSettings />} />
                 <Route path="services" element={<BusinessServices />} />
               </Route>
+              {/* Admin Panel Routes */}
+              <Route path="/admin-panel" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="posts" element={<AdminPosts />} />
+                <Route path="businesses" element={<AdminBusinesses />} />
+                <Route path="jobs" element={<AdminJobs />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
+              <Route path="/admin-login" element={<AdminLogin />} />
+
               {/* Username-based profile route - must be LAST to avoid conflicts */}
               <Route path="/:username/post/:postId" element={<SinglePostPage />} />
               <Route path="/:username" element={<UsernameProfile />} />

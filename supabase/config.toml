@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.rewrite-post]
 verify_jwt = false
+
+[functions.admin-verify]
+verify_jwt = false
