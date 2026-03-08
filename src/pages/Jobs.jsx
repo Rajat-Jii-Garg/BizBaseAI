@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import CreateJobModal from '@/components/CreateJobModal';
+import SEOHead from '@/components/SEOHead';
 
 const Jobs = () => {
   const { user } = useAuth();
