@@ -9,6 +9,7 @@ import {
   Gift, Copy, Users, Trophy, Coins, Share2, Check, 
   Sparkles, ArrowRight, Crown, Star, Zap
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 
 const Referrals = () => {
   const { referrals, referralCode, stats, loading, createReferralLink } = useReferrals();
