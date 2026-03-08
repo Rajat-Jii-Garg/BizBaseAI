@@ -159,6 +159,7 @@ export const usePosts = () => {
         }
       }
 
+      awardCoins('post');
       await fetchPosts();
     } catch (error) {
       console.error('Error creating post:', error);
