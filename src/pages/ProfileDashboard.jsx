@@ -596,7 +596,9 @@ const ProfileDashboard = () => {
 
             {/* Power Score - Desktop */}
             <PowerScoreCard />
-          </div>
+
+            {/* BizCoins - Desktop */}
+            <BizCoinsCard />
 
           {/* Middle Content */}
           <div className="lg:col-span-6 space-y-6">
