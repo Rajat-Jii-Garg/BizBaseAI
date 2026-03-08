@@ -723,7 +723,7 @@ const ProfilePage = ({ userId }) => {
             <Card className="bg-card border-border">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="w-full justify-start bg-transparent border-b rounded-none p-0 h-auto overflow-x-auto">
-                  {['Overview', 'Projects', 'Services', 'Case Studies', 'Posts'].map((tab) => (
+                  {['Posts', 'Projects', 'Services', 'Case Studies', 'Overview'].map((tab) => (
                     <TabsTrigger
                       key={tab.toLowerCase().replace(' ', '-')}
                       value={tab.toLowerCase().replace(' ', '-')}
