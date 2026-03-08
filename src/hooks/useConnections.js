@@ -246,6 +246,23 @@ export const useConnections = () => {
     }
   };
 
+  const withdrawRequest = async (connectionId) => {
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .delete()
+        .eq('id', connectionId);
+
+      if (error) throw error;
+
+      toast.success('Connection request withdrawn');
+      await fetchConnections();
+    } catch (err) {
+      console.error('Error withdrawing request:', err);
+      toast.error('Failed to withdraw request');
+    }
+  };
+
   // Initialize and setup realtime subscription
   useEffect(() => {
     if (!user) {
