@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <Navbar variant="hero" />
       <Hero />
       <Features />
       <Benefits />
