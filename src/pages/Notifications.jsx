@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import SEOHead from '@/components/SEOHead';
 
 const Notifications = () => {
   const { user } = useAuth();
