@@ -466,7 +466,13 @@ const ProfileDashboard = () => {
                       <Share2 className="w-3.5 h-3.5" />
                       Share
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-1.5 text-xs md:text-sm md:size-default" onClick={() => navigate(`/profile-preview/${user?.id}`)}>
+                    <Button variant="outline" size="sm" className="gap-1.5 text-xs md:text-sm md:size-default" onClick={() => {
+                      if (profile?.username) {
+                        navigate(`/@${profile.username}?preview=true`);
+                      } else {
+                        toast({ title: 'Username Required', description: 'Please set a username first to preview your profile.', variant: 'destructive' });
+                      }
+                    }}>
                       <Eye className="w-3.5 h-3.5" />
                       Preview
                     </Button>
