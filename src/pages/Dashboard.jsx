@@ -54,6 +54,8 @@ import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
 import NetworkSuggestions from '@/components/NetworkSuggestions';
 import QuickProfileActions from '@/components/QuickProfileActions';
 import UsernameSetupModal from '@/components/UsernameSetupModal';
+import WhoViewedProfile from '@/components/WhoViewedProfile';
+import AchievementBadges from '@/components/AchievementBadges';
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
@@ -566,6 +568,11 @@ const Dashboard = () => {
 
             {/* Right Sidebar - Connections & Insights */}
             <div className="hidden lg:block lg:col-span-3 space-y-6">
+              {/* Who Viewed Profile */}
+              <WhoViewedProfile />
+
+              {/* Achievement Badges */}
+              <AchievementBadges />
 
               {/* Smart Connections */}
               <Card className="bg-white shadow-lg border-0 overflow-hidden">

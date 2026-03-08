@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-// import { toast } from 'sonner';
+import { useBizCoins } from '@/hooks/useBizCoins';
 
 export const usePostEngagement = () => {
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(false);
+  const { awardCoins } = useBizCoins();
 
   const toggleLike = async (postId) => {
     setLoading(true);
@@ -29,8 +30,7 @@ export const usePostEngagement = () => {
         await supabase
           .from('post_likes')
           .insert({ post_id: postId, user_id: user.id });
-        
-        // toast("Post Upvoted", { description: "You've upvoted this post" });
+        awardCoins('like');
       }
     } catch (error) {
       console.error('Error toggling upvote:', error);
@@ -50,8 +50,7 @@ export const usePostEngagement = () => {
           user_id: user.id,
           content: content.trim()
         });
-
-      // toast("Feedback Added", { description: "Your feedback has been posted" });
+      awardCoins('comment');
     } catch (error) {
       console.error('Error adding feedback:', error);
       // toast.error("Error", { description: "Failed to add feedback" });
@@ -175,6 +174,7 @@ export const usePostEngagement = () => {
           repost_of_user_id: postData.user_id
         });
 
+      awardCoins('repost');
       return "added";
     } catch (error) {
       console.error('Error reposting:', error);
