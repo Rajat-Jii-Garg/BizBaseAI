@@ -40,7 +40,7 @@ import EnhancedPostComposer from '@/components/EnhancedPostComposer';
 import TrackedPostCard from '@/components/TrackedPostCard';
 import MobileCreatorFAB from '@/components/MobileCreatorFAB';
 import FullPagePostCreator from '@/components/FullPagePostCreator';
-import FullPageCommunityCreator from '@/components/FullPageCommunityCreator';
+import FullPageCommunityPostCreator from '@/components/FullPageCommunityPostCreator';
 import FullPageEventCreator from '@/components/FullPageEventCreator';
 import FullPageJobCreator from '@/components/FullPageJobCreator';
 import ConnectionsList from '@/components/ConnectionsList';
@@ -742,10 +742,9 @@ const Dashboard = () => {
         isOpen={showPostCreator} 
         onClose={() => setShowPostCreator(false)} 
       />
-      <FullPageCommunityCreator 
+      <FullPageCommunityPostCreator 
         isOpen={showCommunityCreator} 
         onClose={() => setShowCommunityCreator(false)}
-        onSuccess={() => refetch()}
       />
       <FullPageEventCreator 
         isOpen={showEventCreator} 
