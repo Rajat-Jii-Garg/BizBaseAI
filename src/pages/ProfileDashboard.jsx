@@ -544,21 +544,8 @@ const ProfileDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* BizScore Card */}
-            <Card className="bg-gradient-to-br from-[#5B6CFF]/10 to-[#8B5CF6]/10 border-[#5B6CFF]/20">
-              <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="text-[#5B6CFF] font-semibold text-sm">Bizcenta</span>
-                  <BadgeCheck className="w-4 h-4 text-[#5B6CFF]" />
-                </div>
-                <div className="text-4xl font-bold text-[#5B6CFF] mb-1">
-                  {profile?.bizcoins || 0}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {profile?.bizcoins >= 500 ? 'Expert' : profile?.bizcoins >= 100 ? 'Experienced' : 'Beginner'}
-                </p>
-              </CardContent>
-            </Card>
+            {/* Power Score */}
+            <PowerScoreCard />
           </div>
 
           {/* Middle Content */}
