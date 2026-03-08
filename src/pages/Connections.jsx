@@ -113,29 +113,29 @@ const Connections = () => {
   // Suggestion Card
   const SuggestionCard = ({ profile }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-border bg-card">
-      <div className="h-12 bg-gradient-to-r from-[hsl(var(--primary))]/30 via-[#8B5CF6]/30 to-[#06B6D4]/30" />
-      <CardContent className="p-3 pt-0 -mt-6">
+      <div className="h-12 lg:h-16 bg-gradient-to-r from-[hsl(var(--primary))]/30 via-[#8B5CF6]/30 to-[#06B6D4]/30" />
+      <CardContent className="p-3 lg:p-4 pt-0 -mt-6 lg:-mt-8">
         <div className="text-center">
           <Avatar
-            className="h-12 w-12 mx-auto border-2 border-background cursor-pointer ring-2 ring-primary/20 hover:ring-primary/40 transition-all" 
+            className="h-12 w-12 lg:h-14 lg:w-14 mx-auto border-2 border-background cursor-pointer ring-2 ring-primary/20 hover:ring-primary/40 transition-all" 
             onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile.id}`)}
           >
             <AvatarImage src={profile.avatar_url} />
-            <AvatarFallback className="bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6] text-white text-sm font-semibold">
+            <AvatarFallback className="bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6] text-white text-sm lg:text-base font-semibold">
               {profile.full_name?.charAt(0) || 'U'}
             </AvatarFallback>
           </Avatar>
           <h4
-            className="font-semibold text-sm mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
+            className="font-semibold text-sm lg:text-base mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
             onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile.id}`)}
           >
             {profile.full_name}
           </h4>
           {profile.bio && (
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
+            <p className="text-xs lg:text-sm text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
           )}
           {profile.industry && (
-            <Badge variant="secondary" className="mt-2 text-[10px] px-2 py-0">
+            <Badge variant="secondary" className="mt-2 text-[10px] lg:text-xs px-2 py-0">
               {profile.industry}
             </Badge>
           )}
@@ -143,7 +143,7 @@ const Connections = () => {
         <div className="flex gap-1.5 mt-3">
           <Button
             size="sm"
-            className="flex-1 h-7 text-xs bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white"
+            className="flex-1 h-7 lg:h-8 text-xs lg:text-sm bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white"
             onClick={() => sendRequest(profile.id)}
           >
             <UserPlus className="w-3 h-3 mr-1" />
@@ -152,7 +152,7 @@ const Connections = () => {
           <Button
             size="sm"
             variant="outline"
-            className="h-7 w-7 p-0"
+            className="h-7 lg:h-8 w-7 lg:w-8 p-0"
             onClick={() => removeSuggestion(profile.id)}
           >
             <X className="w-3 h-3" />
