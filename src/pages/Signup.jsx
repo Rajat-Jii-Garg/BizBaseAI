@@ -149,8 +149,7 @@ const Signup = () => {
     }
 
     try {
-      // Create user account with Supabase (email verification auto)
-      const { error } = await supabase.auth.signUp({
+      const { data: signUpData, error } = await supabase.auth.signUp({
         email: signupData.email,
         password: signupData.password,
         options: {
@@ -165,21 +164,45 @@ const Signup = () => {
 
       if (error) {
         console.error('Account creation error:', error);
-        toast({
-          title: 'Account Creation Error',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error('Account Creation Error', { description: error.message });
         setLoading(false);
         return;
       }
 
-      toast({
-        title: "Verification Email Sent!",
+      // Track referral if ref code exists
+      if (refCode && signUpData?.user?.id) {
+        try {
+          const { data: referrer } = await supabase
+            .from('profiles')
+            .select('id, bizcoins')
+            .eq('referral_code', refCode)
+            .single();
+
+          if (referrer && referrer.id !== signUpData.user.id) {
+            await supabase.from('referrals').insert({
+              referrer_id: referrer.id,
+              referred_user_id: signUpData.user.id,
+              referral_code: refCode,
+              referred_email: signupData.email,
+              status: 'completed',
+              coins_awarded: true,
+              completed_at: new Date().toISOString()
+            });
+
+            await supabase
+              .from('profiles')
+              .update({ bizcoins: (referrer.bizcoins || 0) + 10 })
+              .eq('id', referrer.id);
+          }
+        } catch (refErr) {
+          console.error('Referral tracking error:', refErr);
+        }
+      }
+
+      toast.success("Verification Email Sent!", {
         description: "Please check your inbox and verify your email before logging in.",
       });
       
-      // After signup, redirect to login page
       setTimeout(() => {
         navigate('/login');
       }, 1000);
