@@ -25,6 +25,7 @@ import {
   Video
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import SEOHead from '@/components/SEOHead';
 
 const Events = () => {
   const { user } = useAuth();
