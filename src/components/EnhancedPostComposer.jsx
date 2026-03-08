@@ -453,33 +453,92 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
           </Button>
         </div>
         {showAIPopup && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl w-[500px] p-6 shadow-xl">
-              <h3 className="text-lg font-semibold mb-3">Rewrite with AI</h3>
-
-              <Textarea
-                value={content}
-                onChange={(e)=>setContent(e.target.value)}
-                className="mb-4"
-              />
-
-              <select
-                value={aiTone}
-                onChange={(e)=>setAiTone(e.target.value)}
-                className="border p-2 rounded mb-4 w-full"
-              >
-                <option value="professional">Professional</option>
-                <option value="warm">Warm</option>
-                <option value="calm">Calm</option>
-              </select>
-
-              <div className="flex justify-between">
-                <Button
-                  onClick={rewriteWithAI}
-                  disabled={aiLoading}
-                >
-                  {aiLoading ? "Rewriting..." : "Rewrite"}
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-gray-100 overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-blue-50">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-600" />
+                  <h3 className="text-lg font-bold text-gray-900">Rewrite with AI</h3>
+                </div>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full" onClick={() => setShowAIPopup(false)}>
+                  <X className="w-4 h-4" />
                 </Button>
+              </div>
+
+              <div className="p-5 space-y-4">
+                {/* Content */}
+                <Textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Write your post content here..."
+                  className="min-h-[120px] border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 resize-none text-sm"
+                />
+
+                {/* Tone selector */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Select Tone</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'professional', label: '💼 Professional' },
+                      { value: 'warm', label: '🤝 Warm' },
+                      { value: 'calm', label: '🧘 Calm' },
+                      { value: 'bold', label: '🔥 Bold' },
+                      { value: 'casual', label: '😎 Casual' },
+                    ].map((t) => (
+                      <button
+                        key={t.value}
+                        onClick={() => setAiTone(t.value)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                          aiTone === t.value
+                            ? 'bg-purple-600 text-white border-purple-600 shadow-md'
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={rewriteWithAI}
+                    disabled={aiLoading || !content.trim()}
+                    className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Rewriting...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Rewrite
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowAIPopup(false);
+                      handleSubmit();
+                    }}
+                    disabled={(!content.trim() && !mediaFile) || loading}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Posting...
+                      </>
+                    ) : (
+                      'Post'
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.personalized-feed]
 verify_jwt = true
+
+[functions.rewrite-post]
+verify_jwt = false
