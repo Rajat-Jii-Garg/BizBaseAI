@@ -185,7 +185,7 @@ const App = () => (
               <Route path="/demo" element={<Demo />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
-              <Route path="/explore" element={<Explore />} />
+              
               <Route path="/leaderboard" element={
                 <ProtectedRoute>
                   <Leaderboard />
