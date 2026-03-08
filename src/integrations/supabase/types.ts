@@ -1980,6 +1980,10 @@ export type Database = {
         Returns: boolean
       }
       increment_job_views: { Args: { job_id: string }; Returns: undefined }
+      is_business_team_member: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_username_available: {
         Args: { check_username: string }
         Returns: boolean
