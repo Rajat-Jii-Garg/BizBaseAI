@@ -390,9 +390,9 @@ const Connections = () => {
 
           {/* REQUESTS TAB */}
           <TabsContent value="requests" className="mt-4">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2 mb-3">
-                <UserPlus className="w-5 h-5 text-amber-500" />
+            <div className="mb-4 lg:mb-6">
+              <h2 className="text-lg lg:text-xl font-semibold flex items-center gap-2 mb-3">
+                <UserPlus className="w-5 h-5 lg:w-6 lg:h-6 text-amber-500" />
                 Connection Requests
               </h2>
               
