@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
   X, Video, Hash, AtSign, Loader2, Sparkles, Send, XCircle, Camera, Users, ArrowRight
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
