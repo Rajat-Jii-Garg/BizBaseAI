@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Brain,
   Trophy,
+  Gift,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';

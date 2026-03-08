@@ -39,10 +39,14 @@ const Navbar = () => {
               Pricing
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
             </a>
-            <a href="#contact" className="text-slate-700 hover:text-blue-600 transition-colors font-semibold relative group">
+           <a href="#contact" className="text-slate-700 hover:text-blue-600 transition-colors font-semibold relative group">
               Contact
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
             </a>
+            <Link to="/blog" className="text-slate-700 hover:text-blue-600 transition-colors font-semibold relative group">
+              Blogs
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
+            </Link>
           </div>
           
           {/* Desktop Auth Buttons */}
