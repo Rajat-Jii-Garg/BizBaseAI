@@ -573,15 +573,6 @@ const Dashboard = () => {
               {/* Who Viewed Profile */}
               <WhoViewedProfile />
 
-              {/* Achievement Badges */}
-              <AchievementBadges />
-
-              {/* Power Score */}
-              <PowerScoreCard />
-
-              {/* Referral Widget */}
-              <ReferralWidget />
-
               {/* Smart Connections */}
               <Card className="bg-white shadow-lg border-0 overflow-hidden">
                 <CardHeader className="pb-2">
