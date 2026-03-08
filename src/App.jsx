@@ -57,6 +57,17 @@ import {
 import UsernameProfile from "./pages/UsernameProfile";
 import SinglePostPage from "./pages/SinglePostPage";
 
+// Admin pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminPosts from "./pages/admin/AdminPosts";
+import AdminBusinesses from "./pages/admin/AdminBusinesses";
+import AdminJobs from "./pages/admin/AdminJobs";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminSettings from "./pages/admin/AdminSettings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
