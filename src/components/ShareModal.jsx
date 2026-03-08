@@ -154,6 +154,13 @@ const ShareModal = ({ postShareUrl, onClose }) => {
             ))}
           </div>
         </div>
+
+        {/* Powered by BizBase */}
+        <div className="text-center pt-2 border-t border-border/30">
+          <p className="text-[10px] text-muted-foreground">
+            Powered by <span className="font-bold text-primary">BizBase</span> — AI Business Networking
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -194,6 +194,11 @@ const App = () => (
                   <Leaderboard />
                 </ProtectedRoute>
               } />
+              <Route path="/referrals" element={
+                <ProtectedRoute>
+                  <Referrals />
+                </ProtectedRoute>
+              } />
               {/* <Route path="/profile-dashboard" element={
                 <ProtectedRoute>
                   <ProfileDashboard />
