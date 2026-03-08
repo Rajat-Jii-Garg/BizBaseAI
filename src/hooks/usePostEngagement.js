@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-// import { toast } from 'sonner';
+import { useBizCoins } from '@/hooks/useBizCoins';
 
 export const usePostEngagement = () => {
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(false);
+  const { awardCoins } = useBizCoins();
 
   const toggleLike = async (postId) => {
     setLoading(true);
