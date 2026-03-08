@@ -27,7 +27,7 @@ const ReferralWidget = () => {
           <span className="font-bold text-sm text-foreground">Invite & Earn</span>
         </div>
         <p className="text-xs text-muted-foreground mb-3">
-          Earn 100 BizCoins for each friend who joins!
+          Earn 10 BizCoins for each friend who joins!
         </p>
         <div className="flex items-center gap-2 mb-3">
           <div className="text-center flex-1 bg-white/80 rounded-lg p-2">

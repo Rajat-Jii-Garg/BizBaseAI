@@ -700,7 +700,8 @@ const Dashboard = () => {
 
               <TrendingHashtags />
 
-
+              {/* Who Viewed Profile */}
+              <WhoViewedProfile />
             </div>
           </div>
         </div>

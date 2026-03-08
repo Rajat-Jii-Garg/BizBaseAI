@@ -28,9 +28,9 @@ const Referrals = () => {
   };
 
   const rewards = [
-    { coins: 100, label: 'Per successful referral', icon: Gift },
-    { coins: 500, label: 'Refer 5 users bonus', icon: Star },
-    { coins: 1000, label: 'Refer 10 users - Premium Free', icon: Crown },
+    { coins: 10, label: 'Per successful referral', icon: Gift },
+    { coins: 50, label: 'Refer 5 users bonus', icon: Star },
+    { coins: 100, label: 'Refer 10 users - Premium Free', icon: Crown },
   ];
 
   return (
