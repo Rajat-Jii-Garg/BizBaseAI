@@ -221,23 +221,21 @@ const DashboardLayout = ({ children }) => {
       {/* Navigation Bar - All screens with horizontal scroll */}
       <div className="bg-white border-b border-gray-100 shadow-sm fixed top-16 left-0 right-0 z-40">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-          <div className="flex items-center justify-start lg:justify-center py-2 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center justify-start lg:justify-center h-10 sm:h-11 overflow-x-auto scrollbar-hide">
             <div className="flex items-center space-x-1 px-1">
               {menuItems.map((item, index) => (
-                <Button
+                <button
                   key={index}
-                  variant={isActive(item.path) ? "default" : "ghost"}
-                  size="sm"
                   className={`${
                     isActive(item.path) 
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' 
                       : 'hover:bg-gray-100 text-gray-600'
-                  } transition-all duration-200 whitespace-nowrap px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-medium text-[11px] sm:text-xs lg:text-sm flex-shrink-0`}
+                  } transition-all duration-200 whitespace-nowrap px-2 sm:px-3 lg:px-4 h-7 sm:h-8 rounded-lg font-medium text-[11px] sm:text-xs lg:text-sm flex-shrink-0 inline-flex items-center`}
                   onClick={() => navigate(item.path)}
                 >
                   <item.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 mr-1 sm:mr-1.5 lg:mr-2" />
                   <span>{item.label}</span>
-                </Button>
+                </button>
               ))}
             </div>
           </div>
