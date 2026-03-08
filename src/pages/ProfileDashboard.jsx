@@ -55,7 +55,7 @@ const ProfileDashboard = () => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('posts');
   const [activeNav, setActiveNav] = useState('overview');
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(false);

@@ -65,12 +65,17 @@ const Settings = () => {
         company_name: profile.company_name || '',
         industry: profile.industry || '',
       });
+      // Load privacy settings from localStorage
+      const savedPrivacy = user?.id ? JSON.parse(localStorage.getItem(`privacy_${user.id}`) || '{}') : {};
       setPrivacySettings(prev => ({
         ...prev,
         actively_looking_for_work: profile.actively_looking_for_work || false,
+        showEmail: savedPrivacy.showEmail || false,
+        showPhone: savedPrivacy.showPhone || false,
+        showLocation: savedPrivacy.showLocation || false,
       }));
     }
-  }, [profile]);
+  }, [profile, user]);
 
   const handleSaveProfile = async () => {
     if (!user) return;
