@@ -325,14 +325,17 @@ const Events = () => {
       <div className="max-w-7xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Trending Events</h1>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Trending Events</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Discover networking events, workshops, and conferences</p>
+          </div>
           <Button
             size="sm"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-[10px] h-9"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-[10px] h-9 px-3"
             onClick={() => setIsCreateModalOpen(true)}
           >
             <Plus className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">Event</span>
+            Event
           </Button>
         </div>
 
