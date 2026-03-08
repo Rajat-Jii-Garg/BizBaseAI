@@ -8,6 +8,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { useBizCoins } from '@/hooks/useBizCoins';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import SEOHead from '@/components/SEOHead';
 
 const Leaderboard = () => {
   const { getLeaderboard } = useBizCoins();
