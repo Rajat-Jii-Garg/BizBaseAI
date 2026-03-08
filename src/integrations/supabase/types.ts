@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          author_id: string
+          category: string | null
+          content: string
+          cover_image_url: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          is_published: boolean | null
+          slug: string
+          tags: Json | null
+          title: string
+          updated_at: string
+          views_count: number | null
+        }
+        Insert: {
+          author_id: string
+          category?: string | null
+          content: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          is_published?: boolean | null
+          slug: string
+          tags?: Json | null
+          title: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          author_id?: string
+          category?: string | null
+          content?: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          is_published?: boolean | null
+          slug?: string
+          tags?: Json | null
+          title?: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
       business_leads: {
         Row: {
           assigned_to: string | null
@@ -949,6 +997,38 @@ export type Database = {
         }
         Relationships: []
       }
+      poll_votes: {
+        Row: {
+          created_at: string
+          id: string
+          option_index: number
+          poll_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          option_index: number
+          poll_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          option_index?: number
+          poll_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "post_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_comments: {
         Row: {
           content: string
@@ -1071,6 +1151,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "post_mentions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_polls: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          options: Json
+          post_id: string
+          question: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          options?: Json
+          post_id: string
+          question: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          options?: Json
+          post_id?: string
+          question?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_polls_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
@@ -1242,9 +1357,12 @@ export type Database = {
           phone: string | null
           portfolio_url: string | null
           posts_count: number | null
+          power_score: number | null
           profession: string | null
           profile_completed: boolean | null
           profile_completion_score: number | null
+          referral_code: string | null
+          referred_by: string | null
           resume_url: string | null
           skills: Json | null
           subscription_plan: string | null
@@ -1286,9 +1404,12 @@ export type Database = {
           phone?: string | null
           portfolio_url?: string | null
           posts_count?: number | null
+          power_score?: number | null
           profession?: string | null
           profile_completed?: boolean | null
           profile_completion_score?: number | null
+          referral_code?: string | null
+          referred_by?: string | null
           resume_url?: string | null
           skills?: Json | null
           subscription_plan?: string | null
@@ -1330,9 +1451,12 @@ export type Database = {
           phone?: string | null
           portfolio_url?: string | null
           posts_count?: number | null
+          power_score?: number | null
           profession?: string | null
           profile_completed?: boolean | null
           profile_completion_score?: number | null
+          referral_code?: string | null
+          referred_by?: string | null
           resume_url?: string | null
           skills?: Json | null
           subscription_plan?: string | null
@@ -1342,6 +1466,42 @@ export type Database = {
           updated_at?: string | null
           username?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          coins_awarded: boolean | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_email: string | null
+          referred_user_id: string | null
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          coins_awarded?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_email?: string | null
+          referred_user_id?: string | null
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          coins_awarded?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_email?: string | null
+          referred_user_id?: string | null
+          referrer_id?: string
+          status?: string
         }
         Relationships: []
       }
