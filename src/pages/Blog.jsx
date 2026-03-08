@@ -118,6 +118,7 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <SEOHead title="Blog - Professional Insights & Career Tips" description="Read expert articles on professional networking, career growth, business strategies, and AI-powered insights on BizBase AI." path="/blog" />
       <Navbar />
       
       {/* Hero */}

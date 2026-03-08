@@ -585,7 +585,8 @@ const BusinessSetup = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto p-6">          
+      <SEOHead title="Register Your Business" description="Set up your business on BizBase AI. Create your business profile and start growing." path="/business-setup" noIndex />
+      <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">

@@ -196,6 +196,7 @@ const Network = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Network - Professional Connections" description="Build and grow your professional network on BizBase AI. Connect with industry experts and peers." path="/network" />
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
           <CardHeader>

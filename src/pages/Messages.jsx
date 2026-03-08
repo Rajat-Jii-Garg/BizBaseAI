@@ -841,6 +841,7 @@ const Messages = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Messages" description="Chat with your professional connections on BizBase AI." path="/messages" noIndex />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="h-[calc(100vh-8rem)] flex bg-background rounded-xl shadow-lg border border-gray-200 overflow-hidden">

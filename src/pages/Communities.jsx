@@ -248,6 +248,7 @@ const Communities = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Communities - Connect with Professionals" description="Join professional communities on BizBase AI. Share knowledge, network, and collaborate with like-minded professionals." path="/communities" />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
           {/* Header: Title + Create button */}

@@ -54,6 +54,7 @@ const Demo = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50/30">
+      <SEOHead title="Demo - See BizBase AI in Action" description="Watch how entrepreneurs build businesses using BizBase AI. See live demos of networking, AI assistant, business management, and more." path="/demo" />
       {/* Hero Section */}
       <section className="pt-20 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

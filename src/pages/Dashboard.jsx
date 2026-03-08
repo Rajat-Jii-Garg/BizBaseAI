@@ -337,6 +337,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Dashboard" description="Your BizBase AI dashboard - manage connections, track analytics, and grow your professional network." path="/dashboard" noIndex />
       <WelcomeFlow />
       <UsernameSetupModal 
         open={showUsernameModal} 

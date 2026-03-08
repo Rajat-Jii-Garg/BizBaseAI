@@ -193,6 +193,7 @@ const Settings = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Settings" description="Manage your BizBase AI account settings, privacy, and preferences." path="/settings" noIndex />
       <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
         <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
           <CardHeader>

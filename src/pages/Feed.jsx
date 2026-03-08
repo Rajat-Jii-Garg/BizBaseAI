@@ -23,6 +23,7 @@ const Feed = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Feed" description="Your personalized professional feed on BizBase AI." path="/feed" noIndex />
       <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-4">
 
         <div className="space-y-6">

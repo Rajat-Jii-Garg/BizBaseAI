@@ -203,6 +203,7 @@ const Jobs = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Jobs - Find Your Next Opportunity" description="Browse thousands of job listings on BizBase AI. Find remote, hybrid, and on-site opportunities across industries." path="/jobs" />
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-muted/50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-4 lg:space-y-6">
 
