@@ -26,7 +26,7 @@ const AdminLayout = () => {
   useEffect(() => {
     if (!authLoading && !adminLoading) {
       if (!user || !isAdmin) {
-        navigate('/admin-panel', { replace: true });
+        navigate('/admin-login', { replace: true });
       }
     }
   }, [user, isAdmin, authLoading, adminLoading, navigate]);
