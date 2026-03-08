@@ -186,9 +186,9 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Community
+        <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg h-9 w-9 sm:w-auto sm:h-auto p-0 sm:px-4 sm:py-2 rounded-full sm:rounded-md">
+          <Plus className="w-5 h-5 sm:w-4 sm:h-4 sm:mr-2" />
+          <span className="hidden sm:inline">Create Community</span>
         </Button>
       </DialogTrigger>
       
