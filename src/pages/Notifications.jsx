@@ -111,7 +111,17 @@ const Notifications = () => {
   };
 
   const getIcon = (type) => {
-    const icons = { like: <Heart className="w-4 h-4 text-red-500" />, comment: <MessageSquare className="w-4 h-4 text-blue-500" />, share: <Share2 className="w-4 h-4 text-green-500" />, connection: <UserPlus className="w-4 h-4 text-purple-500" /> };
+    const icons = {
+      like: <Heart className="w-4 h-4 text-red-500" />,
+      comment: <MessageSquare className="w-4 h-4 text-blue-500" />,
+      share: <Share2 className="w-4 h-4 text-green-500" />,
+      connection: <UserPlus className="w-4 h-4 text-purple-500" />,
+      follow: <UserPlus className="w-4 h-4 text-indigo-500" />,
+      repost: <Share2 className="w-4 h-4 text-orange-500" />,
+      event: <Bell className="w-4 h-4 text-yellow-500" />,
+      job_application: <Bell className="w-4 h-4 text-emerald-500" />,
+      community: <Bell className="w-4 h-4 text-cyan-500" />,
+    };
     return icons[type] || <Bell className="w-4 h-4 text-muted-foreground" />;
   };
 
