@@ -15,6 +15,7 @@ import {
   Calendar
 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
+import SEOHead from '@/components/SEOHead';
 
 const Analytics = () => {
   const analytics = {
