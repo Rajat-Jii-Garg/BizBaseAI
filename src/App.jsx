@@ -41,7 +41,6 @@ import FAQ from "./pages/FAQ";
 import ProfileDashboard from "./pages/ProfileDashboard";
 import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 import Leaderboard from "./pages/Leaderboard";
-import Explore from "./pages/Explore";
 
 // Business pages
 import { 
@@ -186,7 +185,7 @@ const App = () => (
               <Route path="/demo" element={<Demo />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
-              <Route path="/explore" element={<Explore />} />
+              
               <Route path="/leaderboard" element={
                 <ProtectedRoute>
                   <Leaderboard />

@@ -6,7 +6,6 @@ import { useProfileViews } from '@/hooks/useProfileViews';
 import { Loader2 } from 'lucide-react';
 import ProfilePage from './ProfilePage';
 import ProfileDashboard from './ProfileDashboard';
-import { BusinessDashboard } from './Businesses';
 
 const UsernameProfile = () => {
   const { username } = useParams();
@@ -14,13 +13,12 @@ const UsernameProfile = () => {
   const navigate = useNavigate();
   const [profileId, setProfileId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [entityType, setEntityType] = useState(null);
-  const [entityId, setEntityId] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const { recordView } = useProfileViews();
 
   useEffect(() => {
     const fetchProfile = async () => {
+      setLoading(true);
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
@@ -31,12 +29,20 @@ const UsernameProfile = () => {
         setNotFound(true);
       } else {
         setProfileId(data.id);
+        setNotFound(false);
       }
-        setLoading(false);
-      };
+      setLoading(false);
+    };
 
-      fetchProfile();
+    fetchProfile();
   }, [username]);
+
+  // Record profile view for other users
+  useEffect(() => {
+    if (profileId && user?.id && profileId !== user.id) {
+      recordView(profileId);
+    }
+  }, [profileId, user?.id, recordView]);
 
   if (loading) {
     return (
@@ -64,13 +70,6 @@ const UsernameProfile = () => {
   }
 
   const isOwnProfile = user?.id === profileId;
-
-  // Record profile view for other users
-  useEffect(() => {
-    if (profileId && !isOwnProfile) {
-      recordView(profileId);
-    }
-  }, [profileId, isOwnProfile, recordView]);
 
   return isOwnProfile
     ? <ProfileDashboard />
