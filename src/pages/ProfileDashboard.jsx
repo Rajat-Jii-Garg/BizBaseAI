@@ -48,7 +48,9 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import PowerScoreCard from '@/components/PowerScoreCard';
+import AchievementBadges from '@/components/AchievementBadges';
+import ReferralWidget from '@/components/ReferralWidget';
 const ProfileDashboard = () => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
