@@ -76,32 +76,32 @@ const Connections = () => {
   const ProfileCard = ({ profile, bannerUrl, bannerGradient, ringClass, fallbackGradient, badge, actions }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-border bg-card">
       <div 
-        className="h-10 bg-cover bg-center"
+        className="h-10 lg:h-16 bg-cover bg-center"
         style={{
           backgroundImage: bannerUrl 
             ? `url(${bannerUrl})`
             : bannerGradient || 'linear-gradient(135deg, rgba(91,108,255,0.3), rgba(139,92,246,0.3), rgba(6,182,212,0.3))'
         }}
       />
-      <CardContent className="p-3 pt-0 -mt-5">
+      <CardContent className="p-3 lg:p-4 pt-0 -mt-5 lg:-mt-7">
         <div className="text-center">
           <Avatar 
-            className={`h-10 w-10 mx-auto border-2 border-background cursor-pointer ${ringClass || 'ring-2 ring-primary/20'}`}
+            className={`h-10 w-10 lg:h-14 lg:w-14 mx-auto border-2 border-background cursor-pointer ${ringClass || 'ring-2 ring-primary/20'}`}
             onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
           >
             <AvatarImage src={profile?.avatar_url} />
-            <AvatarFallback className={`${fallbackGradient || 'bg-gradient-to-br from-primary to-primary/80'} text-white text-sm font-semibold`}>
+            <AvatarFallback className={`${fallbackGradient || 'bg-gradient-to-br from-primary to-primary/80'} text-white text-sm lg:text-base font-semibold`}>
               {profile?.full_name?.[0] || 'U'}
             </AvatarFallback>
           </Avatar>
           <h3 
-            className="font-semibold text-sm mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
+            className="font-semibold text-sm lg:text-base mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
             onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile?.id}`)}
           >
             {profile?.full_name || 'Unknown User'}
           </h3>
           {profile?.bio && (
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
+            <p className="text-xs lg:text-sm text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
           )}
           {badge}
         </div>
@@ -113,29 +113,29 @@ const Connections = () => {
   // Suggestion Card
   const SuggestionCard = ({ profile }) => (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-border bg-card">
-      <div className="h-12 bg-gradient-to-r from-[hsl(var(--primary))]/30 via-[#8B5CF6]/30 to-[#06B6D4]/30" />
-      <CardContent className="p-3 pt-0 -mt-6">
+      <div className="h-12 lg:h-16 bg-gradient-to-r from-[hsl(var(--primary))]/30 via-[#8B5CF6]/30 to-[#06B6D4]/30" />
+      <CardContent className="p-3 lg:p-4 pt-0 -mt-6 lg:-mt-8">
         <div className="text-center">
           <Avatar
-            className="h-12 w-12 mx-auto border-2 border-background cursor-pointer ring-2 ring-primary/20 hover:ring-primary/40 transition-all" 
+            className="h-12 w-12 lg:h-14 lg:w-14 mx-auto border-2 border-background cursor-pointer ring-2 ring-primary/20 hover:ring-primary/40 transition-all" 
             onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile.id}`)}
           >
             <AvatarImage src={profile.avatar_url} />
-            <AvatarFallback className="bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6] text-white text-sm font-semibold">
+            <AvatarFallback className="bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6] text-white text-sm lg:text-base font-semibold">
               {profile.full_name?.charAt(0) || 'U'}
             </AvatarFallback>
           </Avatar>
           <h4
-            className="font-semibold text-sm mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
+            className="font-semibold text-sm lg:text-base mt-2 cursor-pointer hover:text-primary transition-colors line-clamp-1"
             onClick={() => profile?.username ? navigate(`/@${profile.username}`) : navigate(`/profile/${profile.id}`)}
           >
             {profile.full_name}
           </h4>
           {profile.bio && (
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
+            <p className="text-xs lg:text-sm text-muted-foreground line-clamp-2 mt-1">{profile.bio}</p>
           )}
           {profile.industry && (
-            <Badge variant="secondary" className="mt-2 text-[10px] px-2 py-0">
+            <Badge variant="secondary" className="mt-2 text-[10px] lg:text-xs px-2 py-0">
               {profile.industry}
             </Badge>
           )}
@@ -143,7 +143,7 @@ const Connections = () => {
         <div className="flex gap-1.5 mt-3">
           <Button
             size="sm"
-            className="flex-1 h-7 text-xs bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white"
+            className="flex-1 h-7 lg:h-8 text-xs lg:text-sm bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white"
             onClick={() => sendRequest(profile.id)}
           >
             <UserPlus className="w-3 h-3 mr-1" />
@@ -152,7 +152,7 @@ const Connections = () => {
           <Button
             size="sm"
             variant="outline"
-            className="h-7 w-7 p-0"
+            className="h-7 lg:h-8 w-7 lg:w-8 p-0"
             onClick={() => removeSuggestion(profile.id)}
           >
             <X className="w-3 h-3" />
@@ -267,40 +267,40 @@ const Connections = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto p-3 sm:p-4 space-y-4">
+      <div className="max-w-7xl mx-auto p-3 sm:p-4 lg:p-6 space-y-4 lg:space-y-6">
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Compact Tab Buttons - smaller on mobile */}
-          <TabsList className="grid w-full grid-cols-3 h-8 sm:h-10 p-0.5 sm:p-1 bg-muted/50 rounded-xl">
+          <TabsList className="grid w-full grid-cols-3 h-8 sm:h-9 lg:h-11 p-0.5 sm:p-1 bg-muted/50 rounded-xl">
             <TabsTrigger 
               value="suggestions"
-              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#5B6CFF] data-[state=active]:to-[#8B5CF6] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-xs lg:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#5B6CFF] data-[state=active]:to-[#8B5CF6] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <Sparkles className="w-3 h-3 mr-0.5 sm:mr-1" />
+              <Sparkles className="w-3 h-3 lg:w-4 lg:h-4 mr-0.5 sm:mr-1 lg:mr-2" />
               <span className="hidden sm:inline">Suggestions</span>
               <span className="sm:hidden">Suggest</span>
             </TabsTrigger>
 
             <TabsTrigger 
               value="connections"
-              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#10B981] data-[state=active]:to-[#059669] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-xs lg:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#10B981] data-[state=active]:to-[#059669] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <UserCheck className="w-3 h-3 mr-0.5 sm:mr-1" />
+              <UserCheck className="w-3 h-3 lg:w-4 lg:h-4 mr-0.5 sm:mr-1 lg:mr-2" />
               <span className="hidden sm:inline">Connected</span>
               <span className="sm:hidden">Connect</span>
-              <Badge variant="secondary" className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-3.5 sm:h-4">
+              <Badge variant="secondary" className="ml-0.5 sm:ml-1 lg:ml-2 text-[9px] sm:text-[10px] lg:text-xs px-1 sm:px-1.5 py-0 h-3.5 sm:h-4 lg:h-5">
                 {connections.length}
               </Badge>
             </TabsTrigger>
 
             <TabsTrigger 
               value="requests"
-              className="text-[10px] sm:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="text-[10px] sm:text-xs lg:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <UserPlus className="w-3 h-3 mr-0.5 sm:mr-1" />
+              <UserPlus className="w-3 h-3 lg:w-4 lg:h-4 mr-0.5 sm:mr-1 lg:mr-2" />
               <span className="hidden sm:inline">Requests</span>
               <span className="sm:hidden">Req</span>
-              <Badge variant="secondary" className="ml-0.5 sm:ml-1 text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-3.5 sm:h-4">
+              <Badge variant="secondary" className="ml-0.5 sm:ml-1 lg:ml-2 text-[9px] sm:text-[10px] lg:text-xs px-1 sm:px-1.5 py-0 h-3.5 sm:h-4 lg:h-5">
                 {receivedRequests.length + sentRequests.length}
               </Badge>
             </TabsTrigger>
@@ -310,11 +310,11 @@ const Connections = () => {
           <TabsContent value="suggestions" className="mt-4">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[#5B6CFF]" />
+                <h2 className="text-lg lg:text-xl font-semibold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 text-[#5B6CFF]" />
                   People You May Know
                 </h2>
-                <p className="text-xs text-muted-foreground">Expand your professional network</p>
+                <p className="text-xs lg:text-sm text-muted-foreground">Expand your professional network</p>
               </div>
               <Button
                 variant="outline"
@@ -350,17 +350,17 @@ const Connections = () => {
 
           {/* CONNECTIONS TAB */}
           <TabsContent value="connections" className="mt-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-[#10B981]" />
+            <h2 className="text-lg lg:text-xl font-semibold flex items-center gap-2">
+              <UserCheck className="w-5 h-5 lg:w-6 lg:h-6 text-[#10B981]" />
               My Connections
             </h2>
-            <div className="relative mt-2 mb-4">
+            <div className="relative mt-2 lg:mt-3 mb-4 lg:mb-6">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search connections..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="pl-9 h-9 text-sm rounded-[10px] w-full"
+                className="pl-9 h-9 lg:h-10 text-sm lg:text-base rounded-[10px] w-full lg:max-w-md"
               />
             </div>
 
@@ -390,9 +390,9 @@ const Connections = () => {
 
           {/* REQUESTS TAB */}
           <TabsContent value="requests" className="mt-4">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2 mb-3">
-                <UserPlus className="w-5 h-5 text-amber-500" />
+            <div className="mb-4 lg:mb-6">
+              <h2 className="text-lg lg:text-xl font-semibold flex items-center gap-2 mb-3">
+                <UserPlus className="w-5 h-5 lg:w-6 lg:h-6 text-amber-500" />
                 Connection Requests
               </h2>
               
