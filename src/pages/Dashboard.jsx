@@ -700,19 +700,6 @@ const Dashboard = () => {
 
               <TrendingHashtags />
 
-              {connectionsLoading ? (
-                <Card className="bg-white shadow-lg border-0">
-                  <CardContent className="p-6 flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                  </CardContent>
-                </Card>
-              ) : (
-                <ConnectionsList
-                  receivedRequests={receivedRequests}
-                  onAcceptRequest={acceptRequest}
-                  onRejectRequest={rejectRequest}
-                />
-              )}
 
             </div>
           </div>
