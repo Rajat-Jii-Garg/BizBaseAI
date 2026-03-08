@@ -61,7 +61,7 @@ const ProfilePage = ({ userId }) => {
   const { user, profile: authProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('posts');
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(false);
   const [skills, setSkills] = useState([]);
