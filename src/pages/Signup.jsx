@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
 import { supabase } from '@/integrations/supabase/client';
+import { useSearchParams } from 'react-router-dom';
 
 const Signup = () => {
   const [signupData, setSignupData] = useState({
