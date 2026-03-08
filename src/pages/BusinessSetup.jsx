@@ -18,6 +18,7 @@ import {
   Upload,
   Rocket
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
