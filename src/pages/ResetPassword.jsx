@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import SEOHead from '@/components/SEOHead';
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
