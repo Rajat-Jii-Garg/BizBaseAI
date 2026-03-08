@@ -100,6 +100,12 @@ const Settings = () => {
         .update({ actively_looking_for_work: privacySettings.actively_looking_for_work })
         .eq('id', user.id);
       if (error) throw error;
+      // Save privacy settings to localStorage for client-side use
+      localStorage.setItem(`privacy_${user.id}`, JSON.stringify({
+        showEmail: privacySettings.showEmail,
+        showPhone: privacySettings.showPhone,
+        showLocation: privacySettings.showLocation,
+      }));
       toast.success('Privacy settings saved!');
     } catch (error) {
       toast.error('Failed to save privacy settings');
