@@ -22,6 +22,7 @@ import {
   Clock,
   Send
 } from 'lucide-react';
+import SEOHead from '@/components/SEOHead';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useConnections } from '@/hooks/useConnections';
 
