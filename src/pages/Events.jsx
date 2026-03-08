@@ -337,23 +337,22 @@ const Events = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg overflow-x-auto">
-        {['discover', 'my-events', 'saved-events'].map((tab) => (
+        <div className="flex space-x-1 bg-muted p-1 rounded-lg">
+          {[
+            { id: 'discover', label: 'Discover' },
+            { id: 'my-events', label: 'My Events' },
+            { id: 'saved-events', label: 'Saved' }
+          ].map((tab) => (
             <button
-              key={tab}
-              onClick={() => setSelectedTab(tab)}
-              className={`flex-1 py-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                selectedTab === tab
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+              key={tab.id}
+              onClick={() => setSelectedTab(tab.id)}
+              className={`flex-1 py-1.5 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                selectedTab === tab.id
+                  ? 'bg-background text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {tab === 'discover' && <span className="hidden sm:inline">Discover Events</span>}
-              {tab === 'discover' && <span className="sm:hidden">Discover</span>}
-              {tab === 'my-events' && <span className="hidden sm:inline">My Events</span>}
-              {tab === 'my-events' && <span className="sm:hidden">My Events</span>}
-              {tab === 'saved-events' && <span className="hidden sm:inline">Saved Events</span>}
-              {tab === 'saved-events' && <span className="sm:hidden">Saved</span>}
+              {tab.label}
             </button>
           ))}
         </div>
