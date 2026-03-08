@@ -39,13 +39,13 @@ const ShareModal = ({ postShareUrl, onClose }) => {
       name: 'WhatsApp',
       icon: <MessageSquare size={20} />,
       bg: 'bg-green-500',
-      onClick: () => window.open(`https://wa.me/?text=${shareUrl}`, '_blank'),
+      onClick: () => window.open(`https://wa.me/?text=${shareText}%20${shareUrl}`, '_blank'),
     },
     {
       name: 'Twitter',
       icon: <Send size={20} />,
       bg: 'bg-sky-500',
-      onClick: () => window.open(`https://twitter.com/intent/tweet?url=${shareUrl}`, '_blank'),
+      onClick: () => window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, '_blank'),
     },
     {
       name: 'Gmail',
