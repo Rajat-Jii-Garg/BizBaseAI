@@ -174,6 +174,7 @@ export const usePostEngagement = () => {
           repost_of_user_id: postData.user_id
         });
 
+      awardCoins('repost');
       return "added";
     } catch (error) {
       console.error('Error reposting:', error);
