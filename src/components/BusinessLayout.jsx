@@ -19,17 +19,13 @@ const BusinessLayout = () => {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Close sidebar on route change (mobile)
   useEffect(() => {
     if (isMobile) setSidebarOpen(false);
   }, [slug, isMobile]);
 
   useEffect(() => {
     const initBusiness = async () => {
-      if (!user) {
-        navigate('/login');
-        return;
-      }
+      if (!user) { navigate('/login'); return; }
       if (slug && (!currentBusiness || currentBusiness.username !== slug)) {
         await switchBusiness(slug);
       }
@@ -47,10 +43,7 @@ const BusinessLayout = () => {
   if (loading || initializing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading business...</p>
-        </div>
+        <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
       </div>
     );
   }
@@ -59,11 +52,8 @@ const BusinessLayout = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-foreground mb-2">Business not found</h2>
-          <p className="text-muted-foreground mb-4">The business you're looking for doesn't exist or you don't have access.</p>
-          <button onClick={() => navigate('/dashboard')} className="text-primary hover:underline">
-            Go to Dashboard
-          </button>
+          <h2 className="text-lg font-semibold text-foreground mb-2">Business not found</h2>
+          <button onClick={() => navigate('/dashboard')} className="text-primary hover:underline text-sm">Go to Dashboard</button>
         </div>
       </div>
     );
@@ -71,27 +61,28 @@ const BusinessLayout = () => {
 
   return (
     <SidebarContext.Provider value={{ sidebarOpen, setSidebarOpen }}>
-      <div className="min-h-screen bg-background">
-        {/* Mobile overlay */}
-        {isMobile && sidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black/50 z-40 transition-opacity"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Header - full width on top */}
+        <BusinessHeader onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
 
-        {/* Sidebar */}
-        <div className={`
-          ${isMobile 
-            ? `fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
-            : 'fixed inset-y-0 left-0 z-40'
-          }
-        `}>
-          <BusinessSidebar onClose={() => setSidebarOpen(false)} />
-        </div>
+        {/* Below header: sidebar + content */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Mobile overlay */}
+          {isMobile && sidebarOpen && (
+            <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />
+          )}
 
-        <div className={`${isMobile ? '' : 'ml-64'} flex flex-col min-h-screen`}>
-          <BusinessHeader onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
+          {/* Sidebar */}
+          <div className={`
+            ${isMobile
+              ? `fixed top-0 left-0 z-50 h-full transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
+              : 'relative flex-shrink-0'
+            }
+          `}>
+            <BusinessSidebar onClose={() => setSidebarOpen(false)} />
+          </div>
+
+          {/* Main Content */}
           <main className="flex-1 overflow-auto">
             <Outlet />
           </main>
