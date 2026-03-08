@@ -68,8 +68,6 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPosts from "./pages/admin/AdminPosts";
 import AdminBusinesses from "./pages/admin/AdminBusinesses";
 import AdminJobs from "./pages/admin/AdminJobs";
-import AdminCommunities from "./pages/admin/AdminCommunities";
-import AdminEvents from "./pages/admin/AdminEvents";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminSettings from "./pages/admin/AdminSettings";
 
@@ -241,8 +239,6 @@ const App = () => (
                 <Route path="posts" element={<AdminPosts />} />
                 <Route path="businesses" element={<AdminBusinesses />} />
                 <Route path="jobs" element={<AdminJobs />} />
-                <Route path="communities" element={<AdminCommunities />} />
-                <Route path="events" element={<AdminEvents />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>

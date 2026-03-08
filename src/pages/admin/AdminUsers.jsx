@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, Trash2, Loader2, RefreshCw, ShieldCheck, ShieldOff } from 'lucide-react';
+import { Search, Trash2, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 const AdminUsers = () => {
-  const { fetchUsers, deleteUser, toggleUserVerification } = useAdmin();
+  const { fetchUsers, deleteUser } = useAdmin();
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,9 @@ const AdminUsers = () => {
     setLoading(false);
   };
 
-  useEffect(() => { loadUsers(); }, []);
+  useEffect(() => {
+    loadUsers();
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -41,19 +43,9 @@ const AdminUsers = () => {
     }
   };
 
-  const handleToggleVerify = async (userId) => {
-    const result = await toggleUserVerification(userId);
-    if (result?.success) {
-      toast.success(result.is_verified ? 'User verified' : 'Verification removed');
-      setUsers(users.map(u => u.id === userId ? { ...u, is_verified: result.is_verified } : u));
-    } else {
-      toast.error('Failed to update verification');
-    }
-  };
-
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Users</h1>
           <p className="text-muted-foreground">{users.length} users found</p>
@@ -77,7 +69,7 @@ const AdminUsers = () => {
       </form>
 
       <Card className="border-border/50">
-        <CardContent className="p-0 overflow-x-auto">
+        <CardContent className="p-0">
           {loading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -118,25 +110,14 @@ const AdminUsers = () => {
                       <Badge variant="outline">{user.bizcoins || 0}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={user.is_verified ? "text-green-500 hover:text-orange-500" : "text-muted-foreground hover:text-green-500"}
-                          onClick={() => handleToggleVerify(user.id)}
-                          title={user.is_verified ? 'Remove verification' : 'Verify user'}
-                        >
-                          {user.is_verified ? <ShieldCheck className="h-4 w-4" /> : <ShieldOff className="h-4 w-4" />}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => handleDelete(user.id, user.full_name)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleDelete(user.id, user.full_name)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
