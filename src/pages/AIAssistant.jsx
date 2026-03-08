@@ -9,18 +9,13 @@ import { toast } from 'sonner';
 import {
   Bot,
   Brain,
-  MessageSquare,
   Send,
   Sparkles,
   Star,
   TrendingUp,
-  User,
-  Users,
   Zap,
   Target,
   Lightbulb,
-  BookOpen,
-  Briefcase
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -30,6 +25,7 @@ const AIAssistant = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState('general');
+  const [showTools, setShowTools] = useState(false);
   const chatEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -99,200 +95,159 @@ const AIAssistant = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
-        <div className="text-center">
-          <Badge className="mb-3 bg-purple-100 text-purple-700">
-            <Sparkles className="w-3 h-3 mr-1" />
-            Powered by BizAI
-          </Badge>
-          <h1 className="text-3xl font-black text-foreground flex items-center justify-center gap-3">
-            <Brain className="w-8 h-8 text-purple-600" />
-            BizAI Assistant
-          </h1>
-          <p className="text-muted-foreground mt-2">Your intelligent companion for professional growth</p>
-        </div>
+      <div className="max-w-6xl mx-auto px-3 sm:px-6 py-3 sm:py-6 flex flex-col" style={{ height: 'calc(100vh - 64px)' }}>
+        
+        {/* Chat Card - takes all available space */}
+        <Card className="flex-1 flex flex-col border-0 shadow-lg min-h-0 overflow-hidden">
+          <CardHeader className="border-b py-3 px-3 sm:px-4 shrink-0">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+              <Bot className="w-5 h-5 text-blue-600" />
+              BizAI Chat
+              <div className="ml-auto flex items-center gap-2">
+                <Badge variant="secondary" className="text-[10px] sm:text-xs">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  {mode === 'career-coach' ? 'Career Coach' : 'General'}
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-[10px] sm:text-xs px-2"
+                  onClick={() => setShowTools(!showTools)}
+                >
+                  <Zap className="w-3 h-3 mr-1" />
+                  Tools
+                </Button>
+              </div>
+            </CardTitle>
+          </CardHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 space-y-4">
-            {/* Mode Selector */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-amber-500" />
-                  AI Mode
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
+          {/* Collapsible tools panel */}
+          {showTools && (
+            <div className="border-b px-3 py-2 sm:px-4 sm:py-3 bg-muted/30 shrink-0 space-y-2">
+              {/* Mode selector */}
+              <div className="flex gap-2">
                 <Button
                   variant={mode === 'general' ? 'default' : 'outline'}
                   size="sm"
-                  className="w-full justify-start"
+                  className="h-7 text-[10px] sm:text-xs flex-1"
                   onClick={() => setMode('general')}
                 >
-                  <Bot className="w-4 h-4 mr-2" />
-                  General Assistant
+                  <Bot className="w-3 h-3 mr-1" />
+                  General
                 </Button>
                 <Button
                   variant={mode === 'career-coach' ? 'default' : 'outline'}
                   size="sm"
-                  className="w-full justify-start"
+                  className="h-7 text-[10px] sm:text-xs flex-1"
                   onClick={() => setMode('career-coach')}
                 >
-                  <Target className="w-4 h-4 mr-2" />
+                  <Target className="w-3 h-3 mr-1" />
                   Career Coach
                 </Button>
-              </CardContent>
-            </Card>
-
-            {/* Quick Tools */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-yellow-500" />
-                  Quick Prompts
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {quickPrompts.map((prompt, i) => (
-                  <Button
-                    key={i}
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start text-xs h-auto py-2 text-left"
-                    onClick={() => sendMessage(prompt)}
-                  >
-                    <Sparkles className="w-3 h-3 mr-2 shrink-0 text-purple-500" />
-                    <span className="truncate">{prompt}</span>
-                  </Button>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* AI Tools */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-yellow-600" />
-                  AI Tools
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
+              </div>
+              {/* AI Tools grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {aiTools.map((tool, index) => (
-                  <div
+                  <button
                     key={index}
-                    className="p-3 rounded-lg border hover:shadow-md transition-all cursor-pointer hover:border-primary/30"
+                    className="p-2 rounded-lg border bg-background hover:shadow-sm transition-all text-left"
                     onClick={() => {
                       setMode(tool.mode);
                       sendMessage(`Help me with: ${tool.title} - ${tool.description}`);
+                      setShowTools(false);
                     }}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className={`p-1.5 rounded-lg ${tool.color} text-white`}>
+                    <div className="flex items-center gap-1.5">
+                      <div className={`p-1 rounded ${tool.color} text-white`}>
                         <tool.icon className="w-3 h-3" />
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-xs text-foreground">{tool.title}</h4>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{tool.description}</p>
+                      <span className="text-[10px] sm:text-xs font-medium text-foreground truncate">{tool.title}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Chat messages area */}
+          <CardContent className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0">
+            {chatHistory.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center px-2">
+                  <div className="p-3 sm:p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-full w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 flex items-center justify-center">
+                    <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" />
+                  </div>
+                  <h3 className="text-base sm:text-xl font-bold text-foreground mb-1">BizAI Ready</h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-3">Ask me anything about your career, networking, or business!</p>
+                  <div className="flex flex-wrap gap-1.5 justify-center">
+                    {quickPrompts.slice(0, 3).map((p, i) => (
+                      <Button key={i} variant="outline" size="sm" className="text-[10px] sm:text-xs h-7 sm:h-8" onClick={() => sendMessage(p)}>
+                        {p}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {chatHistory.map((msg, index) => (
+                  <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] sm:max-w-[80%] p-2.5 sm:p-3 rounded-2xl ${
+                      msg.role === 'user'
+                        ? 'bg-primary text-primary-foreground rounded-br-sm'
+                        : 'bg-muted text-foreground rounded-bl-sm'
+                    }`}>
+                      <div className="flex items-start gap-2">
+                        {msg.role === 'assistant' && <Bot className="w-4 h-4 mt-0.5 text-purple-600 shrink-0" />}
+                        <p className="text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                       </div>
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="lg:col-span-2">
-            <Card className="h-[700px] flex flex-col border-0 shadow-lg">
-              <CardHeader className="border-b">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Bot className="w-5 h-5 text-blue-600" />
-                  BizAI Chat
-                  <Badge variant="secondary" className="ml-auto text-xs">
-                    <Sparkles className="w-3 h-3 mr-1" />
-                    {mode === 'career-coach' ? 'Career Coach' : 'General'}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="flex-1 overflow-y-auto p-4">
-                {chatHistory.length === 0 ? (
-                  <div className="h-full flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="p-4 bg-gradient-to-br from-purple-100 to-blue-100 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                        <Brain className="w-10 h-10 text-purple-600" />
-                      </div>
-                      <h3 className="text-xl font-bold text-foreground mb-2">BizAI Ready</h3>
-                      <p className="text-muted-foreground text-sm mb-4">Ask me anything about your career, networking, or business!</p>
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {quickPrompts.slice(0, 3).map((p, i) => (
-                          <Button key={i} variant="outline" size="sm" className="text-xs" onClick={() => sendMessage(p)}>
-                            {p}
-                          </Button>
-                        ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-muted p-3 rounded-2xl rounded-bl-sm">
+                      <div className="flex items-center gap-2">
+                        <Bot className="w-4 h-4 text-purple-600" />
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {chatHistory.map((msg, index) => (
-                      <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] p-3 rounded-2xl ${
-                          msg.role === 'user'
-                            ? 'bg-primary text-primary-foreground rounded-br-sm'
-                            : 'bg-muted text-foreground rounded-bl-sm'
-                        }`}>
-                          <div className="flex items-start gap-2">
-                            {msg.role === 'assistant' && <Bot className="w-4 h-4 mt-0.5 text-purple-600 shrink-0" />}
-                            <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    {isLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-muted p-3 rounded-2xl rounded-bl-sm">
-                          <div className="flex items-center gap-2">
-                            <Bot className="w-4 h-4 text-purple-600" />
-                            <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={chatEndRef} />
-                  </div>
                 )}
-              </CardContent>
-
-              <div className="p-4 border-t">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={mode === 'career-coach' ? "Ask BizAI about your career..." : "Ask BizAI anything..."}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    disabled={isLoading}
-                    className="flex-1"
-                  />
-                  <Button
-                    onClick={() => sendMessage()}
-                    disabled={!message.trim() || isLoading}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600"
-                  >
-                    {isLoading ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Send className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
+                <div ref={chatEndRef} />
               </div>
-            </Card>
+            )}
+          </CardContent>
+
+          {/* Input area - always at bottom */}
+          <div className="p-3 sm:p-4 border-t shrink-0">
+            <div className="flex gap-2">
+              <Input
+                placeholder={mode === 'career-coach' ? "Ask about your career..." : "Ask BizAI anything..."}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isLoading}
+                className="flex-1 h-10 rounded-[10px] text-sm"
+              />
+              <Button
+                onClick={() => sendMessage()}
+                disabled={!message.trim() || isLoading}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 h-10 w-10 p-0 rounded-[10px]"
+              >
+                {isLoading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
+        </Card>
       </div>
     </DashboardLayout>
   );
