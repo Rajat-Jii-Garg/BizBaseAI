@@ -35,6 +35,7 @@ const DashboardSidebar = () => {
     { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
     { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
     { icon: TrendingUp, label: 'Insights', path: '/insights' },
+    { icon: Gift, label: 'Referrals', path: '/referrals' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
