@@ -573,9 +573,6 @@ const Dashboard = () => {
 
             {/* Right Sidebar - Connections & Insights */}
             <div className="hidden lg:block lg:col-span-3 space-y-6">
-              {/* Who Viewed Profile */}
-              <WhoViewedProfile />
-
               {/* Smart Connections */}
               <Card className="bg-white shadow-lg border-0 overflow-hidden">
                 <CardHeader className="pb-2">
