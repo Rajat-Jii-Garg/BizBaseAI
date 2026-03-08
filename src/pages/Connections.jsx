@@ -268,6 +268,7 @@ const Connections = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead title="Connections" description="Manage your professional connections on BizBase AI." path="/connections" noIndex />
       <div className="max-w-7xl mx-auto p-3 sm:p-4 lg:p-6 space-y-4 lg:space-y-6">
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
