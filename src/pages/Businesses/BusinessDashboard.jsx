@@ -169,7 +169,7 @@ const BusinessDashboard = () => {
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg sm:text-xl font-bold text-foreground">{currentBusiness?.name}</h1>
+              <h1 className="text-base sm:text-lg font-bold text-foreground">{currentBusiness?.name}</h1>
               {currentBusiness?.is_verified && (
                 <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs">
                   <CheckCircle className="w-3 h-3 mr-1" />Verified
