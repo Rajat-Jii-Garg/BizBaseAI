@@ -603,26 +603,33 @@ const ProfilePage = ({ userId }) => {
               </div>
             </div>
 
-            {/* Contact Info Bar */}
+            {/* Contact Info Bar - privacy aware */}
             <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-4 pt-4 border-t border-border text-sm text-muted-foreground">
-              {profile?.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-[#5B6CFF]" />
-                  <span>{profile.email}</span>
-                </div>
-              )}
-              {profile?.location && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#5B6CFF]" />
-                  <span>{profile.location}</span>
-                </div>
-              )}
-              {profile?.phone && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-[#5B6CFF]" />
-                  <span>{profile.phone}</span>
-                </div>
-              )}
+              {(() => {
+                const privacy = JSON.parse(localStorage.getItem(`privacy_${userId}`) || '{}');
+                return (
+                  <>
+                    {privacy.showEmail && profile?.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-[#5B6CFF]" />
+                        <span>{profile.email}</span>
+                      </div>
+                    )}
+                    {privacy.showLocation && profile?.location && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-[#5B6CFF]" />
+                        <span>{profile.location}</span>
+                      </div>
+                    )}
+                    {privacy.showPhone && profile?.phone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-[#5B6CFF]" />
+                        <span>{profile.phone}</span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
               {profile?.website && (
                 <a href={profile.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#5B6CFF] hover:underline">
                   <Globe className="w-4 h-4" />
