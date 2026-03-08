@@ -181,7 +181,6 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
       });
     } finally {
       setAiLoading(false);
-      setShowAIPopup(false);
     }
   };
 
