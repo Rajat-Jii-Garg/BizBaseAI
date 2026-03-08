@@ -34,7 +34,6 @@ const DashboardSidebar = () => {
     { icon: MessageSquare, label: 'Messages', path: '/messages' },
     { icon: Bell, label: 'Notifications', path: '/notifications' },
     { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
-    { icon: Compass, label: 'Explore', path: '/explore' },
     { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
     { icon: TrendingUp, label: 'Insights', path: '/insights' },
     { icon: Settings, label: 'Settings', path: '/settings' },
