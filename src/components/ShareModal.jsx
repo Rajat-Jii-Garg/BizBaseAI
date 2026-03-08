@@ -31,6 +31,7 @@ const ShareModal = ({ postShareUrl, onClose }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const shareText = encodeURIComponent(`Check this out on BizBase - the next-gen professional network! 🚀`);
   const shareUrl = encodeURIComponent(postShareUrl || window.location.href);
 
   const platforms = [
@@ -38,13 +39,13 @@ const ShareModal = ({ postShareUrl, onClose }) => {
       name: 'WhatsApp',
       icon: <MessageSquare size={20} />,
       bg: 'bg-green-500',
-      onClick: () => window.open(`https://wa.me/?text=${shareUrl}`, '_blank'),
+      onClick: () => window.open(`https://wa.me/?text=${shareText}%20${shareUrl}`, '_blank'),
     },
     {
       name: 'Twitter',
       icon: <Send size={20} />,
       bg: 'bg-sky-500',
-      onClick: () => window.open(`https://twitter.com/intent/tweet?url=${shareUrl}`, '_blank'),
+      onClick: () => window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, '_blank'),
     },
     {
       name: 'Gmail',
@@ -152,6 +153,13 @@ const ShareModal = ({ postShareUrl, onClose }) => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Powered by BizBase */}
+        <div className="text-center pt-2 border-t border-border/30">
+          <p className="text-[10px] text-muted-foreground">
+            Powered by <span className="font-bold text-primary">BizBase</span> — AI Business Networking
+          </p>
         </div>
       </div>
     </div>

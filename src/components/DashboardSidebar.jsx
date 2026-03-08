@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Brain,
   Trophy,
+  Gift,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +36,7 @@ const DashboardSidebar = () => {
     { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
     { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
     { icon: TrendingUp, label: 'Insights', path: '/insights' },
+    { icon: Gift, label: 'Referrals', path: '/referrals' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 

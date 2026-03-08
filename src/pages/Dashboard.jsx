@@ -56,6 +56,8 @@ import QuickProfileActions from '@/components/QuickProfileActions';
 import UsernameSetupModal from '@/components/UsernameSetupModal';
 import WhoViewedProfile from '@/components/WhoViewedProfile';
 import AchievementBadges from '@/components/AchievementBadges';
+import PowerScoreCard from '@/components/PowerScoreCard';
+import ReferralWidget from '@/components/ReferralWidget';
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
@@ -573,6 +575,12 @@ const Dashboard = () => {
 
               {/* Achievement Badges */}
               <AchievementBadges />
+
+              {/* Power Score */}
+              <PowerScoreCard />
+
+              {/* Referral Widget */}
+              <ReferralWidget />
 
               {/* Smart Connections */}
               <Card className="bg-white shadow-lg border-0 overflow-hidden">
