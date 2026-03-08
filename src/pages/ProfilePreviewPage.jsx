@@ -203,12 +203,15 @@ export default function ProfilePreviewPage() {
               </p>
 
               <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mt-2">
-                {profile?.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {profile.location}
-                  </span>
-                )}
+                {(() => {
+                  const privacy = JSON.parse(localStorage.getItem(`privacy_${userId}`) || '{}');
+                  return privacy.showLocation && profile?.location ? (
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {profile.location}
+                    </span>
+                  ) : null;
+                })()}
 
                 {profile?.company_name && (
                   <span className="flex items-center gap-1">
