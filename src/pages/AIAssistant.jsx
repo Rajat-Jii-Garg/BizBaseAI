@@ -95,7 +95,7 @@ const AIAssistant = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto px-3 sm:px-6 py-1 sm:py-3 flex flex-col" style={{ height: 'calc(100vh - 100px)' }}>
+      <div className="max-w-6xl mx-auto px-3 sm:px-6 py-0 flex flex-col" style={{ height: 'calc(100vh - 100px)' }}>
         
         {/* Chat Card - takes all available space */}
         <Card className="flex-1 flex flex-col border-0 shadow-lg min-h-0 overflow-hidden">
