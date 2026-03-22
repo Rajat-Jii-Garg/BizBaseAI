@@ -163,57 +163,100 @@ const Signup = () => {
         }
       });
 
+      // Check if error is specifically about email sending (account may still be created)
       if (error) {
-        console.error('Account creation error:', error);
-        toast.error('Account Creation Error', { description: error.message });
-        setLoading(false);
-        return;
+        const isEmailError = error.message?.toLowerCase().includes('email') || 
+                             error.message?.toLowerCase().includes('confirmation') ||
+                             error.message?.toLowerCase().includes('sending');
+        
+        // If it's not an email-sending error, it's a real signup failure
+        if (!isEmailError) {
+          console.error('Account creation error:', error);
+          toast.error('Account Creation Error', { description: error.message });
+          setLoading(false);
+          return;
+        }
+        
+        // Email sending failed but account might be created - try to sign in
+        console.warn('Email sending failed, attempting direct sign-in:', error.message);
       }
 
-      // Track referral if ref code exists
-      if (refCode && signUpData?.user?.id) {
-        try {
-          const { data: referrer } = await supabase
-            .from('profiles')
-            .select('id, bizcoins')
-            .eq('referral_code', refCode)
-            .single();
-
-          if (referrer && referrer.id !== signUpData.user.id) {
-            await supabase.from('referrals').insert({
-              referrer_id: referrer.id,
-              referred_user_id: signUpData.user.id,
-              referral_code: refCode,
-              referred_email: signupData.email,
-              status: 'completed',
-              coins_awarded: true,
-              completed_at: new Date().toISOString()
-            });
-
-            await supabase
+      // If user was created successfully or email just failed to send
+      const userId = signUpData?.user?.id;
+      
+      if (userId) {
+        // Track referral if ref code exists
+        if (refCode) {
+          try {
+            const { data: referrer } = await supabase
               .from('profiles')
-              .update({ bizcoins: (referrer.bizcoins || 0) + 10 })
-              .eq('id', referrer.id);
+              .select('id, bizcoins')
+              .eq('referral_code', refCode)
+              .single();
+
+            if (referrer && referrer.id !== userId) {
+              await supabase.from('referrals').insert({
+                referrer_id: referrer.id,
+                referred_user_id: userId,
+                referral_code: refCode,
+                referred_email: signupData.email,
+                status: 'completed',
+                coins_awarded: true,
+                completed_at: new Date().toISOString()
+              });
+
+              await supabase
+                .from('profiles')
+                .update({ bizcoins: (referrer.bizcoins || 0) + 10 })
+                .eq('id', referrer.id);
+            }
+          } catch (refErr) {
+            console.error('Referral tracking error:', refErr);
           }
-        } catch (refErr) {
-          console.error('Referral tracking error:', refErr);
+        }
+
+        // Send welcome email (non-blocking)
+        supabase.functions.invoke('send-welcome-email', {
+          body: { email: signupData.email, fullName: signupData.fullName }
+        }).catch(err => console.warn('Welcome email failed:', err));
+      }
+
+      // If session exists, user is auto-confirmed - go to dashboard
+      if (signUpData?.session) {
+        toast.success("Account Created Successfully!", {
+          description: "Welcome to BizBase! Redirecting to dashboard...",
+        });
+        setTimeout(() => navigate('/dashboard'), 500);
+      } else if (userId) {
+        // Account created but needs email verification
+        toast.success("Account Created!", {
+          description: "Please check your email to verify your account, then log in.",
+        });
+        setTimeout(() => navigate('/login'), 1500);
+      } else {
+        // Fallback - try signing in directly
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: signupData.email,
+          password: signupData.password,
+        });
+        
+        if (!signInError) {
+          toast.success("Account Created Successfully!", {
+            description: "Welcome to BizBase!",
+          });
+          setTimeout(() => navigate('/dashboard'), 500);
+        } else {
+          toast.success("Account Created!", {
+            description: "Please log in with your credentials.",
+          });
+          setTimeout(() => navigate('/login'), 1500);
         }
       }
 
-      toast.success("Verification Email Sent!", {
-        description: "Please check your inbox and verify your email before logging in.",
-      });
-      
-      setTimeout(() => {
-        navigate('/login');
-      }, 1000);
-
     } catch (error) {
       console.error('Signup error:', error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to create account. Please try again.",
-        variant: "destructive"
       });
     } finally {
       setLoading(false);
