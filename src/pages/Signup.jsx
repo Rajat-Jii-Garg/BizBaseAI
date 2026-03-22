@@ -3,24 +3,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Sparkles, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight, AtSign, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
 import { supabase } from '@/integrations/supabase/client';
-import { useSearchParams } from 'react-router-dom';
 import SEOHead from '@/components/SEOHead';
+import OTPVerificationModal from '@/components/auth/OTPVerificationModal';
 
 const Signup = () => {
   const [signupData, setSignupData] = useState({
-    fullName: '',
-    username: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: ''
+    fullName: '', username: '', email: '', phone: '', password: '', confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,68 +23,37 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const refCode = searchParams.get('ref');
-  const { signUp, user } = useAuth();
+  const { user } = useAuth();
 
-  // Redirect if already logged in
   useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
-    }
+    if (user) navigate('/dashboard');
   }, [user, navigate]);
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhone = (phone) => /^[+]?[\d\s\-\(\)]{10,}$/.test(phone);
+  const validatePassword = (password) => password.length >= 8;
+  const validateUsername = (username) => username.length >= 3 && /^[a-z0-9_]+$/.test(username);
 
-  const validatePhone = (phone) => {
-    const phoneRegex = /^[+]?[\d\s\-\(\)]{10,}$/;
-    return phoneRegex.test(phone);
-  };
-
-  const validatePassword = (password) => {
-    return password.length >= 8;
-  };
-
-  const validateUsername = (username) => {
-    return username.length >= 3 && /^[a-z0-9_]+$/.test(username);
-  };
-
-  // Check username availability with debounce
   const checkUsernameAvailability = useCallback(async (username) => {
-    if (!username || username.length < 3) {
-      setUsernameAvailable(null);
-      return;
-    }
-    
+    if (!username || username.length < 3) { setUsernameAvailable(null); return; }
     setCheckingUsername(true);
     try {
-      const { data, error } = await supabase.rpc('is_username_available', { 
-        check_username: username 
-      });
-      
+      const { data, error } = await supabase.rpc('is_username_available', { check_username: username });
       if (error) throw error;
       setUsernameAvailable(data);
-    } catch (error) {
-      console.error('Error checking username:', error);
-      setUsernameAvailable(null);
-    } finally {
-      setCheckingUsername(false);
-    }
+    } catch { setUsernameAvailable(null); }
+    finally { setCheckingUsername(false); }
   }, []);
 
-  // Debounced username check
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (signupData.username) {
-        checkUsernameAvailability(signupData.username);
-      }
+      if (signupData.username) checkUsernameAvailability(signupData.username);
     }, 500);
-
     return () => clearTimeout(timer);
   }, [signupData.username, checkUsernameAvailability]);
 
@@ -99,49 +63,24 @@ const Signup = () => {
     if (errors.username) setErrors(prev => ({ ...prev, username: '' }));
   };
 
-  const clearErrors = () => setErrors({});
-
+  // Step 1: Validate form and send OTP
   const handleSignup = async (e) => {
     e.preventDefault();
-    clearErrors();
+    setErrors({});
     setLoading(true);
     
-    // Validation
     const newErrors = {};
-    
-    if (!signupData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
-    }
-
-    if (!signupData.username) {
-      newErrors.username = 'Username is required';
-    } else if (!validateUsername(signupData.username)) {
-      newErrors.username = 'Username must be at least 3 characters (letters, numbers, underscore only)';
-    } else if (usernameAvailable === false) {
-      newErrors.username = 'This username is already taken';
-    }
-    
-    if (!signupData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!validateEmail(signupData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
-    if (!signupData.phone) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!validatePhone(signupData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-    
-    if (!signupData.password) {
-      newErrors.password = 'Password is required';
-    } else if (!validatePassword(signupData.password)) {
-      newErrors.password = 'Password must be at least 8 characters long';
-    }
-    
-    if (signupData.password !== signupData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
+    if (!signupData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!signupData.username) newErrors.username = 'Username is required';
+    else if (!validateUsername(signupData.username)) newErrors.username = 'Username must be at least 3 characters (letters, numbers, underscore only)';
+    else if (usernameAvailable === false) newErrors.username = 'This username is already taken';
+    if (!signupData.email) newErrors.email = 'Email is required';
+    else if (!validateEmail(signupData.email)) newErrors.email = 'Please enter a valid email address';
+    if (!signupData.phone) newErrors.phone = 'Phone number is required';
+    else if (!validatePhone(signupData.phone)) newErrors.phone = 'Please enter a valid phone number';
+    if (!signupData.password) newErrors.password = 'Password is required';
+    else if (!validatePassword(signupData.password)) newErrors.password = 'Password must be at least 8 characters long';
+    if (signupData.password !== signupData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -149,140 +88,67 @@ const Signup = () => {
       return;
     }
 
-    const handlePostSignup = (userId) => {
-      if (!userId) return;
-      // Track referral
-      if (refCode) {
-        supabase.from('profiles').select('id, bizcoins').eq('referral_code', refCode).single()
-          .then(({ data: referrer }) => {
-            if (referrer && referrer.id !== userId) {
-              supabase.from('referrals').insert({
-                referrer_id: referrer.id, referred_user_id: userId,
-                referral_code: refCode, referred_email: signupData.email,
-                status: 'completed', coins_awarded: true, completed_at: new Date().toISOString()
-              }).catch(e => console.warn('Referral insert failed:', e));
-              supabase.from('profiles').update({ bizcoins: (referrer.bizcoins || 0) + 10 })
-                .eq('id', referrer.id).catch(e => console.warn('Referral coins failed:', e));
-            }
-          }).catch(e => console.warn('Referral lookup failed:', e));
-      }
-      // Welcome email
-      supabase.functions.invoke('send-welcome-email', {
-        body: { email: signupData.email, fullName: signupData.fullName }
-      }).catch(err => console.warn('Welcome email failed:', err));
-    };
-
     try {
-      const { data: signUpData, error } = await supabase.auth.signUp({
-        email: signupData.email,
-        password: signupData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: {
-            full_name: signupData.fullName,
-            phone: signupData.phone,
-            username: signupData.username,
-          }
-        }
+      // Send OTP to user's email
+      const { data, error } = await supabase.functions.invoke('send-otp', {
+        body: { email: signupData.email, purpose: 'signup' }
       });
 
-      if (error) {
-        console.error('Signup error:', error);
-        
-        if (error.message?.toLowerCase().includes('already registered') || 
-            error.message?.toLowerCase().includes('already been registered')) {
-          toast.error('Account Already Exists', { 
-            description: 'This email is already registered. Please login instead.' 
-          });
-          setTimeout(() => navigate('/login'), 1500);
-          setLoading(false);
-          return;
-        }
-        
-        // For email/SMTP errors (500) - account may still be created
-        const isEmailError = error.message?.toLowerCase().includes('email') || 
-                             error.message?.toLowerCase().includes('confirmation') ||
-                             error.message?.toLowerCase().includes('sending') ||
-                             error.status === 500;
-        
-        if (isEmailError) {
-          console.warn('Email sending failed, trying direct sign-in...');
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: signupData.email,
-            password: signupData.password,
-          });
-          
-          if (!signInError && signInData?.session) {
-            handlePostSignup(signInData.user?.id);
-            toast.success("Account Created Successfully!", {
-              description: "Welcome to BizBase!",
-            });
-            setTimeout(() => navigate('/dashboard'), 500);
-            setLoading(false);
-            return;
-          }
-          
-          // Account created but email not confirmed - can't auto-login
-          toast.error('Signup Issue', { 
-            description: 'Account may have been created but email verification is required. Please contact support or try again.' 
-          });
-          setLoading(false);
-          return;
-        }
-        
-        toast.error('Signup Failed', { description: error.message });
-        setLoading(false);
-        return;
-      }
+      if (error) throw error;
 
-      // Success - no error
-      const userId = signUpData?.user?.id;
-      if (userId) handlePostSignup(userId);
-
-      if (signUpData?.session) {
-        toast.success("Account Created Successfully!", {
-          description: "Welcome to BizBase! Redirecting to dashboard...",
-        });
-        setTimeout(() => navigate('/dashboard'), 500);
-      } else if (userId && signUpData?.user?.identities?.length === 0) {
-        toast.error('Account Already Exists', { 
-          description: 'This email is already registered. Please login instead.' 
-        });
-        setTimeout(() => navigate('/login'), 1500);
-      } else if (userId) {
-        toast.success("Account Created!", {
-          description: "Please check your email to verify, then log in.",
-        });
-        setTimeout(() => navigate('/login'), 1500);
-      } else {
-        toast.success("Account Created!", {
-          description: "Please log in with your credentials.",
-        });
-        setTimeout(() => navigate('/login'), 1500);
-      }
-
+      toast.success("Verification Code Sent!", {
+        description: `We've sent a 6-digit code to ${signupData.email}`,
+      });
+      setShowOTPModal(true);
     } catch (error) {
-      console.error('Signup error:', error);
-      toast.error("Error", {
-        description: "Failed to create account. Please try again.",
-      });
+      console.error('Send OTP error:', error);
+      toast.error("Error", { description: "Failed to send verification code. Please try again." });
     } finally {
       setLoading(false);
     }
   };
 
+  // Step 2: After OTP verified, create account via edge function
+  const handleOTPVerified = async () => {
+    // The OTP modal will pass the verified OTP code
+    // Account is created inside the modal's verify handler
+    // This is called after successful account creation
+    
+    // Handle referral tracking (non-blocking)
+    const userId = localStorage.getItem('newUserId');
+    if (userId && refCode) {
+      supabase.from('profiles').select('id, bizcoins').eq('referral_code', refCode).single()
+        .then(({ data: referrer }) => {
+          if (referrer && referrer.id !== userId) {
+            supabase.from('referrals').insert({
+              referrer_id: referrer.id, referred_user_id: userId,
+              referral_code: refCode, referred_email: signupData.email,
+              status: 'completed', coins_awarded: true, completed_at: new Date().toISOString()
+            }).catch(e => console.warn('Referral insert failed:', e));
+            supabase.from('profiles').update({ bizcoins: (referrer.bizcoins || 0) + 10 })
+              .eq('id', referrer.id).catch(e => console.warn('Referral coins failed:', e));
+          }
+        }).catch(e => console.warn('Referral lookup failed:', e));
+    }
+
+    // Welcome email (non-blocking)
+    supabase.functions.invoke('send-welcome-email', {
+      body: { email: signupData.email, fullName: signupData.fullName }
+    }).catch(err => console.warn('Welcome email failed:', err));
+
+    // Clean up
+    localStorage.removeItem('newUserId');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex">
-      <SEOHead title="Sign Up - Create Your Account" description="Join BizBase AI - the AI-powered professional networking platform. Create your free account and start building your career." path="/signup" />
-      {/* Feature Highlight Sidebar - Hidden on mobile */}
+      <SEOHead title="Sign Up - Create Your Account" description="Join BizBase AI - the AI-powered professional networking platform." path="/signup" />
       <div className="hidden lg:flex lg:w-1/2">
         <FeatureHighlight />
       </div>
 
-      {/* Signup Form */}
       <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
         <div className="w-full max-w-md">
-          {/* Header */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center space-x-2 mb-6 group">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -296,179 +162,103 @@ const Signup = () => {
             <p className="text-gray-600">Join thousands of professionals growing with BizBase</p>
           </div>
 
-          {/* Error Display */}
           {errors.general && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-600 text-sm">{errors.general}</p>
             </div>
           )}
 
-          {/* Signup Card */}
           <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
             <CardHeader className="space-y-1 pb-4">
               <CardTitle className="text-center text-xl">Sign Up</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignup} className="space-y-6">
-                {/* Full Name */}
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name *</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={signupData.fullName}
-                      onChange={(e) => {
-                        setSignupData(prev => ({ ...prev, fullName: e.target.value }));
-                        if (errors.fullName) setErrors(prev => ({ ...prev, fullName: '' }));
-                      }}
-                      className={`pl-10 transition-all duration-200 ${errors.fullName ? 'border-destructive' : 'focus:border-primary'}`}
-                      required
-                    />
+                    <Input id="fullName" type="text" placeholder="Enter your full name" value={signupData.fullName}
+                      onChange={(e) => { setSignupData(prev => ({ ...prev, fullName: e.target.value })); if (errors.fullName) setErrors(prev => ({ ...prev, fullName: '' })); }}
+                      className={`pl-10 ${errors.fullName ? 'border-destructive' : 'focus:border-primary'}`} required />
                   </div>
                   {errors.fullName && <p className="text-destructive text-xs mt-1">{errors.fullName}</p>}
                 </div>
 
-                {/* Username */}
                 <div className="space-y-2">
                   <Label htmlFor="username">Username *</Label>
                   <div className="relative">
                     <AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="username"
-                      type="text"
-                      placeholder="Choose a unique username"
-                      value={signupData.username}
+                    <Input id="username" type="text" placeholder="Choose a unique username" value={signupData.username}
                       onChange={(e) => handleUsernameChange(e.target.value)}
-                      className={`pl-10 pr-10 transition-all duration-200 ${
-                        errors.username ? 'border-destructive' : 
-                        usernameAvailable === true ? 'border-green-500' : 
-                        usernameAvailable === false ? 'border-destructive' : 
-                        'focus:border-primary'
-                      }`}
-                      required
-                    />
+                      className={`pl-10 pr-10 ${errors.username ? 'border-destructive' : usernameAvailable === true ? 'border-green-500' : usernameAvailable === false ? 'border-destructive' : 'focus:border-primary'}`} required />
                     <div className="absolute right-3 top-3">
                       {checkingUsername && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
                       {!checkingUsername && usernameAvailable === true && <CheckCircle className="h-4 w-4 text-green-500" />}
                       {!checkingUsername && usernameAvailable === false && <XCircle className="h-4 w-4 text-destructive" />}
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Your profile URL: bizbase.com/@{signupData.username || 'username'}
-                  </p>
+                  <p className="text-xs text-muted-foreground">Your profile URL: bizbase.com/@{signupData.username || 'username'}</p>
                   {errors.username && <p className="text-destructive text-xs mt-1">{errors.username}</p>}
                 </div>
                 
-                {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address *</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={signupData.email}
-                      onChange={(e) => {
-                        setSignupData(prev => ({ ...prev, email: e.target.value }));
-                        if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
-                      }}
-                      className={`pl-10 transition-all duration-200 ${errors.email ? 'border-red-500' : 'focus:border-blue-500'}`}
-                      required
-                    />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input id="email" type="email" placeholder="Enter your email" value={signupData.email}
+                      onChange={(e) => { setSignupData(prev => ({ ...prev, email: e.target.value })); if (errors.email) setErrors(prev => ({ ...prev, email: '' })); }}
+                      className={`pl-10 ${errors.email ? 'border-destructive' : 'focus:border-primary'}`} required />
                   </div>
-                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                  {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
                 </div>
 
-                {/* Phone */}
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number *</Label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+1 (555) 123-4567"
-                      value={signupData.phone}
-                      onChange={(e) => {
-                        setSignupData(prev => ({ ...prev, phone: e.target.value }));
-                        if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
-                      }}
-                      className={`pl-10 transition-all duration-200 ${errors.phone ? 'border-red-500' : 'focus:border-blue-500'}`}
-                      required
-                    />
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input id="phone" type="tel" placeholder="+91 98765 43210" value={signupData.phone}
+                      onChange={(e) => { setSignupData(prev => ({ ...prev, phone: e.target.value })); if (errors.phone) setErrors(prev => ({ ...prev, phone: '' })); }}
+                      className={`pl-10 ${errors.phone ? 'border-destructive' : 'focus:border-primary'}`} required />
                   </div>
-                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                  {errors.phone && <p className="text-destructive text-xs mt-1">{errors.phone}</p>}
                 </div>
                 
-                {/* Password */}
                 <div className="space-y-2">
                   <Label htmlFor="password">Password *</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Create a strong password (min 8 characters)"
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="Min 8 characters"
                       value={signupData.password}
-                      onChange={(e) => {
-                        setSignupData(prev => ({ ...prev, password: e.target.value }));
-                        if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
-                      }}
-                      className={`pl-10 pr-10 transition-all duration-200 ${errors.password ? 'border-red-500' : 'focus:border-blue-500'}`}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
+                      onChange={(e) => { setSignupData(prev => ({ ...prev, password: e.target.value })); if (errors.password) setErrors(prev => ({ ...prev, password: '' })); }}
+                      className={`pl-10 pr-10 ${errors.password ? 'border-destructive' : 'focus:border-primary'}`} required />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                  {errors.password && <p className="text-destructive text-xs mt-1">{errors.password}</p>}
                 </div>
                 
-                {/* Confirm Password */}
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirm Password *</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password"
                       value={signupData.confirmPassword}
-                      onChange={(e) => {
-                        setSignupData(prev => ({ ...prev, confirmPassword: e.target.value }));
-                        if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }));
-                      }}
-                      className={`pl-10 pr-10 transition-all duration-200 ${errors.confirmPassword ? 'border-red-500' : 'focus:border-blue-500'}`}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
+                      onChange={(e) => { setSignupData(prev => ({ ...prev, confirmPassword: e.target.value })); if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' })); }}
+                      className={`pl-10 pr-10 ${errors.confirmPassword ? 'border-destructive' : 'focus:border-primary'}`} required />
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && <p className="text-destructive text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
                 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
-                  disabled={loading}
-                >
+                <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]" disabled={loading}>
                   {loading ? (
                     <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Creating Account...</span>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Sending Verification Code...</span>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2">
@@ -479,452 +269,38 @@ const Signup = () => {
                 </Button>
               </form>
 
-              {/* Social Login */}
               <SocialLoginButtons />
 
-              {/* Link to Login */}
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Already have an account?{' '}
-                  <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                    Sign in here
-                  </Link>
+                  <Link to="/login" className="text-primary hover:text-primary/80 font-medium">Sign in here</Link>
                 </p>
               </div>
               
-              {/* Legal Links */}
               <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-xs text-muted-foreground">
                   By signing up, you agree to our{' '}
-                  <Link to="/terms" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="/privacy" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                    Privacy Policy
-                  </Link>
+                  <Link to="/terms" className="text-primary hover:text-primary/80">Terms of Service</Link>{' '}and{' '}
+                  <Link to="/privacy" className="text-primary hover:text-primary/80">Privacy Policy</Link>
                 </p>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* OTP Verification Modal */}
+      <OTPVerificationModal
+        isOpen={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        purpose="signup"
+        email={signupData.email}
+        signupData={signupData}
+        onVerified={handleOTPVerified}
+      />
     </div>
   );
 };
 
 export default Signup;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useState, useEffect } from 'react';
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Link, useNavigate } from 'react-router-dom';
-// import { Sparkles, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight } from 'lucide-react';
-// import { useAuth } from '@/contexts/AuthContext';
-// import { useToast } from '@/hooks/use-toast';
-// import EnhancedOTPModal from '@/components/auth/EnhancedOTPModal';
-// import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
-// import FeatureHighlight from '@/components/auth/FeatureHighlight';
-// import { supabase } from '@/integrations/supabase/client';
-
-// const Signup = () => {
-//   const [signupData, setSignupData] = useState({
-//     fullName: '',
-//     email: '',
-//     phone: '',
-//     password: '',
-//     confirmPassword: ''
-//   });
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-//   const [loading, setLoading] = useState(false);
-//   const [showOTPModal, setShowOTPModal] = useState(false);
-//   const [errors, setErrors] = useState({});
-  
-//   const navigate = useNavigate();
-//   const { signUp, user } = useAuth();
-//   const { toast } = useToast();
-
-//   // Redirect if already logged in
-//   useEffect(() => {
-//     if (user) {
-//       navigate('/dashboard');
-//     }
-//   }, [user, navigate]);
-
-//   const validateEmail = (email) => {
-//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     return emailRegex.test(email);
-//   };
-
-//   const validatePhone = (phone) => {
-//     const phoneRegex = /^[+]?[\d\s\-\(\)]{10,}$/;
-//     return phoneRegex.test(phone);
-//   };
-
-//   const validatePassword = (password) => {
-//     return password.length >= 8;
-//   };
-
-//   const clearErrors = () => setErrors({});
-
-//   const handleSignup = async (e) => {
-//     e.preventDefault();
-//     clearErrors();
-//     setLoading(true);
-    
-//     // Validation
-//     const newErrors = {};
-    
-//     if (!signupData.fullName.trim()) {
-//       newErrors.fullName = 'Full name is required';
-//     }
-    
-//     if (!signupData.email) {
-//       newErrors.email = 'Email is required';
-//     } else if (!validateEmail(signupData.email)) {
-//       newErrors.email = 'Please enter a valid email address';
-//     }
-    
-//     if (!signupData.phone) {
-//       newErrors.phone = 'Phone number is required';
-//     } else if (!validatePhone(signupData.phone)) {
-//       newErrors.phone = 'Please enter a valid phone number';
-//     }
-    
-//     if (!signupData.password) {
-//       newErrors.password = 'Password is required';
-//     } else if (!validatePassword(signupData.password)) {
-//       newErrors.password = 'Password must be at least 8 characters long';
-//     }
-    
-//     if (signupData.password !== signupData.confirmPassword) {
-//       newErrors.confirmPassword = 'Passwords do not match';
-//     }
-    
-//     if (Object.keys(newErrors).length > 0) {
-//       setErrors(newErrors);
-//       setLoading(false);
-//       return;
-//     }
-    
-//     // Store signup data temporarily in localStorage
-//     localStorage.setItem('pendingSignup', JSON.stringify(signupData));
-    
-//     // Show OTP modal immediately
-//     setShowOTPModal(true);
-//     setLoading(false);
-    
-//     toast({
-//       title: "Verification Required",
-//       description: "Please check your email for the verification code.",
-//     });
-//   };
-
-//   const handleOTPVerified = async () => {
-//     try {
-//       // Get stored signup data
-//       const storedData = localStorage.getItem('pendingSignup');
-//       if (!storedData) {
-//         toast({
-//           title: "Error",
-//           description: "Signup data not found. Please try again.",
-//           variant: "destructive"
-//         });
-//         return;
-//       }
-      
-//       const pendingSignup = JSON.parse(storedData);
-      
-//       console.log('Creating user account after OTP verification...');
-      
-//       // Now create the actual user account
-//       const { error } = await supabase.auth.signUp({
-//         email: pendingSignup.email,
-//         password: pendingSignup.password,
-//         options: {
-//           emailRedirectTo: `${window.location.origin}/dashboard`,
-//           data: {
-//             full_name: pendingSignup.fullName,
-//             phone: pendingSignup.phone,
-//           }
-//         }
-//       });
-
-//       if (error) {
-//         console.error('Account creation error:', error);
-//         toast({
-//           title: 'Account Creation Error',
-//           description: error.message,
-//           variant: 'destructive',
-//         });
-//         return;
-//       }
-
-//       // Clear stored data
-//       localStorage.removeItem('pendingSignup');
-      
-//       toast({
-//         title: "Welcome to BizBase!",
-//         description: "Your account has been created successfully.",
-//       });
-      
-//       // Navigate to dashboard
-//       setTimeout(() => {
-//         navigate('/dashboard');
-//       }, 1000);
-      
-//     } catch (error) {
-//       console.error('Signup completion error:', error);
-//       toast({
-//         title: "Error",
-//         description: "Failed to complete signup. Please try again.",
-//         variant: "destructive"
-//       });
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex">
-//       {/* Feature Highlight Sidebar - Hidden on mobile */}
-//       <div className="hidden lg:flex lg:w-1/2">
-//         <FeatureHighlight />
-//       </div>
-
-//       {/* Signup Form */}
-//       <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
-//         <div className="w-full max-w-md">
-//           {/* Header */}
-//           <div className="text-center mb-8">
-//             <Link to="/" className="inline-flex items-center space-x-2 mb-6 group">
-//               <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-//                 <Sparkles className="w-7 h-7 text-white animate-pulse" />
-//               </div>
-//               <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-//                 BizBase
-//               </span>
-//             </Link>
-//             <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Your Account</h1>
-//             <p className="text-gray-600">Join thousands of professionals growing with BizBase</p>
-//           </div>
-
-//           {/* Error Display */}
-//           {errors.general && (
-//             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-//               <p className="text-red-600 text-sm">{errors.general}</p>
-//             </div>
-//           )}
-
-//           {/* Signup Card */}
-//           <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
-//             <CardHeader className="space-y-1 pb-4">
-//               <CardTitle className="text-center text-xl">Sign Up</CardTitle>
-//             </CardHeader>
-//             <CardContent>
-//               <form onSubmit={handleSignup} className="space-y-6">
-//                 <div className="space-y-2">
-//                   <Label htmlFor="fullName">Full Name *</Label>
-//                   <div className="relative">
-//                     <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                     <Input
-//                       id="fullName"
-//                       type="text"
-//                       placeholder="Enter your full name"
-//                       value={signupData.fullName}
-//                       onChange={(e) => {
-//                         setSignupData(prev => ({ ...prev, fullName: e.target.value }));
-//                         if (errors.fullName) setErrors(prev => ({ ...prev, fullName: '' }));
-//                       }}
-//                       className={`pl-10 transition-all duration-200 ${errors.fullName ? 'border-red-500' : 'focus:border-blue-500'}`}
-//                       required
-//                     />
-//                   </div>
-//                   {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
-//                 </div>
-                
-//                 <div className="space-y-2">
-//                   <Label htmlFor="email">Email Address *</Label>
-//                   <div className="relative">
-//                     <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                     <Input
-//                       id="email"
-//                       type="email"
-//                       placeholder="Enter your email"
-//                       value={signupData.email}
-//                       onChange={(e) => {
-//                         setSignupData(prev => ({ ...prev, email: e.target.value }));
-//                         if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
-//                       }}
-//                       className={`pl-10 transition-all duration-200 ${errors.email ? 'border-red-500' : 'focus:border-blue-500'}`}
-//                       required
-//                     />
-//                   </div>
-//                   {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-//                 </div>
-
-//                 <div className="space-y-2">
-//                   <Label htmlFor="phone">Phone Number *</Label>
-//                   <div className="relative">
-//                     <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                     <Input
-//                       id="phone"
-//                       type="tel"
-//                       placeholder="+1 (555) 123-4567"
-//                       value={signupData.phone}
-//                       onChange={(e) => {
-//                         setSignupData(prev => ({ ...prev, phone: e.target.value }));
-//                         if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
-//                       }}
-//                       className={`pl-10 transition-all duration-200 ${errors.phone ? 'border-red-500' : 'focus:border-blue-500'}`}
-//                       required
-//                     />
-//                   </div>
-//                   {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-//                 </div>
-                
-//                 <div className="space-y-2">
-//                   <Label htmlFor="password">Password *</Label>
-//                   <div className="relative">
-//                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                     <Input
-//                       id="password"
-//                       type={showPassword ? "text" : "password"}
-//                       placeholder="Create a strong password (min 8 characters)"
-//                       value={signupData.password}
-//                       onChange={(e) => {
-//                         setSignupData(prev => ({ ...prev, password: e.target.value }));
-//                         if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
-//                       }}
-//                       className={`pl-10 pr-10 transition-all duration-200 ${errors.password ? 'border-red-500' : 'focus:border-blue-500'}`}
-//                       required
-//                     />
-//                     <button
-//                       type="button"
-//                       onClick={() => setShowPassword(!showPassword)}
-//                       className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
-//                     >
-//                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-//                     </button>
-//                   </div>
-//                   {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-//                 </div>
-                
-//                 <div className="space-y-2">
-//                   <Label htmlFor="confirmPassword">Confirm Password *</Label>
-//                   <div className="relative">
-//                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                     <Input
-//                       id="confirmPassword"
-//                       type={showConfirmPassword ? "text" : "password"}
-//                       placeholder="Confirm your password"
-//                       value={signupData.confirmPassword}
-//                       onChange={(e) => {
-//                         setSignupData(prev => ({ ...prev, confirmPassword: e.target.value }));
-//                         if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' }));
-//                       }}
-//                       className={`pl-10 pr-10 transition-all duration-200 ${errors.confirmPassword ? 'border-red-500' : 'focus:border-blue-500'}`}
-//                       required
-//                     />
-//                     <button
-//                       type="button"
-//                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-//                       className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
-//                     >
-//                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-//                     </button>
-//                   </div>
-//                   {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
-//                 </div>
-                
-//                 <Button 
-//                   type="submit" 
-//                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
-//                   disabled={loading}
-//                 >
-//                   {loading ? (
-//                     <div className="flex items-center space-x-2">
-//                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-//                       <span>Creating Account...</span>
-//                     </div>
-//                   ) : (
-//                     <div className="flex items-center space-x-2">
-//                       <span>Create Account</span>
-//                       <ArrowRight className="w-4 h-4" />
-//                     </div>
-//                   )}
-//                 </Button>
-//               </form>
-
-//               {/* Social Login */}
-//               <SocialLoginButtons />
-
-//               {/* Link to Login */}
-//               <div className="mt-6 text-center">
-//                 <p className="text-sm text-gray-600">
-//                   Already have an account?{' '}
-//                   <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-//                     Sign in here
-//                   </Link>
-//                 </p>
-//               </div>
-              
-//               {/* Legal Links */}
-//               <div className="mt-4 text-center">
-//                 <p className="text-sm text-gray-600">
-//                   By signing up, you agree to our{' '}
-//                   <Link to="/terms" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-//                     Terms of Service
-//                   </Link>{' '}
-//                   and{' '}
-//                   <Link to="/privacy" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-//                     Privacy Policy
-//                   </Link>
-//                 </p>
-//               </div>
-//             </CardContent>
-//           </Card>
-//         </div>
-//       </div>
-
-//       {/* Enhanced OTP Verification Modal */}
-//       <EnhancedOTPModal 
-//         isOpen={showOTPModal}
-//         onClose={() => {
-//           setShowOTPModal(false);
-//           // Clear any stored signup data if user closes modal
-//           localStorage.removeItem('pendingSignup');
-//         }}
-//         onVerified={handleOTPVerified}
-//         email={signupData.email}
-//         purpose="signup"
-//       />
-//     </div>
-//   );
-// };
-
-// export default Signup;
