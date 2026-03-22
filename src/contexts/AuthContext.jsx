@@ -66,9 +66,12 @@ export const AuthProvider = ({ children }) => {
       const currentUser = session?.user ?? null;
       setSession(session);
       setUser(currentUser);
-      
+
+      if (event === "SIGNED_IN" && session) {
+        window.location.href = "/dashboard";
+      }
+
       if (currentUser) {
-        // Defer profile fetch with setTimeout to avoid deadlock
         setTimeout(() => {
           if (mounted) {
             fetchUserProfile(currentUser.id).finally(() => {
@@ -282,13 +285,10 @@ export const AuthProvider = ({ children }) => {
     session,
     profile,
     loading,
-    signUp,
     signIn,
+    signUp,
     signOut,
     resetPassword,
-    sendOTP,
-    verifyOTP,
-    completeSignup,
     refreshProfile,
   };
 
