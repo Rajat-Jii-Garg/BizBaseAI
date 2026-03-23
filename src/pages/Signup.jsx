@@ -11,6 +11,7 @@ import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
 import { supabase } from '@/integrations/supabase/client';
 import SEOHead from '@/components/SEOHead';
+import OTPVerificationModal from '@/components/auth/OTPVerificationModal';
 
 const Signup = () => {
   const [signupData, setSignupData] = useState({
@@ -22,6 +23,7 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -33,8 +35,6 @@ const Signup = () => {
   }, [user, navigate]);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePhone = (phone) => /^[+]?[\d\s\-\(\)]{10,}$/.test(phone);
-  const validatePassword = (password) => password.length >= 8;
   const validateUsername = (username) => username.length >= 3 && /^[a-z0-9_]+$/.test(username);
 
   const checkUsernameAvailability = useCallback(async (username) => {
@@ -61,74 +61,58 @@ const Signup = () => {
     if (errors.username) setErrors(prev => ({ ...prev, username: '' }));
   };
 
-  // Step 1: Validate form and send confirm email
+  // Step 1: Validate form and send OTP email via Resend
   const handleSignup = async (e) => {
-  e.preventDefault();
-  setErrors({});
-  setLoading(true);
+    e.preventDefault();
+    setErrors({});
+    setLoading(true);
 
-  const newErrors = {};
-  if (!signupData.fullName.trim()) newErrors.fullName = 'Full name is required';
-  if (!signupData.username) newErrors.username = 'Username is required';
-  else if (!validateUsername(signupData.username)) newErrors.username = 'Invalid username';
-  else if (usernameAvailable === false) newErrors.username = 'Username taken';
-  if (!signupData.email) newErrors.email = 'Email required';
-  else if (!validateEmail(signupData.email)) newErrors.email = 'Invalid email';
-  if (!signupData.phone) newErrors.phone = 'Phone required';
-  if (!signupData.password) newErrors.password = 'Password required';
-  if (signupData.password !== signupData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    const newErrors = {};
+    if (!signupData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!signupData.username) newErrors.username = 'Username is required';
+    else if (!validateUsername(signupData.username)) newErrors.username = 'Invalid username';
+    else if (usernameAvailable === false) newErrors.username = 'Username taken';
+    if (!signupData.email) newErrors.email = 'Email required';
+    else if (!validateEmail(signupData.email)) newErrors.email = 'Invalid email';
+    if (!signupData.phone) newErrors.phone = 'Phone required';
+    if (!signupData.password) newErrors.password = 'Password required';
+    else if (signupData.password.length < 8) newErrors.password = 'Min 8 characters';
+    if (signupData.password !== signupData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
 
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email: signupData.email,
-      password: signupData.password,
-      options: {
-        data: {
-          full_name: signupData.fullName,
-          username: signupData.username,
-          phone: signupData.phone,
-        },
-        emailRedirectTo: window.location.origin + "/dashboard"
-      }
-    });
-
-    if (error) throw error;
-
-    if (data?.user) {
-      await supabase.from("profiles").insert({
-        id: data.user.id,
-        full_name: signupData.fullName,
-        username: signupData.username,
-        phone: signupData.phone,
-        email: signupData.email
-      });
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setLoading(false);
+      return;
     }
 
-    toast.success("Check your email!", {
-      description: "Please verify your account from your inbox.",
-    });
+    try {
+      // Send OTP to user's email via Resend API
+      const { data, error } = await supabase.functions.invoke('send-otp', {
+        body: { email: signupData.email, purpose: 'signup' }
+      });
 
-  } catch (error) {
-    toast.error("Signup failed", {
-      description: error.message,
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+      if (error) throw new Error('Failed to send verification email. Please try again.');
 
-  // Step 2: After OTP verified, create account via edge function
+      if (data?.error) throw new Error(data.error);
+
+      // Show OTP modal
+      setShowOTPModal(true);
+      toast.success("Verification code sent!", {
+        description: `Check your email at ${signupData.email}`,
+      });
+
+    } catch (error) {
+      console.error('Send OTP error:', error);
+      toast.error("Failed to send verification email", {
+        description: error.message || "Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: After OTP verified & account created
   const handleOTPVerified = async () => {
-    // The OTP modal will pass the verified OTP code
-    // Account is created inside the modal's verify handler
-    // This is called after successful account creation
-    
     // Handle referral tracking (non-blocking)
     const userId = localStorage.getItem('newUserId');
     if (userId && refCode) {
@@ -151,7 +135,6 @@ const Signup = () => {
       body: { email: signupData.email, fullName: signupData.fullName }
     }).catch(err => console.warn('Welcome email failed:', err));
 
-    // Clean up
     localStorage.removeItem('newUserId');
   };
 
@@ -273,7 +256,7 @@ const Signup = () => {
                   {loading ? (
                     <div className="flex items-center space-x-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Creating Account...</span>
+                      <span>Sending Verification...</span>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2">
@@ -304,6 +287,16 @@ const Signup = () => {
           </Card>
         </div>
       </div>
+
+      {/* OTP Verification Modal */}
+      <OTPVerificationModal
+        isOpen={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        purpose="signup"
+        email={signupData.email}
+        signupData={signupData}
+        onVerified={handleOTPVerified}
+      />
     </div>
   );
 };
