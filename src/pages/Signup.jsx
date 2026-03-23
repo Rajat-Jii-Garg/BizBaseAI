@@ -61,98 +61,100 @@ const Signup = () => {
     if (errors.username) setErrors(prev => ({ ...prev, username: '' }));
   };
 
-  // Step 1: Validate form and send confirm email
   const handleSignup = async (e) => {
-  e.preventDefault();
-  setErrors({});
-  setLoading(true);
+    e.preventDefault();
+    setErrors({});
+    setLoading(true);
 
-  const newErrors = {};
-  if (!signupData.fullName.trim()) newErrors.fullName = 'Full name is required';
-  if (!signupData.username) newErrors.username = 'Username is required';
-  else if (!validateUsername(signupData.username)) newErrors.username = 'Invalid username';
-  else if (usernameAvailable === false) newErrors.username = 'Username taken';
-  if (!signupData.email) newErrors.email = 'Email required';
-  else if (!validateEmail(signupData.email)) newErrors.email = 'Invalid email';
-  if (!signupData.phone) newErrors.phone = 'Phone required';
-  if (!signupData.password) newErrors.password = 'Password required';
-  if (signupData.password !== signupData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    const newErrors = {};
+    if (!signupData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!signupData.username) newErrors.username = 'Username is required';
+    else if (!validateUsername(signupData.username)) newErrors.username = 'Invalid username';
+    else if (usernameAvailable === false) newErrors.username = 'Username taken';
+    if (!signupData.email) newErrors.email = 'Email required';
+    else if (!validateEmail(signupData.email)) newErrors.email = 'Invalid email';
+    if (!signupData.phone) newErrors.phone = 'Phone required';
+    if (!signupData.password) newErrors.password = 'Password required';
+    else if (!validatePassword(signupData.password)) newErrors.password = 'Password must be at least 8 characters';
+    if (signupData.password !== signupData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
 
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    setLoading(false);
-    return;
-  }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setLoading(false);
+      return;
+    }
 
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email: signupData.email,
-      password: signupData.password,
-      options: {
-        data: {
-          full_name: signupData.fullName,
-          username: signupData.username,
-          phone: signupData.phone,
-        },
-        emailRedirectTo: window.location.origin + "/dashboard"
-      }
-    });
-
-    if (error) throw error;
-
-    if (data?.user) {
-      await supabase.from("profiles").insert({
-        id: data.user.id,
-        full_name: signupData.fullName,
-        username: signupData.username,
-        phone: signupData.phone,
-        email: signupData.email
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: signupData.email,
+        password: signupData.password,
+        options: {
+          data: {
+            full_name: signupData.fullName,
+            username: signupData.username,
+            phone: signupData.phone,
+          },
+          emailRedirectTo: window.location.origin + "/dashboard"
+        }
       });
+
+      if (error) throw error;
+
+      // Check if user needs email confirmation or was auto-confirmed
+      if (data?.user?.identities?.length === 0) {
+        toast.error("Account already exists", {
+          description: "This email is already registered. Please login instead.",
+        });
+        navigate('/login');
+        return;
+      }
+
+      if (data?.session) {
+        // Auto-confirmed (confirm email is OFF) - redirect to dashboard
+        toast.success("Account Created!", { description: "Welcome to BizBase!" });
+        navigate('/dashboard');
+      } else {
+        // Needs email confirmation
+        toast.success("Check your email!", {
+          description: "We've sent a confirmation link to " + signupData.email + ". Click the link to activate your account.",
+          duration: 10000,
+        });
+        navigate('/login');
+      }
+
+      // Handle referral tracking (non-blocking)
+      if (data?.user?.id && refCode) {
+        supabase.from('profiles').select('id, bizcoins').eq('referral_code', refCode).single()
+          .then(({ data: referrer }) => {
+            if (referrer && referrer.id !== data.user.id) {
+              supabase.from('referrals').insert({
+                referrer_id: referrer.id, referred_user_id: data.user.id,
+                referral_code: refCode, referred_email: signupData.email,
+                status: 'completed', coins_awarded: true, completed_at: new Date().toISOString()
+              }).catch(e => console.warn('Referral insert failed:', e));
+              supabase.from('profiles').update({ bizcoins: (referrer.bizcoins || 0) + 10 })
+                .eq('id', referrer.id).catch(e => console.warn('Referral coins failed:', e));
+            }
+          }).catch(e => console.warn('Referral lookup failed:', e));
+      }
+
+      // Welcome email (non-blocking)
+      supabase.functions.invoke('send-welcome-email', {
+        body: { email: signupData.email, fullName: signupData.fullName }
+      }).catch(err => console.warn('Welcome email failed:', err));
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      if (error.message?.includes('sending confirmation email')) {
+        toast.error("Email service error", {
+          description: "Could not send confirmation email. Please try again later or contact support.",
+        });
+      } else {
+        toast.error("Signup failed", { description: error.message });
+      }
+    } finally {
+      setLoading(false);
     }
-
-    toast.success("Check your email!", {
-      description: "Please verify your account from your inbox.",
-    });
-
-  } catch (error) {
-    toast.error("Signup failed", {
-      description: error.message,
-    });
-  } finally {
-    setLoading(false);
-  }
-};
-
-  // Step 2: After OTP verified, create account via edge function
-  const handleOTPVerified = async () => {
-    // The OTP modal will pass the verified OTP code
-    // Account is created inside the modal's verify handler
-    // This is called after successful account creation
-    
-    // Handle referral tracking (non-blocking)
-    const userId = localStorage.getItem('newUserId');
-    if (userId && refCode) {
-      supabase.from('profiles').select('id, bizcoins').eq('referral_code', refCode).single()
-        .then(({ data: referrer }) => {
-          if (referrer && referrer.id !== userId) {
-            supabase.from('referrals').insert({
-              referrer_id: referrer.id, referred_user_id: userId,
-              referral_code: refCode, referred_email: signupData.email,
-              status: 'completed', coins_awarded: true, completed_at: new Date().toISOString()
-            }).catch(e => console.warn('Referral insert failed:', e));
-            supabase.from('profiles').update({ bizcoins: (referrer.bizcoins || 0) + 10 })
-              .eq('id', referrer.id).catch(e => console.warn('Referral coins failed:', e));
-          }
-        }).catch(e => console.warn('Referral lookup failed:', e));
-    }
-
-    // Welcome email (non-blocking)
-    supabase.functions.invoke('send-welcome-email', {
-      body: { email: signupData.email, fullName: signupData.fullName }
-    }).catch(err => console.warn('Welcome email failed:', err));
-
-    // Clean up
-    localStorage.removeItem('newUserId');
   };
 
   return (
