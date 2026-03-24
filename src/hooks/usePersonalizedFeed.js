@@ -165,9 +165,11 @@ export const usePersonalizedFeed = () => {
     await fetchPersonalizedFeed(false, offset);
   }, [fetchPersonalizedFeed, hasMore, loading, refreshing, offset]);
 
-  // Initial load
+  // Initial load - only once when user becomes available
+  const initialLoadDone = useRef(false);
   useEffect(() => {
-    if (user) {
+    if (user && !initialLoadDone.current) {
+      initialLoadDone.current = true;
       fetchPersonalizedFeed(true, 0);
     }
   }, [user]);

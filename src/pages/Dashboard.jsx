@@ -121,9 +121,7 @@ const Dashboard = () => {
     }
   }, [hasMore, loadingPosts, refreshing, loadMore, refreshFeed]);
 
-  useEffect(() => {
-    refreshFeed(); // always fetch latest feed on page open
-  }, []);
+  // Feed is loaded by usePersonalizedFeed hook on mount - no need to call refreshFeed here
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
