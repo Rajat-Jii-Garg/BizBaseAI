@@ -223,11 +223,8 @@ export const usePosts = () => {
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      fetchPosts();
-    }
-  }, [user]);
+  // Don't auto-fetch on mount - let usePersonalizedFeed handle feed loading
+  // Only fetch when explicitly called (createPost, editPost, etc.)
 
   const editPost = async (postId, newContent) => {
     if (!user) {

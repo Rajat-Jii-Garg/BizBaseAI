@@ -110,11 +110,6 @@ const Dashboard = () => {
     const scrollTop = window.scrollY;
     setShowScrollTop(scrollTop > 500);
 
-    // 🔥 Auto refresh when user reaches top
-    if (scrollTop === 0 && !refreshing) {
-      refreshFeed();
-    }
-
     // Infinite scroll - load more when near bottom
     if (
       window.innerHeight + scrollTop >= document.documentElement.scrollHeight - 1000 &&
@@ -126,9 +121,7 @@ const Dashboard = () => {
     }
   }, [hasMore, loadingPosts, refreshing, loadMore, refreshFeed]);
 
-  useEffect(() => {
-    refreshFeed(); // always fetch latest feed on page open
-  }, []);
+  // Feed is loaded by usePersonalizedFeed hook on mount - no need to call refreshFeed here
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);

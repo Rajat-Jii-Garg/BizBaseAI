@@ -67,9 +67,8 @@ export const AuthProvider = ({ children }) => {
       setSession(session);
       setUser(currentUser);
 
-      if (event === "SIGNED_IN" && session) {
-        window.location.href = "/dashboard";
-      }
+      // Note: Navigation after sign-in is handled by individual pages (Login, Signup, etc.)
+      // Do NOT use window.location.href here as it causes full page reload loops
 
       if (currentUser) {
         setTimeout(() => {
