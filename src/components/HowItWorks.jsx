@@ -9,7 +9,7 @@ const steps = [
     title: 'Create Account & Access Dashboard',
     description: 'Create your account and access your personal dashboard where you can manage everything in one place.',
     color: 'from-[#13e4ed] to-[#26ebb1]',
-    image: '/public/images/dashboard.png'
+    image: '/images/userDashboard.png'
   },
   {
     step: '02',
@@ -17,7 +17,7 @@ const steps = [
     title: 'Complete Profile & Start Networking',
     description: 'Build your profile and connect with professionals to grow your network and opportunities.',
     color: 'from-[#39e8c5] to-[#2a8ffc]',
-    image: '/public/images/connections.png'
+    image: '/images/connections.png'
   },
   {
     step: '03',
@@ -25,7 +25,7 @@ const steps = [
     title: 'Register Your Business',
     description: 'Add your business details, services, and start building your digital presence on the platform.',
     color: 'from-[#7649be] to-[#77fbde]',
-    image: '/public/images/businessregistration.png'
+    image: '/images/Businessregistration.png'
   },
   {
     step: '04',
@@ -33,7 +33,7 @@ const steps = [
     title: 'Manage & Scale Your Business',
     description: 'Control your business, track growth, and automate operations using AI-powered tools.',
     color: 'from-[#41ebca] to-[#2977fd]',
-    image: '/public/images/businessDashboard.png'
+    image: '/images/businessDashboard.png'
   }
 ];
 
