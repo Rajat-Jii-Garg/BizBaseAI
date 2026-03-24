@@ -59,11 +59,11 @@ const HowItWorks = () => {
             Get started with <span className="font-bold text-violet-600">BizBase</span> in just <span className="text-blue-400">4 simple steps.</span> Our AI platform makes business effortless!
           </p>
         </div>
-        <div className="space-y-12">
+        <div className="space-y-16 md:space-y-20">
           {steps.map((step, index) => (
             <div
               key={index}
-              className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-8 ${getAnim(index)} opacity-0 will-change-transform animate-fade-in`}
+              className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-6 md:gap-10 ${getAnim(index)} opacity-0 will-change-transform animate-fade-in`}
               style={{
                 animationDelay: `${350 + index * 210}ms`,
                 animationFillMode: 'forwards'
@@ -71,31 +71,31 @@ const HowItWorks = () => {
             >
               <div className="flex-1 min-w-0">
                 <Card className="group card-glass card-hover transition-all duration-500 hover:-translate-y-2 overflow-hidden">
-                  <div className="relative h-52 lg:h-64 overflow-hidden">
+                  <div className="relative h-44 sm:h-48 lg:h-56 overflow-hidden rounded-xl">
                     <img 
                       src={step.image} 
                       alt={step.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-10`} />
-                    <div className={`absolute top-6 left-6 w-16 h-16 rounded-2xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-xl animate-pulse-glow`}>
-                      <step.icon className="w-8 h-8 text-white" />
+                    <div className={`absolute top-6 left-6 w-12 h-12 rounded-2xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-xl animate-pulse-glow`}>
+                      <step.icon className="w-6 h-6 text-white" />
                     </div>
                     <div className="absolute bottom-6 left-6">
-                      <span className="text-6xl font-black text-gradient-main font-display">{step.step}</span>
+                      <span className="text-4xl lg:text-5xl font-black text-gradient-main font-display">{step.step}</span>
                     </div>
                   </div>
                 </Card>
               </div>
-              <div className="flex-1 space-y-6 min-w-0">
+              <div className="flex-1 space-y-4 min-w-0">
                 <div className="flex items-center space-x-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
                     <step.icon className="w-6 h-6 text-white" />
                   </div>
                   <span className="text-lg font-semibold font-display text-gradient-accent">Step {step.step}</span>
                 </div>
-                <h3 className="text-3xl md:text-4xl font-bold font-display text-gradient-main leading-tight">{step.title}</h3>
-                <p className="text-xl text-[#4f55a2] font-medium leading-relaxed font-sans">{step.description}</p>
+                <h3 className="text-2xl md:text-3xl font-bold font-display text-gradient-main leading-tight">{step.title}</h3>
+                <p className="text-base md:text-lg text-[#4f55a2] font-medium leading-relaxed font-sans">{step.description}</p>
                 <div className={`w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`} />
               </div>
             </div>
