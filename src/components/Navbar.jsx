@@ -43,13 +43,14 @@ const Navbar = ({ variant = 'default' }) => {
           {/* Desktop Auth */}
           <div className="hidden md:flex items-center space-x-3">
             <Link to="/login">
-              <Button variant="ghost" className="text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg px-4">
+              <Button variant="ghost" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-lg px-4">
+                <LogIn className="w-4 h-4" />
                 Login
               </Button>
             </Link>
             <Link to="/signup">
               <Button className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white font-semibold px-6 py-2 rounded-lg border-0 shadow-md shadow-violet-200/40 hover:shadow-lg transition-all duration-300 text-sm">
-                Get Early Access
+                Get Started Free
               </Button>
             </Link>
           </div>
@@ -77,7 +78,7 @@ const Navbar = ({ variant = 'default' }) => {
             </Link>
             <Link to="/signup" onClick={() => setMobileOpen(false)}>
               <Button className="w-full bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm">
-                Get Early Access
+                Get Started Free
               </Button>
             </Link>
           </div>
