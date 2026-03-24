@@ -2,19 +2,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Zap, TrendingUp, Users, Settings, Lock, Globe } from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, TrendingUp, Shield, Globe, Rocket, Star, CheckCircle, Users, Brain, Play, ChevronRight, Settings } from 'lucide-react';
 
 const FloatingIcon = ({ icon: Icon, className, size = 'w-12 h-12', iconSize = 'w-5 h-5', color = 'text-violet-500', bg = 'bg-violet-50' }) => (
-  <div className={`absolute ${className} ${size} rounded-2xl ${bg} border border-violet-100/50 shadow-lg shadow-violet-100/30 flex items-center justify-center animate-float`}>
+  <div className={`absolute ${className} ${size} rounded-2xl ${bg} border border-violet-100/50 shadow-lg shadow-violet-100/30 flex items-center justify-center`}>
     <Icon className={`${iconSize} ${color}`} />
   </div>
 );
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen pt-24 pb-20 overflow-hidden bg-white">
+    <section className="relative min-h-screen pt-20 pb-16 overflow-hidden bg-white">
       {/* Subtle radial glow */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse,rgba(124,58,237,0.06)_0%,transparent_70%)]" />
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse,rgba(124,58,237,0.04)_0%,transparent_70%)]" />
 
       {/* Floating Icons */}
       <FloatingIcon icon={Sparkles} className="top-32 left-[8%] animate-[float_6s_ease-in-out_infinite]" color="text-violet-500" bg="bg-violet-50" />
@@ -24,81 +24,148 @@ const Hero = () => {
       <FloatingIcon icon={TrendingUp} className="bottom-[20%] right-[8%] animate-[float_6.5s_ease-in-out_infinite_2s]" color="text-blue-500" bg="bg-blue-50" size="w-11 h-11" />
       <FloatingIcon icon={Globe} className="bottom-[28%] left-[10%] animate-[float_7s_ease-in-out_infinite_0.8s] hidden md:flex" color="text-indigo-400" bg="bg-indigo-50" size="w-9 h-9" iconSize="w-4 h-4" />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-8 pt-10 sm:pt-16">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-6 pt-14 sm:pt-20">
 
           {/* Announcement pill */}
-          <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-600 px-4 py-2 rounded-full text-sm font-medium">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+          <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-600 px-3.5 py-1.5 rounded-full text-xs font-medium">
+            <span className="flex h-1.5 w-1.5 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
             </span>
-            <span>Launching Soon — Join the Founding Community</span>
+            <span>Now with AI-Powered Tools</span>
+            <ChevronRight className="w-3 h-3 text-violet-400/60" />
           </div>
 
           {/* Main Headline */}
-          <div className="space-y-6 max-w-3xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-extrabold leading-[1.1] tracking-tight text-foreground">
-              The Future of{' '}
-              <span className="bg-gradient-to-r from-violet-600 to-blue-500 bg-clip-text text-transparent">
-                Professional Growth
-              </span>
+          <div className="space-y-4 max-w-3xl mx-auto">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold leading-[1.15] tracking-tight">
+              <span className="text-foreground">Where Professionals</span>
               <br />
-              Starts Here.
+              <span className="bg-gradient-to-r from-violet-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
+                Connect, Grow & Build
+              </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Students, Freshers, Job Seekers, Teams — Build your network, grow with AI, 
-              and join communities that actually matter.
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              Network smarter, manage your business, and grow your brand — all powered by AI on one unified platform.
             </p>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-2">
+          <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center items-center pt-1">
             <Link to="/signup">
-              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white px-8 py-6 text-base font-semibold rounded-xl shadow-lg shadow-violet-200/50 hover:shadow-xl hover:shadow-violet-300/50 transform hover:scale-[1.02] transition-all duration-300 border-0">
-                Get Early Access
-                <ArrowRight className="w-4 h-4 ml-2" />
+              <Button size="default" className="bg-gradient-to-r from-violet-600 via-indigo-500 to-blue-500 hover:from-violet-700 hover:via-indigo-600 hover:to-blue-600 text-white px-6 py-5 text-sm font-semibold rounded-xl shadow-lg shadow-violet-200/50 hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 border-0">
+                <Rocket className="w-4 h-4 mr-1.5" />
+                Get Started Free
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
               </Button>
             </Link>
-            <Link to="/communities">
-              <Button size="lg" variant="outline" className="px-8 py-6 text-base font-semibold rounded-xl border-2 border-slate-200 text-foreground hover:bg-slate-50 transition-all duration-300">
-                Join Founding Community
+            <Link to="/demo">
+              <Button size="default" variant="outline" className="px-6 py-5 text-sm font-medium rounded-xl border border-slate-200 text-foreground hover:bg-slate-50 transition-all duration-300">
+                <Play className="w-3.5 h-3.5 mr-1.5" />
+                Watch Demo
               </Button>
             </Link>
-          </div>
-
-          {/* Avatar group + waitlist count */}
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <div className="flex -space-x-2">
-              {['PS', 'RM', 'SC', 'AK', 'VI'].map((initials, i) => (
-                <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold shadow-sm">
-                  {initials}
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              <span className="font-bold text-foreground">487+</span> professionals on the waitlist
-            </p>
           </div>
 
           {/* Trust badges */}
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 pt-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-amber-500" />
-              <span>100% Free Early Access</span>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 pt-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Free to start</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-violet-500" />
-              <span>AI-Powered Growth</span>
+            <div className="flex items-center gap-1">
+              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+              <span>No credit card</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-blue-500" />
-              <span>Global Community</span>
+            <div className="flex items-center gap-1">
+              <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+              <span>AI-powered</span>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 pt-8 max-w-2xl mx-auto">
+            {[
+              { value: '10K+', label: 'Professionals', icon: Users, color: 'text-blue-500', bg: 'from-blue-50 to-blue-100/50' },
+              { value: '99.9%', label: 'Uptime', icon: Shield, color: 'text-emerald-500', bg: 'from-emerald-50 to-emerald-100/50' },
+              { value: '24/7', label: 'AI Assistant', icon: Brain, color: 'text-violet-500', bg: 'from-violet-50 to-violet-100/50' },
+              { value: '50+', label: 'Smart Tools', icon: Sparkles, color: 'text-cyan-500', bg: 'from-cyan-50 to-cyan-100/50' }
+            ].map((stat, index) => (
+              <div key={index} className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all duration-500">
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-lg bg-gradient-to-br ${stat.bg} flex items-center justify-center`}>
+                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                </div>
+                <div className="text-xl sm:text-2xl font-bold text-foreground mb-0.5">{stat.value}</div>
+                <div className="text-[11px] text-muted-foreground font-medium">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Feature Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-10 max-w-3xl mx-auto">
+            {[
+              {
+                icon: Zap,
+                title: 'AI Networking',
+                desc: 'Smart connections matched to your goals.',
+                color: 'text-amber-500',
+                bg: 'from-amber-50 to-orange-50',
+                border: 'hover:border-amber-200'
+              },
+              {
+                icon: TrendingUp,
+                title: 'Brand Growth',
+                desc: 'Real-time analytics to track your rise.',
+                color: 'text-emerald-500',
+                bg: 'from-emerald-50 to-teal-50',
+                border: 'hover:border-emerald-200'
+              },
+              {
+                icon: Globe,
+                title: 'Business Suite',
+                desc: 'CRM, finance, teams — one platform.',
+                color: 'text-blue-500',
+                bg: 'from-blue-50 to-indigo-50',
+                border: 'hover:border-blue-200'
+              }
+            ].map((f, i) => (
+              <div key={i} className={`group bg-slate-50/60 rounded-xl p-5 border border-slate-100 ${f.border} hover:bg-slate-50 transition-all duration-500 text-left`}>
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${f.bg} flex items-center justify-center mb-3`}>
+                  <f.icon className={`w-5 h-5 ${f.color}`} />
+                </div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">{f.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Testimonial */}
+          <div className="pt-10 max-w-lg mx-auto">
+            <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-5">
+              <div className="flex items-center justify-center gap-0.5 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <p className="text-muted-foreground text-xs leading-relaxed italic mb-3">
+                "BizBase changed how I run my business. AI tools save hours daily, and networking helped me land my biggest clients."
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white text-[10px] font-bold">S</div>
+                <div className="text-left">
+                  <p className="text-foreground text-xs font-medium">Sarah J.</p>
+                  <p className="text-muted-foreground text-[10px]">Founder, TechVentures</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 };
