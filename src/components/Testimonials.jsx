@@ -6,39 +6,27 @@ import { Star, Crown } from 'lucide-react';
 
 const Testimonials = () => {
   const testimonials = [
-    {
-      name: 'Priya Sharma',
-      title: 'Product Designer at Razorpay',
-      image: '',
-      quote: "BizBase's AI assistant helped me land 3 interviews in my first week. The community is incredibly supportive.",
-      revenue: '',
-      growth: ''
-    },
-    {
-      name: 'Rahul Mehta',
-      title: 'CS Student, IIT Delhi',
-      image: '',
-      quote: "Finally a platform that doesn't treat freshers as an afterthought. The AI career guidance is a game-changer.",
-      revenue: '',
-      growth: ''
-    },
-    {
-      name: 'Sarah Chen',
-      title: 'Marketing Lead, Startup',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'',
-      quote: "The AI content tools save me 5+ hours every week. Networking quality is much better than LinkedIn.",
-      revenue: '',
-      growth: ''
-    },
-    {
-      name: 'David Kim',
-      title: 'Global Consultant',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-      quote: 'BizBase helped me scale my consulting firm globally. I now manage 200+ consultants across 50 countries effortlessly.',
-      revenue: '50+ Team Members',
-      growth: '5+ Countries'
-    }
-  ];
+  {
+    name: 'Priya Sharma',
+    title: 'Product Designer at Razorpay',
+    quote: "BizBase's AI assistant helped me land 3 interviews in my first week. The community is incredibly supportive."
+  },
+  {
+    name: 'Rahul Mehta',
+    title: 'CS Student, IIT Delhi',
+    quote: "Finally a platform that doesn't treat freshers as an afterthought. The AI career guidance is a game-changer."
+  },
+  {
+    name: 'Sarah Chen',
+    title: 'Marketing Lead, Startup',
+    quote: "The AI content tools save me 5+ hours every week. Networking quality is much better than LinkedIn."
+  },
+  {
+    name: 'David Kim',
+    title: 'Global Consultant',
+    quote: "BizBase helped me scale my consulting firm globally. I now manage teams across multiple countries effortlessly."
+  }
+];
 
   return (
     <section className="py-24 bg-gradient-to-br from-blue-900 via-purple-900 to-slate-900">
@@ -63,7 +51,7 @@ const Testimonials = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="group bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl hover:shadow-3xl transform hover:-translate-y-4 transition-all duration-500">
+            <Card key={index} className="group bg-white/10 backdrop-blur-lg border border-white/20 shadow-md hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-500">
               <CardContent className="p-5">
                 <div className="flex justify-center mb-6">
                   {[...Array(5)].map((_, i) => (
@@ -75,7 +63,7 @@ const Testimonials = () => {
                 </blockquote>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 flex items-center justify-center text-white text-sm font-bold">
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 flex items-center justify-center text-white text-sm font-semibold">
                       {testimonial.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
