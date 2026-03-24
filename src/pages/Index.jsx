@@ -20,7 +20,7 @@ const Index = () => {
         description="BizBase AI - Build professional connections, grow your career, manage businesses, and unlock opportunities with AI-driven insights. Join the next-gen networking platform."
         path="/"
       />
-      <Navbar variant="hero" />
+      <Navbar />
       <Hero />
       <Features />
       <Benefits />
