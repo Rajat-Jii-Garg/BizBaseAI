@@ -87,7 +87,7 @@ const HowItWorks = () => {
                   </div>
                 </Card>
               </div>
-              <div className="flex-1 space-y-4 min-w-0">
+              <div className="flex-1 space-y-4 min-w-0 max-w-md mx-auto lg:mx-0">
                 <div className="flex items-center space-x-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
                     <step.icon className="w-6 h-6 text-white" />
