@@ -91,7 +91,7 @@ const Hero = () => {
               { value: '10K+', label: 'Professionals', icon: Users, color: 'text-blue-500', bg: 'from-blue-50 to-blue-100/50' },
               { value: '99.9%', label: 'Uptime', icon: Shield, color: 'text-emerald-500', bg: 'from-emerald-50 to-emerald-100/50' },
               { value: '24/7', label: 'AI Assistant', icon: Brain, color: 'text-violet-500', bg: 'from-violet-50 to-violet-100/50' },
-              { value: '50+', label: 'Smart Tools', icon: Sparkles, color: 'text-cyan-500', bg: 'from-cyan-50 to-cyan-100/50' }
+              { value: '20+', label: 'Smart Tools', icon: Sparkles, color: 'text-cyan-500', bg: 'from-cyan-50 to-cyan-100/50' }
             ].map((stat, index) => (
               <div key={index} className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all duration-500">
                 <div className={`w-8 h-8 mx-auto mb-2 rounded-lg bg-gradient-to-br ${stat.bg} flex items-center justify-center`}>
@@ -142,7 +142,7 @@ const Hero = () => {
           </div>
 
           {/* Testimonial */}
-          <div className="pt-10 max-w-lg mx-auto">
+          {/* <div className="pt-10 max-w-lg mx-auto">
             <div className="bg-slate-50/80 border border-slate-100 rounded-xl p-5">
               <div className="flex items-center justify-center gap-0.5 mb-3">
                 {[...Array(5)].map((_, i) => (
@@ -160,7 +160,7 @@ const Hero = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

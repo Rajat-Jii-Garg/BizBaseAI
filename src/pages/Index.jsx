@@ -16,8 +16,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="AI Powered Professional Networking & Business Platform"
-        description="BizBase AI - Build professional connections, grow your career, manage businesses, and unlock opportunities with AI-driven insights. Join the next-gen networking platform."
+        title="BizBase AI - AI Powered Professional Networking & Business Platform to Build, Grow & Automate"
+        description="Build Professional Networks, Grow your Career, Manage Businesses, and Automate your Work with Smart Tools. Start Free and Scale Faster."
         path="/"
       />
       <Navbar />
