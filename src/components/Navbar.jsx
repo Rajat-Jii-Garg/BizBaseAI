@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 const Navbar = ({ variant = 'default' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const isHero = variant === 'hero';
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -38,7 +39,7 @@ const Navbar = ({ variant = 'default' }) => {
               }`}>
                 BizBase
               </span>
-              <span className={`text-xs font-medium -mt-1 ${isHero ? 'text-white/40' : 'text-slate-500'}`}>Build Scale Automate</span>
+              <span className={`text-xs font-medium -mt-1 ${isHero ? 'text-white/40' : 'text-slate-500'}`}>Build • Scale • Automate</span>
             </div>
           </Link>
           
@@ -107,11 +108,27 @@ const Navbar = ({ variant = 'default' }) => {
       {/* Mobile Dropdown */}
       {mobileOpen && (
         <div className="md:hidden absolute top-16 left-0 w-full bg-white shadow-xl border-b border-slate-100 p-5 space-y-4">
-          {navLinks.map((item) => (
-            <a key={item.label} href={item.href} className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2" onClick={() => setMobileOpen(false)}>
-              {item.label}
-            </a>
-          ))}
+          {navLinks.map((item) =>
+            item.isRoute ? (
+              <Link
+                key={item.label}
+                to={item.href}
+                className="block text-sm font-medium text-muted-foreground py-2"
+                onClick={() => setMobileOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <a
+                key={item.label}
+                href={item.href}
+                className="block text-sm font-medium text-muted-foreground py-2"
+                onClick={() => setMobileOpen(false)}
+              >
+                {item.label}
+              </a>
+            )
+          )}
           <div className="pt-3 border-t border-slate-100 space-y-2">
             <Link to="/login" onClick={() => setMobileOpen(false)}>
               <Button variant="ghost" className="w-full text-sm">Login</Button>
