@@ -12,7 +12,7 @@ const FloatingIcon = ({ icon: Icon, className, size = 'w-12 h-12', iconSize = 'w
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen pt-20 pb-16 overflow-hidden bg-white">
+    <section className="relative min-h-screen pt-14 pb-16 overflow-hidden bg-white">
       {/* Subtle radial glow */}
       <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse,rgba(124,58,237,0.04)_0%,transparent_70%)]" />
 
@@ -25,7 +25,7 @@ const Hero = () => {
       <FloatingIcon icon={Globe} className="bottom-[28%] left-[10%] animate-[float_7s_ease-in-out_infinite_0.8s] hidden md:flex" color="text-indigo-400" bg="bg-indigo-50" size="w-9 h-9" iconSize="w-4 h-4" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-6 pt-14 sm:pt-20">
+        <div className="text-center space-y-5 pt-6 sm:pt-10">
 
           {/* Announcement pill */}
           <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-600 px-3.5 py-1.5 rounded-full text-xs font-medium">
