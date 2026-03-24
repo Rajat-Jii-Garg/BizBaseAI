@@ -1,39 +1,39 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { UserPlus, Settings, Zap, TrendingUp } from 'lucide-react';
+import { UserPlus, Settings, Zap, TrendingUp, Users } from 'lucide-react';
 
 const steps = [
   {
     step: '01',
     icon: UserPlus,
-    title: 'Sign Up & Setup',
-    description: 'Create your account in seconds and set up your business profile with our intelligent onboarding.',
+    title: 'Create Account & Access Dashboard',
+    description: 'Create your account and access your personal dashboard where you can manage everything in one place.',
     color: 'from-[#13e4ed] to-[#26ebb1]',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop'
+    image: '/public/images/dashboard.png'
   },
   {
     step: '02',
-    icon: Settings,
-    title: 'Configure Your Workspace',
-    description: 'Customize modules based on your business needs. Our AI will suggest the best configuration.',
+    icon: Users,
+    title: 'Complete Profile & Start Networking',
+    description: 'Build your profile and connect with professionals to grow your network and opportunities.',
     color: 'from-[#39e8c5] to-[#2a8ffc]',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop'
+    image: '/public/images/connections.png'
   },
   {
     step: '03',
-    icon: Zap,
-    title: 'Import & Automate',
-    description: 'Import your existing data and set up smart automations to streamline your workflows.',
+    icon: Settings,
+    title: 'Register Your Business',
+    description: 'Add your business details, services, and start building your digital presence on the platform.',
     color: 'from-[#7649be] to-[#77fbde]',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop'
+    image: '/public/images/businessregistration.png'
   },
   {
     step: '04',
     icon: TrendingUp,
-    title: 'Scale & Optimize',
-    description: 'Watch your business grow with AI-powered insights and recommendations for continuous improvement.',
+    title: 'Manage & Scale Your Business',
+    description: 'Control your business, track growth, and automate operations using AI-powered tools.',
     color: 'from-[#41ebca] to-[#2977fd]',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop'
+    image: '/public/images/businessDashboard.png'
   }
 ];
 
@@ -44,7 +44,7 @@ const getAnim = (index) => {
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-24 bg-gradient-to-tr from-[#e6f9ff] via-white to-[#f5fcff] relative overflow-hidden">
+    <section id="how-it-works" className="py-16 bg-gradient-to-tr from-[#e6f9ff] via-white to-[#f5fcff] relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-0">
         <div className="absolute -top-8 left-[40%] w-[400px] h-[480px] bg-gradient-to-br from-[#c8fbfa]/20 to-[#bce0f8]/70 rounded-full opacity-20 blur-2xl" />
         <div className="absolute top-[60%] right-[3%] w-[180px] h-[200px] bg-gradient-to-br from-[#d7faf2]/30 to-[#e3f7ff]/60 rounded-full opacity-25 blur-3xl" />
@@ -59,11 +59,11 @@ const HowItWorks = () => {
             Get started with <span className="font-bold text-violet-600">BizBase</span> in just <span className="text-blue-400">4 simple steps.</span> Our AI platform makes business effortless!
           </p>
         </div>
-        <div className="space-y-20">
+        <div className="space-y-12">
           {steps.map((step, index) => (
             <div
               key={index}
-              className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-14 ${getAnim(index)} opacity-0 will-change-transform animate-fade-in`}
+              className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-8 ${getAnim(index)} opacity-0 will-change-transform animate-fade-in`}
               style={{
                 animationDelay: `${350 + index * 210}ms`,
                 animationFillMode: 'forwards'
@@ -71,7 +71,7 @@ const HowItWorks = () => {
             >
               <div className="flex-1 min-w-0">
                 <Card className="group card-glass card-hover transition-all duration-500 hover:-translate-y-2 overflow-hidden">
-                  <div className="relative h-64 lg:h-80 overflow-hidden">
+                  <div className="relative h-52 lg:h-64 overflow-hidden">
                     <img 
                       src={step.image} 
                       alt={step.title}
