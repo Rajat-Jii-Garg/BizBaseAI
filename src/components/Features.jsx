@@ -106,7 +106,7 @@ const Features = () => {
             <Crown className="w-4 h-4 inline mr-2" />
             World's Most Advanced Platform
           </div>
-          <h2 className="text-6xl md:text-8xl font-black mb-8">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
             <span className="bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent">
               Features That
             </span>
@@ -114,7 +114,7 @@ const Features = () => {
               Dominate Industries
             </span>
           </h2>
-          <p className="text-2xl text-white/80 max-w-4xl mx-auto leading-relaxed font-medium">
+          <p className="text-sm sm:text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
             Revolutionary AI-powered tools that transform ordinary businesses into 
             <span className="font-bold text-yellow-400"> unstoppable market leaders</span>
           </p>
@@ -138,10 +138,10 @@ const Features = () => {
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-black mb-4 text-white group-hover:text-blue-400 transition-colors">
+                <h3 className="text-lg md:text-xl font-semibold font-black mb-4 text-white group-hover:text-blue-400 transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-white/70 leading-relaxed mb-6 font-medium">
+                <p className="text-sm text-white/60 leading-relaxed mb-6 font-medium">
                   {feature.description}
                 </p>
 
@@ -158,7 +158,7 @@ const Features = () => {
 
         {/* Revolutionary CTA */}
         <div className="text-center">
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-3xl p-16 text-white shadow-2xl border border-white/20">
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-3xl p-6 sm:p-8 md:p-12 rounded-2xl text-white shadow-2xl border border-white/20">
             <div className="flex justify-center mb-8">
               <div className="flex items-center space-x-2">
                 {[...Array(5)].map((_, i) => (
@@ -166,20 +166,20 @@ const Features = () => {
                 ))}
               </div>
             </div>
-            <h3 className="text-4xl md:text-6xl font-black mb-6">Ready to Dominate Your Industry?</h3>
-            <p className="text-xl md:text-2xl mb-12 opacity-90 max-w-4xl mx-auto">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-black mb-6">Ready to Dominate Your Industry?</h3>
+            <p className="text-sm sm:text-base md:text-lg opacity-90 max-w-xl mx-auto mb-12 opacity-90 max-w-4xl mx-auto">
               Join the exclusive club of entrepreneurs who use BizBase to build business empires and generate millions in revenue.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/login">
-                <button className="bg-white text-blue-600 px-12 py-6 rounded-2xl font-black text-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 flex items-center">
+                <button className="bg-white text-blue-600 px-6 py-3 text-sm md:text-base rounded-2xl font-black hover:shadow-2xl transform hover:scale-110 transition-all duration-300 flex items-center">
                   <Crown className="w-6 h-6 mr-3" />
                   Start Your Empire Now
                   <Rocket className="w-6 h-6 ml-3" />
                 </button>
               </Link>
               <Link to="/login">
-                <button className="border-2 border-white text-white px-12 py-6 rounded-2xl font-black text-xl hover:bg-white hover:text-blue-600 transition-all duration-300">
+                <button className="border-2 border-white text-white px-6 py-3 text-sm md:text-base rounded-2xl font-black hover:bg-white hover:text-blue-600 transition-all duration-300">
                   Watch Success Stories
                 </button>
               </Link>

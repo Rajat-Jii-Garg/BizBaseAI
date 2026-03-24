@@ -89,13 +89,13 @@ const Testimonials = () => {
 
         {/* CTA */}
         <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-3xl p-12 text-white">
-            <h3 className="text-3xl md:text-4xl font-black mb-6">Your Success Story Starts Now</h3>
-            <p className="text-xl mb-8 opacity-90">
+          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl p-6 sm:p-8 md:p-10 text-white max-w-2xl mx-auto">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6">Your Success Story Starts Now</h3>
+            <p className="text-sm sm:text-base md:text-lg opacity-90 mb-8 opacity-90">
               Join thousands of entrepreneurs who transformed their dreams into business empires with BizBase
             </p>
             <Link to="/login">
-              <button className="bg-white text-orange-600 px-12 py-6 rounded-2xl font-black text-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+              <button className="bg-white text-orange-600 px-6 py-3 text-sm md:text-base rounded-xl rounded-2xl font-black hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
                 Start Your Empire Today
               </button>
             </Link>
