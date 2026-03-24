@@ -110,11 +110,6 @@ const Dashboard = () => {
     const scrollTop = window.scrollY;
     setShowScrollTop(scrollTop > 500);
 
-    // 🔥 Auto refresh when user reaches top
-    if (scrollTop === 0 && !refreshing) {
-      refreshFeed();
-    }
-
     // Infinite scroll - load more when near bottom
     if (
       window.innerHeight + scrollTop >= document.documentElement.scrollHeight - 1000 &&
