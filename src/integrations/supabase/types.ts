@@ -1364,6 +1364,9 @@ export type Database = {
           referral_code: string | null
           referred_by: string | null
           resume_url: string | null
+          show_email: boolean
+          show_location: boolean
+          show_phone: boolean
           skills: Json | null
           subscription_plan: string | null
           this_month_views: number | null
@@ -1411,6 +1414,9 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           resume_url?: string | null
+          show_email?: boolean
+          show_location?: boolean
+          show_phone?: boolean
           skills?: Json | null
           subscription_plan?: string | null
           this_month_views?: number | null
@@ -1458,6 +1464,9 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           resume_url?: string | null
+          show_email?: boolean
+          show_location?: boolean
+          show_phone?: boolean
           skills?: Json | null
           subscription_plan?: string | null
           this_month_views?: number | null

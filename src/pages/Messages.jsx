@@ -668,11 +668,13 @@ const Messages = () => {
 
     if (uploadError) throw uploadError;
 
-    const { data: { publicUrl } } = supabase.storage
+    // Bucket is private — generate a long-lived signed URL (7 days).
+    const { data: signed, error: signErr } = await supabase.storage
       .from('chat-files')
-      .getPublicUrl(filePath);
+      .createSignedUrl(filePath, 60 * 60 * 24 * 7);
 
-    return publicUrl;
+    if (signErr) throw signErr;
+    return signed.signedUrl;
   };
 
   const sendMessage = async () => {
