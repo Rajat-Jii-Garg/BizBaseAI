@@ -124,71 +124,24 @@ export const AuthProvider = ({ children }) => {
     return () => clearTimeout(t);
   }, []);
 
+  // Signup is handled directly by Supabase email confirmation in src/pages/Signup.jsx.
+  // No password is ever stored in localStorage. This helper just delegates to Supabase auth.
   const signUp = async (email, password, fullName, phone) => {
     try {
-      // Store signup data temporarily for OTP verification
-      localStorage.setItem('pendingSignup', JSON.stringify({
-        email,
-        password,
-        fullName,
-        phone
-      }));
-      
-      console.log('Signup data stored for OTP verification');
-      return { error: null };
-    } catch (error) {
-      console.error('Signup preparation error:', error);
-      return { error };
-    }
-  };
-
-  const completeSignup = async (email, password, fullName, phone) => {
-    try {
-      console.log('Creating user account after OTP verification...');
-      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: {
-            full_name: fullName,
-            phone: phone,
-          }
-        }
+          data: { full_name: fullName, phone },
+        },
       });
-
       if (error) {
-        console.error('Account creation error:', error);
-        toast.error('Account Creation Error', { description: error.message });
-        return { error };
+        toast.error('Signup Error', { description: error.message });
       }
-
-      // Send welcome email after successful signup
-      try {
-        const { error: emailError } = await supabase.functions.invoke('send-welcome-email', {
-          body: {
-            email: email,
-            fullName: fullName
-          }
-        });
-        
-        if (emailError) {
-          console.error('Welcome email error:', emailError);
-        } else {
-          console.log('Welcome email sent successfully');
-        }
-      } catch (emailError) {
-        console.error('Failed to send welcome email:', emailError);
-      }
-
-      toast.success("Account Created Successfully!", { 
-        description: "Welcome to BizBase! Check your email for a welcome message." 
-      });
-      
-      return { error: null };
+      return { error };
     } catch (error) {
-      console.error('Complete signup error:', error);
+      console.error('Signup error:', error);
       return { error };
     }
   };

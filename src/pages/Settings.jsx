@@ -65,14 +65,13 @@ const Settings = () => {
         company_name: profile.company_name || '',
         industry: profile.industry || '',
       });
-      // Load privacy settings from localStorage
-      const savedPrivacy = user?.id ? JSON.parse(localStorage.getItem(`privacy_${user.id}`) || '{}') : {};
+      // Load privacy settings from the profiles row (server-enforced)
       setPrivacySettings(prev => ({
         ...prev,
         actively_looking_for_work: profile.actively_looking_for_work || false,
-        showEmail: savedPrivacy.showEmail || false,
-        showPhone: savedPrivacy.showPhone || false,
-        showLocation: savedPrivacy.showLocation || false,
+        showEmail: profile.show_email || false,
+        showPhone: profile.show_phone || false,
+        showLocation: profile.show_location || false,
       }));
     }
   }, [profile, user]);
@@ -102,15 +101,14 @@ const Settings = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ actively_looking_for_work: privacySettings.actively_looking_for_work })
+        .update({
+          actively_looking_for_work: privacySettings.actively_looking_for_work,
+          show_email: privacySettings.showEmail,
+          show_phone: privacySettings.showPhone,
+          show_location: privacySettings.showLocation,
+        })
         .eq('id', user.id);
       if (error) throw error;
-      // Save privacy settings to localStorage for client-side use
-      localStorage.setItem(`privacy_${user.id}`, JSON.stringify({
-        showEmail: privacySettings.showEmail,
-        showPhone: privacySettings.showPhone,
-        showLocation: privacySettings.showLocation,
-      }));
       toast.success('Privacy settings saved!');
     } catch (error) {
       toast.error('Failed to save privacy settings');

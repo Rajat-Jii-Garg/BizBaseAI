@@ -203,15 +203,12 @@ export default function ProfilePreviewPage() {
               </p>
 
               <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mt-2">
-                {(() => {
-                  const privacy = JSON.parse(localStorage.getItem(`privacy_${userId}`) || '{}');
-                  return privacy.showLocation && profile?.location ? (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      {profile.location}
-                    </span>
-                  ) : null;
-                })()}
+                {profile?.show_location && profile?.location ? (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    {profile.location}
+                  </span>
+                ) : null}
 
                 {profile?.company_name && (
                   <span className="flex items-center gap-1">
@@ -233,18 +230,19 @@ export default function ProfilePreviewPage() {
 
             {/* CONTACT INFO - Privacy aware */}
             {(() => {
-              const privacy = JSON.parse(localStorage.getItem(`privacy_${userId}`) || '{}');
-              const hasVisibleContact = (privacy.showEmail && profile?.email) || (privacy.showPhone && profile?.phone) || profile?.website || profile?.linkedin_url;
+              const showEmail = !!profile?.show_email;
+              const showPhone = !!profile?.show_phone;
+              const hasVisibleContact = (showEmail && profile?.email) || (showPhone && profile?.phone) || profile?.website || profile?.linkedin_url;
               if (!hasVisibleContact) return null;
               return (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 bg-muted/30 rounded-lg mt-4">
-                  {privacy.showEmail && profile?.email && (
+                  {showEmail && profile?.email && (
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-muted-foreground" />
                       <span>{profile.email}</span>
                     </div>
                   )}
-                  {privacy.showPhone && profile?.phone && (
+                  {showPhone && profile?.phone && (
                     <div className="flex items-center gap-2">
                       <Phone className="w-4 h-4 text-muted-foreground" />
                       <span>{profile.phone}</span>

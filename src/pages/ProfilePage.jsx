@@ -606,22 +606,25 @@ const ProfilePage = ({ userId }) => {
             {/* Contact Info Bar - privacy aware */}
             <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-4 pt-4 border-t border-border text-sm text-muted-foreground">
               {(() => {
-                const privacy = JSON.parse(localStorage.getItem(`privacy_${userId}`) || '{}');
+                // Server-enforced visibility flags (cannot be bypassed via localStorage)
+                const showEmail = !!profile?.show_email;
+                const showPhone = !!profile?.show_phone;
+                const showLocation = !!profile?.show_location;
                 return (
                   <>
-                    {privacy.showEmail && profile?.email && (
+                    {showEmail && profile?.email && (
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-[#5B6CFF]" />
                         <span>{profile.email}</span>
                       </div>
                     )}
-                    {privacy.showLocation && profile?.location && (
+                    {showLocation && profile?.location && (
                       <div className="flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-[#5B6CFF]" />
                         <span>{profile.location}</span>
                       </div>
                     )}
-                    {privacy.showPhone && profile?.phone && (
+                    {showPhone && profile?.phone && (
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-[#5B6CFF]" />
                         <span>{profile.phone}</span>
