@@ -117,6 +117,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "business_leads_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "business_leads_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
@@ -280,6 +287,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "business_team_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       business_transactions: {
@@ -414,6 +428,13 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -586,10 +607,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "conversations_participant1_id_fkey"
+            columns: ["participant1_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "conversations_participant2_id_fkey"
             columns: ["participant2_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_participant2_id_fkey"
+            columns: ["participant2_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1713,6 +1748,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_creator_affinity_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_education: {
@@ -1942,7 +1984,153 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          about: string | null
+          achievements: Json | null
+          actively_looking_for_work: boolean | null
+          avatar_url: string | null
+          banner_url: string | null
+          belongs_to: string | null
+          bio: string | null
+          bizcoins: number | null
+          business_type: string | null
+          company_name: string | null
+          created_at: string | null
+          current_position: string | null
+          education: string | null
+          email: string | null
+          email_verified: boolean | null
+          experience_years: number | null
+          followers_count: number | null
+          following_count: number | null
+          full_name: string | null
+          github_url: string | null
+          id: string | null
+          industry: string | null
+          is_verified: boolean | null
+          linkedin_url: string | null
+          location: string | null
+          nickname: string | null
+          personal_branding_score: number | null
+          phone: string | null
+          portfolio_url: string | null
+          posts_count: number | null
+          power_score: number | null
+          profession: string | null
+          profile_completion_score: number | null
+          referral_code: string | null
+          resume_url: string | null
+          show_email: boolean | null
+          show_location: boolean | null
+          show_phone: boolean | null
+          skills: Json | null
+          subscription_plan: string | null
+          this_month_views: number | null
+          total_profile_views: number | null
+          twitter_url: string | null
+          updated_at: string | null
+          username: string | null
+          website: string | null
+        }
+        Insert: {
+          about?: string | null
+          achievements?: Json | null
+          actively_looking_for_work?: boolean | null
+          avatar_url?: string | null
+          banner_url?: string | null
+          belongs_to?: string | null
+          bio?: string | null
+          bizcoins?: number | null
+          business_type?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          current_position?: string | null
+          education?: string | null
+          email?: never
+          email_verified?: boolean | null
+          experience_years?: number | null
+          followers_count?: number | null
+          following_count?: number | null
+          full_name?: string | null
+          github_url?: string | null
+          id?: string | null
+          industry?: string | null
+          is_verified?: boolean | null
+          linkedin_url?: string | null
+          location?: never
+          nickname?: string | null
+          personal_branding_score?: number | null
+          phone?: never
+          portfolio_url?: string | null
+          posts_count?: number | null
+          power_score?: number | null
+          profession?: string | null
+          profile_completion_score?: number | null
+          referral_code?: string | null
+          resume_url?: string | null
+          show_email?: boolean | null
+          show_location?: boolean | null
+          show_phone?: boolean | null
+          skills?: Json | null
+          subscription_plan?: string | null
+          this_month_views?: number | null
+          total_profile_views?: number | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Update: {
+          about?: string | null
+          achievements?: Json | null
+          actively_looking_for_work?: boolean | null
+          avatar_url?: string | null
+          banner_url?: string | null
+          belongs_to?: string | null
+          bio?: string | null
+          bizcoins?: number | null
+          business_type?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          current_position?: string | null
+          education?: string | null
+          email?: never
+          email_verified?: boolean | null
+          experience_years?: number | null
+          followers_count?: number | null
+          following_count?: number | null
+          full_name?: string | null
+          github_url?: string | null
+          id?: string | null
+          industry?: string | null
+          is_verified?: boolean | null
+          linkedin_url?: string | null
+          location?: never
+          nickname?: string | null
+          personal_branding_score?: number | null
+          phone?: never
+          portfolio_url?: string | null
+          posts_count?: number | null
+          power_score?: number | null
+          profession?: string | null
+          profile_completion_score?: number | null
+          referral_code?: string | null
+          resume_url?: string | null
+          show_email?: boolean | null
+          show_location?: boolean | null
+          show_phone?: boolean | null
+          skills?: Json | null
+          subscription_plan?: string | null
+          this_month_views?: number | null
+          total_profile_views?: number | null
+          twitter_url?: string | null
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       award_bizcoins:
