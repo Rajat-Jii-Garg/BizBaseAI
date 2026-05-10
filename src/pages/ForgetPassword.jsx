@@ -18,7 +18,7 @@ const ForgetPassword = () => {
     setLoading(true);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://bizbase-ai.lovable.app/reset-password",
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {

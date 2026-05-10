@@ -21,13 +21,36 @@ const ResetPassword = () => {
 
   // Ensure recovery session exists
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
+    const getRecoverySession = async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error || !session) {
         toast.error("Invalid or expired reset link");
-        navigate("/login");
+        navigate("/forget-password");
+        return;
+      }
+    };
+
+    getRecoverySession();
+  }, [navigate]);
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        console.log("Recovery session ready");
       }
     });
-  }, [navigate]);
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
