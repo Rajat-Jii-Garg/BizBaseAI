@@ -21,20 +21,27 @@ const ResetPassword = () => {
 
   // Ensure recovery session exists
   useEffect(() => {
-    const getRecoverySession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+    const handleRecovery = async () => {
+      const hash = window.location.hash;
 
-      if (error || !session) {
+      if (!hash.includes("access_token")) {
         toast.error("Invalid or expired reset link");
         navigate("/forget-password");
         return;
       }
+
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error) {
+        toast.error("Recovery session error");
+        navigate("/forget-password");
+        return;
+      }
+
+      console.log("Recovery session:", data.session);
     };
 
-    getRecoverySession();
+    handleRecovery();
   }, [navigate]);
 
   useEffect(() => {
