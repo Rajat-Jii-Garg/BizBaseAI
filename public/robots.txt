@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://bizbase-ai.lovable.app/sitemap.xml
+Sitemap: https://bizbase-ai.vercel.app/sitemap.xml
