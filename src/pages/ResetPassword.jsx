@@ -15,23 +15,106 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(true);
+  const [sessionReady, setSessionReady] = useState(false);
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
-  // Ensure recovery session exists
+  // Handle BOTH the PKCE flow (?code=...) and the legacy hash flow (#access_token=...)
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
+    let cancelled = false;
+
+    const init = async () => {
+      try {
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get("code");
+        const errorDescription =
+          url.searchParams.get("error_description") ||
+          new URLSearchParams(window.location.hash.replace(/^#/, "")).get("error_description");
+
+        if (errorDescription) {
+          toast.error("Reset link invalid or expired", { description: errorDescription });
+          navigate("/forget-password");
+          return;
+        }
+
+        // 1) PKCE flow — Supabase sends ?code=... after the email link redirect
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          if (error) {
+            toast.error("Reset link invalid or expired", { description: error.message });
+            navigate("/forget-password");
+            return;
+          }
+          // Clean the URL
+          window.history.replaceState({}, document.title, "/reset-password");
+          if (!cancelled) {
+            setSessionReady(true);
+            setVerifying(false);
+          }
+          return;
+        }
+
+        // 2) Legacy implicit flow — tokens in the hash fragment
+        if (window.location.hash.includes("access_token")) {
+          // detectSessionInUrl will pick this up; just confirm we have a session
+          const { data } = await supabase.auth.getSession();
+          if (data.session) {
+            window.history.replaceState({}, document.title, "/reset-password");
+            if (!cancelled) {
+              setSessionReady(true);
+              setVerifying(false);
+            }
+            return;
+          }
+        }
+
+        // 3) Maybe the user already has a recovery session (e.g. from onAuthStateChange)
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          if (!cancelled) {
+            setSessionReady(true);
+            setVerifying(false);
+          }
+          return;
+        }
+
+        // No code, no hash, no session → invalid entry
         toast.error("Invalid or expired reset link");
-        navigate("/login");
+        navigate("/forget-password");
+      } catch (err) {
+        console.error("Recovery init error:", err);
+        toast.error("Recovery session error");
+        navigate("/forget-password");
+      }
+    };
+
+    init();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+        if (!cancelled) {
+          setSessionReady(true);
+          setVerifying(false);
+        }
       }
     });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!sessionReady) {
+      setError("Recovery session not ready yet. Please wait a moment.");
+      return;
+    }
 
     if (!password || !confirmPassword) {
       setError("Both fields are required");
@@ -53,14 +136,17 @@ const ResetPassword = () => {
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      toast.error("Failed to update password", {
-        description: error.message,
-      });
-    } else {
-      toast.success("Password updated successfully");
-      navigate("/login");
+      toast.error("Failed to update password", { description: error.message });
+      setLoading(false);
+      return;
     }
 
+    toast.success("Password updated successfully", {
+      description: "Please sign in with your new password.",
+    });
+    // Sign out the recovery session so the user logs in fresh
+    await supabase.auth.signOut();
+    navigate("/login");
     setLoading(false);
   };
 
@@ -79,104 +165,97 @@ const ResetPassword = () => {
             </span>
           </Link>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Set new password
-          </h1>
-          <p className="text-gray-600">
-            Create a strong password to secure your account
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Set new password</h1>
+          <p className="text-gray-600">Create a strong password to secure your account</p>
         </div>
 
-        {/* Error */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-600 text-sm">{error}</p>
           </div>
         )}
 
-        {/* Card */}
         <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
           <CardHeader className="pb-4">
-            <CardTitle className="text-center text-xl">
-              Reset Password
-            </CardTitle>
+            <CardTitle className="text-center text-xl">Reset Password</CardTitle>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleUpdatePassword} className="space-y-6">
-              {/* New Password */}
-              <div className="space-y-2">
-                <Label htmlFor="password">New Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter new password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
+            {verifying ? (
+              <div className="py-10 flex flex-col items-center justify-center text-gray-600">
+                <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+                <p>Verifying reset link...</p>
               </div>
-
-              {/* Confirm Password */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirm ? "text" : "password"}
-                    placeholder="Confirm new password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                  >
-                    {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+            ) : (
+              <form onSubmit={handleUpdatePassword} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="password">New Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter new password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Submit */}
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
-                disabled={loading}
-              >
-                {loading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Updating...</span>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirm ? "text" : "password"}
+                      placeholder="Confirm new password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="pl-10 pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm(!showConfirm)}
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                   </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <span>Update Password</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
-                )}
-              </Button>
-            </form>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
+                  disabled={loading || !sessionReady}
+                >
+                  {loading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Updating...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <span>Update Password</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  )}
+                </Button>
+              </form>
+            )}
 
             <div className="mt-6 text-center">
-              <Link
-                to="/login"
-                className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
-              >
+              <Link to="/login" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
                 Back to login
               </Link>
             </div>
