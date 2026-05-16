@@ -5,6 +5,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL');
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
 
 const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
 
@@ -14,25 +15,35 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { userId } = await req.json();
-
-    if (!userId) {
-      return new Response(JSON.stringify({ error: 'User ID is required' }), {
-        status: 400,
+    // Authenticate caller and derive userId from JWT (never trust body)
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    const authedClient = createClient(supabaseUrl!, supabaseAnonKey!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userErr } = await authedClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const userId = userData.user.id;
 
-    // Get user profile
+    // Get user profile (only non-PII fields needed for matching)
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, current_position, industry, experience_years, location, show_location, skills, bio, profile_completion_score')
       .eq('id', userId)
       .single();
 
@@ -43,7 +54,6 @@ serve(async (req) => {
       });
     }
 
-    // Get all active jobs
     const { data: jobs, error: jobsError } = await supabase
       .from('jobs')
       .select('*')
@@ -56,7 +66,6 @@ serve(async (req) => {
       });
     }
 
-    // Get user's applied jobs to exclude them
     const { data: appliedJobs } = await supabase
       .from('job_applications')
       .select('job_id')
@@ -71,12 +80,11 @@ serve(async (req) => {
       });
     }
 
-    // Create user profile summary for AI analysis
     const userSkills = profile.skills || [];
     const userIndustry = profile.industry || '';
     const userExperience = profile.experience_years || 0;
     const userPosition = profile.current_position || '';
-    const userLocation = profile.location || '';
+    const userLocation = profile.show_location ? (profile.location || '') : '';
 
     const userProfileSummary = `
 User Profile:
@@ -84,11 +92,10 @@ User Profile:
 - Industry: ${userIndustry}
 - Experience: ${userExperience} years
 - Location: ${userLocation}
-- Skills: ${userSkills.join(', ')}
+- Skills: ${Array.isArray(userSkills) ? userSkills.join(', ') : ''}
 - Bio: ${profile.bio || 'Not provided'}
 `;
 
-    // Create jobs summary for AI analysis
     const jobsSummary = availableJobs.map(job => ({
       id: job.id,
       title: job.title,
@@ -103,7 +110,6 @@ User Profile:
       salary_range: job.salary_min && job.salary_max ? `${job.salary_min}-${job.salary_max} ${job.salary_currency}` : 'Not specified'
     }));
 
-    // Use OpenAI to analyze and rank jobs
     const prompt = `
 You are an AI career advisor. Analyze the user profile and rank the following jobs based on how well they match the user's background, skills, and career progression.
 
@@ -118,24 +124,13 @@ Please provide a response in the following JSON format:
     {
       "job_id": "job_id_here",
       "match_score": 95,
-      "reasons": [
-        "Strong skill match with React and JavaScript",
-        "Perfect experience level alignment",
-        "Industry expertise in Technology"
-      ],
-      "growth_potential": "This role offers excellent growth opportunities in senior engineering positions"
+      "reasons": ["..."],
+      "growth_potential": "..."
     }
   ]
 }
 
-Rank jobs by match score (0-100), considering:
-1. Skill alignment (40%)
-2. Experience level fit (25%)
-3. Industry match (20%)
-4. Location preference (10%)
-5. Career progression potential (5%)
-
-Only include jobs with match score >= 60. Limit to top 10 recommendations.
+Rank jobs by match score (0-100). Only include jobs with match score >= 60. Limit to top 10.
 `;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -156,28 +151,19 @@ Only include jobs with match score >= 60. Limit to top 10 recommendations.
     });
 
     const aiResult = await response.json();
-    
-    if (!aiResult.choices || !aiResult.choices[0] || !aiResult.choices[0].message) {
+    if (!aiResult.choices?.[0]?.message) {
       throw new Error('Invalid AI response format');
     }
-    
     let aiContent = aiResult.choices[0].message.content;
-    
-    // Clean up AI response if it contains markdown code blocks
     if (aiContent.includes('```json')) {
       aiContent = aiContent.replace(/```json\n?/g, '').replace(/\n?```/g, '');
     }
-    
     const aiRecommendations = JSON.parse(aiContent);
 
-    // Enrich recommendations with full job details
     const enrichedRecommendations = aiRecommendations.recommendations.map((rec: any) => {
       const job = availableJobs.find(j => j.id === rec.job_id);
-      return {
-        ...rec,
-        job: job
-      };
-    }).filter((rec: any) => rec.job); // Filter out any recommendations where job wasn't found
+      return { ...rec, job };
+    }).filter((rec: any) => rec.job);
 
     return new Response(JSON.stringify({ 
       recommendations: enrichedRecommendations,
@@ -189,8 +175,7 @@ Only include jobs with match score >= 60. Limit to top 10 recommendations.
 
   } catch (error) {
     console.error('Error in ai-job-recommendations function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: 'Request failed' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
