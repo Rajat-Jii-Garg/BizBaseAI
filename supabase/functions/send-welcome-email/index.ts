@@ -93,7 +93,7 @@ const handler = async (req: Request): Promise<Response> => {
               <h2 style="color: #1e293b; text-align: center;">Welcome, ${fullName}! 🎉</h2>
               <p style="color: #475569; font-size: 16px;">Your account has been created. Start exploring BizBase to grow your professional network.</p>
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://bizbase-ai.lovable.app/dashboard" style="background: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Dashboard</a>
+                <a href="https://bizbase-ai.vercel.app/dashboard" style="background: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Go to Dashboard</a>
               </div>
             </div>
           </div>

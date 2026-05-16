@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const BASE_URL = 'https://bizbase-ai.lovable.app';
+const BASE_URL = 'https://bizbase-ai.vercel.app';
 const DEFAULT_TITLE = 'BizBase AI | AI Powered Professional Networking & Business Platform';
 const DEFAULT_DESC = 'BizBase AI - The next-generation AI-powered professional networking platform. Build connections, grow your career, manage businesses, and unlock opportunities.';
 const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;

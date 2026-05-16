@@ -2,42 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/</loc>
+    <loc>https://bizbase-ai.vercel.app/</loc>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/demo</loc>
+    <loc>https://bizbase-ai.vercel.app/demo</loc>
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/contact</loc>
+    <loc>https://bizbase-ai.vercel.app/contact</loc>
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/faq</loc>
+    <loc>https://bizbase-ai.vercel.app/faq</loc>
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/jobs</loc>
+    <loc>https://bizbase-ai.vercel.app/jobs</loc>
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/events</loc>
+    <loc>https://bizbase-ai.vercel.app/events</loc>
   </url>
 
   <url>
-    <loc>https://bizbase-ai.lovable.app/communities</loc>
+    <loc>https://bizbase-ai.vercel.app/communities</loc>
   </url>
 
   <!-- Public Profile -->
   <url>
-    <loc>https://bizbase-ai.lovable.app/rajat_aggarwal</loc>
+    <loc>https://bizbase-ai.vercel.app/rajat_aggarwal</loc>
   </url>
 
   <!-- Public Post -->
   <url>
-    <loc>https://bizbase-ai.lovable.app/rajat_aggarwal/post/f2ef61d6-76ea-43c3-8994-6dbddc6d0726</loc>
+    <loc>https://bizbase-ai.vercel.app/rajat_aggarwal/post/f2ef61d6-76ea-43c3-8994-6dbddc6d0726</loc>
   </url>
 
 </urlset>

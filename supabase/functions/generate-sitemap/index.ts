@@ -15,7 +15,7 @@ serve(async (req) => {
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const baseUrl = "https://bizbase-ai.lovable.app";
+  const baseUrl = "https://bizbase-ai.vercel.app";
 
   const staticPages = [
     "", "login", "signup", "forget-password", "demo", "contact", "faq",
