@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow" />
     <meta name="google-site-verification" content="IXm9umN3sH1hoNT4GuSArrv-eayR20IqYiqgWTQUpzM" />
+    <script>
+      // Force canonical to Vercel domain and noindex any non-Vercel mirror (e.g. lovable.app preview)
+      (function () {
+        try {
+          var primary = 'https://bizbase-ai.vercel.app';
+          var host = window.location.hostname;
+          if (host !== 'bizbase-ai.vercel.app' && host !== 'localhost' && host !== '127.0.0.1') {
+            var r = document.querySelector('meta[name="robots"]');
+            if (r) r.setAttribute('content', 'noindex, nofollow');
+            var c = document.querySelector('link[rel="canonical"]');
+            if (c) c.setAttribute('href', primary + window.location.pathname);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <title>BizBase AI | AI Powered Professional Networking & Business Platform</title>
     <meta name="description" content="BizBase AI - The next-generation AI-powered professional networking platform. Build connections, grow your career, manage businesses, and unlock opportunities with AI-driven insights." />
     <meta name="author" content="Rajat Aggarwal" />
