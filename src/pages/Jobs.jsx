@@ -135,10 +135,41 @@ const Jobs = () => {
     }
   };
 
-  const handleApplyJob = async (jobId) => {
+  const handleApplyJob = async (job) => {
+    // External jobs: open original posting in new tab
+    if (job.source && job.source !== 'internal' && job.external_url) {
+      window.open(job.external_url, '_blank', 'noopener,noreferrer');
+      return;
+    }
     if (!user) { toast.error('Please login to apply'); return; }
-    setApplicationData({ ...applicationData, job_id: jobId });
+    setApplicationData({ ...applicationData, job_id: job.id });
     setShowApplicationModal(true);
+  };
+
+  const handleShareJob = async (job) => {
+    const url = job.source && job.source !== 'internal' && job.external_url
+      ? job.external_url
+      : `${window.location.origin}/jobs?job=${job.id}`;
+    const shareData = {
+      title: `${job.title} at ${job.company_name}`,
+      text: `${job.title} — ${job.company_name} (${job.location}). Found on BizBase.`,
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${url}`);
+        toast.success('Job link copied!');
+      }
+    } catch (err) {
+      if (err?.name !== 'AbortError') {
+        try {
+          await navigator.clipboard.writeText(url);
+          toast.success('Link copied!');
+        } catch { toast.error('Could not share'); }
+      }
+    }
   };
 
   const submitApplication = async () => {
