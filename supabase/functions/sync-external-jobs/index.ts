@@ -115,18 +115,33 @@ Deno.serve(async (req) => {
     try {
       const rows = await src.fn();
       if (rows.length === 0) {
-        summary[src.name] = { fetched: 0, upserted: 0 };
+        summary[src.name] = { fetched: 0, inserted: 0 };
         continue;
       }
-      const { error, count } = await supabase
+      // Find existing external_ids for this source to avoid duplicates
+      const ids = rows.map((r) => r.external_id);
+      const { data: existing, error: selErr } = await supabase
         .from("jobs")
-        .upsert(rows, { onConflict: "source,external_id", count: "exact", ignoreDuplicates: false });
-      if (error) throw error;
-      summary[src.name] = { fetched: rows.length, upserted: count ?? rows.length };
-      totalInserted += count ?? rows.length;
+        .select("external_id")
+        .eq("source", src.name)
+        .in("external_id", ids);
+      if (selErr) throw selErr;
+      const existingSet = new Set((existing || []).map((r: any) => r.external_id));
+      const newRows = rows.filter((r) => !existingSet.has(r.external_id));
+      if (newRows.length === 0) {
+        summary[src.name] = { fetched: rows.length, inserted: 0, skipped: rows.length };
+        continue;
+      }
+      const { error: insErr, count } = await supabase
+        .from("jobs")
+        .insert(newRows, { count: "exact" });
+      if (insErr) throw insErr;
+      summary[src.name] = { fetched: rows.length, inserted: count ?? newRows.length, skipped: rows.length - newRows.length };
+      totalInserted += count ?? newRows.length;
     } catch (e) {
-      console.error(`[${src.name}] sync failed`, e);
-      summary[src.name] = { error: e instanceof Error ? e.message : String(e) };
+      const msg = e instanceof Error ? e.message : (typeof e === "object" ? JSON.stringify(e) : String(e));
+      console.error(`[${src.name}] sync failed`, msg);
+      summary[src.name] = { error: msg };
     }
   }
 
