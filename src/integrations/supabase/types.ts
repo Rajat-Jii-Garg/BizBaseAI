@@ -822,8 +822,10 @@ export type Database = {
           company_name: string
           created_at: string
           description: string
-          employer_id: string
+          employer_id: string | null
           experience_level: string
+          external_id: string | null
+          external_url: string | null
           id: string
           industry: string
           is_active: boolean
@@ -835,6 +837,7 @@ export type Database = {
           salary_max: number | null
           salary_min: number | null
           skills_required: string[] | null
+          source: string
           title: string
           updated_at: string
           views_count: number
@@ -847,8 +850,10 @@ export type Database = {
           company_name: string
           created_at?: string
           description: string
-          employer_id: string
+          employer_id?: string | null
           experience_level?: string
+          external_id?: string | null
+          external_url?: string | null
           id?: string
           industry: string
           is_active?: boolean
@@ -860,6 +865,7 @@ export type Database = {
           salary_max?: number | null
           salary_min?: number | null
           skills_required?: string[] | null
+          source?: string
           title: string
           updated_at?: string
           views_count?: number
@@ -872,8 +878,10 @@ export type Database = {
           company_name?: string
           created_at?: string
           description?: string
-          employer_id?: string
+          employer_id?: string | null
           experience_level?: string
+          external_id?: string | null
+          external_url?: string | null
           id?: string
           industry?: string
           is_active?: boolean
@@ -885,6 +893,7 @@ export type Database = {
           salary_max?: number | null
           salary_min?: number | null
           skills_required?: string[] | null
+          source?: string
           title?: string
           updated_at?: string
           views_count?: number
