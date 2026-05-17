@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { MapPin, Clock, DollarSign, Building, Users, Search, Filter, Bookmark, BookmarkCheck, Plus, Eye, Briefcase, Calendar } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Building, Users, Search, Filter, Bookmark, BookmarkCheck, Plus, Eye, Briefcase, Calendar, Share2, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -135,10 +135,41 @@ const Jobs = () => {
     }
   };
 
-  const handleApplyJob = async (jobId) => {
+  const handleApplyJob = async (job) => {
+    // External jobs: open original posting in new tab
+    if (job.source && job.source !== 'internal' && job.external_url) {
+      window.open(job.external_url, '_blank', 'noopener,noreferrer');
+      return;
+    }
     if (!user) { toast.error('Please login to apply'); return; }
-    setApplicationData({ ...applicationData, job_id: jobId });
+    setApplicationData({ ...applicationData, job_id: job.id });
     setShowApplicationModal(true);
+  };
+
+  const handleShareJob = async (job) => {
+    const url = job.source && job.source !== 'internal' && job.external_url
+      ? job.external_url
+      : `${window.location.origin}/jobs?job=${job.id}`;
+    const shareData = {
+      title: `${job.title} at ${job.company_name}`,
+      text: `${job.title} — ${job.company_name} (${job.location}). Found on BizBase.`,
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${url}`);
+        toast.success('Job link copied!');
+      }
+    } catch (err) {
+      if (err?.name !== 'AbortError') {
+        try {
+          await navigator.clipboard.writeText(url);
+          toast.success('Link copied!');
+        } catch { toast.error('Could not share'); }
+      }
+    }
   };
 
   const submitApplication = async () => {
@@ -338,6 +369,11 @@ const Jobs = () => {
                         {job.is_featured && (
                           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-amber-100 text-amber-800">Featured</Badge>
                         )}
+                        {job.source && job.source !== 'internal' && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 capitalize border-primary/30 text-primary">
+                            via {job.source}
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mb-2">
                         <span className="flex items-center gap-1"><Building className="h-3 w-3" />{job.company_name}</span>
@@ -380,12 +416,17 @@ const Jobs = () => {
                     </p>
                   )}
 
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {appliedJobs.has(job.id) ? (
                       <Button variant="outline" size="sm" disabled className="text-xs h-8 rounded-full">Applied</Button>
                     ) : (
-                      <Button size="sm" onClick={() => handleApplyJob(job.id)} className="text-xs h-8 rounded-full">Apply Now</Button>
+                      <Button size="sm" onClick={() => handleApplyJob(job)} className="text-xs h-8 rounded-full gap-1">
+                        {job.source && job.source !== 'internal' ? (<>Apply <ExternalLink className="h-3 w-3" /></>) : 'Apply Now'}
+                      </Button>
                     )}
+                    <Button variant="outline" size="sm" onClick={() => handleShareJob(job)} className="text-xs h-8 rounded-full gap-1">
+                      <Share2 className="h-3 w-3" /> Share
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
