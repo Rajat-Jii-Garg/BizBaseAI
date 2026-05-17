@@ -369,6 +369,11 @@ const Jobs = () => {
                         {job.is_featured && (
                           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-amber-100 text-amber-800">Featured</Badge>
                         )}
+                        {job.source && job.source !== 'internal' && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 capitalize border-primary/30 text-primary">
+                            via {job.source}
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mb-2">
                         <span className="flex items-center gap-1"><Building className="h-3 w-3" />{job.company_name}</span>
