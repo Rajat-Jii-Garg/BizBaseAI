@@ -1,5 +1,6 @@
 import DashboardLayout from '@/components/DashboardLayout';
 import ProfileEditModal from '@/components/ProfileEditModal';
+import ProfileShareCard from '@/components/ProfileShareCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -72,6 +73,7 @@ const ProfileDashboard = () => {
     clientsHelped: 0
   });
   const [uploading, setUploading] = useState(false);
+  const [shareCardOpen, setShareCardOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -287,9 +289,11 @@ const ProfileDashboard = () => {
   };
 
   const handleShare = () => {
-    const profileUrl = `${window.location.origin}/${profile.username}`;
-    navigator.clipboard.writeText(profileUrl);
-    toast({ title: 'Link copied!', description: 'Profile link copied to clipboard' });
+    if (!profile?.username) {
+      toast({ title: 'Username required', description: 'Set a username first to share your profile card.', variant: 'destructive' });
+      return;
+    }
+    setShareCardOpen(true);
   };
 
   const getTimeAgo = (dateString) => {
@@ -914,6 +918,11 @@ const ProfileDashboard = () => {
           <ReferralWidget />
         </div>
       </div>
+      <ProfileShareCard
+        open={shareCardOpen}
+        onClose={() => setShareCardOpen(false)}
+        profile={profile}
+      />
     </DashboardLayout>
   );
 };
