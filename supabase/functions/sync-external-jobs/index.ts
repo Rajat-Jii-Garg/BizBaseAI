@@ -44,26 +44,47 @@ const mapJobType = (t: string): string => {
   return "full-time";
 };
 
+// Returns true if job location/region targets India (or is worldwide remote → eligible for Indian applicants)
+const isIndiaEligible = (location: string, extra: string = ""): boolean => {
+  const s = `${location} ${extra}`.toLowerCase();
+  if (!s.trim()) return false;
+  // Explicit India keywords
+  const indiaKeywords = [
+    "india", "bharat", "bangalore", "bengaluru", "mumbai", "delhi", "ncr", "gurgaon", "gurugram",
+    "noida", "hyderabad", "chennai", "pune", "kolkata", "ahmedabad", "jaipur", "kochi", "cochin",
+    "indore", "chandigarh", "lucknow", "nagpur", "coimbatore", "trivandrum", "thiruvananthapuram",
+    "mysore", "mysuru", "vadodara", "surat", "bhubaneswar", "visakhapatnam", "vizag", " in,", " in ",
+    "(in)", "asia pacific", "apac"
+  ];
+  if (indiaKeywords.some((k) => s.includes(k))) return true;
+  // Worldwide / anywhere remote → eligible for Indians
+  const worldwide = ["worldwide", "anywhere", "global", "remote - global", "100% remote", "fully remote"];
+  if (worldwide.some((k) => s.includes(k))) return true;
+  return false;
+};
+
 async function fetchRemotive(): Promise<JobRow[]> {
-  const res = await fetch("https://remotive.com/api/remote-jobs?limit=50");
+  const res = await fetch("https://remotive.com/api/remote-jobs?limit=100");
   if (!res.ok) throw new Error(`Remotive HTTP ${res.status}`);
   const data = await res.json();
   const jobs = (data.jobs || []) as any[];
-  return jobs.map((j) => ({
-    source: "remotive",
-    external_id: String(j.id),
-    external_url: j.url,
-    title: j.title?.slice(0, 200) || "Untitled",
-    company_name: j.company_name || "Unknown",
-    location: j.candidate_required_location || "Remote",
-    job_type: mapJobType(j.job_type),
-    work_mode: "remote",
-    experience_level: "mid-level",
-    industry: j.category || "Technology",
-    description: stripHtml(j.description || "").slice(0, 4000),
-    skills_required: Array.isArray(j.tags) ? j.tags.slice(0, 10) : null,
-    is_active: true,
-  }));
+  return jobs
+    .filter((j) => isIndiaEligible(j.candidate_required_location || "", j.title || ""))
+    .map((j) => ({
+      source: "remotive",
+      external_id: String(j.id),
+      external_url: j.url,
+      title: j.title?.slice(0, 200) || "Untitled",
+      company_name: j.company_name || "Unknown",
+      location: j.candidate_required_location || "Remote",
+      job_type: mapJobType(j.job_type),
+      work_mode: "remote",
+      experience_level: "mid-level",
+      industry: j.category || "Technology",
+      description: stripHtml(j.description || "").slice(0, 4000),
+      skills_required: Array.isArray(j.tags) ? j.tags.slice(0, 10) : null,
+      is_active: true,
+    }));
 }
 
 async function fetchArbeitnow(): Promise<JobRow[]> {
