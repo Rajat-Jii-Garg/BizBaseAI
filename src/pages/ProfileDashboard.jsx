@@ -1,5 +1,6 @@
 import DashboardLayout from '@/components/DashboardLayout';
 import ProfileEditModal from '@/components/ProfileEditModal';
+import ProfileShareCard from '@/components/ProfileShareCard';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -72,6 +73,7 @@ const ProfileDashboard = () => {
     clientsHelped: 0
   });
   const [uploading, setUploading] = useState(false);
+  const [shareCardOpen, setShareCardOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
