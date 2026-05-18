@@ -160,7 +160,6 @@ Deno.serve(async (req) => {
   const sources: Array<{ name: string; fn: () => Promise<JobRow[]> }> = [
     { name: "remotive", fn: fetchRemotive },
     { name: "arbeitnow", fn: fetchArbeitnow },
-    { name: "remoteok", fn: fetchRemoteOK },
   ];
 
   let totalInserted = 0;
