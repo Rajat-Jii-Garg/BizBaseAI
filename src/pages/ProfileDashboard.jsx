@@ -918,6 +918,11 @@ const ProfileDashboard = () => {
           <ReferralWidget />
         </div>
       </div>
+      <ProfileShareCard
+        open={shareCardOpen}
+        onClose={() => setShareCardOpen(false)}
+        profile={profile}
+      />
     </DashboardLayout>
   );
 };
