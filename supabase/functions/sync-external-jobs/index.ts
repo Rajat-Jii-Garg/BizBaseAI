@@ -92,21 +92,52 @@ async function fetchArbeitnow(): Promise<JobRow[]> {
   if (!res.ok) throw new Error(`Arbeitnow HTTP ${res.status}`);
   const data = await res.json();
   const jobs = (data.data || []) as any[];
-  return jobs.slice(0, 50).map((j) => ({
-    source: "arbeitnow",
-    external_id: j.slug,
-    external_url: j.url,
-    title: (j.title || "Untitled").slice(0, 200),
-    company_name: j.company_name || "Unknown",
-    location: j.location || "Remote",
-    job_type: Array.isArray(j.job_types) && j.job_types.length ? mapJobType(j.job_types[0]) : "full-time",
-    work_mode: j.remote ? "remote" : "on-site",
-    experience_level: "mid-level",
-    industry: Array.isArray(j.tags) && j.tags.length ? j.tags[0] : "General",
-    description: stripHtml(j.description || "").slice(0, 4000),
-    skills_required: Array.isArray(j.tags) ? j.tags.slice(0, 10) : null,
-    is_active: true,
-  }));
+  return jobs
+    .filter((j) => isIndiaEligible(j.location || "", `${j.title || ""} ${(j.tags || []).join(" ")}`))
+    .slice(0, 50)
+    .map((j) => ({
+      source: "arbeitnow",
+      external_id: j.slug,
+      external_url: j.url,
+      title: (j.title || "Untitled").slice(0, 200),
+      company_name: j.company_name || "Unknown",
+      location: j.location || "Remote",
+      job_type: Array.isArray(j.job_types) && j.job_types.length ? mapJobType(j.job_types[0]) : "full-time",
+      work_mode: j.remote ? "remote" : "on-site",
+      experience_level: "mid-level",
+      industry: Array.isArray(j.tags) && j.tags.length ? j.tags[0] : "General",
+      description: stripHtml(j.description || "").slice(0, 4000),
+      skills_required: Array.isArray(j.tags) ? j.tags.slice(0, 10) : null,
+      is_active: true,
+    }));
+}
+
+// Remoteok also lists worldwide remote jobs that Indian devs can apply to
+async function fetchRemoteOK(): Promise<JobRow[]> {
+  const res = await fetch("https://remoteok.com/api", {
+    headers: { "User-Agent": "BizBase Job Sync (contact: support@bizbase-ai.com)" },
+  });
+  if (!res.ok) throw new Error(`RemoteOK HTTP ${res.status}`);
+  const data = await res.json();
+  const jobs = (Array.isArray(data) ? data : []).slice(1) as any[]; // first item is legal notice
+  return jobs
+    .filter((j) => isIndiaEligible(j.location || "", `${j.position || ""} ${(j.tags || []).join(" ")}`))
+    .slice(0, 50)
+    .map((j) => ({
+      source: "remoteok",
+      external_id: String(j.id || j.slug),
+      external_url: j.url || `https://remoteok.com/remote-jobs/${j.id}`,
+      title: (j.position || "Untitled").slice(0, 200),
+      company_name: j.company || "Unknown",
+      location: j.location || "Remote",
+      job_type: "full-time",
+      work_mode: "remote",
+      experience_level: "mid-level",
+      industry: Array.isArray(j.tags) && j.tags.length ? j.tags[0] : "Technology",
+      description: stripHtml(j.description || "").slice(0, 4000),
+      skills_required: Array.isArray(j.tags) ? j.tags.slice(0, 10) : null,
+      is_active: true,
+    }));
 }
 
 Deno.serve(async (req) => {
