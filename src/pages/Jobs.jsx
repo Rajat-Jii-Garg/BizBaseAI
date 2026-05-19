@@ -147,19 +147,20 @@ const Jobs = () => {
   };
 
   const handleShareJob = async (job) => {
-    const url = job.source && job.source !== 'internal' && job.external_url
-      ? job.external_url
+    // Always share BizBase's own job page (never external site URL)
+    const url = job.slug
+      ? `${window.location.origin}/jobs/${job.slug}`
       : `${window.location.origin}/jobs?job=${job.id}`;
     const shareData = {
-      title: `${job.title} at ${job.company_name}`,
-      text: `${job.title} — ${job.company_name} (${job.location}). Found on BizBase.`,
+      title: `${job.title} at ${job.company_name} | BizBase Jobs`,
+      text: `${job.title} — ${job.company_name} (${job.location}). Apply via BizBase.`,
       url,
     };
     try {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${url}`);
+        await navigator.clipboard.writeText(`${shareData.title}\n${url}`);
         toast.success('Job link copied!');
       }
     } catch (err) {
