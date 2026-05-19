@@ -30,6 +30,7 @@ import AIAssistant from "./pages/AIAssistant";
 import BusinessSetup from "./pages/BusinessSetup";
 import BusinessLayout from "./components/BusinessLayout";
 import Jobs from "./pages/Jobs";
+import JobDetail from "./pages/JobDetail";
 import CRM from "./pages/CRM";
 import Projects from "./pages/Projects";
 import HR from "./pages/HR";
