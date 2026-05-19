@@ -837,6 +837,7 @@ export type Database = {
           salary_max: number | null
           salary_min: number | null
           skills_required: string[] | null
+          slug: string | null
           source: string
           title: string
           updated_at: string
@@ -865,6 +866,7 @@ export type Database = {
           salary_max?: number | null
           salary_min?: number | null
           skills_required?: string[] | null
+          slug?: string | null
           source?: string
           title: string
           updated_at?: string
@@ -893,6 +895,7 @@ export type Database = {
           salary_max?: number | null
           salary_min?: number | null
           skills_required?: string[] | null
+          slug?: string | null
           source?: string
           title?: string
           updated_at?: string
