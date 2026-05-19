@@ -162,6 +162,8 @@ const App = () => (
                   <Jobs />
                 </ProtectedRoute>
               } />
+              {/* Public job detail page (SEO indexable) */}
+              <Route path="/jobs/:slug" element={<JobDetail />} />
               <Route path="/dashboard/crm" element={
                 <ProtectedRoute>
                   <CRM />
