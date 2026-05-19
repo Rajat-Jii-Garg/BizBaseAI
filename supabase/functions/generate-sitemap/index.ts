@@ -53,6 +53,18 @@ serve(async (req) => {
     urls.push(`<url><loc>${baseUrl}/communities/${c.id}</loc><lastmod>${new Date(c.updated_at || Date.now()).toISOString()}</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>`);
   });
 
+  // Jobs (public detail pages - highest SEO value for Google Jobs)
+  const { data: jobs } = await supabase
+    .from("jobs")
+    .select("slug, updated_at, created_at")
+    .eq("is_active", true)
+    .not("slug", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(5000);
+  (jobs || []).forEach((j: any) => {
+    urls.push(`<url><loc>${baseUrl}/jobs/${j.slug}</loc><lastmod>${new Date(j.updated_at || j.created_at).toISOString()}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`);
+  });
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.join("\n")}
