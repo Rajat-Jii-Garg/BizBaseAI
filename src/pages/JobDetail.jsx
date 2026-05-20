@@ -325,6 +325,12 @@ const JobDetail = () => {
           Powered by <Link to="/" className="text-primary font-medium">BizBase</Link> — India's professional network for freshers, students &amp; professionals.
         </footer>
       </main>
+
+      {/* Mobile sticky apply bar */}
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur px-4 py-3 flex gap-2">
+        <Button onClick={handleApply} className="flex-1 gap-2">Apply Now <ExternalLink className="h-4 w-4" /></Button>
+        <Button variant="outline" size="icon" onClick={handleShare} aria-label="Share"><Share2 className="h-4 w-4" /></Button>
+      </div>
     </div>
   );
 };
