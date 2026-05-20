@@ -114,7 +114,7 @@ const JobDetail = () => {
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/jobs/${job.slug}`;
+    const url = buildShareUrl(`/jobs/${job.slug}`);
     const shareData = {
       title: `${job.title} at ${job.company_name} | BizBase Jobs`,
       text: `${job.title} — ${job.company_name} (${job.location}). Apply via BizBase.`,
