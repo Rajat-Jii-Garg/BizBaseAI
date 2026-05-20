@@ -34,8 +34,8 @@ const JobDetail = () => {
         return;
       }
       setJob(data);
-      // increment views (fire & forget)
-      supabase.rpc('increment_job_views', { job_id: data.id }).catch(() => {});
+      // increment views (fire & forget) — wrap in Promise.resolve since PostgrestBuilder isn't a true Promise
+      Promise.resolve(supabase.rpc('increment_job_views', { job_id: data.id })).catch(() => {});
       // related jobs same industry
       const { data: rel } = await supabase
         .from('jobs')

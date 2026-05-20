@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.increment_job_views(uuid) TO anon;
