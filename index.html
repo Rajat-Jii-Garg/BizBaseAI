@@ -42,20 +42,49 @@
     <meta name="twitter:description" content="Build professional connections, grow your career, and manage businesses with AI-powered insights." />
     <meta name="twitter:image" content="https://bizbase-ai.vercel.app/og-image.png" />
 
-    <!-- JSON-LD Structured Data -->
+    <!-- JSON-LD: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "BizBase",
+      "alternateName": "BizBase AI",
+      "url": "https://bizbase-ai.vercel.app",
+      "logo": "https://bizbase-ai.vercel.app/og-image.png",
+      "description": "India's AI-powered professional networking and business platform for students, freshers, professionals and businesses.",
+      "founder": { "@type": "Person", "name": "Rajat Aggarwal" },
+      "sameAs": [
+        "https://bizbase-ai.vercel.app"
+      ]
+    }
+    </script>
+
+    <!-- JSON-LD: WebSite + Sitelinks Searchbox -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "BizBase",
+      "url": "https://bizbase-ai.vercel.app",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://bizbase-ai.vercel.app/jobs?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- JSON-LD: WebApplication -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "BizBase AI",
       "url": "https://bizbase-ai.vercel.app",
-      "description": "AI-powered professional networking and business management platform",
+      "description": "AI-powered professional networking and business management platform for India.",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
-      "author": {
-        "@type": "Person",
-        "name": "Rajat Aggarwal"
-      }
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
     }
     </script>
   </head>
