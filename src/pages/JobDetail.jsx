@@ -4,11 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Clock, Building, Users, Eye, Briefcase, Calendar, Share2, ExternalLink, ArrowLeft, DollarSign, CheckCircle2, Sparkles } from 'lucide-react';
+import { MapPin, Clock, Building, Users, Eye, Briefcase, Calendar, Share2, ExternalLink, ArrowLeft, IndianRupee, CheckCircle2, Sparkles, Bookmark, BookmarkCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
+import { CANONICAL_SITE_URL, buildShareUrl } from '@/lib/siteUrl';
+import { useAuth } from '@/contexts/AuthContext';
 
-const BASE_URL = 'https://bizbase-ai.vercel.app';
+const BASE_URL = CANONICAL_SITE_URL;
 
 const JobDetail = () => {
   const { slug } = useParams();
