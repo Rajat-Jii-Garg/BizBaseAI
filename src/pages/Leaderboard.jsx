@@ -41,7 +41,7 @@ const Leaderboard = () => {
 
   return (
     <DashboardLayout>
-      <SEOHead title="Leaderboard - Top Contributors" description="See the top contributors on BizBase AI. Compete, earn BizCoins, and climb the leaderboard." path="/leaderboard" noIndex />
+      <SEOHead title="Leaderboard - Top Contributors" description="See the top contributors on BizBase AI. Compete, earn BizCoins, and climb the leaderboard." path="/leaderboard" />
       <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
         {/* Hero Header */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-600 p-6 md:p-8 text-white">

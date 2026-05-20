@@ -141,7 +141,7 @@ const JobDetail = () => {
   if (!job) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4 px-4">
-        <SEOHead title="Job not found" noIndex path={`/jobs/${slug}`} />
+        <SEOHead title="Job not found" path={`/jobs/${slug}`} />
         <Briefcase className="h-12 w-12 text-muted-foreground/40" />
         <h1 className="text-xl font-semibold">Job not found or expired</h1>
         <Link to="/jobs"><Button>Browse all jobs</Button></Link>

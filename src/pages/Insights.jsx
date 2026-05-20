@@ -200,7 +200,7 @@ const Insights = () => {
 
   return (
     <DashboardLayout>
-      <SEOHead title="Professional Insights" description="AI-powered professional insights and growth tracking on BizBase AI." path="/insights" noIndex />
+      <SEOHead title="Professional Insights" description="AI-powered professional insights and growth tracking on BizBase AI." path="/insights" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
