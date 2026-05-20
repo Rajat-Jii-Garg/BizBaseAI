@@ -154,8 +154,10 @@ const JobDetail = () => {
     ? `${job.salary_currency || 'INR'} ${Intl.NumberFormat('en-IN').format(job.salary_min)} - ${Intl.NumberFormat('en-IN').format(job.salary_max)}/yr`
     : null;
 
+  const companyInitial = (job.company_name || '?').trim().charAt(0).toUpperCase();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background pb-24 sm:pb-10">
       <SEOHead
         title={`${job.title} at ${job.company_name} — ${job.location}`}
         description={`${job.title} job at ${job.company_name} in ${job.location}. ${metaDesc}`}
@@ -176,10 +178,24 @@ const JobDetail = () => {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 sm:py-10 space-y-6">
-        {/* Header card */}
-        <Card className="border-border/60 shadow-sm">
-          <CardContent className="p-5 sm:p-8">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
+        {/* Hero header card */}
+        <Card className="relative overflow-hidden border-border/60 shadow-sm">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pointer-events-none" />
+          <CardContent className="relative p-5 sm:p-8">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 text-primary-foreground flex items-center justify-center text-2xl font-bold shadow-sm shrink-0">
+                {companyInitial}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-muted-foreground">{job.company_name}</p>
+                <h1 className="text-xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight">{job.title}</h1>
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
+                  <MapPin className="h-3.5 w-3.5" />{job.location}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5 mb-4">
               {job.is_featured && <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Featured</Badge>}
               <Badge variant="outline" className="capitalize">{(job.job_type || '').replace('-', ' ')}</Badge>
               <Badge variant="outline" className="capitalize">{(job.work_mode || '').replace('-', ' ')}</Badge>
@@ -188,17 +204,30 @@ const JobDetail = () => {
                 <Badge variant="outline" className="capitalize border-primary/30 text-primary">via {job.source}</Badge>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">{job.title}</h1>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mb-5">
-              <span className="flex items-center gap-1.5"><Building className="h-4 w-4" />{job.company_name}</span>
-              <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" />{job.location}</span>
-              <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{new Date(job.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-              <span className="flex items-center gap-1.5"><Eye className="h-4 w-4" />{job.views_count || 0} views</span>
-              <span className="flex items-center gap-1.5"><Users className="h-4 w-4" />{job.applications_count || 0} applied</span>
+
+            {/* Stat chips */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
+              <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Clock className="h-3 w-3" /> Posted</div>
+                <p className="text-sm font-semibold text-foreground mt-0.5">{new Date(job.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</p>
+              </div>
+              <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Eye className="h-3 w-3" /> Views</div>
+                <p className="text-sm font-semibold text-foreground mt-0.5">{job.views_count || 0}</p>
+              </div>
+              <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Users className="h-3 w-3" /> Applied</div>
+                <p className="text-sm font-semibold text-foreground mt-0.5">{job.applications_count || 0}</p>
+              </div>
+              <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Building className="h-3 w-3" /> Industry</div>
+                <p className="text-sm font-semibold text-foreground mt-0.5 truncate capitalize">{job.industry || '—'}</p>
+              </div>
             </div>
+
             {salaryStr && (
-              <div className="inline-flex items-center gap-1.5 text-green-600 font-semibold text-sm mb-4">
-                <DollarSign className="h-4 w-4" />{salaryStr}
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 text-green-700 dark:text-green-400 px-3 py-1.5 font-semibold text-sm mb-4">
+                <IndianRupee className="h-4 w-4" />{salaryStr}
               </div>
             )}
             {job.application_deadline && (
@@ -206,7 +235,7 @@ const JobDetail = () => {
                 <Calendar className="h-3.5 w-3.5" /> Apply by {new Date(job.application_deadline).toLocaleDateString('en-IN')}
               </p>
             )}
-            <div className="flex flex-wrap gap-2">
+            <div className="hidden sm:flex flex-wrap gap-2">
               <Button size="lg" onClick={handleApply} className="gap-2">
                 Apply Now <ExternalLink className="h-4 w-4" />
               </Button>
