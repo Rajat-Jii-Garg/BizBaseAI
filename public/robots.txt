@@ -1,3 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin-panel
+Disallow: /admin-login
+Disallow: /settings
+Disallow: /notifications
+Disallow: /messages
+Disallow: /reset-password
+Disallow: /forget-password
+
 User-agent: Googlebot
 Allow: /
 
@@ -10,7 +20,7 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
-
+# Static sitemap (core pages)
 Sitemap: https://bizbase-ai.vercel.app/sitemap.xml
+# Dynamic sitemap (jobs, profiles, posts, communities)
+Sitemap: https://ahdtenixvhgncwaglxui.supabase.co/functions/v1/generate-sitemap
