@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import CreateJobModal from '@/components/CreateJobModal';
 import SEOHead from '@/components/SEOHead';
+import { buildShareUrl } from '@/lib/siteUrl';
 
 const Jobs = () => {
   const { user } = useAuth();
@@ -149,8 +150,8 @@ const Jobs = () => {
   const handleShareJob = async (job) => {
     // Always share BizBase's own job page (never external site URL)
     const url = job.slug
-      ? `${window.location.origin}/jobs/${job.slug}`
-      : `${window.location.origin}/jobs?job=${job.id}`;
+      ? buildShareUrl(`/jobs/${job.slug}`)
+      : buildShareUrl(`/jobs?job=${job.id}`);
     const shareData = {
       title: `${job.title} at ${job.company_name} | BizBase Jobs`,
       text: `${job.title} — ${job.company_name} (${job.location}). Apply via BizBase.`,
