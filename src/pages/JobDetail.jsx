@@ -8,7 +8,6 @@ import { MapPin, Clock, Building, Users, Eye, Briefcase, Calendar, Share2, Exter
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
 import { CANONICAL_SITE_URL, buildShareUrl } from '@/lib/siteUrl';
-import { useAuth } from '@/contexts/AuthContext';
 
 const BASE_URL = CANONICAL_SITE_URL;
 
