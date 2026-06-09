@@ -364,7 +364,35 @@ const Settings = () => {
           </TabsContent>
 
           {/* Notification Settings */}
-          <TabsContent value="notifications">
+          <TabsContent value="notifications" className="space-y-6">
+            <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-transparent">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  AI Profile Coach
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <Label className="text-foreground">Weekly AI Coach Emails</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Every Monday, our AI analyzes your profile and emails you personalized suggestions to grow your network and improve your visibility.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notifSettings.aiCoachEmails}
+                    disabled={coachSaving}
+                    onCheckedChange={toggleAiCoach}
+                  />
+                </div>
+                <Button size="sm" variant="outline" onClick={sendCoachTest} disabled={sendingTest || !notifSettings.aiCoachEmails}>
+                  {sendingTest ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+                  Send me a test analysis now
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader><CardTitle className="text-foreground">Notification Preferences</CardTitle></CardHeader>
               <CardContent className="space-y-6">
