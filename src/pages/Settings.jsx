@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import SEOHead from '@/components/SEOHead';
 import {
   Bell, Eye, Lock, Mail, Settings as SettingsIcon, Shield,
   Smartphone, Trash2, Upload, User, Save, Loader2, Globe, Palette, Sparkles, Send
@@ -417,7 +418,10 @@ const Settings = () => {
                       </div>
                     </div>
                     <Button size="sm" variant="outline" onClick={requestPushPermission}>
-                      {Notification?.permission === 'granted' ? 'Enabled ✓' : 'Enable'}
+                      {typeof Notification !== 'undefined' &&
+                        Notification.permission === 'granted'
+                          ? 'Enabled ✓' 
+                          : 'Enable'}
                     </Button>
                   </div>
 
