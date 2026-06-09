@@ -122,46 +122,26 @@ const App = () => (
                   <Connections />
                 </ProtectedRoute>
               } />
-              <Route path="/communities" element={
-                <ProtectedRoute>
-                  <Communities />
-                </ProtectedRoute>
-              } />
-              <Route path="/communities/:id" element={
-                <ProtectedRoute>
-                  <Community />
-                </ProtectedRoute>
-              } />
+              <Route path="/communities" element={<Communities />} />
+              <Route path="/communities/:id" element={<Community />} />
               <Route path="/settings" element={
                 <ProtectedRoute>
                   <Settings />
                 </ProtectedRoute>
               } />
-              <Route path="/events" element={
-                <ProtectedRoute>
-                  <Events />
-                </ProtectedRoute>
-              } />
+              <Route path="/events" element={<Events />} />
               <Route path="/insights" element={
                 <ProtectedRoute>
                   <Insights />
                 </ProtectedRoute>
               } />
-              <Route path="/ai-assistant" element={
-                <ProtectedRoute>
-                  <AIAssistant />
-                </ProtectedRoute>
-              } />
+              <Route path="/ai-assistant" element={<AIAssistant />} />
               <Route path="/business-setup" element={
                 <ProtectedRoute>
                   <BusinessSetup />
                 </ProtectedRoute>
               } />
-              <Route path="/jobs" element={
-                <ProtectedRoute>
-                  <Jobs />
-                </ProtectedRoute>
-              } />
+              <Route path="/jobs" element={<Jobs />} />
               {/* Public job detail page (SEO indexable) */}
               <Route path="/jobs/:slug" element={<JobDetail />} />
               <Route path="/dashboard/crm" element={
