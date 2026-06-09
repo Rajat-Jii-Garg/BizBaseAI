@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Bell, Eye, Lock, Mail, Settings as SettingsIcon, Shield,
-  Smartphone, Trash2, Upload, User, Save, Loader2, Globe, Palette
+  Smartphone, Trash2, Upload, User, Save, Loader2, Globe, Palette, Sparkles, Send
 } from 'lucide-react';
 
 const Settings = () => {
@@ -50,7 +50,10 @@ const Settings = () => {
     postShares: false,
     networkUpdates: true,
     jobAlerts: true,
+    aiCoachEmails: true,
   });
+  const [coachSaving, setCoachSaving] = useState(false);
+  const [sendingTest, setSendingTest] = useState(false);
 
   // Load profile data
   useEffect(() => {
@@ -73,8 +76,48 @@ const Settings = () => {
         showPhone: profile.show_phone || false,
         showLocation: profile.show_location || false,
       }));
+      setNotifSettings(prev => ({
+        ...prev,
+        aiCoachEmails: profile.ai_coach_emails_enabled !== false,
+      }));
     }
   }, [profile, user]);
+
+  const toggleAiCoach = async (enabled) => {
+    if (!user) return;
+    setNotifSettings(p => ({ ...p, aiCoachEmails: enabled }));
+    setCoachSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ ai_coach_emails_enabled: enabled })
+        .eq('id', user.id);
+      if (error) throw error;
+      toast.success(enabled ? 'AI Coach emails enabled' : 'AI Coach emails disabled');
+    } catch (e) {
+      toast.error('Failed to update preference');
+      setNotifSettings(p => ({ ...p, aiCoachEmails: !enabled }));
+    } finally {
+      setCoachSaving(false);
+    }
+  };
+
+  const sendCoachTest = async () => {
+    if (!user) return;
+    setSendingTest(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('profile-ai-coach', {
+        body: { user_id: user.id, force: true },
+      });
+      if (error) throw error;
+      toast.success('Test email sent! Check your inbox in a minute.');
+    } catch (e) {
+      toast.error('Could not send test email');
+      console.error(e);
+    } finally {
+      setSendingTest(false);
+    }
+  };
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -321,7 +364,35 @@ const Settings = () => {
           </TabsContent>
 
           {/* Notification Settings */}
-          <TabsContent value="notifications">
+          <TabsContent value="notifications" className="space-y-6">
+            <Card className="border-primary/30 bg-gradient-to-br from-primary/5 via-purple-500/5 to-transparent">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  AI Profile Coach
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <Label className="text-foreground">Weekly AI Coach Emails</Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Every Monday, our AI analyzes your profile and emails you personalized suggestions to grow your network and improve your visibility.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notifSettings.aiCoachEmails}
+                    disabled={coachSaving}
+                    onCheckedChange={toggleAiCoach}
+                  />
+                </div>
+                <Button size="sm" variant="outline" onClick={sendCoachTest} disabled={sendingTest || !notifSettings.aiCoachEmails}>
+                  {sendingTest ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+                  Send me a test analysis now
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader><CardTitle className="text-foreground">Notification Preferences</CardTitle></CardHeader>
               <CardContent className="space-y-6">

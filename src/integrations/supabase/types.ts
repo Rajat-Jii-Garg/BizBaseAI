@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_coach_email_logs: {
+        Row: {
+          email_status: string | null
+          error_message: string | null
+          id: string
+          profile_score: number | null
+          sent_at: string
+          suggestions: Json | null
+          user_id: string
+        }
+        Insert: {
+          email_status?: string | null
+          error_message?: string | null
+          id?: string
+          profile_score?: number | null
+          sent_at?: string
+          suggestions?: Json | null
+          user_id: string
+        }
+        Update: {
+          email_status?: string | null
+          error_message?: string | null
+          id?: string
+          profile_score?: number | null
+          sent_at?: string
+          suggestions?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_coach_email_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_coach_email_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author_id: string
@@ -1929,6 +1974,7 @@ export type Database = {
           about: string | null
           achievements: Json | null
           actively_looking_for_work: boolean | null
+          ai_coach_emails_enabled: boolean
           avatar_url: string | null
           banner_url: string | null
           belongs_to: string | null
@@ -1949,6 +1995,7 @@ export type Database = {
           id: string
           industry: string | null
           is_verified: boolean | null
+          last_ai_coach_email_at: string | null
           linkedin_url: string | null
           location: string | null
           nickname: string | null
@@ -1979,6 +2026,7 @@ export type Database = {
           about?: string | null
           achievements?: Json | null
           actively_looking_for_work?: boolean | null
+          ai_coach_emails_enabled?: boolean
           avatar_url?: string | null
           banner_url?: string | null
           belongs_to?: string | null
@@ -1999,6 +2047,7 @@ export type Database = {
           id: string
           industry?: string | null
           is_verified?: boolean | null
+          last_ai_coach_email_at?: string | null
           linkedin_url?: string | null
           location?: string | null
           nickname?: string | null
@@ -2029,6 +2078,7 @@ export type Database = {
           about?: string | null
           achievements?: Json | null
           actively_looking_for_work?: boolean | null
+          ai_coach_emails_enabled?: boolean
           avatar_url?: string | null
           banner_url?: string | null
           belongs_to?: string | null
@@ -2049,6 +2099,7 @@ export type Database = {
           id?: string
           industry?: string | null
           is_verified?: boolean | null
+          last_ai_coach_email_at?: string | null
           linkedin_url?: string | null
           location?: string | null
           nickname?: string | null
