@@ -8,7 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { BusinessProvider } from '@/contexts/BusinessContext';
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
-import { Navigate } from "react-router-dom";
+
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgetPassword from "./pages/ForgetPassword";
