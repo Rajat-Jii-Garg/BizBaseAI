@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.sync-external-jobs]
 verify_jwt = false
+
+[functions.profile-ai-coach]
+verify_jwt = false
