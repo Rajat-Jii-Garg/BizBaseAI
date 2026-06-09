@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Bell, Eye, Lock, Mail, Settings as SettingsIcon, Shield,
-  Smartphone, Trash2, Upload, User, Save, Loader2, Globe, Palette
+  Smartphone, Trash2, Upload, User, Save, Loader2, Globe, Palette, Sparkles, Send
 } from 'lucide-react';
 
 const Settings = () => {
