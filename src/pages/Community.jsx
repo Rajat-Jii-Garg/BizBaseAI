@@ -8,6 +8,7 @@ import { Hash, Globe, Lock, Users, MessageSquare, ArrowLeft } from 'lucide-react
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import SEOHead from '@/components/SEOHead';
 
 const Community = () => {
   const { id } = useParams();
@@ -120,6 +121,12 @@ const Community = () => {
 
   return (
     <DashboardLayout>
+      <SEOHead
+        title={community?.name ? `${community.name} Community` : 'Community'}
+        description={community?.description?.slice(0, 155) || `Join ${community?.name || 'this'} community on BizBase AI — connect, discuss and grow with like-minded professionals.`}
+        path={`/communities/${community?.id || ''}`}
+        type="article"
+      />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Button variant="outline" onClick={() => navigate('/communities')} className="mb-4">
