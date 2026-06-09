@@ -739,6 +739,558 @@ export type Database = {
         }
         Relationships: []
       }
+      fi_certificates: {
+        Row: {
+          certificate_id: string
+          enrollment_id: string
+          grade: string | null
+          id: string
+          internship_id: string
+          issued_at: string
+          score: number | null
+          status: Database["public"]["Enums"]["fi_certificate_status"]
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          certificate_id: string
+          enrollment_id: string
+          grade?: string | null
+          id?: string
+          internship_id: string
+          issued_at?: string
+          score?: number | null
+          status?: Database["public"]["Enums"]["fi_certificate_status"]
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          certificate_id?: string
+          enrollment_id?: string
+          grade?: string | null
+          id?: string
+          internship_id?: string
+          issued_at?: string
+          score?: number | null
+          status?: Database["public"]["Enums"]["fi_certificate_status"]
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fi_certificates_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: true
+            referencedRelation: "fi_internship_enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fi_certificates_internship_id_fkey"
+            columns: ["internship_id"]
+            isOneToOne: false
+            referencedRelation: "fi_internships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fi_contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      fi_email_logs: {
+        Row: {
+          error: string | null
+          id: string
+          sent_at: string | null
+          status: string
+          subject: string | null
+          template: string
+          to_address: string
+          user_id: string | null
+        }
+        Insert: {
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          template: string
+          to_address: string
+          user_id?: string | null
+        }
+        Update: {
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          template?: string
+          to_address?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      fi_evaluations: {
+        Row: {
+          assignment_id: string
+          criteria: Json | null
+          evaluated_at: string
+          feedback: string | null
+          id: string
+          score: number | null
+          submission_id: string
+          suggestions: string | null
+          user_id: string
+        }
+        Insert: {
+          assignment_id: string
+          criteria?: Json | null
+          evaluated_at?: string
+          feedback?: string | null
+          id?: string
+          score?: number | null
+          submission_id: string
+          suggestions?: string | null
+          user_id: string
+        }
+        Update: {
+          assignment_id?: string
+          criteria?: Json | null
+          evaluated_at?: string
+          feedback?: string | null
+          id?: string
+          score?: number | null
+          submission_id?: string
+          suggestions?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fi_evaluations_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "fi_task_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fi_evaluations_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: true
+            referencedRelation: "fi_task_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fi_internship_enrollments: {
+        Row: {
+          completed_at: string | null
+          final_grade: string | null
+          final_score: number | null
+          id: string
+          internship_id: string
+          started_at: string
+          status: Database["public"]["Enums"]["fi_enrollment_status"]
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          final_grade?: string | null
+          final_score?: number | null
+          id?: string
+          internship_id: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["fi_enrollment_status"]
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          final_grade?: string | null
+          final_score?: number | null
+          id?: string
+          internship_id?: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["fi_enrollment_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fi_internship_enrollments_internship_id_fkey"
+            columns: ["internship_id"]
+            isOneToOne: false
+            referencedRelation: "fi_internships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fi_internships: {
+        Row: {
+          category: string
+          completion_criteria: string | null
+          cover_emoji: string | null
+          created_at: string
+          description: string
+          difficulty: string | null
+          duration_weeks: number
+          id: string
+          is_published: boolean
+          objectives: string[] | null
+          qualifications: string[] | null
+          requirements: string[] | null
+          short_description: string | null
+          skills: string[] | null
+          slug: string
+          task_count: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          completion_criteria?: string | null
+          cover_emoji?: string | null
+          created_at?: string
+          description: string
+          difficulty?: string | null
+          duration_weeks?: number
+          id?: string
+          is_published?: boolean
+          objectives?: string[] | null
+          qualifications?: string[] | null
+          requirements?: string[] | null
+          short_description?: string | null
+          skills?: string[] | null
+          slug: string
+          task_count?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          completion_criteria?: string | null
+          cover_emoji?: string | null
+          created_at?: string
+          description?: string
+          difficulty?: string | null
+          duration_weeks?: number
+          id?: string
+          is_published?: boolean
+          objectives?: string[] | null
+          qualifications?: string[] | null
+          requirements?: string[] | null
+          short_description?: string | null
+          skills?: string[] | null
+          slug?: string
+          task_count?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fi_notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fi_profiles_cache: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          bizbase_url: string | null
+          email: string | null
+          full_name: string | null
+          synced_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          bizbase_url?: string | null
+          email?: string | null
+          full_name?: string | null
+          synced_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          bizbase_url?: string | null
+          email?: string | null
+          full_name?: string | null
+          synced_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      fi_referrals: {
+        Row: {
+          code: string
+          converted_at: string | null
+          created_at: string
+          id: string
+          referee_id: string | null
+          referrer_id: string
+        }
+        Insert: {
+          code: string
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referee_id?: string | null
+          referrer_id: string
+        }
+        Update: {
+          code?: string
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referee_id?: string | null
+          referrer_id?: string
+        }
+        Relationships: []
+      }
+      fi_task_assignments: {
+        Row: {
+          assigned_at: string
+          deadline: string | null
+          enrollment_id: string
+          id: string
+          status: Database["public"]["Enums"]["fi_task_status"]
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          deadline?: string | null
+          enrollment_id: string
+          id?: string
+          status?: Database["public"]["Enums"]["fi_task_status"]
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          deadline?: string | null
+          enrollment_id?: string
+          id?: string
+          status?: Database["public"]["Enums"]["fi_task_status"]
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fi_task_assignments_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "fi_internship_enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fi_task_assignments_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "fi_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fi_task_submissions: {
+        Row: {
+          assignment_id: string
+          attachments: Json | null
+          content: string
+          id: string
+          submitted_at: string
+          user_id: string
+        }
+        Insert: {
+          assignment_id: string
+          attachments?: Json | null
+          content: string
+          id?: string
+          submitted_at?: string
+          user_id: string
+        }
+        Update: {
+          assignment_id?: string
+          attachments?: Json | null
+          content?: string
+          id?: string
+          submitted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fi_task_submissions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "fi_task_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fi_tasks: {
+        Row: {
+          created_at: string
+          deadline_days: number
+          description: string
+          id: string
+          instructions: string | null
+          internship_id: string
+          order_index: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          deadline_days?: number
+          description: string
+          id?: string
+          instructions?: string | null
+          internship_id: string
+          order_index?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          deadline_days?: number
+          description?: string
+          id?: string
+          instructions?: string | null
+          internship_id?: string
+          order_index?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fi_tasks_internship_id_fkey"
+            columns: ["internship_id"]
+            isOneToOne: false
+            referencedRelation: "fi_internships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fi_user_assessments: {
+        Row: {
+          career_goal: string | null
+          created_at: string
+          current_job_role: string | null
+          current_skills: string[] | null
+          education_level: string | null
+          experience_level: string | null
+          id: string
+          interested_industry: string | null
+          learning_objective: string | null
+          preferred_duration: string | null
+          updated_at: string
+          user_id: string
+          weekly_hours: number | null
+        }
+        Insert: {
+          career_goal?: string | null
+          created_at?: string
+          current_job_role?: string | null
+          current_skills?: string[] | null
+          education_level?: string | null
+          experience_level?: string | null
+          id?: string
+          interested_industry?: string | null
+          learning_objective?: string | null
+          preferred_duration?: string | null
+          updated_at?: string
+          user_id: string
+          weekly_hours?: number | null
+        }
+        Update: {
+          career_goal?: string | null
+          created_at?: string
+          current_job_role?: string | null
+          current_skills?: string[] | null
+          education_level?: string | null
+          experience_level?: string | null
+          id?: string
+          interested_industry?: string | null
+          learning_objective?: string | null
+          preferred_duration?: string | null
+          updated_at?: string
+          user_id?: string
+          weekly_hours?: number | null
+        }
+        Relationships: []
+      }
+      fi_user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["fi_app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["fi_app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["fi_app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       follows: {
         Row: {
           created_at: string
@@ -2170,6 +2722,14 @@ export type Database = {
         Returns: string
       }
       decay_user_interests: { Args: never; Returns: undefined }
+      fi_has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["fi_app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      fi_next_certificate_id: { Args: never; Returns: string }
       generate_otp: { Args: never; Returns: string }
       get_entity_by_username: {
         Args: { search_username: string }
@@ -2220,6 +2780,10 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      fi_app_role: "admin" | "moderator" | "user"
+      fi_certificate_status: "locked" | "unlocked" | "revoked"
+      fi_enrollment_status: "applied" | "active" | "completed" | "cancelled"
+      fi_task_status: "pending" | "submitted" | "evaluated" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2348,6 +2912,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      fi_app_role: ["admin", "moderator", "user"],
+      fi_certificate_status: ["locked", "unlocked", "revoked"],
+      fi_enrollment_status: ["applied", "active", "completed", "cancelled"],
+      fi_task_status: ["pending", "submitted", "evaluated", "completed"],
     },
   },
 } as const
