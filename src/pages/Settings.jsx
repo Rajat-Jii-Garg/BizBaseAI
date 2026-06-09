@@ -50,7 +50,10 @@ const Settings = () => {
     postShares: false,
     networkUpdates: true,
     jobAlerts: true,
+    aiCoachEmails: true,
   });
+  const [coachSaving, setCoachSaving] = useState(false);
+  const [sendingTest, setSendingTest] = useState(false);
 
   // Load profile data
   useEffect(() => {
