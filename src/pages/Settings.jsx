@@ -76,8 +76,48 @@ const Settings = () => {
         showPhone: profile.show_phone || false,
         showLocation: profile.show_location || false,
       }));
+      setNotifSettings(prev => ({
+        ...prev,
+        aiCoachEmails: profile.ai_coach_emails_enabled !== false,
+      }));
     }
   }, [profile, user]);
+
+  const toggleAiCoach = async (enabled) => {
+    if (!user) return;
+    setNotifSettings(p => ({ ...p, aiCoachEmails: enabled }));
+    setCoachSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ ai_coach_emails_enabled: enabled })
+        .eq('id', user.id);
+      if (error) throw error;
+      toast.success(enabled ? 'AI Coach emails enabled' : 'AI Coach emails disabled');
+    } catch (e) {
+      toast.error('Failed to update preference');
+      setNotifSettings(p => ({ ...p, aiCoachEmails: !enabled }));
+    } finally {
+      setCoachSaving(false);
+    }
+  };
+
+  const sendCoachTest = async () => {
+    if (!user) return;
+    setSendingTest(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('profile-ai-coach', {
+        body: { user_id: user.id, force: true },
+      });
+      if (error) throw error;
+      toast.success('Test email sent! Check your inbox in a minute.');
+    } catch (e) {
+      toast.error('Could not send test email');
+      console.error(e);
+    } finally {
+      setSendingTest(false);
+    }
+  };
 
   const handleSaveProfile = async () => {
     if (!user) return;
