@@ -8,6 +8,7 @@ import { Hash, Globe, Lock, Users, MessageSquare, ArrowLeft } from 'lucide-react
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import SEOHead from '@/components/SEOHead';
 
 const Community = () => {
   const { id } = useParams();
