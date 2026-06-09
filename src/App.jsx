@@ -85,7 +85,7 @@ const App = () => (
           <BusinessProvider>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
+              <Route path="/auth" element={<Navigate to="/login" replace />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/forget-password" element={<ForgetPassword />} />
