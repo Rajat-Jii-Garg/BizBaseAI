@@ -159,6 +159,7 @@ const Settings = () => {
         })
         .eq('id', user.id);
       if (error) throw error;
+      await refreshProfile?.();
       toast.success('Privacy settings saved!');
     } catch (error) {
       toast.error('Failed to save privacy settings');
