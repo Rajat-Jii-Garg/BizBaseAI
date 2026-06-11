@@ -135,6 +135,7 @@ const Settings = () => {
         .eq('id', user.id);
 
       if (error) throw error;
+      await refreshProfile?.();
       toast.success('Profile updated successfully!');
     } catch (error) {
       toast.error('Failed to update profile');
