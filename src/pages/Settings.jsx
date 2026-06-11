@@ -392,10 +392,9 @@ const Settings = () => {
                     onCheckedChange={toggleAiCoach}
                   />
                 </div>
-                <Button size="sm" variant="outline" onClick={sendCoachTest} disabled={sendingTest || !notifSettings.aiCoachEmails}>
-                  {sendingTest ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
-                  Send me a test analysis now
-                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Coach emails are sent automatically every Monday based on your latest profile data.
+                </p>
               </CardContent>
             </Card>
 
