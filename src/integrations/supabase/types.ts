@@ -1999,6 +1999,7 @@ export type Database = {
           linkedin_url: string | null
           location: string | null
           nickname: string | null
+          notification_preferences: Json
           personal_branding_score: number | null
           phone: string | null
           portfolio_url: string | null
@@ -2051,6 +2052,7 @@ export type Database = {
           linkedin_url?: string | null
           location?: string | null
           nickname?: string | null
+          notification_preferences?: Json
           personal_branding_score?: number | null
           phone?: string | null
           portfolio_url?: string | null
@@ -2103,6 +2105,7 @@ export type Database = {
           linkedin_url?: string | null
           location?: string | null
           nickname?: string | null
+          notification_preferences?: Json
           personal_branding_score?: number | null
           phone?: string | null
           portfolio_url?: string | null

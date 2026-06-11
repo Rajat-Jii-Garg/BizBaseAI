@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 const Settings = () => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, refreshProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -54,7 +54,7 @@ const Settings = () => {
     aiCoachEmails: true,
   });
   const [coachSaving, setCoachSaving] = useState(false);
-  const [sendingTest, setSendingTest] = useState(false);
+  const [savingNotif, setSavingNotif] = useState(false);
 
   // Load profile data
   useEffect(() => {
@@ -77,8 +77,10 @@ const Settings = () => {
         showPhone: profile.show_phone || false,
         showLocation: profile.show_location || false,
       }));
+      const prefs = profile.notification_preferences || {};
       setNotifSettings(prev => ({
         ...prev,
+        ...prefs,
         aiCoachEmails: profile.ai_coach_emails_enabled !== false,
       }));
     }
@@ -103,22 +105,25 @@ const Settings = () => {
     }
   };
 
-  const sendCoachTest = async () => {
+  const handleSaveNotifications = async () => {
     if (!user) return;
-    setSendingTest(true);
+    setSavingNotif(true);
     try {
-      const { data, error } = await supabase.functions.invoke('profile-ai-coach', {
-        body: { user_id: user.id, force: true },
-      });
+      const { aiCoachEmails, ...prefs } = notifSettings;
+      const { error } = await supabase
+        .from('profiles')
+        .update({ notification_preferences: prefs })
+        .eq('id', user.id);
       if (error) throw error;
-      toast.success('Test email sent! Check your inbox in a minute.');
+      toast.success('Notification preferences saved!');
     } catch (e) {
-      toast.error('Could not send test email');
+      toast.error('Failed to save preferences');
       console.error(e);
     } finally {
-      setSendingTest(false);
+      setSavingNotif(false);
     }
   };
+
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -130,6 +135,7 @@ const Settings = () => {
         .eq('id', user.id);
 
       if (error) throw error;
+      await refreshProfile?.();
       toast.success('Profile updated successfully!');
     } catch (error) {
       toast.error('Failed to update profile');
@@ -153,6 +159,7 @@ const Settings = () => {
         })
         .eq('id', user.id);
       if (error) throw error;
+      await refreshProfile?.();
       toast.success('Privacy settings saved!');
     } catch (error) {
       toast.error('Failed to save privacy settings');
@@ -387,10 +394,9 @@ const Settings = () => {
                     onCheckedChange={toggleAiCoach}
                   />
                 </div>
-                <Button size="sm" variant="outline" onClick={sendCoachTest} disabled={sendingTest || !notifSettings.aiCoachEmails}>
-                  {sendingTest ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
-                  Send me a test analysis now
-                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Coach emails are sent automatically every Monday based on your latest profile data.
+                </p>
               </CardContent>
             </Card>
 
@@ -444,8 +450,9 @@ const Settings = () => {
                     </div>
                   </div>
                 </div>
-                <Button onClick={() => toast.success('Notification preferences saved!')}>
-                  <Save className="w-4 h-4 mr-2" /> Save Preferences
+                <Button onClick={handleSaveNotifications} disabled={savingNotif}>
+                  {savingNotif ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                  Save Preferences
                 </Button>
               </CardContent>
             </Card>
