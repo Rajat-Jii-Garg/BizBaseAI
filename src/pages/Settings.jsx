@@ -448,8 +448,9 @@ const Settings = () => {
                     </div>
                   </div>
                 </div>
-                <Button onClick={() => toast.success('Notification preferences saved!')}>
-                  <Save className="w-4 h-4 mr-2" /> Save Preferences
+                <Button onClick={handleSaveNotifications} disabled={savingNotif}>
+                  {savingNotif ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                  Save Preferences
                 </Button>
               </CardContent>
             </Card>
