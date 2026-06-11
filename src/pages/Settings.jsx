@@ -54,7 +54,7 @@ const Settings = () => {
     aiCoachEmails: true,
   });
   const [coachSaving, setCoachSaving] = useState(false);
-  const [sendingTest, setSendingTest] = useState(false);
+  const [savingNotif, setSavingNotif] = useState(false);
 
   // Load profile data
   useEffect(() => {
