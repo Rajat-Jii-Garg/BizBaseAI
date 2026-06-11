@@ -105,22 +105,25 @@ const Settings = () => {
     }
   };
 
-  const sendCoachTest = async () => {
+  const handleSaveNotifications = async () => {
     if (!user) return;
-    setSendingTest(true);
+    setSavingNotif(true);
     try {
-      const { data, error } = await supabase.functions.invoke('profile-ai-coach', {
-        body: { user_id: user.id, force: true },
-      });
+      const { aiCoachEmails, ...prefs } = notifSettings;
+      const { error } = await supabase
+        .from('profiles')
+        .update({ notification_preferences: prefs })
+        .eq('id', user.id);
       if (error) throw error;
-      toast.success('Test email sent! Check your inbox in a minute.');
+      toast.success('Notification preferences saved!');
     } catch (e) {
-      toast.error('Could not send test email');
+      toast.error('Failed to save preferences');
       console.error(e);
     } finally {
-      setSendingTest(false);
+      setSavingNotif(false);
     }
   };
+
 
   const handleSaveProfile = async () => {
     if (!user) return;
