@@ -77,8 +77,10 @@ const Settings = () => {
         showPhone: profile.show_phone || false,
         showLocation: profile.show_location || false,
       }));
+      const prefs = profile.notification_preferences || {};
       setNotifSettings(prev => ({
         ...prev,
+        ...prefs,
         aiCoachEmails: profile.ai_coach_emails_enabled !== false,
       }));
     }
