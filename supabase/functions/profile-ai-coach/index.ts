@@ -1,4 +1,4 @@
-// Profile AI Coach — analyzes user profiles weekly and emails improvement tips
+// Profile AI Coach — weekly profile analysis + email + in-app notification
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
 import nodemailer from "npm:nodemailer@6.9.14";
 
@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
 const GMAIL_USER = Deno.env.get("GMAIL_USER")!;
 const GMAIL_PASS = Deno.env.get("GMAIL_PASS")!;
 const SITE_URL = "https://bizbase-ai.vercel.app";
@@ -36,41 +36,37 @@ async function analyzeProfile(profile: any) {
     completion_score: profile.profile_completion_score,
   };
 
-  const prompt = `Analyze this BizBase user's profile and return STRICT JSON only.
+  const prompt = `You are a professional profile coach for BizBase, a career & networking platform.
+Analyze this user's profile and return STRICT JSON only (no markdown, no code fences).
 Profile: ${JSON.stringify(ctx)}
 
-Return JSON shape:
+Return exactly:
 {
   "score": <0-100 strength score>,
   "headline": "<one short motivational headline addressed to user>",
   "summary": "<2-3 sentence summary of profile state>",
   "suggestions": [
-    {"title": "<short>", "why": "<why it matters>", "action": "<concrete one-liner action>"},
-    ... (3 to 5 items)
+    {"title": "<short>", "why": "<why it matters>", "action": "<concrete one-liner action>"}
   ]
 }
-Focus on missing/weak fields, bio quality, skills, professional positioning, and networking opportunities.`;
+Provide 3 to 5 suggestions. Focus on missing/weak fields, bio quality, skills, professional positioning, and networking opportunities.`;
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7, responseMimeType: "application/json" },
+      }),
     },
-    body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
-      messages: [
-        { role: "system", content: "You are a professional profile coach. Respond ONLY with valid JSON, no markdown fences." },
-        { role: "user", content: prompt },
-      ],
-      temperature: 0.7,
-    }),
-  });
+  );
 
-  if (!res.ok) throw new Error(`AI gateway ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  let txt = data.choices[0].message.content.trim();
-  txt = txt.replace(/^```json\s*/i, "").replace(/```$/g, "").trim();
+  let txt = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  txt = txt.trim().replace(/^```json\s*/i, "").replace(/```$/g, "").trim();
   return JSON.parse(txt);
 }
 
@@ -119,6 +115,18 @@ async function processUser(profile: any) {
     subject: `${profile.full_name?.split(" ")[0] || "Your"} profile insights — ${analysis.score}/100`,
     html,
   });
+
+  // In-app notification
+  try {
+    await supabase.from("notifications").insert({
+      user_id: profile.id,
+      type: "ai_coach",
+      title: `AI Coach: ${analysis.score}/100 profile strength`,
+      content: analysis.headline || "We've sent personalized improvement tips to your email.",
+    });
+  } catch (e) {
+    console.error("notification insert failed", e);
+  }
 
   await supabase.from("profiles").update({ last_ai_coach_email_at: new Date().toISOString() }).eq("id", profile.id);
   await supabase.from("ai_coach_email_logs").insert({
