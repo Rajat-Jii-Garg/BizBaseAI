@@ -18,6 +18,7 @@ import {
   Crown,
   Rocket,
   DollarSign,
+  Sparkles,
   Lightbulb,
   Star,
   Award
