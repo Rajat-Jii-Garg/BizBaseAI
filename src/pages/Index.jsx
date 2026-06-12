@@ -5,9 +5,10 @@ import SEOHead from '@/components/SEOHead';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
+import ProductPreview from '@/components/ProductPreview';
 import Benefits from '@/components/Benefits';
+import WhoIsItFor from '@/components/WhoIsItFor';
 import HowItWorks from '@/components/HowItWorks';
-import Testimonials from '@/components/Testimonials';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -16,18 +17,19 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="BizBase AI - AI Powered Professional Networking & Business Platform to Build, Grow & Automate"
-        description="Build Professional Networks, Grow your Career, Manage Businesses, and Automate your Work with Smart Tools. Start Free and Scale Faster."
+        title="BizBase AI - All-in-One Platform for Professionals, Students & Businesses"
+        description="Network, find jobs, join communities, get AI career coaching, and run your business — all under one roof. 100% free for every professional."
         path="/"
       />
       <Navbar />
       <Hero />
+      <ProductPreview />
       <Features />
+      <WhoIsItFor />
       <Benefits />
       <HowItWorks />
-      <Testimonials />
       <CallToAction />
-      
+
       {/* Quick Auth Links Section */}
       <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4 text-center">
@@ -36,7 +38,7 @@ const Index = () => {
           </h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white">
-              <Link to="/signup">Create Account</Link>
+              <Link to="/signup">Create Free Account</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
               <Link to="/login">Sign In</Link>
@@ -44,7 +46,7 @@ const Index = () => {
           </div>
         </div>
       </section>
-      
+
       <Footer />
     </div>
   );

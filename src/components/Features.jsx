@@ -27,67 +27,51 @@ const Features = () => {
   const features = [
     {
       icon: Brain,
-      title: 'AI Business Brain',
-      description: 'Revolutionary AI that thinks, plans, and executes business strategies automatically with superhuman intelligence.',
-      gradient: 'from-purple-600 to-pink-600',
-      category: 'AI Revolution',
-      stats: '10x Smarter'
-    },
-    {
-      icon: DollarSign,
-      title: 'Automated Money Machine',
-      description: 'AI-powered revenue generation systems that create multiple income streams while you focus on growth.',
-      gradient: 'from-emerald-600 to-teal-600',
-      category: 'Revenue Generation',
-      stats: '$1M+ Generated'
+      title: 'AI Career Coach',
+      description: 'Personalized weekly emails analyzing your profile, skills and giving real growth steps powered by Gemini AI.',
+      gradient: 'from-violet-500 to-purple-500',
+      category: 'AI',
+      stats: 'Weekly insights'
     },
     {
       icon: Users,
-      title: 'Global Empire Management',
-      description: 'Manage unlimited teams across continents with AI-powered coordination and real-time performance optimization.',
-      gradient: 'from-blue-600 to-cyan-600',
-      category: 'Team Domination',
-      stats: 'Unlimited Scale'
+      title: 'Smart Networking',
+      description: 'AI-matched connection suggestions based on your goals, skills and interests — no more cold outreach.',
+      gradient: 'from-blue-500 to-cyan-500',
+      category: 'Network',
+      stats: 'AI-matched'
     },
     {
-      icon: Rocket,
-      title: 'Hypergrowth Engine',
-      description: 'Proprietary algorithms that identify and execute growth opportunities 24/7, scaling your business exponentially.',
-      gradient: 'from-orange-600 to-red-600',
-      category: 'Growth Acceleration',
-      stats: '1000% Growth'
+      icon: Workflow,
+      title: 'Communities & Events',
+      description: 'Join niche communities, host or attend events, and learn directly from peers in your field.',
+      gradient: 'from-emerald-500 to-teal-500',
+      category: 'Learn',
+      stats: 'Built-in chat'
     },
     {
-      icon: Crown,
-      title: 'Market Domination Suite',
-      description: 'Complete competitive intelligence and market domination tools that ensure you always stay ahead of competition.',
-      gradient: 'from-yellow-600 to-amber-600',
-      category: 'Market Leadership',
-      stats: '#1 Position'
-    },
-    {
-      icon: Shield,
-      title: 'Fortress Security',
-      description: 'Military-grade security with AI threat detection that protects your business empire from any digital attack.',
-      gradient: 'from-slate-600 to-gray-700',
-      category: 'Ultimate Protection',
-      stats: '100% Secure'
+      icon: Target,
+      title: 'Jobs Portal',
+      description: 'Discover internships, jobs and freelance gigs — with AI-powered recommendations based on your profile.',
+      gradient: 'from-orange-500 to-amber-500',
+      category: 'Career',
+      stats: 'AI-recommended'
     },
     {
       icon: BarChart3,
-      title: 'Predictive Intelligence',
-      description: 'See the future of your business with AI that predicts market trends, customer behavior, and opportunities.',
-      gradient: 'from-indigo-600 to-purple-600',
-      category: 'Future Vision',
-      stats: '99.9% Accuracy'
+      title: 'Business Suite',
+      description: 'Run your business with built-in CRM, finance, projects, team and lead tools — all included free.',
+      gradient: 'from-indigo-500 to-blue-500',
+      category: 'Business',
+      stats: '6+ modules'
     },
     {
-      icon: Globe,
-      title: 'Global Domination Hub',
-      description: 'Expand to any country instantly with AI-powered localization, compliance, and market entry strategies.',
-      gradient: 'from-teal-600 to-blue-600',
-      category: 'World Expansion',
-      stats: '195 Countries'
+      icon: Zap,
+      title: 'BizAI Assistant',
+      description: '24/7 AI assistant for content, ideas, replies, post rewriting and career questions — always available.',
+      gradient: 'from-pink-500 to-rose-500',
+      category: 'AI',
+      stats: 'Always on'
     }
   ];
 
@@ -101,26 +85,25 @@ const Features = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-24">
-          <div className="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-sm font-bold uppercase tracking-wider mb-8">
-            <Crown className="w-4 h-4 inline mr-2" />
-            World's Most Advanced Platform
+        <div className="text-center mb-20">
+          <div className="inline-block px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-6">
+            <Sparkles className="w-4 h-4 inline mr-2" />
+            Everything you need, free
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-5 leading-tight">
             <span className="bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent">
-              Features That
+              Powerful features
             </span>
             <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-teal-400 bg-clip-text text-transparent">
-              Dominate Industries
+              for every professional
             </span>
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
-            Revolutionary AI-powered tools that transform ordinary businesses into 
-            <span className="font-bold text-yellow-400"> unstoppable market leaders</span>
+            Real tools to help you network, learn, grow your career and run your business — without paying for 5 different apps.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {features.map((feature, index) => (
             <Card
               key={index}
@@ -156,31 +139,23 @@ const Features = () => {
           ))}
         </div>
 
-        {/* Revolutionary CTA */}
+        {/* CTA */}
         <div className="text-center">
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-3xl p-6 sm:p-8 md:p-12 rounded-2xl text-white shadow-2xl border border-white/20">
-            <div className="flex justify-center mb-8">
-              <div className="flex items-center space-x-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-8 h-8 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-            </div>
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-black mb-6">Ready to Dominate Your Industry?</h3>
-            <p className="text-sm sm:text-base md:text-lg opacity-90 max-w-xl mx-auto mb-12 opacity-90 max-w-4xl mx-auto">
-              Join the exclusive club of entrepreneurs who use BizBase to build business empires and generate millions in revenue.
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-3xl p-6 sm:p-8 md:p-12 text-white shadow-2xl border border-white/20">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Ready to grow with BizBase?</h3>
+            <p className="text-sm sm:text-base md:text-lg opacity-90 max-w-xl mx-auto mb-8">
+              Join a growing community of professionals, freelancers and founders building their future on BizBase — free forever.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link to="/login">
-                <button className="bg-white text-blue-600 px-6 py-3 text-sm md:text-base rounded-2xl font-black hover:shadow-2xl transform hover:scale-110 transition-all duration-300 flex items-center">
-                  <Crown className="w-6 h-6 mr-3" />
-                  Start Your Empire Now
-                  <Rocket className="w-6 h-6 ml-3" />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/signup">
+                <button className="bg-white text-blue-600 px-6 py-3 text-sm md:text-base rounded-2xl font-bold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center">
+                  <Rocket className="w-5 h-5 mr-2" />
+                  Get Started Free
                 </button>
               </Link>
               <Link to="/login">
-                <button className="border-2 border-white text-white px-6 py-3 text-sm md:text-base rounded-2xl font-black hover:bg-white hover:text-blue-600 transition-all duration-300">
-                  Watch Success Stories
+                <button className="border-2 border-white text-white px-6 py-3 text-sm md:text-base rounded-2xl font-bold hover:bg-white hover:text-blue-600 transition-all duration-300">
+                  Sign In
                 </button>
               </Link>
             </div>
