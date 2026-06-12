@@ -40,15 +40,15 @@ const Hero = () => {
           {/* Main Headline */}
           <div className="space-y-4 max-w-3xl mx-auto">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold leading-[1.15] tracking-tight">
-              <span className="text-foreground">Where Professionals</span>
+              <span className="text-foreground">One Platform for Every</span>
               <br />
               <span className="bg-gradient-to-r from-violet-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-                Connect, Grow & Build
+                Professional & Business
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Network smarter, manage your business, and grow your brand — all powered by AI on one unified platform.
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Built for students, freelancers, job seekers, founders & business owners. Network, learn, find jobs, join communities, get AI career coaching, and run your business — all under one roof, 100% free.
             </p>
           </div>
 
@@ -73,11 +73,11 @@ const Hero = () => {
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 pt-1 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Free to start</span>
+              <span>100% Free</span>
             </div>
             <div className="flex items-center gap-1">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-              <span>No credit card</span>
+              <span>No user limits</span>
             </div>
             <div className="flex items-center gap-1">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
@@ -85,13 +85,13 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Stats */}
+          {/* Stats — real, honest */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 pt-8 max-w-2xl mx-auto">
             {[
-              { value: '10K+', label: 'Professionals', icon: Users, color: 'text-blue-500', bg: 'from-blue-50 to-blue-100/50' },
-              { value: '99.9%', label: 'Uptime', icon: Shield, color: 'text-emerald-500', bg: 'from-emerald-50 to-emerald-100/50' },
-              { value: '24/7', label: 'AI Assistant', icon: Brain, color: 'text-violet-500', bg: 'from-violet-50 to-violet-100/50' },
-              { value: '20+', label: 'Smart Tools', icon: Sparkles, color: 'text-cyan-500', bg: 'from-cyan-50 to-cyan-100/50' }
+              { value: '15+', label: 'AI Tools', icon: Brain, color: 'text-violet-500', bg: 'from-violet-50 to-violet-100/50' },
+              { value: '8+', label: 'Core Modules', icon: Sparkles, color: 'text-blue-500', bg: 'from-blue-50 to-blue-100/50' },
+              { value: '100%', label: 'Free to Use', icon: Shield, color: 'text-emerald-500', bg: 'from-emerald-50 to-emerald-100/50' },
+              { value: '24/7', label: 'AI Assistant', icon: Zap, color: 'text-cyan-500', bg: 'from-cyan-50 to-cyan-100/50' }
             ].map((stat, index) => (
               <div key={index} className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all duration-500">
                 <div className={`w-8 h-8 mx-auto mb-2 rounded-lg bg-gradient-to-br ${stat.bg} flex items-center justify-center`}>

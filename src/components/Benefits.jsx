@@ -1,84 +1,70 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Zap, 
-  Shield, 
-  Globe, 
-  TrendingUp, 
-  Users, 
-  Brain, 
-  Clock, 
-  Award 
+import {
+  Users,
+  Brain,
+  Briefcase,
+  MessageSquare,
+  Building2,
+  Coins
 } from 'lucide-react';
 
 const Benefits = () => {
   const benefits = [
     {
-      icon: Zap,
-      title: 'Lightning Fast Setup',
-      description: 'Get your business running in minutes, not months. Our AI handles the complex setup automatically.',
-      color: 'from-yellow-500 to-orange-500'
-    },
-    {
-      icon: Shield,
-      title: 'Enterprise Security',
-      description: 'Bank-level encryption and security protocols protect your valuable business data 24/7.',
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      icon: Globe,
-      title: 'Global Reach',
-      description: 'Expand to any market worldwide with built-in localization and compliance tools.',
+      icon: Users,
+      title: 'Professional Networking',
+      description: 'Build real connections with students, founders, freelancers and business owners across India.',
       color: 'from-blue-500 to-cyan-500'
     },
     {
-      icon: TrendingUp,
-      title: 'Predictive Analytics',
-      description: 'AI-powered insights that predict trends and optimize your business performance.',
-      color: 'from-purple-500 to-pink-500'
+      icon: Brain,
+      title: 'AI Career Coach',
+      description: 'Personalized AI suggestions on your profile, skills and growth — delivered to you weekly.',
+      color: 'from-violet-500 to-purple-500'
     },
     {
-      icon: Users,
-      title: 'Team Collaboration',
-      description: 'Connect your entire team with advanced collaboration tools and real-time updates.',
+      icon: Briefcase,
+      title: 'Jobs & Opportunities',
+      description: 'Discover roles, internships and freelance gigs matched to your profile by AI.',
+      color: 'from-emerald-500 to-teal-500'
+    },
+    {
+      icon: MessageSquare,
+      title: 'Communities & Events',
+      description: 'Join niche communities, attend events, and learn directly from people in your field.',
+      color: 'from-amber-500 to-orange-500'
+    },
+    {
+      icon: Building2,
+      title: 'Business Dashboard',
+      description: 'Run your business with built-in CRM, finance, projects, team and lead management — free.',
       color: 'from-indigo-500 to-blue-500'
     },
     {
-      icon: Brain,
-      title: 'AI Assistant',
-      description: 'Your personal business AI that learns from your data and provides smart recommendations.',
-      color: 'from-teal-500 to-green-500'
-    },
-    {
-      icon: Clock,
-      title: '24/7 Automation',
-      description: 'Never miss an opportunity with round-the-clock automated workflows and processes.',
-      color: 'from-rose-500 to-red-500'
-    },
-    {
-      icon: Award,
-      title: 'Proven Results',
-      description: 'Join thousands of successful businesses that have transformed with BizBase.',
-      color: 'from-amber-500 to-yellow-500'
+      icon: Coins,
+      title: 'BizCoins Rewards',
+      description: 'Earn BizCoins for activity, referrals and engagement. Real rewards for real participation.',
+      color: 'from-yellow-500 to-amber-500'
     }
   ];
 
   return (
     <section className="py-20 bg-gradient-to-br from-white via-slate-50 to-blue-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-black mb-6">
+        <div className="text-center mb-14">
+          <h2 className="text-3xl md:text-5xl font-black mb-5">
             <span className="bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-              Why Choose BizBase?
+              Everything You Need, in One Place
             </span>
           </h2>
-          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Experience the difference with our cutting-edge features designed for modern businesses
+          <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            No need to juggle LinkedIn, Notion, HubSpot and 5 other tools. BizBase brings every essential into one free platform.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {benefits.map((benefit, index) => (
             <Card key={index} className="group card-professional hover:shadow-xl">
               <CardContent className="p-6 text-center">
