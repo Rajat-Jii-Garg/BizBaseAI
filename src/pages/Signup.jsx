@@ -25,6 +25,7 @@ const Signup = () => {
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const refCode = searchParams.get('ref');
   const { user } = useAuth();
 
@@ -94,7 +95,8 @@ const Signup = () => {
             username: signupData.username,
             phone: signupData.phone,
           },
-          emailRedirectTo: window.location.origin + "/dashboard"
+        emailRedirectTo:
+          redirect || (window.location.origin + "/dashboard")
         }
       });
 
@@ -110,9 +112,29 @@ const Signup = () => {
       }
 
       if (data?.session) {
-        // Auto-confirmed (confirm email is OFF) - redirect to dashboard
-        toast.success("Account Created!", { description: "Welcome to BizBase!" });
-        navigate('/dashboard');
+        toast.success("Account Created!", {
+          description: "Welcome to BizBase!"
+        });
+
+        if (redirect) {
+          const {
+            data: { session }
+          } = await supabase.auth.getSession();
+
+          const url =
+            redirect +
+            (redirect.includes("?") ? "&" : "?") +
+            "access_token=" +
+            encodeURIComponent(session.access_token) +
+            "&refresh_token=" +
+            encodeURIComponent(session.refresh_token);
+
+          window.location.href = url;
+
+          return;
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         // Needs email confirmation
         toast.success("Check your email!", {

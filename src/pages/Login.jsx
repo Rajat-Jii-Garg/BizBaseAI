@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom';
 import SEOHead from '@/components/SEOHead';
 
 const Login = () => {
@@ -19,6 +20,8 @@ const Login = () => {
   
   const navigate = useNavigate();
   const { signIn, user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   useEffect(() => {
     if (user) {
@@ -67,9 +70,30 @@ const Login = () => {
         setErrors({ general: error.message });
       }
     } else {
-      toast.success("Welcome back!", { description: "Successfully signed in to BizBase." });
-      navigate('/dashboard');
-    }
+        toast.success("Welcome back!", {
+          description: "Successfully signed in to BizBase."
+        });
+
+        if (redirect) {
+          const {
+            data: { session }
+          } = await supabase.auth.getSession();
+
+          const url =
+            redirect +
+            (redirect.includes("?") ? "&" : "?") +
+            "access_token=" +
+            encodeURIComponent(session.access_token) +
+            "&refresh_token=" +
+            encodeURIComponent(session.refresh_token);
+
+          window.location.href = url;
+
+          return;
+        } else {
+          navigate('/dashboard');
+        }
+      }
     setLoading(false);
   };
 
