@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
 import SEOHead from '@/components/SEOHead';
+import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '', rememberMe: false });
@@ -24,10 +25,33 @@ const Login = () => {
   const redirect = searchParams.get("redirect");
 
   useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
+    async function handleExistingUser() {
+      if (!user) return;
+
+      if (redirect) {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session) {
+          const url =
+            redirect +
+            (redirect.includes("?") ? "&" : "?") +
+            "access_token=" +
+            encodeURIComponent(session.access_token) +
+            "&refresh_token=" +
+            encodeURIComponent(session.refresh_token);
+
+          window.location.href = url;
+          return;
+        }
+      }
+
+      navigate("/dashboard");
     }
-  }, [user, navigate]);
+
+    handleExistingUser();
+  }, [user, redirect, navigate]);
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

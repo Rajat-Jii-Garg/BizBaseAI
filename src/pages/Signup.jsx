@@ -107,7 +107,11 @@ const Signup = () => {
         toast.error("Account already exists", {
           description: "This email is already registered. Please login instead.",
         });
-        navigate('/login');
+        navigate(
+          redirect
+            ? `/login?redirect=${encodeURIComponent(redirect)}`
+            : "/login"
+        );
         return;
       }
 
@@ -141,7 +145,11 @@ const Signup = () => {
           description: "We've sent a confirmation link to " + signupData.email + ". Click the link to activate your account.",
           duration: 10000,
         });
-        navigate('/login');
+        navigate(
+          redirect
+            ? `/login?redirect=${encodeURIComponent(redirect)}`
+            : "/login"
+        );
       }
 
       // Handle referral tracking (non-blocking)
