@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import DashboardLayout from '@/components/DashboardLayout';
+import LaunchingSoonOverlay from '@/components/LaunchingSoonOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -104,6 +105,10 @@ const MyBusinesses = () => {
 
   return (
     <DashboardLayout>
+      <LaunchingSoonOverlay
+        title="My Businesses — Launching Soon"
+        subtitle="The business workspace is almost ready. Until then, grow your personal brand & connections on BizBase."
+      >
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -243,6 +248,7 @@ const MyBusinesses = () => {
           </div>
         )}
       </div>
+      </LaunchingSoonOverlay>
     </DashboardLayout>
   );
 };
