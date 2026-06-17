@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import SEOHead from '@/components/SEOHead';
 import DashboardLayout from '@/components/DashboardLayout';
+import LaunchingSoonOverlay from '@/components/LaunchingSoonOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -586,6 +587,10 @@ const BusinessSetup = () => {
   return (
     <DashboardLayout>
       <SEOHead title="Register Your Business" description="Set up your business on BizBase AI. Create your business profile and start growing." path="/business-setup" />
+      <LaunchingSoonOverlay
+        title="Business Registration — Launching Soon"
+        subtitle="We are finalising the business onboarding flow. Meanwhile, build your personal brand & smart network on BizBase — that's where real opportunities are happening right now."
+      >
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -656,6 +661,7 @@ const BusinessSetup = () => {
           )}
         </div>
       </div>
+      </LaunchingSoonOverlay>
     </DashboardLayout>
   );
 };

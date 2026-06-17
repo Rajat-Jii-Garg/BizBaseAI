@@ -3,6 +3,7 @@ import { Outlet, useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import BusinessSidebar from './BusinessSidebar';
 import BusinessHeader from './BusinessHeader';
+import LaunchingSoonOverlay from './LaunchingSoonOverlay';
 import { useBusinessContext } from '@/contexts/BusinessContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -84,7 +85,12 @@ const BusinessLayout = () => {
 
           {/* Main Content */}
           <main className="flex-1 overflow-x-clip overflow-y-auto h-[calc(100vh-41px)]">
-            <Outlet />
+            <LaunchingSoonOverlay
+              title="Business Workspace — Launching Soon"
+              subtitle="CRM, Finance, Team, Projects & Services are getting their final touches. Meanwhile, focus on Smart Networking, real conversations & opportunities on BizBase."
+            >
+              <Outlet />
+            </LaunchingSoonOverlay>
           </main>
         </div>
       </div>
