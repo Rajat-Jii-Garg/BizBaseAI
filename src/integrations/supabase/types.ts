@@ -1994,6 +1994,7 @@ export type Database = {
           github_url: string | null
           id: string
           industry: string | null
+          is_seed_bot: boolean
           is_verified: boolean | null
           last_ai_coach_email_at: string | null
           linkedin_url: string | null
@@ -2047,6 +2048,7 @@ export type Database = {
           github_url?: string | null
           id: string
           industry?: string | null
+          is_seed_bot?: boolean
           is_verified?: boolean | null
           last_ai_coach_email_at?: string | null
           linkedin_url?: string | null
@@ -2100,6 +2102,7 @@ export type Database = {
           github_url?: string | null
           id?: string
           industry?: string | null
+          is_seed_bot?: boolean
           is_verified?: boolean | null
           last_ai_coach_email_at?: string | null
           linkedin_url?: string | null
@@ -2213,6 +2216,27 @@ export type Database = {
           id?: string
           job_id?: string
           saved_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      seed_post_logs: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
           user_id?: string
         }
         Relationships: []
