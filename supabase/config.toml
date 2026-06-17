@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.profile-ai-coach]
 verify_jwt = false
+
+[functions.seed-auto-posts]
+verify_jwt = false
