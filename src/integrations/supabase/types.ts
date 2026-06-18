@@ -1575,6 +1575,27 @@ export type Database = {
           },
         ]
       }
+      notification_email_log: {
+        Row: {
+          id: string
+          notification_count: number
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          notification_count?: number
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          notification_count?: number
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           content: string | null
@@ -2846,6 +2867,10 @@ export type Database = {
       send_otp_email: {
         Args: { otp_purpose: string; user_email: string }
         Returns: string
+      }
+      should_notify: {
+        Args: { _pref_key: string; _user_id: string }
+        Returns: boolean
       }
       verify_otp: {
         Args: { otp_purpose: string; provided_otp: string; user_email: string }
