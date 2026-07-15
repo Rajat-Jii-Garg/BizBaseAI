@@ -1,19 +1,19 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, Sparkles, Menu, X } from 'lucide-react';
+import { LogIn, Sparkles, Menu, X, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Navbar = ({ variant = 'default' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [companyOpen, setCompanyOpen] = useState(false);
   const isHero = variant === 'hero';
 
   const navLinks = [
-    { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Benefits', href: '#benefits' },
+    { label: 'Solutions', href: '#benefits' },
     { label: 'Blogs', href: '/blog', isRoute: true },
-    { label: 'Community', href: '#cta' },
+    { label: 'Community', href: '/community', isRoute: true },
+    { label: 'Who is BizBase for?', href: '#who-is-it-for' },
   ];
 
   return (
@@ -56,27 +56,67 @@ const Navbar = ({ variant = 'default' }) => {
             ))}
           </div> */}
           <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((item) =>
-              item.isRoute ? (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
-                >
-                  {item.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
-                </Link>
-              ) : (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
-                >
-                  {item.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
-                </a>
-              )
-            )}
+            {/* Solutions */}
+            <a 
+              href="#features" 
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
+            >
+              Solutions
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
+            </a>
+
+            {/* Company dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setCompanyOpen(true)}
+              onMouseLeave={() => setCompanyOpen(false)}
+            >
+              <button
+                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Company
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${companyOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {companyOpen && (
+                <div className="absolute top-full left-0 pt-2">
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-lg py-1.5 px-1.5 min-w-[140px]">
+                    <Link
+                      to="/about"
+                      className="block text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-slate-50 rounded-lg px-3 py-2 transition-colors"
+                    >
+                      About
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Blogs */}
+            <Link
+              to="/blog"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
+            >
+              Blogs
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
+            </Link>
+
+            {/* Community */}
+            <Link
+              to="/community"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
+            >
+              Community
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
+            </Link>
+
+            {/* Who is BizBase for? */}
+            
+              href="#who-is-it-for"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
+            >
+              Who is BizBase for?
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
+            </a>
           </div>
           
           {/* Desktop Auth */}
@@ -108,27 +148,21 @@ const Navbar = ({ variant = 'default' }) => {
       {/* Mobile Dropdown */}
       {mobileOpen && (
         <div className="md:hidden absolute top-16 left-0 w-full bg-white shadow-xl border-b border-slate-100 p-5 space-y-4">
-          {navLinks.map((item) =>
-            item.isRoute ? (
-              <Link
-                key={item.label}
-                to={item.href}
-                className="block text-sm font-medium text-muted-foreground py-2"
-                onClick={() => setMobileOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ) : (
-              <a
-                key={item.label}
-                href={item.href}
-                className="block text-sm font-medium text-muted-foreground py-2"
-                onClick={() => setMobileOpen(false)}
-              >
-                {item.label}
-              </a>
-            )
-          )}
+          <a href="#features" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
+            Solutions
+          </a>
+          <Link to="/about" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
+            Company — About
+          </Link>
+          <Link to="/blog" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
+            Blogs
+          </Link>
+          <Link to="/community" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
+            Community
+          </Link>
+          <a href="#who-is-it-for" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
+            Who is BizBase for?
+          </a>
           <div className="pt-3 border-t border-slate-100 space-y-2">
             <Link to="/login" onClick={() => setMobileOpen(false)}>
               <Button variant="ghost" className="w-full text-sm">Login</Button>

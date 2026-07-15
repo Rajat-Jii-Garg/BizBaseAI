@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Zap, TrendingUp, Shield, Globe, Rocket, Star, CheckCircle, Users, Brain, Play, ChevronRight, Settings } from 'lucide-react';
+import { LogIn, ArrowRight, Sparkles, Zap, TrendingUp, Shield, Globe, Rocket, CheckCircle, Users, Brain, ChevronRight, Settings } from 'lucide-react';
 
 const FloatingIcon = ({ icon: Icon, className, size = 'w-12 h-12', iconSize = 'w-5 h-5', color = 'text-violet-500', bg = 'bg-violet-50' }) => (
   <div className={`absolute ${className} ${size} rounded-2xl ${bg} border border-violet-100/50 shadow-lg shadow-violet-100/30 flex items-center justify-center`}>
@@ -24,8 +24,8 @@ const Hero = () => {
       <FloatingIcon icon={TrendingUp} className="bottom-[20%] right-[8%] animate-[float_6.5s_ease-in-out_infinite_2s]" color="text-blue-500" bg="bg-blue-50" size="w-11 h-11" />
       <FloatingIcon icon={Globe} className="bottom-[28%] left-[10%] animate-[float_7s_ease-in-out_infinite_0.8s] hidden md:flex" color="text-indigo-400" bg="bg-indigo-50" size="w-9 h-9" iconSize="w-4 h-4" />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-5 pt-6 sm:pt-10">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-7 pt-10 sm:pt-10">
 
           {/* Announcement pill */}
           <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-600 px-3.5 py-1.5 rounded-full text-xs font-medium">
@@ -33,13 +33,13 @@ const Hero = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
             </span>
-            <span>Now with AI-Powered Tools</span>
+            <span>Trusted by Professionals & Businesses</span>
             <ChevronRight className="w-3 h-3 text-violet-400/60" />
           </div>
 
           {/* Main Headline */}
           <div className="space-y-4 max-w-3xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold leading-[1.15] tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold leading-[1.15] tracking-tight">
               <span className="text-foreground">One Platform for Every</span>
               <br />
               <span className="bg-gradient-to-r from-violet-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
@@ -48,36 +48,38 @@ const Hero = () => {
             </h1>
 
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Built for students, freelancers, job seekers, founders & business owners. Network, learn, find jobs, join communities, get AI career coaching, and run your business — all under one roof, 100% free.
+              Create your professional identity, build meaningful connections, discover opportunities, grow your business, and access powerful AI tools — all in BizBase!
             </p>
           </div>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center items-center pt-1">
+            <Link to="/login">
+              <Button size="default" variant="outline" className="px-7 py-5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-semibold transition-all duration-300">
+                <LogIn className="w-4 h-4" />
+                Login
+              </Button>
+            </Link>
+
             <Link to="/signup">
-              <Button size="default" className="bg-gradient-to-r from-violet-600 via-indigo-500 to-blue-500 hover:from-violet-700 hover:via-indigo-600 hover:to-blue-600 text-white px-6 py-5 text-sm font-semibold rounded-xl shadow-lg shadow-violet-200/50 hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 border-0">
+              <Button size="default" className="bg-gradient-to-r from-violet-600 via-indigo-500 to-blue-500 hover:from-violet-700 hover:via-indigo-600 hover:to-blue-600 text-white px-7 py-5 text-sm font-semibold rounded-2xl shadow-lg shadow-violet-200/50 hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 border-0">
                 <Rocket className="w-4 h-4 mr-1.5" />
                 Get Started Free
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
               </Button>
             </Link>
-            <Link to="/demo">
-              <Button size="default" variant="outline" className="px-6 py-5 text-sm font-medium rounded-xl border border-slate-200 text-foreground hover:bg-slate-50 transition-all duration-300">
-                <Play className="w-3.5 h-3.5 mr-1.5" />
-                Watch Demo
-              </Button>
-            </Link>
+
           </div>
 
           {/* Trust badges */}
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 pt-1 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-              <span>100% Free</span>
+              <span>Unlimited Growth</span>
             </div>
             <div className="flex items-center gap-1">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-              <span>No user limits</span>
+              <span>100% Secure</span>
             </div>
             <div className="flex items-center gap-1">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
@@ -88,10 +90,10 @@ const Hero = () => {
           {/* Stats — real, honest */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 pt-8 max-w-2xl mx-auto">
             {[
-              { value: '15+', label: 'AI Tools', icon: Brain, color: 'text-violet-500', bg: 'from-violet-50 to-violet-100/50' },
-              { value: '8+', label: 'Core Modules', icon: Sparkles, color: 'text-blue-500', bg: 'from-blue-50 to-blue-100/50' },
-              { value: '100%', label: 'Free to Use', icon: Shield, color: 'text-emerald-500', bg: 'from-emerald-50 to-emerald-100/50' },
-              { value: '24/7', label: 'AI Assistant', icon: Zap, color: 'text-cyan-500', bg: 'from-cyan-50 to-cyan-100/50' }
+              { value: '15+', label: 'AI Features', icon: Brain, color: 'text-violet-500', bg: 'from-violet-50 to-violet-100/50' },
+              { value: '8+', label: 'Core Products', icon: Sparkles, color: 'text-blue-500', bg: 'from-blue-50 to-blue-100/50' },
+              { value: '100%', label: 'Free Access', icon: Shield, color: 'text-emerald-500', bg: 'from-emerald-50 to-emerald-100/50' },
+              { value: '24/7', label: 'AI Assistance', icon: Zap, color: 'text-cyan-500', bg: 'from-cyan-50 to-cyan-100/50' }
             ].map((stat, index) => (
               <div key={index} className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all duration-500">
                 <div className={`w-8 h-8 mx-auto mb-2 rounded-lg bg-gradient-to-br ${stat.bg} flex items-center justify-center`}>
@@ -104,7 +106,7 @@ const Hero = () => {
           </div>
 
           {/* Feature Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-10 max-w-3xl mx-auto">
+          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-10 max-w-3xl mx-auto">
             {[
               {
                 icon: Zap,
@@ -139,7 +141,7 @@ const Hero = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* Testimonial */}
           {/* <div className="pt-10 max-w-lg mx-auto">

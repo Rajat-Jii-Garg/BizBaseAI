@@ -24,60 +24,60 @@ import {
   Award
 } from 'lucide-react';
 
-const Features = () => {
-  const features = [
-    {
-      icon: Brain,
-      title: 'AI Career Coach',
-      description: 'Personalized weekly emails analyzing your profile, skills and giving real growth steps powered by Gemini AI.',
-      gradient: 'from-violet-500 to-purple-500',
-      category: 'AI',
-      stats: 'Weekly insights'
-    },
-    {
-      icon: Users,
-      title: 'Smart Networking',
-      description: 'AI-matched connection suggestions based on your goals, skills and interests — no more cold outreach.',
-      gradient: 'from-blue-500 to-cyan-500',
-      category: 'Network',
-      stats: 'AI-matched'
-    },
-    {
-      icon: Workflow,
-      title: 'Communities & Events',
-      description: 'Join niche communities, host or attend events, and learn directly from peers in your field.',
-      gradient: 'from-emerald-500 to-teal-500',
-      category: 'Learn',
-      stats: 'Built-in chat'
-    },
-    {
-      icon: Target,
-      title: 'Jobs Portal',
-      description: 'Discover internships, jobs and freelance gigs — with AI-powered recommendations based on your profile.',
-      gradient: 'from-orange-500 to-amber-500',
-      category: 'Career',
-      stats: 'AI-recommended'
-    },
-    {
-      icon: BarChart3,
-      title: 'Business Suite',
-      description: 'Run your business with built-in CRM, finance, projects, team and lead tools — all included free.',
-      gradient: 'from-indigo-500 to-blue-500',
-      category: 'Business',
-      stats: '6+ modules'
-    },
-    {
-      icon: Zap,
-      title: 'BizAI Assistant',
-      description: '24/7 AI assistant for content, ideas, replies, post rewriting and career questions — always available.',
-      gradient: 'from-pink-500 to-rose-500',
-      category: 'AI',
-      stats: 'Always on'
-    }
-  ];
+// const Features = () => {
+//   const features = [
+//     {
+//       icon: Brain,
+//       title: 'AI Career Coach',
+//       description: 'Personalized weekly emails analyzing your profile, skills and giving real growth steps powered by Gemini AI.',
+//       gradient: 'from-violet-500 to-purple-500',
+//       category: 'AI',
+//       stats: 'Weekly insights'
+//     },
+//     {
+//       icon: Users,
+//       title: 'Smart Networking',
+//       description: 'AI-matched connection suggestions based on your goals, skills and interests — no more cold outreach.',
+//       gradient: 'from-blue-500 to-cyan-500',
+//       category: 'Network',
+//       stats: 'AI-matched'
+//     },
+//     {
+//       icon: Workflow,
+//       title: 'Communities & Events',
+//       description: 'Join niche communities, host or attend events, and learn directly from peers in your field.',
+//       gradient: 'from-emerald-500 to-teal-500',
+//       category: 'Learn',
+//       stats: 'Built-in chat'
+//     },
+//     {
+//       icon: Target,
+//       title: 'Jobs Portal',
+//       description: 'Discover internships, jobs and freelance gigs — with AI-powered recommendations based on your profile.',
+//       gradient: 'from-orange-500 to-amber-500',
+//       category: 'Career',
+//       stats: 'AI-recommended'
+//     },
+//     {
+//       icon: BarChart3,
+//       title: 'Business Suite',
+//       description: 'Run your business with built-in CRM, finance, projects, team and lead tools — all included free.',
+//       gradient: 'from-indigo-500 to-blue-500',
+//       category: 'Business',
+//       stats: '6+ modules'
+//     },
+//     {
+//       icon: Zap,
+//       title: 'BizAI Assistant',
+//       description: '24/7 AI assistant for content, ideas, replies, post rewriting and career questions — always available.',
+//       gradient: 'from-pink-500 to-rose-500',
+//       category: 'AI',
+//       stats: 'Always on'
+//     }
+//   ];
 
   return (
-    <section className="py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 relative overflow-hidden">
+    <section id="features" className="py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 relative overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
@@ -86,7 +86,7 @@ const Features = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-20">
+        {/* <div className="text-center mb-20">
           <div className="inline-block px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-6">
             <Sparkles className="w-4 h-4 inline mr-2" />
             Everything you need, free
@@ -133,12 +133,11 @@ const Features = () => {
                   {feature.stats}
                 </div>
 
-                {/* Hover effect overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
               </CardContent>
             </Card>
           ))}
-        </div>
+        </div> */}
 
         {/* CTA */}
         <div className="text-center">

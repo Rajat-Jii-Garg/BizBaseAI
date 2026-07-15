@@ -1,13 +1,13 @@
 import React from 'react';
-import { GraduationCap, Briefcase, Rocket, Building2, Search, Users } from 'lucide-react';
+import { GraduationCap, Briefcase, Rocket, Building2, Lightbulb, Users } from 'lucide-react';
 
 const audiences = [
-  { icon: GraduationCap, title: 'Students', desc: 'Build your profile, learn from communities, find internships early.', color: 'from-blue-500 to-cyan-500' },
-  { icon: Search, title: 'Job Seekers', desc: 'Discover roles, get AI resume coaching, apply directly through BizBase.', color: 'from-emerald-500 to-teal-500' },
-  { icon: Briefcase, title: 'Freelancers', desc: 'Showcase skills, find clients, manage projects and payments in one place.', color: 'from-amber-500 to-orange-500' },
-  { icon: Rocket, title: 'Founders', desc: 'Network with other founders, hire talent, get visibility from day one.', color: 'from-violet-500 to-purple-500' },
-  { icon: Building2, title: 'Business Owners', desc: 'Run your business with built-in CRM, finance, team and lead tools.', color: 'from-indigo-500 to-blue-500' },
-  { icon: Users, title: 'Working Professionals', desc: 'Grow your network, share insights, get noticed by the right people.', color: 'from-rose-500 to-pink-500' },
+  { icon: Rocket, title: 'Founders', desc: 'Build startups, raise visibility, connect with investors and grow faster together.', color: 'from-violet-500 to-purple-500' },
+  { icon: Lightbulb, title: 'Entrepreneurs', desc: 'Validate ideas, build businesses, find partners and scale with AI-powered tools.', color: 'from-blue-500 to-cyan-500' },
+  { icon: Briefcase, title: 'Freelancers', desc: 'Showcase skills, find clients, manage projects and grow your freelance career.', color: 'from-amber-500 to-orange-500' },
+  { icon: GraduationCap, title: 'Students', desc: 'Build your profile, learn from communities, find internships and start your career.', color: 'from-emerald-500 to-teal-500' },
+  { icon: Building2, title: 'Business Owners', desc: 'Manage operations, grow revenue, automate workflows and scale your business effortlessly.', color: 'from-indigo-500 to-blue-500' },
+  { icon: Users, title: 'Working Professionals', desc: 'Grow your network, share insights, discover opportunities and advance your career.', color: 'from-rose-500 to-pink-500' },
 ];
 
 const WhoIsItFor = () => {
