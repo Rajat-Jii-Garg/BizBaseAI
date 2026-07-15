@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Clock, Building, Users, Eye, Briefcase, Calendar, Share2, ExternalLink, ArrowLeft, IndianRupee, CheckCircle2, Sparkles, Bookmark, BookmarkCheck } from 'lucide-react';
+import { MapPin, Clock, Building, Users, Eye, Briefcase, Calendar, Share2, ExternalLink, ArrowLeft, IndianRupee, CheckCircle2, Sparkles, Bookmark, BookmarkCheck, BadgeCheck, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
 import { CANONICAL_SITE_URL, buildShareUrl } from '@/lib/siteUrl';
@@ -22,11 +22,11 @@ const JobDetail = () => {
     let mounted = true;
     (async () => {
       setLoading(true);
+      // Fetch regardless of is_active so closed jobs still render with a Closed banner.
       const { data, error } = await supabase
         .from('jobs')
         .select('*')
         .eq('slug', slug)
-        .eq('is_active', true)
         .maybeSingle();
       if (!mounted) return;
       if (error || !data) {
@@ -35,9 +35,7 @@ const JobDetail = () => {
         return;
       }
       setJob(data);
-      // increment views (fire & forget) — wrap in Promise.resolve since PostgrestBuilder isn't a true Promise
       Promise.resolve(supabase.rpc('increment_job_views', { job_id: data.id })).catch(() => {});
-      // related jobs same industry
       const { data: rel } = await supabase
         .from('jobs')
         .select('id, slug, title, company_name, location, work_mode')
@@ -104,7 +102,10 @@ const JobDetail = () => {
     return () => { el?.remove(); };
   }, [job]);
 
+  const isClosed = job && (!job.is_active || (job.application_deadline && new Date(job.application_deadline) < new Date()));
+
   const handleApply = () => {
+    if (isClosed) { toast.error('This job is closed'); return; }
     if (job?.external_url) {
       window.open(job.external_url, '_blank', 'noopener,noreferrer');
     } else {
@@ -196,12 +197,19 @@ const JobDetail = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-1.5 mb-4">
-              {job.is_featured && <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Featured</Badge>}
+              {isClosed && (
+                <Badge variant="outline" className="bg-muted text-muted-foreground border-muted-foreground/30 gap-1">
+                  <Lock className="h-3 w-3" /> Hiring Closed
+                </Badge>
+              )}
+              {job.is_featured && !isClosed && <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Featured</Badge>}
               <Badge variant="outline" className="capitalize">{(job.job_type || '').replace('-', ' ')}</Badge>
               <Badge variant="outline" className="capitalize">{(job.work_mode || '').replace('-', ' ')}</Badge>
               <Badge variant="outline" className="capitalize">{(job.experience_level || '').replace('-', ' ')}</Badge>
-              {job.source && job.source !== 'internal' && (
-                <Badge variant="outline" className="capitalize border-primary/30 text-primary">via {job.source}</Badge>
+              {!isClosed && (
+                <Badge variant="outline" className="border-primary/30 text-primary gap-1">
+                  <BadgeCheck className="h-3 w-3" /> Verified by BizBase
+                </Badge>
               )}
             </div>
 
@@ -236,8 +244,8 @@ const JobDetail = () => {
               </p>
             )}
             <div className="hidden sm:flex flex-wrap gap-2">
-              <Button size="lg" onClick={handleApply} className="gap-2">
-                Apply Now <ExternalLink className="h-4 w-4" />
+              <Button size="lg" onClick={handleApply} disabled={isClosed} className="gap-2">
+                {isClosed ? (<><Lock className="h-4 w-4" /> Hiring Closed</>) : (<>Apply Now <ExternalLink className="h-4 w-4" /></>)}
               </Button>
               <Button size="lg" variant="outline" onClick={handleShare} className="gap-2">
                 <Share2 className="h-4 w-4" /> Share Job
@@ -328,7 +336,9 @@ const JobDetail = () => {
 
       {/* Mobile sticky apply bar */}
       <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur px-4 py-3 flex gap-2">
-        <Button onClick={handleApply} className="flex-1 gap-2">Apply Now <ExternalLink className="h-4 w-4" /></Button>
+        <Button onClick={handleApply} disabled={isClosed} className="flex-1 gap-2">
+          {isClosed ? (<><Lock className="h-4 w-4" /> Closed</>) : (<>Apply Now <ExternalLink className="h-4 w-4" /></>)}
+        </Button>
         <Button variant="outline" size="icon" onClick={handleShare} aria-label="Share"><Share2 className="h-4 w-4" /></Button>
       </div>
     </div>

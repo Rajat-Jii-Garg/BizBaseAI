@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { MapPin, Clock, DollarSign, Building, Users, Search, Filter, Bookmark, BookmarkCheck, Plus, Eye, Briefcase, Calendar, Share2, ExternalLink } from 'lucide-react';
+import { MapPin, Clock, IndianRupee, Building, Users, Search, Filter, Bookmark, BookmarkCheck, Plus, Eye, Briefcase, Calendar, Share2, ExternalLink, BadgeCheck, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -49,11 +49,13 @@ const Jobs = () => {
 
   const fetchJobs = async () => {
     try {
+      // Fetch all jobs (active + closed); closed ones are shown with a Closed badge.
       const { data, error } = await supabase
         .from('jobs')
         .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .order('is_active', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(500);
 
       if (error) throw error;
       setJobs(data || []);
@@ -137,6 +139,10 @@ const Jobs = () => {
   };
 
   const handleApplyJob = async (job) => {
+    if (!job.is_active) {
+      toast.error('This job is closed');
+      return;
+    }
     // External jobs: open original posting in new tab
     if (job.source && job.source !== 'internal' && job.external_url) {
       window.open(job.external_url, '_blank', 'noopener,noreferrer');
@@ -203,8 +209,9 @@ const Jobs = () => {
   };
 
   const formatSalary = (min, max, currency) => {
-    const fmt = (n) => new Intl.NumberFormat('en-US').format(n);
-    return `${currency} ${fmt(min)} - ${fmt(max)}`;
+    const cur = currency || 'INR';
+    const fmt = (n) => new Intl.NumberFormat(cur === 'INR' ? 'en-IN' : 'en-US').format(n);
+    return `${cur} ${fmt(min)} - ${fmt(max)}`;
   };
 
   const getUniqueValues = (key) => [...new Set(jobs.map(job => job[key]))].filter(Boolean);
@@ -356,8 +363,10 @@ const Jobs = () => {
 
           {/* Jobs List */}
           <div className="space-y-3">
-            {filteredJobs.map((job) => (
-              <Card key={job.id} className="hover:shadow-md transition-shadow border-border/50">
+            {filteredJobs.map((job) => {
+              const closed = !job.is_active || (job.application_deadline && new Date(job.application_deadline) < new Date());
+              return (
+              <Card key={job.id} className={`hover:shadow-md transition-shadow border-border/50 ${closed ? 'opacity-70' : ''}`}>
                 <CardContent className="p-3 sm:p-5">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1 min-w-0">
@@ -368,19 +377,24 @@ const Jobs = () => {
                         >
                           {job.title}
                         </h3>
-                        {job.is_featured && (
+                        {closed && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-muted text-muted-foreground border-muted-foreground/30 gap-0.5">
+                            <Lock className="h-2.5 w-2.5" /> Closed
+                          </Badge>
+                        )}
+                        {job.is_featured && !closed && (
                           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-amber-100 text-amber-800">Featured</Badge>
                         )}
-                        {job.source && job.source !== 'internal' && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 capitalize border-primary/30 text-primary">
-                            via {job.source}
+                        {!closed && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/30 text-primary gap-0.5">
+                            <BadgeCheck className="h-2.5 w-2.5" /> Verified by BizBase
                           </Badge>
                         )}
                       </div>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mb-2">
                         <span className="flex items-center gap-1"><Building className="h-3 w-3" />{job.company_name}</span>
                         <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{job.location}</span>
-                        <span className="hidden sm:flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(job.created_at).toLocaleDateString()}</span>
+                        <span className="hidden sm:flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(job.created_at).toLocaleDateString('en-IN')}</span>
                         <span className="hidden md:flex items-center gap-1"><Eye className="h-3 w-3" />{job.views_count}</span>
                         <span className="hidden md:flex items-center gap-1"><Users className="h-3 w-3" />{job.applications_count} apps</span>
                       </div>
@@ -406,7 +420,7 @@ const Jobs = () => {
 
                   {job.salary_min && job.salary_max && (
                     <p className="text-xs sm:text-sm text-green-600 font-medium mb-2 flex items-center gap-1">
-                      <DollarSign className="h-3 w-3" />
+                      <IndianRupee className="h-3 w-3" />
                       {formatSalary(job.salary_min, job.salary_max, job.salary_currency)}/yr
                     </p>
                   )}
@@ -414,12 +428,16 @@ const Jobs = () => {
                   {job.application_deadline && (
                     <p className="text-[10px] sm:text-xs text-destructive mb-2 flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      Apply by: {new Date(job.application_deadline).toLocaleDateString()}
+                      Apply by: {new Date(job.application_deadline).toLocaleDateString('en-IN')}
                     </p>
                   )}
 
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {appliedJobs.has(job.id) ? (
+                    {closed ? (
+                      <Button variant="outline" size="sm" disabled className="text-xs h-8 rounded-full gap-1">
+                        <Lock className="h-3 w-3" /> Hiring Closed
+                      </Button>
+                    ) : appliedJobs.has(job.id) ? (
                       <Button variant="outline" size="sm" disabled className="text-xs h-8 rounded-full">Applied</Button>
                     ) : (
                       <Button size="sm" onClick={() => handleApplyJob(job)} className="text-xs h-8 rounded-full gap-1">
@@ -432,7 +450,8 @@ const Jobs = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
 
             {filteredJobs.length === 0 && (
               <Card>
