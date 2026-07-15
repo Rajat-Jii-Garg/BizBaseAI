@@ -6,19 +6,31 @@ import { Link } from 'react-router-dom';
 
 const CallToAction = () => {
   const benefits = [
-    '100% free — no hidden fees',
-    'No user or feature limits',
-    'AI-powered career & business tools',
-    'Built-in jobs, communities & events',
-    'Full business dashboard included'
+    'Smart Connections',
+    'Jobs & Opportunities',
+    'AI-Powered Career Assistant',
+    'Active Communities & Events',
+    'Business Management Dashboard'
   ];
 
   return (
-    <section id="cta" className="py-24 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">
+    <section id="cta" className="py-20 md:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.1%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      {/* Top Left Glow */}
+      <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-cyan-400/20 blur-[120px]" />
+      {/* Bottom Right Glow */}
+      <div className="absolute -bottom-40 -right-40 w-[550px] h-[550px] rounded-full bg-violet-500/20 blur-[140px]" />
+      {/* Center Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full bg-blue-400/10 blur-[150px]" />
+
+      <div className="absolute top-24 left-20 w-4 h-4 rounded-full bg-white/30"></div>
+      <div className="absolute bottom-40 left-1/4 w-3 h-3 rounded-full bg-cyan-300/40"></div>
+      <div className="absolute top-32 right-20 w-5 h-5 rounded-full bg-purple-300/30"></div>
+      <div className="absolute bottom-20 right-1/3 w-2 h-2 rounded-full bg-white/40"></div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
           <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full mb-8">
             <Sparkles className="w-5 h-5 text-white" />
@@ -26,19 +38,19 @@ const CallToAction = () => {
           </div>
 
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            Start Building Your
+            Join Thousands of Professionals
             <br />
-            Professional Future
+            Building Their Future with BizBase
           </h2>
 
           <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Join BizBase and access networking, AI coaching, jobs, communities and a full business dashboard — all in one place, no cost.
+            Create your professional profile, discover opportunities, connect with the right people, manage your business, and use AI to grow faster — all from one free platform.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <h3 className="text-3xl font-bold text-white mb-6">What you'll win:</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <div className="space-y-6 order-2 lg:order-1">
+            <h3 className="text-3xl font-bold text-white mb-6">Why professionals choose BizBase:</h3>
             <div className="space-y-4">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center space-x-3">
@@ -57,21 +69,21 @@ const CallToAction = () => {
             </div> */}
           </div>
           
-          <div className="text-center lg:text-left">
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 mb-8">
+          <div className="text-center lg:text-left  order-1 lg:order-2">
+            <div className="bg-white/8 backdrop-blur-xl border border-white/20 backdrop-blur-sm rounded-3xl p-8 mb-8">
               <div className="space-y-6">
                 <Link to="/signup">
-                  <Button size="lg" className="w-full bg-white text-blue-600 hover:bg-blue-50 px-12 py-4 text-xl font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300">
-                    Get Started Free
+                  <Button size="lg" className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-blue-600 hover:bg-blue-50 px-12 py-3.5 text-lg rounded-2xl font-semibold shadow-2xl hover:shadow-blue-500/25 transition-all duration-300">
+                    Create Free Account
                     <ArrowRight className="w-6 h-6 ml-3" />
                   </Button>
                 </Link>
                 
                 <div className="text-center">
-                  <div className="text-blue-200 text-sm mb-4">Or</div>
+                  <div className="text-blue-200 text-sm mb-4"></div>
                   <Link to="/login">
-                    <Button size="lg" className="w-full bg-white text-blue-600 hover:bg-blue-50 px-12 py-4 text-xl font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300">
-                      Login to Dashboard
+                    <Button size="lg" className="w-full bg-ransparent border-white/30 hover:bg-white hover:text-blue-600 text-blue-600 hover:bg-blue-50 px-12 py-3.5 text-lg rounded-2xl font-semibold shadow-2xl hover:shadow-blue-500/25 transition-all duration-300">
+                      Login →
                     </Button>
                   </Link>
                 </div>
@@ -79,29 +91,35 @@ const CallToAction = () => {
             </div>
             
             <div className="text-center text-blue-200 text-sm">
-              <p>🔒 Your data is secure and fully encrypted.</p>
-              <p>📧 No spam, we respect your privacy.</p>
+              <p>🔒 Career Growth</p>
+              <p>🤖 Smart AI Powered</p>
+              <p>🔒 Secure Authentication</p>
+              <p>🌍 Access Anywhere</p>
             </div>
           </div>
         </div>
         
         <div className="text-center mt-16">
+          <p className="text-blue-100 text-base font-medium">
+            Trusted by Founders, Entrepreneurs, Freelancers, Professionals and Businesses across India.
+            Build smart identity, meaningful connections, discover opportunities, grow your business.
+          </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-            <div className="text-center">
+            <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md py-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white/15">
               <div className="text-3xl font-bold text-white mb-2">15+</div>
-              <div className="text-blue-200 text-sm">AI Tools</div>
+              <div className="text-blue-200 text-sm">AI Features</div>
             </div>
-            <div className="text-center">
+            <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md py-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white/15">
               <div className="text-3xl font-bold text-white mb-2">8+</div>
-              <div className="text-blue-200 text-sm">Core Modules</div>
+              <div className="text-blue-200 text-sm">Core Products</div>
             </div>
-            <div className="text-center">
+            <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md py-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white/15">
               <div className="text-3xl font-bold text-white mb-2">100%</div>
-              <div className="text-blue-200 text-sm">Free Forever</div>
+              <div className="text-blue-200 text-sm">Free Access</div>
             </div>
-            <div className="text-center">
+            <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md py-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white/15">
               <div className="text-3xl font-bold text-white mb-2">24/7</div>
-              <div className="text-blue-200 text-sm">AI Assistant</div>
+              <div className="text-blue-200 text-sm">AI Assistance</div>
             </div>
           </div>
         </div>
