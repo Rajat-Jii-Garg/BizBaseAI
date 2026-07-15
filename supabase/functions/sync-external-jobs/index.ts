@@ -1,5 +1,6 @@
-// Fetches latest jobs from free public job APIs (Remotive + Arbeitnow)
-// and upserts them into public.jobs. Designed to be invoked by pg_cron every 6 hours.
+// Fetches ONLY India-located jobs from public job APIs and upserts into public.jobs.
+// Also auto-closes jobs whose application_deadline has passed.
+// Invoked by pg_cron every 6 hours.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -44,39 +45,28 @@ const mapJobType = (t: string): string => {
   return "full-time";
 };
 
-// Returns true if job location/region targets India (or is worldwide remote → eligible for Indian applicants)
-const isIndiaEligible = (location: string, extra: string = ""): boolean => {
-  const s = `${location} ${extra}`.toLowerCase();
-  if (!s.trim()) return false;
-  // Explicit India keywords
-  const indiaKeywords = [
-    "india", "bharat", "bangalore", "bengaluru", "mumbai", "delhi", "ncr", "gurgaon", "gurugram",
-    "noida", "hyderabad", "chennai", "pune", "kolkata", "ahmedabad", "jaipur", "kochi", "cochin",
-    "indore", "chandigarh", "lucknow", "nagpur", "coimbatore", "trivandrum", "thiruvananthapuram",
-    "mysore", "mysuru", "vadodara", "surat", "bhubaneswar", "visakhapatnam", "vizag", " in,", " in ",
-    "(in)", "asia pacific", "apac"
-  ];
-  if (indiaKeywords.some((k) => s.includes(k))) return true;
-  // Worldwide / anywhere remote → eligible for Indians
-  const worldwide = ["worldwide", "anywhere", "global", "remote - global", "100% remote", "fully remote"];
-  if (worldwide.some((k) => s.includes(k))) return true;
-  return false;
+// STRICT India-only check. Location must reference India or an Indian city/state.
+const INDIA_REGEX = /(india|bharat|bangalore|bengaluru|mumbai|delhi\b|new delhi|gurgaon|gurugram|noida|hyderabad|chennai|pune|kolkata|ahmedabad|jaipur|kochi|cochin|indore|chandigarh|lucknow|nagpur|coimbatore|trivandrum|thiruvananthapuram|mysore|mysuru|vadodara|surat|bhubaneswar|visakhapatnam|vizag|goa|kerala|gujarat|maharashtra|karnataka|tamil nadu|telangana|punjab|haryana|rajasthan|uttar pradesh|west bengal|odisha)/i;
+
+const isIndia = (location: string): boolean => {
+  if (!location) return false;
+  return INDIA_REGEX.test(location);
 };
 
 async function fetchRemotive(): Promise<JobRow[]> {
-  const res = await fetch("https://remotive.com/api/remote-jobs?limit=100");
+  const res = await fetch("https://remotive.com/api/remote-jobs?limit=200");
   if (!res.ok) throw new Error(`Remotive HTTP ${res.status}`);
   const data = await res.json();
   const jobs = (data.jobs || []) as any[];
   return jobs
-    .filter((j) => isIndiaEligible(j.candidate_required_location || "", j.title || ""))
+    .filter((j) => isIndia(j.candidate_required_location || ""))
     .map((j) => ({
       source: "remotive",
       external_id: String(j.id),
       external_url: j.url,
       title: j.title?.slice(0, 200) || "Untitled",
       company_name: j.company_name || "Unknown",
-      location: j.candidate_required_location || "Remote",
+      location: j.candidate_required_location || "India",
       job_type: mapJobType(j.job_type),
       work_mode: "remote",
       experience_level: "mid-level",
@@ -87,49 +77,23 @@ async function fetchRemotive(): Promise<JobRow[]> {
     }));
 }
 
-async function fetchArbeitnow(): Promise<JobRow[]> {
-  const res = await fetch("https://www.arbeitnow.com/api/job-board-api");
-  if (!res.ok) throw new Error(`Arbeitnow HTTP ${res.status}`);
-  const data = await res.json();
-  const jobs = (data.data || []) as any[];
-  return jobs
-    .filter((j) => isIndiaEligible(j.location || "", `${j.title || ""} ${(j.tags || []).join(" ")}`))
-    .slice(0, 50)
-    .map((j) => ({
-      source: "arbeitnow",
-      external_id: j.slug,
-      external_url: j.url,
-      title: (j.title || "Untitled").slice(0, 200),
-      company_name: j.company_name || "Unknown",
-      location: j.location || "Remote",
-      job_type: Array.isArray(j.job_types) && j.job_types.length ? mapJobType(j.job_types[0]) : "full-time",
-      work_mode: j.remote ? "remote" : "on-site",
-      experience_level: "mid-level",
-      industry: Array.isArray(j.tags) && j.tags.length ? j.tags[0] : "General",
-      description: stripHtml(j.description || "").slice(0, 4000),
-      skills_required: Array.isArray(j.tags) ? j.tags.slice(0, 10) : null,
-      is_active: true,
-    }));
-}
-
-// Remoteok also lists worldwide remote jobs that Indian devs can apply to
 async function fetchRemoteOK(): Promise<JobRow[]> {
   const res = await fetch("https://remoteok.com/api", {
-    headers: { "User-Agent": "BizBase Job Sync (contact: support@bizbase-ai.com)" },
+    headers: { "User-Agent": "BizBase Job Sync (support@bizbase-ai.com)" },
   });
   if (!res.ok) throw new Error(`RemoteOK HTTP ${res.status}`);
   const data = await res.json();
-  const jobs = (Array.isArray(data) ? data : []).slice(1) as any[]; // first item is legal notice
+  const jobs = (Array.isArray(data) ? data : []).slice(1) as any[];
   return jobs
-    .filter((j) => isIndiaEligible(j.location || "", `${j.position || ""} ${(j.tags || []).join(" ")}`))
-    .slice(0, 50)
+    .filter((j) => isIndia(j.location || ""))
+    .slice(0, 80)
     .map((j) => ({
       source: "remoteok",
       external_id: String(j.id || j.slug),
       external_url: j.url || `https://remoteok.com/remote-jobs/${j.id}`,
       title: (j.position || "Untitled").slice(0, 200),
       company_name: j.company || "Unknown",
-      location: j.location || "Remote",
+      location: j.location || "India",
       job_type: "full-time",
       work_mode: "remote",
       experience_level: "mid-level",
@@ -139,6 +103,10 @@ async function fetchRemoteOK(): Promise<JobRow[]> {
       is_active: true,
     }));
 }
+
+// Jooble — India feed (free public API, no key required for basic queries via their partner endpoint is limited).
+// We use their public search endpoint that doesn't require a key by returning JSON via query URL is not supported;
+// so we rely on Remotive + RemoteOK which reliably tag India locations.
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -156,10 +124,21 @@ Deno.serve(async (req) => {
     auth: { persistSession: false },
   });
 
+  // Auto-close jobs whose deadline passed
+  try {
+    await supabase
+      .from("jobs")
+      .update({ is_active: false })
+      .lt("application_deadline", new Date().toISOString())
+      .eq("is_active", true);
+  } catch (e) {
+    console.error("Auto-close failed", e);
+  }
+
   const summary: Record<string, unknown> = {};
   const sources: Array<{ name: string; fn: () => Promise<JobRow[]> }> = [
     { name: "remotive", fn: fetchRemotive },
-    { name: "arbeitnow", fn: fetchArbeitnow },
+    { name: "remoteok", fn: fetchRemoteOK },
   ];
 
   let totalInserted = 0;
@@ -170,7 +149,6 @@ Deno.serve(async (req) => {
         summary[src.name] = { fetched: 0, inserted: 0 };
         continue;
       }
-      // Find existing external_ids for this source to avoid duplicates
       const ids = rows.map((r) => r.external_id);
       const { data: existing, error: selErr } = await supabase
         .from("jobs")
@@ -191,7 +169,7 @@ Deno.serve(async (req) => {
       summary[src.name] = { fetched: rows.length, inserted: count ?? newRows.length, skipped: rows.length - newRows.length };
       totalInserted += count ?? newRows.length;
     } catch (e) {
-      const msg = e instanceof Error ? e.message : (typeof e === "object" ? JSON.stringify(e) : String(e));
+      const msg = e instanceof Error ? e.message : String(e);
       console.error(`[${src.name}] sync failed`, msg);
       summary[src.name] = { error: msg };
     }
