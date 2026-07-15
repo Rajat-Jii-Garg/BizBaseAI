@@ -24,7 +24,7 @@ import {
   Award
 } from 'lucide-react';
 
-// const Features = () => {
+const Features = () => {
 //   const features = [
 //     {
 //       icon: Brain,
@@ -164,5 +164,5 @@ import {
       </div>
     </section>
   );
-
+};
 export default Features;
