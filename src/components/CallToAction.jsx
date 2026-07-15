@@ -48,8 +48,8 @@ const CallToAction = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-          <div className="space-y-6 order-2 lg:order-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <div className="space-y-6 order-2 lg:order-1 max-w-[500px]">
             <h3 className="text-2xl md:text-3xl font-bold text-white mb-6">Why professionals choose BizBase:</h3>
             <div className="space-y-5">
               {benefits.map((benefit, index) => (
@@ -69,20 +69,20 @@ const CallToAction = () => {
             </div> */}
           </div>
           
-          <div className="flex justify-center lg:justify-end order-1 lg:order-2">
-            <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-10 shadow-2xl">
+          <div className="flex flex-col items-center lg:items-start order-1 lg:order-2">
+            <div className="w-full max-w-[480px] bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12 shadow-2xl">
               <div className="space-y-6">
                 <Link to="/signup">
-                  <Button size="lg" className="w-full bg-white text-slate-900 hover:bg-slate-100 rounded-2xl py-7 text-lg font-semibold transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-2xl border border-slate-200">
+                  <Button size="lg" className="w-full bg-white text-slate-900 hover:bg-slate-100 rounded-2xl h-16 text-lg font-semibold transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-2xl border border-slate-200">
                     Create Free Account
                     <ArrowRight className="w-6 h-6 ml-3" />
                   </Button>
                 </Link>
-                
+               
                 <div className="text-center">
                   <div className="text-blue-200 text-sm mb-4"></div>
                   <Link to="/login">
-                    <Button size="lg" className="-full bg-white text-slate-900 hover:bg-slate-100 rounded-2xl py-7 text-lg font-semibold transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-2xl border border-slate-200">
+                    <Button size="lg" className="w-full bg-white text-slate-900 hover:bg-slate-100 rounded-2xl h-16 text-lg font-semibold transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-2xl border border-slate-200">
                       Login →
                     </Button>
                   </Link>
@@ -90,7 +90,7 @@ const CallToAction = () => {
               </div>
             </div>
             
-            <div className="text-center text-blue-200 text-sm">
+            <div className="mt-8 w-full max-w-[480px] text-center text-blue-100 text-sm space-y-2">
               <p>🚀 Build Your Professional Identity</p>
               <p>🤖 AI Powered Growth</p>
               <p>🔒 Enterprise Grade Security</p>
