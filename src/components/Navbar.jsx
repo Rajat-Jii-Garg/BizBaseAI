@@ -102,15 +102,15 @@ const Navbar = ({ variant = 'default' }) => {
 
             {/* Community */}
             <Link
-              to="/community"
+              to="/whatsappcommunity"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
-              Community
+              Founders Community
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
             </Link>
 
             {/* Who is BizBase for? */}
-            
+            <a
               href="#who-is-it-for"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
@@ -151,14 +151,14 @@ const Navbar = ({ variant = 'default' }) => {
           <a href="#features" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
             Solutions
           </a>
-          <Link to="/about" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
+          <Link to="/" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
             Company — About
           </Link>
           <Link to="/blog" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
             Blogs
           </Link>
-          <Link to="/community" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
-            Community
+          <Link to="/whatsappcommunity" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
+            Founders Community
           </Link>
           <a href="#who-is-it-for" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
             Who is BizBase for?
