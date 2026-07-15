@@ -43,7 +43,7 @@ const CallToAction = () => {
             Building Their Future with BizBase
           </h2>
 
-          <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-blue-100 mb-16 max-w-3xl mx-auto leading-relaxed">
             Create your professional profile, discover opportunities, connect with the right people, manage your business, and use AI to grow faster — all from one free platform.
           </p>
         </div>
