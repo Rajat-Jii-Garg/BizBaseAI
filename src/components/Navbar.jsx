@@ -1,20 +1,13 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, Sparkles, Menu, X, ChevronDown } from 'lucide-react';
+import { LogIn, Sparkles, Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Navbar = ({ variant = 'default' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [companyOpen, setCompanyOpen] = useState(false);
   const isHero = variant === 'hero';
-
-  const navLinks = [
-    { label: 'Solutions', href: '#features' },
-    { label: 'Blogs', href: '/blog', isRoute: true },
-    { label: 'Community', href: '/community', isRoute: true },
-    { label: 'Who is BizBase for?', href: '#who-is-it-for' },
-  ];
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-slate-100 shadow-sm transition-colors duration-300">

@@ -1,28 +1,7 @@
 
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Users, 
-  UserCheck, 
-  FolderOpen, 
-  TrendingUp, 
-  Calculator, 
-  Brain,
-  Zap,
-  Target,
-  Shield,
-  Globe,
-  BarChart3,
-  Workflow,
-  Crown,
-  Rocket,
-  DollarSign,
-  Sparkles,
-  Lightbulb,
-  Star,
-  Award
-} from 'lucide-react';
+import { Rocket } from 'lucide-react';
 
 const CTA = () => {
 //   const features = [
