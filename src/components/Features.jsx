@@ -77,14 +77,10 @@ const Features = () => {
 //   ];
 
   return (
-    <section id="features" className="py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-white/5 to-transparent rounded-full" />
-      </div>
-
+    <section
+      id="features"
+      className="py-24 relative overflow-hidden"
+    >
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* <div className="text-center mb-20">
           <div className="inline-block px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-6">
@@ -141,7 +137,7 @@ const Features = () => {
 
         {/* CTA */}
         <div className="text-center">
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-3xl p-6 sm:p-8 md:p-12 text-white shadow-2xl border border-white/20">
+          <div className="rounded-none md:rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-500 p-10 md:p-16 text-white shadow-2xl">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Ready to grow with BizBase?</h3>
             <p className="text-sm sm:text-base md:text-lg opacity-90 max-w-xl mx-auto mb-8">
               Join a growing community of professionals, freelancers and founders building their future on BizBase — free forever.

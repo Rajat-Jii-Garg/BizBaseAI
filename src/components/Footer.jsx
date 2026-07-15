@@ -17,8 +17,8 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-white/80 mb-6 max-w-md font-medium leading-relaxed">
-              All-in-One AI Powered Business Operating System for modern businesses.<br/>
-              Streamline operations, boost productivity and make smarter, data-driven decisions.
+              AI Powered Smart Professional Networking & Business Management platform for modern businesses.<br/>
+              Build Connections, boost productivity and make smarter decisions.
             </p>
             <div className="flex space-x-4 mt-2">
               {/* Socials */}
@@ -38,22 +38,22 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="font-semibold mb-4 text-white">Product -</h3>
+            <h3 className="font-semibold mb-4 text-white">Quick Links -</h3>
             <ul className="space-y-2 text-white/80 text-base">
-              <li><a href="#features" className="hover:text-white transition story-link">Features</a></li>
-              <li><a href="#solutions" className="hover:text-white transition story-link">Solutions</a></li>
-              <li><a href="#" className="hover:text-white transition story-link">Pricing</a></li>
-              <li><a href="#" className="hover:text-white transition story-link">Integrations</a></li>
+              <li><a href="#benefits" className="hover:text-white transition story-link">Solutions</a></li>
+              <li><a href="/blog" className="hover:text-white transition story-link">Blogs</a></li>
+              <li><a href="#whatsappcommunity" className="hover:text-white transition story-link">Community</a></li>
+              <li><a href="/jobs" className="hover:text-white transition story-link">Careers</a></li>
             </ul>
           </div>
           
           <div>
             <h3 className="font-semibold mb-4 text-white">Company -</h3>
             <ul className="space-y-2 text-white/80 text-base">
-              <li><a href="#" className="hover:text-white transition story-link">About</a></li>
-              <li><a href="#" className="hover:text-white transition story-link">Contact</a></li>
-              <li><a href="#" className="hover:text-white transition story-link">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition story-link">Terms of Service</a></li>
+              <li><a href="/about" className="hover:text-white transition story-link">About</a></li>
+              <li><a href="/contact" className="hover:text-white transition story-link">Contact</a></li>
+              <li><a href="/privacy-policy" className="hover:text-white transition story-link">Privacy Policy</a></li>
+              <li><a href="/terms-of-service" className="hover:text-white transition story-link">Terms of Service</a></li>
             </ul>
           </div>
         </div>
@@ -61,7 +61,7 @@ const Footer = () => {
         <div className="border-t border-[#25619c] mt-12 pt-8 text-center text-white/70">
           <p className="text-sm md:text-base">
             &copy; {new Date().getFullYear()}{" "}
-            <span className="text-[#75eccc] font-semibold">BizBase</span>. All rights reserved.
+            <a href="/index"><span className="text-[#75eccc] font-semibold">BizBase</span></a>. All rights reserved.
             <span className="ml-2">Built for professionals & modern businesses.</span>
           </p>
         </div>

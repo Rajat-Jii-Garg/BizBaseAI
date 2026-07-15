@@ -58,7 +58,7 @@ const Navbar = ({ variant = 'default' }) => {
           <div className="hidden md:flex items-center space-x-8">
             {/* Solutions */}
             <a 
-              href="#features" 
+              href="#benefits" 
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Solutions
@@ -75,7 +75,6 @@ const Navbar = ({ variant = 'default' }) => {
                 className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 Company
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${companyOpen ? 'rotate-180' : ''}`} />
               </button>
               {companyOpen && (
                 <div className="absolute top-full left-0 pt-2">
@@ -111,7 +110,7 @@ const Navbar = ({ variant = 'default' }) => {
 
             {/* Who is BizBase for? */}
             <a
-              href="#who-is-it-for"
+              href="#WhoIsItFor"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Who is BizBase for?
@@ -152,13 +151,13 @@ const Navbar = ({ variant = 'default' }) => {
             Solutions
           </a>
           <Link to="/" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
-            Company — About
+            Company
           </Link>
           <Link to="/blog" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
             Blogs
           </Link>
           <Link to="/whatsappcommunity" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
-            Founders Community
+            Community
           </Link>
           <a href="#who-is-it-for" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
             Who is BizBase for?
