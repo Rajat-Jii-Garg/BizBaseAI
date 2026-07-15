@@ -164,6 +164,5 @@ import {
       </div>
     </section>
   );
-};
 
 export default Features;
