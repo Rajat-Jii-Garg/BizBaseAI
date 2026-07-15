@@ -61,8 +61,8 @@ const Footer = () => {
         <div className="border-t border-[#25619c] mt-12 pt-8 text-center text-white/70">
           <p className="text-sm md:text-base">
             &copy; {new Date().getFullYear()}{" "}
-            <a href="/index"><span className="text-[#75eccc] font-semibold">BizBase</span></a>. All rights reserved.
-            <span className="ml-2">Built for professionals & modern businesses.</span>
+            <a href="/"><span className="text-[#75eccc] font-semibold">BizBase</span></a>. All rights reserved.
+            <span className="ml-2">Built for Founders, Entrepreneurs, Professionals & Modern Businesses.</span>
           </p>
         </div>
       </div>
