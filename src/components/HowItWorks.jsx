@@ -56,7 +56,7 @@ const HowItWorks = () => {
             <span className="bg-gradient-to-r from-[#59e1c2] to-[#555df7] bg-clip-text text-transparent font-black">It Works</span>
           </h2>
           <p className="text-xl max-w-3xl mx-auto leading-relaxed font-display text-gradient-highlight">
-            Get started with <span className="font-bold text-violet-600">BizBase</span> in just <span className="text-blue-400">4 simple steps.</span> Our AI platform makes business effortless!
+            Get started with <span className="font-bold text-violet-600">BizBase</span> in just <span className="text-blue-400">4 simple steps.</span>
           </p>
         </div>
         <div className="space-y-16 md:space-y-20">
@@ -69,33 +69,33 @@ const HowItWorks = () => {
                 animationFillMode: 'forwards'
               }}
             >
-              <div className="flex-1 min-w-0">
-                <Card className="group card-glass card-hover transition-all duration-500 hover:-translate-y-2 overflow-hidden">
-                  <div className="relative h-44 sm:h-48 lg:h-56 overflow-hidden rounded-xl">
+              <div className="w-full lg:w-[44%] xl:w-[42%]">
+                <Card className="group rounded-3xl border border-slate-200 bg-white shadow-xl hover:shadow-2xl card-glass card-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                  <div className="p-5 relative h-[260px] lg:h-[300px] xl:h-[320px] overflow-hidden bg-white rounded-xl">
                     <img 
                       src={step.image} 
                       alt={step.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-contain bg-white group-hover:scale-[1.01] transition-transform duration-500 rounded-2xl"
                     />
-                    <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-10`} />
-                    <div className={`absolute top-6 left-6 w-12 h-12 rounded-2xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-xl animate-pulse-glow`}>
+                    <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-5 pointer-events-none`} />
+                    <div className={`absolute top-6 left-6 w-14 h-14 rounded-3xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-2xl animate-pulse-glow`}>
                       <step.icon className="w-6 h-6 text-white" />
                     </div>
-                    <div className="absolute bottom-6 left-6">
-                      <span className="text-4xl lg:text-5xl font-black text-gradient-main font-display">{step.step}</span>
+                    <div className="absolute bottom-5 right-5">
+                      <span className="text-6xl font-black text-slate-900/10">{step.step}</span>
                     </div>
                   </div>
                 </Card>
               </div>
-              <div className="flex-1 space-y-4 min-w-0 max-w-md mx-auto lg:mx-0">
+              <div className="w-full lg:w-[56%] xl:w-[58%] space-y-6 min-w-0 max-w-xl mx-auto lg:mx-0">
                 <div className="flex items-center space-x-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
                     <step.icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-lg font-semibold font-display text-gradient-accent">Step {step.step}</span>
+                  <span className="text-lg lg:text-xl font-semibold font-display text-gradient-accent">Step {step.step}</span>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold font-display text-gradient-main leading-tight">{step.title}</h3>
-                <p className="text-base md:text-lg text-[#4f55a2] font-medium leading-relaxed font-sans">{step.description}</p>
+                <h3 className="text-3xl xl:text-4xl md:text-3xl font-bold font-display text-gradient-main leading-tight">{step.title}</h3>
+                <p className="text-lg leading-8 md:text-lg text-[#4f55a2] font-medium leading-relaxed font-sans">{step.description}</p>
                 <div className={`w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`} />
               </div>
             </div>
