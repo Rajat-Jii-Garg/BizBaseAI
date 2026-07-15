@@ -17,16 +17,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="BizBase AI - All-in-One Platform for Professionals, Students & Businesses"
+        title="BizBase AI - All-in-One Platform for Founders, Entrepreneurs, Students & Businesses"
         description="Network, find jobs, join communities, get AI career coaching, and run your business — all under one roof. 100% free for every professional."
         path="/"
       />
       <Navbar />
       <Hero />
-      <ProductPreview />
+      {/* <ProductPreview /> */}
       <Features />
+      <CTA />
       <WhoIsItFor />
-      <Benefits />
       <HowItWorks />
       <CallToAction />
 

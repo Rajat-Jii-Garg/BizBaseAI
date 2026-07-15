@@ -45,6 +45,9 @@ import Leaderboard from "./pages/Leaderboard";
 import Referrals from "./pages/Referrals";
 import Blog from "./pages/Blog";
 import WhatsappCommunity from './pages/WhatsappCommunity';
+import About from "./pages/About";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 // Business pages
 import { 
@@ -174,6 +177,9 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/whatsappcommunity" element={<WhatsappCommunity />} />
               
               <Route path="/leaderboard" element={

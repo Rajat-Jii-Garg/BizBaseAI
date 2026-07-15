@@ -10,7 +10,7 @@ const Navbar = ({ variant = 'default' }) => {
   const isHero = variant === 'hero';
 
   const navLinks = [
-    { label: 'Solutions', href: '#benefits' },
+    { label: 'Solutions', href: '#features' },
     { label: 'Blogs', href: '/blog', isRoute: true },
     { label: 'Community', href: '/community', isRoute: true },
     { label: 'Who is BizBase for?', href: '#who-is-it-for' },
@@ -58,7 +58,7 @@ const Navbar = ({ variant = 'default' }) => {
           <div className="hidden md:flex items-center space-x-8">
             {/* Solutions */}
             <a 
-              href="#benefits" 
+              href="#features" 
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Solutions
@@ -110,7 +110,7 @@ const Navbar = ({ variant = 'default' }) => {
 
             {/* Who is BizBase for? */}
             <a
-              href="#WhoIsItFor"
+              href="#who-is-it-for"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Who is BizBase for?
