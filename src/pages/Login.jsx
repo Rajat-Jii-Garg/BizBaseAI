@@ -188,7 +188,7 @@ const Login = () => {
                       setLoginData(prev => ({ ...prev, password: e.target.value }));
                       if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
                     }}
-                    className={`pl-10 pr-11 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
+                    className={`pl-10 pr-12 md:pr-11 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.password
                         ? 'border-red-500 focus:border-red-500'
                         : 'focus:border-blue-500'
@@ -198,7 +198,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -206,16 +206,23 @@ const Login = () => {
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
 
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Switch
-                    id="remember-me"
-                    checked={loginData.rememberMe}
-                    onCheckedChange={(checked) => setLoginData(prev => ({ ...prev, rememberMe: checked }))}
-                  />
-                  <Label htmlFor="remember-me" className="text-[13px] md:text-sm text-gray-600 whitespace-nowrap">Remember me</Label>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="scale-90 md:scale-100 origin-left">
+                    <Switch
+                      id="remember-me"
+                      checked={loginData.rememberMe}
+                      onCheckedChange={(checked) =>
+                        setLoginData(prev => ({
+                          ...prev,
+                          rememberMe: checked,
+                        }))
+                      }
+                    />
+                  </div>
+                  <Label htmlFor="remember-me" className="text-[12px] md:text-sm text-gray-600 leading-none">Remember me</Label>
                 </div>
-                <Link to="/forget-password" className="text-[13px] md:text-sm text-blue-600 hover:text-blue-800 transition-colors whitespace-nowrap">Forget password?</Link>
+                <Link to="/forget-password" className="text-[12px] md:text-sm text-blue-600 hover:text-blue-800 leading-none whitespace-nowrap">Forget password?</Link>
               </div>
               
               <Button 

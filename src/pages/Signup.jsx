@@ -227,7 +227,7 @@ const Signup = () => {
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input id="fullName" type="text" placeholder="Enter your full name" value={signupData.fullName}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, fullName: e.target.value })); if (errors.fullName) setErrors(prev => ({ ...prev, fullName: '' })); }}
-                      className={`pl-10 ${errors.fullName ? 'border-destructive' : 'focus:border-primary'}`} required />
+                      className={`pl-10 placeholder:text-[13px] md:placeholder:text-sm ${errors.fullName ? 'border-destructive' : 'focus:border-primary'}`} required />
                   </div>
                   {errors.fullName && <p className="text-destructive text-xs mt-1">{errors.fullName}</p>}
                 </div>
@@ -238,7 +238,7 @@ const Signup = () => {
                     <AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input id="username" type="text" placeholder="Choose a unique username" value={signupData.username}
                       onChange={(e) => handleUsernameChange(e.target.value)}
-                      className={`pl-10 pr-10 ${errors.username ? 'border-destructive' : usernameAvailable === true ? 'border-green-500' : usernameAvailable === false ? 'border-destructive' : 'focus:border-primary'}`} required />
+                      className={`pl-10 pr-10 placeholder:text-[13px] md:placeholder:text-sm ${errors.username ? 'border-destructive' : usernameAvailable === true ? 'border-green-500' : usernameAvailable === false ? 'border-destructive' : 'focus:border-primary'}`} required />
                     <div className="absolute right-3 top-3">
                       {checkingUsername && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
                       {!checkingUsername && usernameAvailable === true && <CheckCircle className="h-4 w-4 text-green-500" />}
@@ -255,7 +255,7 @@ const Signup = () => {
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input id="email" type="email" placeholder="Enter your email" value={signupData.email}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, email: e.target.value })); if (errors.email) setErrors(prev => ({ ...prev, email: '' })); }}
-                      className={`pl-10 ${errors.email ? 'border-destructive' : 'focus:border-primary'}`} required />
+                      className={`pl-10 placeholder:text-[13px] md:placeholder:text-sm ${errors.email ? 'border-destructive' : 'focus:border-primary'}`} required />
                   </div>
                   {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
                 </div>
@@ -266,7 +266,7 @@ const Signup = () => {
                     <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input id="phone" type="tel" placeholder="+91 98765 43210" value={signupData.phone}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, phone: e.target.value })); if (errors.phone) setErrors(prev => ({ ...prev, phone: '' })); }}
-                      className={`pl-10 ${errors.phone ? 'border-destructive' : 'focus:border-primary'}`} required />
+                      className={`pl-10 placeholder:text-[13px] md:placeholder:text-sm ${errors.phone ? 'border-destructive' : 'focus:border-primary'}`} required />
                   </div>
                   {errors.phone && <p className="text-destructive text-xs mt-1">{errors.phone}</p>}
                 </div>
@@ -278,8 +278,8 @@ const Signup = () => {
                     <Input id="password" type={showPassword ? "text" : "password"} placeholder="Min 8 characters"
                       value={signupData.password}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, password: e.target.value })); if (errors.password) setErrors(prev => ({ ...prev, password: '' })); }}
-                      className={`pl-10 pr-12 ${errors.password ? 'border-destructive' : 'focus:border-primary'}`} required />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                      className={`pl-10 pr-14 md:pr-12 placeholder:text-[13px] md:placeholder:text-sm ${errors.password ? 'border-destructive' : 'focus:border-primary'}`} required />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
@@ -293,8 +293,8 @@ const Signup = () => {
                     <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password"
                       value={signupData.confirmPassword}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, confirmPassword: e.target.value })); if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' })); }}
-                      className={`pl-10 pr-12 ${errors.confirmPassword ? 'border-destructive' : 'focus:border-primary'}`} required />
-                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                      className={`pl-10 pr-14 md:pr-12 placeholder:text-[13px] md:placeholder:text-sm ${errors.confirmPassword ? 'border-destructive' : 'focus:border-primary'}`} required />
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
