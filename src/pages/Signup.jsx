@@ -279,7 +279,7 @@ const Signup = () => {
                       value={signupData.password}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, password: e.target.value })); if (errors.password) setErrors(prev => ({ ...prev, password: '' })); }}
                       className={`pl-10 pr-14 md:pr-12 placeholder:text-[13px] md:placeholder:text-sm ${errors.password ? 'border-destructive' : 'focus:border-primary'}`} required />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 md:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
@@ -294,7 +294,7 @@ const Signup = () => {
                       value={signupData.confirmPassword}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, confirmPassword: e.target.value })); if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' })); }}
                       className={`pl-10 pr-14 md:pr-12 placeholder:text-[13px] md:placeholder:text-sm ${errors.confirmPassword ? 'border-destructive' : 'focus:border-primary'}`} required />
-                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-0 md:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
