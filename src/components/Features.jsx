@@ -74,7 +74,7 @@ const Features = () => {
                 <h3 className="text-[15px] sm:text-base lg:text-lg font-bold mb-2 text-slate-800 group-hover:text-blue-600 transition-colors leading-snug">
                   {benefit.title}
                 </h3>
-               <p className="text-[12px] sm:text-[13px] lg:text-sm text-slate-600 leading-6 max-w-[220px] mx-auto">
+               <p className="text-[11.3px] sm:text-[13px] lg:text-sm text-slate-600 leading-1.2 max-w-[220px] mx-auto">
                   {benefit.description}
                 </p>
               </CardContent>
