@@ -126,7 +126,7 @@ const Navbar = ({ variant = 'default' }) => {
           {/* Mobile menu button */}
           <div className="md:hidden">
             <Button variant="ghost" size="icon" className="h-15 w-15 md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="w-8 h-8 text-foreground" /> : <Menu className="w-8 h-8 text-foreground" />}
+              {mobileOpen ? <X className="w-15 h-15 text-foreground" /> : <Menu className="w-15 h-15 text-foreground" />}
             </Button>
           </div>
         </div>
