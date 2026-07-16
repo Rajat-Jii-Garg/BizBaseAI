@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
@@ -208,19 +207,41 @@ const Login = () => {
 
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="scale-90 md:scale-100 origin-left">
-                    <Switch
-                      id="remember-me"
-                      checked={loginData.rememberMe}
-                      onCheckedChange={(checked) =>
-                        setLoginData(prev => ({
-                          ...prev,
-                          rememberMe: checked,
-                        }))
-                      }
-                    />
-                  </div>
-                  <Label htmlFor="remember-me" className="text-[12px] md:text-sm text-gray-600 leading-none">Remember me</Label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setLoginData(prev => ({
+                        ...prev,
+                        rememberMe: !prev.rememberMe,
+                      }))
+                    }
+                    className={`w-5 h-5 md:w-[22px] md:h-[22px]
+                      rounded-md border-2
+                      flex items-center justify-center
+                      transition-all duration-200
+                      ${
+                        loginData.rememberMe
+                          ? "bg-blue-600 border-blue-600"
+                          : "bg-white border-gray-300"
+                      }`}
+                  >
+                    {loginData.rememberMe && (
+                      <Check className="w-3 h-3 text-white stroke-[3]" />
+                    )}
+                  </button>
+
+                  <Label
+                    htmlFor="remember-me"
+                    className="text-[12px] md:text-sm text-gray-600 cursor-pointer"
+                    onClick={() =>
+                      setLoginData(prev => ({
+                        ...prev,
+                        rememberMe: !prev.rememberMe,
+                      }))
+                    }
+                  >
+                    Remember me
+                  </Label>
                 </div>
                 <Link to="/forget-password" className="text-[12px] md:text-sm text-blue-600 hover:text-blue-800 leading-none whitespace-nowrap">Forget password?</Link>
               </div>
