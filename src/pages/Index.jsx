@@ -31,7 +31,7 @@ const Index = () => {
       <CallToAction />
 
       {/* Quick Auth Links Section */}
-      <section className="py-16 bg-muted/50">
+      <section className="py-8 md:py-16 lg:py-16 bg-muted/50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-foreground mb-8">
             Ready to Get Started?

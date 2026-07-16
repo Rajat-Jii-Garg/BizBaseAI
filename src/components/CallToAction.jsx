@@ -14,7 +14,7 @@ const CallToAction = () => {
   ];
 
   return (
-    <section id="cta" className="py-20 md:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">
+    <section id="cta" className="py-10 md:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.1%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
 
@@ -32,18 +32,18 @@ const CallToAction = () => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full mb-8">
+          <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full mb-6 md:mb-8">
             <Sparkles className="w-5 h-5 text-white" />
-            <span className="text-white font-medium">Free forever for every professional</span>
+            <span className="text-white font-small">Trusted by Professionals & Businesses</span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight font-bold text-white mb-6">
+          <h2 className="text-[1.7rem] md:text-5xl lg:text-6xl leading-tight tracking-tight font-bold text-white mb-4 mb:mb-6">
             Join Thousands of Professionals
             <br />
             Building Their Future with BizBase
           </h2>
 
-          <p className="text-lg md:text-xl text-blue-100 mb-16 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-[0.95rem] md:text-xl text-blue-100 mb-8 md:mb-16 max-w-3xl mx-auto leading-relaxed">
             Create your professional profile, discover opportunities, connect with the right people, manage your business, and use AI to grow faster — all from one free platform.
           </p>
         </div>
@@ -55,7 +55,7 @@ const CallToAction = () => {
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center space-x-3">
                   <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-                  <span className="text-lg text-blue-100">{benefit}</span>
+                  <span className="text-base md:text-lg leading-4 md:leading-5 text-blue-100">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -70,7 +70,7 @@ const CallToAction = () => {
           </div>
           
           <div className="flex flex-col items-center lg:items-start order-1 lg:order-2">
-            <div className="w-full max-w-[480px] bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-12 shadow-2xl">
+            <div className="w-full max-w-[480px] bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-[36px] md:py-12 shadow-2xl">
               <div className="space-y-6">
                 <Link to="/signup">
                   <Button size="lg" className="w-full bg-white text-slate-900 hover:bg-slate-100 rounded-2xl h-16 text-lg font-semibold transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-2xl border border-slate-200">
@@ -90,7 +90,7 @@ const CallToAction = () => {
               </div>
             </div>
             
-            <div className="mt-8 w-full max-w-[480px] text-center text-blue-100 text-sm space-y-2">
+            <div className="mt-8 w-full max-w-[480px] text-center text-blue-100 text-sm leading-4 space-y-2">
               <p>🚀 Build Your Professional Identity</p>
               <p>🤖 AI Powered Growth</p>
               <p>🔒 Enterprise Grade Security</p>
@@ -99,7 +99,7 @@ const CallToAction = () => {
           </div>
         </div>
         
-        <div className="text-center mt-20">
+        <div className="text-center mt-[3rem] md:mt-20">
           <p className="text-blue-100 text-base font-medium max-w-4xl mx-auto leading-relaxed">
             Trusted by Founders, Entrepreneurs, Freelancers, Professionals and Businesses across India.
             Build smart identity, meaningful connections, discover opportunities, grow your business.

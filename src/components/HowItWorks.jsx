@@ -69,17 +69,17 @@ const HowItWorks = () => {
                 animationFillMode: 'forwards'
               }}
             >
-              <div className="w-[42%] sm:w-[38%] lg:w-[44%] xl:w-[42%] flex-shrink-0">
+              <div className="w-[47%] sm:w-[42%] lg:w-[44%] xl:w-[42%] flex-shrink-0">
                 <Card className="group rounded-2xl md:rounded-3xl border border-slate-200 bg-white shadow-xl hover:shadow-2xl card-glass card-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                  <div className="p-5 relative h-[150px] sm:h-[180px] md:h-[220px] lg:h-[300px] xl:h-[320px] overflow-hidden bg-white rounded-xl">
+                  <div className="p-5 relative h-[170px] sm:h-[200px] md:h-[220px] lg:h-[300px] xl:h-[320px] overflow-hidden bg-white rounded-xl">
                     <img 
                       src={step.image} 
                       alt={step.title}
-                      className="w-full h-full object-cover scale-[1.18] md:scale-100 group-hover:scale-[1.22] md:group-hover:scale-[1.02] transition-transform duration-500 rounded-2xl"
+                      className="w-full h-full object-cover scale-[1.28] md:scale-100 group-hover:scale-[1.32] md:group-hover:scale-[1.02] transition-transform duration-500 rounded-2xl"
                     />
                     <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-5 pointer-events-none`} />
                     <div className={`absolute top-3 left-3 md:top-6 md:left-6 w-10 h-10 md:w-14 md:h-14 rounded-3xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-2xl animate-pulse-glow`}>
-                      <step.icon className="w-6 h-6 text-white" />
+                      <step.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <div className="absolute bottom-5 right-5 hidden md:block">
                       <span className="text-4xl md:text-6xl font-black text-slate-900/10">{step.step}</span>
@@ -87,15 +87,15 @@ const HowItWorks = () => {
                   </div>
                 </Card>
               </div>
-              <div className="w-[58%] sm:w-[62%] lg:w-[56%] xl:w-[58%] lg:w-[56%] xl:w-[58%] space-y-3 md:space-y-6 min-w-0 max-w-xl mx-auto lg:mx-0">
+              <div className="w-[53%] sm:w-[58%] lg:w-[56%] xl:w-[58%] space-y-2 md:space-y-6 min-w-0 max-w-xl mx-auto lg:mx-0">
                 <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
-                    <step.icon className="w-6 h-6 text-white" />
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
+                    <step.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                   </div>
                   <span className="text-sm sm:text-base lg:text-xl font-semibold font-display text-gradient-accent">Step {step.step}</span>
                 </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold font-display text-gradient-main leading-tight">{step.title}</h3>
-                <p className="text-sm sm:text-base md:text-lg leading-6 md:leading-8 md:text-lg text-[#4f55a2] font-medium leading-relaxed font-sans">{step.description}</p>
+                <h3 className="text-xg sm:text-xl md:text-3xl xl:text-4xl font-bold font-display text-gradient-main leading-tight">{step.title}</h3>
+                <p className="text-[13px] sm:text-sm md:text-lg leading-5 md:leading-8 md:text-lg text-[#4f55a2] font-medium leading-relaxed font-sans">{step.description}</p>
                 <div className={`w-16 md:w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`} />
               </div>
             </div>
