@@ -12,7 +12,7 @@ const Navbar = ({ variant = 'default' }) => {
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-slate-100 shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14 sm:h-16">
 
           {/* Logo */}
           {/* <Link to="/" className="flex items-center space-x-2">
@@ -21,18 +21,18 @@ const Navbar = ({ variant = 'default' }) => {
             </span>
           </Link> */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl ${
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl ${
               isHero ? 'bg-gradient-to-br from-blue-500 to-violet-500' : 'bg-gradient-to-br from-blue-600 to-purple-600'
             }`}>
-              <Sparkles className="w-7 h-7 text-white" />
+              <Sparkles className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
             </div>
             <div className="flex flex-col">
-              <span className={`text-2xl font-black bg-clip-text text-transparent ${
+              <span className={`text-[1.7rem] sm:text-2xl font-black bg-clip-text text-transparent ${
                 isHero ? 'bg-gradient-to-r from-blue-400 to-violet-400' : 'bg-gradient-to-r from-blue-600 to-purple-600'
               }`}>
                 BizBase
               </span>
-              <span className={`text-xs font-medium -mt-1 ${isHero ? 'text-white/40' : 'text-slate-500'}`}>Build • Scale • Automate</span>
+              <span className={`text-[10px] sm:text-xs font-medium -mt-1 ${isHero ? 'text-white/40' : 'text-slate-500'}`}>Build • Scale • Automate</span>
             </div>
           </Link>
           
@@ -130,8 +130,8 @@ const Navbar = ({ variant = 'default' }) => {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button variant="ghost" size="sm" className="p-2" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
+            <Button variant="ghost" size="sm" className="p-2.5" onClick={() => setMobileOpen(!mobileOpen)}>
+              {mobileOpen ? <X className="w-7 h-7 text-foreground" /> : <Menu className="w-7 h-7 text-foreground" />}
             </Button>
           </div>
         </div>
