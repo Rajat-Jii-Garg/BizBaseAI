@@ -12,7 +12,7 @@ const audiences = [
 
 const WhoIsItFor = () => {
   return (
-    <section id="who-is-it-for" className="py-20 bg-white">
+    <section id="who-is-it-for" className="py-10 sm:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-600 px-3.5 py-1.5 rounded-full text-xs font-medium mb-4">

@@ -44,14 +44,14 @@ const getAnim = (index) => {
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-16 bg-gradient-to-tr from-[#e6f9ff] via-white to-[#f5fcff] relative overflow-hidden">
+    <section id="how-it-works" className="py-10 md:py-16 bg-gradient-to-tr from-[#e6f9ff] via-white to-[#f5fcff] relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-0">
         <div className="absolute -top-8 left-[40%] w-[400px] h-[480px] bg-gradient-to-br from-[#c8fbfa]/20 to-[#bce0f8]/70 rounded-full opacity-20 blur-2xl" />
         <div className="absolute top-[60%] right-[3%] w-[180px] h-[200px] bg-gradient-to-br from-[#d7faf2]/30 to-[#e3f7ff]/60 rounded-full opacity-25 blur-3xl" />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-display font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#11a6c4] via-[#4ce7bb] to-[#8df7f9] animate-fade-in head-accent shadow-title-glow">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="text-3xl md:text-6xl font-display font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#11a6c4] via-[#4ce7bb] to-[#8df7f9] animate-fade-in head-accent shadow-title-glow">
             How {' '}
             <span className="bg-gradient-to-r from-[#59e1c2] to-[#555df7] bg-clip-text text-transparent font-black">It Works</span>
           </h2>
@@ -63,40 +63,40 @@ const HowItWorks = () => {
           {steps.map((step, index) => (
             <div
               key={index}
-              className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-6 md:gap-10 ${getAnim(index)} opacity-0 will-change-transform animate-fade-in`}
+              className={`flex flex-row md:flex-row ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-4 md:gap-8 ${getAnim(index)} opacity-0 will-change-transform animate-fade-in`}
               style={{
                 animationDelay: `${350 + index * 210}ms`,
                 animationFillMode: 'forwards'
               }}
             >
-              <div className="w-full lg:w-[44%] xl:w-[42%]">
-                <Card className="group rounded-3xl border border-slate-200 bg-white shadow-xl hover:shadow-2xl card-glass card-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                  <div className="p-5 relative h-[260px] lg:h-[300px] xl:h-[320px] overflow-hidden bg-white rounded-xl">
+              <div className="w-[42%] sm:w-[38%] lg:w-[44%] xl:w-[42%] flex-shrink-0">
+                <Card className="group rounded-2xl md:rounded-3xl border border-slate-200 bg-white shadow-xl hover:shadow-2xl card-glass card-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                  <div className="p-3 md:p-5 relative h-[150px] sm:h-[180px] md:h-[220px] lg:h-[300px] xl:h-[320px] overflow-hidden bg-white rounded-xl">
                     <img 
                       src={step.image} 
                       alt={step.title}
                       className="w-full h-full object-contain bg-white group-hover:scale-[1.01] transition-transform duration-500 rounded-2xl"
                     />
                     <div className={`absolute inset-0 bg-gradient-to-t ${step.color} opacity-5 pointer-events-none`} />
-                    <div className={`absolute top-6 left-6 w-14 h-14 rounded-3xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-2xl animate-pulse-glow`}>
+                    <div className={`absolute top-3 left-3 md:top-6 md:left-6 w-10 h-10 md:w-14 md:h-14 rounded-3xl bg-gradient-to-r ${step.color} flex items-center justify-center shadow-2xl animate-pulse-glow`}>
                       <step.icon className="w-6 h-6 text-white" />
                     </div>
                     <div className="absolute bottom-5 right-5">
-                      <span className="text-6xl font-black text-slate-900/10">{step.step}</span>
+                      <span className="text-4xl md:text-6xl font-black text-slate-900/10">{step.step}</span>
                     </div>
                   </div>
                 </Card>
               </div>
-              <div className="w-full lg:w-[56%] xl:w-[58%] space-y-6 min-w-0 max-w-xl mx-auto lg:mx-0">
+              <div className="w-[58%] sm:w-[62%] lg:w-[56%] xl:w-[58%] lg:w-[56%] xl:w-[58%] space-y-3 md:space-y-6 min-w-0 max-w-xl mx-auto lg:mx-0">
                 <div className="flex items-center space-x-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center`}>
                     <step.icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-lg lg:text-xl font-semibold font-display text-gradient-accent">Step {step.step}</span>
+                  <span className="text-sm sm:text-base lg:text-xl font-semibold font-display text-gradient-accent">Step {step.step}</span>
                 </div>
-                <h3 className="text-3xl xl:text-4xl md:text-3xl font-bold font-display text-gradient-main leading-tight">{step.title}</h3>
-                <p className="text-lg leading-8 md:text-lg text-[#4f55a2] font-medium leading-relaxed font-sans">{step.description}</p>
-                <div className={`w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`} />
+                <h3 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold font-display text-gradient-main leading-tight">{step.title}</h3>
+                <p className="text-sm sm:text-base md:text-lg leading-6 md:leading-8 md:text-lg text-[#4f55a2] font-medium leading-relaxed font-sans">{step.description}</p>
+                <div className={`w-16 md:w-24 h-1 bg-gradient-to-r ${step.color} rounded-full`} />
               </div>
             </div>
           ))}
