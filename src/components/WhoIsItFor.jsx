@@ -26,14 +26,14 @@ const WhoIsItFor = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
           {audiences.map((a, i) => (
-            <div key={i} className="group relative bg-slate-50/70 hover:bg-white border border-slate-100 hover:border-slate-200 hover:shadow-lg rounded-2xl p-6 transition-all duration-300">
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${a.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                <a.icon className="w-6 h-6 text-white" />
+         className="group relative bg-slate-50/70 hover:bg-white border border-slate-100 hover:border-slate-200 hover:shadow-lg rounded-2xl p-4 sm:p-6 min-h-[210px] sm:min-h-[240px] transition-all duration-300"
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${a.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <a.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{a.title}</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">{a.desc}</p>
+              <h3 className="text-[15px] sm:text-lg font-bold text-slate-900 mb-2 leading-tight">{a.title}</h3>
+              <p className="text-[12px] sm:text-sm text-slate-600 leading-5 sm:leading-relaxed">{a.desc}</p>
             </div>
           ))}
         </div>
