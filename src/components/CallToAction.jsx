@@ -32,30 +32,30 @@ const CallToAction = () => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full mb-6 md:mb-8">
-            <Sparkles className="w-5 h-5 text-white" />
-            <span className="text-white font-small">Trusted by Professionals & Businesses</span>
+          <div className="inline-flex items-center space-x-1.5 md:space-x-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 md:px-6 md:py-3 rounded-full mb-5 md:mb-8">
+            <Sparkles className="w-3.5 h-3.5 md:w-5 md:h-5 text-white" />
+            <span className="text-[11px] md:text-base text-white font-medium whitespace-nowrap">Trusted by Professionals & Businesses</span>
           </div>
 
-          <h2 className="text-[1.7rem] md:text-5xl lg:text-6xl leading-tight tracking-tight font-bold text-white mb-4 mb:mb-6">
+          <h2 className="text-[1.45rem] md:text-5xl lg:text-6xl leading-[1.2] md:leading-tight tracking-tight font-bold text-white mb-4 md:mb-6">
             Join Thousands of Professionals
             <br />
             Building Their Future with BizBase
           </h2>
 
-          <p className="text-[0.95rem] md:text-xl text-blue-100 mb-8 md:mb-16 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-[0.82rem] md:text-xl text-blue-100 mb-8 md:mb-16 max-w-3xl mx-auto leading-6 md:leading-relaxed px-1">
             Create your professional profile, discover opportunities, connect with the right people, manage your business, and use AI to grow faster — all from one free platform.
           </p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           <div className="space-y-6 order-2 lg:order-1 max-w-[500px]">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-6">Why professionals choose BizBase:</h3>
-            <div className="space-y-5">
+            <h3 className="text-[1.7rem] md:text-3xl font-bold text-white mb-5 md:mb-6">Why professionals choose BizBase:</h3>
+            <div className="space-y-3 md:space-y-5">
               {benefits.map((benefit, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-                  <span className="text-base md:text-lg leading-4 md:leading-5 text-blue-100">{benefit}</span>
+                <div key={index} className="flex items-center space-x-2.5 md:space-x-3">
+                  <CheckCircle className="w-5 h-5 md:w-6 md:h-6 text-green-400 flex-shrink-0" />
+                  <span className="text-[0.92rem] md:text-lg leading-[1.2] md:leading-5 text-blue-100">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -100,7 +100,7 @@ const CallToAction = () => {
         </div>
         
         <div className="text-center mt-[3rem] md:mt-20">
-          <p className="text-blue-100 text-base font-medium max-w-4xl mx-auto leading-relaxed">
+          <p className="text-blue-100 text-[0.86rem] md:text-base font-medium max-w-4xl mx-auto leading-6 md:leading-relaxed px-2">
             Trusted by Founders, Entrepreneurs, Freelancers, Professionals and Businesses across India.
             Build smart identity, meaningful connections, discover opportunities, grow your business.
           </p>
