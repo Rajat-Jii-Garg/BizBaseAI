@@ -116,7 +116,7 @@ const CTA = () => {
 
         {/* CTA */}
         <div className="text-center">
-          <div className="rounded-none md:rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-500 p=[1.5rem] sm:px-8 sm:py-14 md:p-16 text-white shadow-2xl">
+          <div className="rounded-none md:rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-500 p-[1.5rem] sm:px-8 sm:py-14 md:p-16 text-white shadow-2xl">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Ready to grow with BizBase?</h3>
             <p className="text-sm sm:text-base md:text-lg opacity-90 max-w-xl mx-auto mb-8">
               Join a growing community of professionals, freelancers and founders building their future on BizBase — free forever.
