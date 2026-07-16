@@ -278,8 +278,8 @@ const Signup = () => {
                     <Input id="password" type={showPassword ? "text" : "password"} placeholder="Min 8 characters"
                       value={signupData.password}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, password: e.target.value })); if (errors.password) setErrors(prev => ({ ...prev, password: '' })); }}
-                      className={`pl-10 pr-10 ${errors.password ? 'border-destructive' : 'focus:border-primary'}`} required />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
+                      className={`pl-10 pr-12 ${errors.password ? 'border-destructive' : 'focus:border-primary'}`} required />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
@@ -293,8 +293,8 @@ const Signup = () => {
                     <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm your password"
                       value={signupData.confirmPassword}
                       onChange={(e) => { setSignupData(prev => ({ ...prev, confirmPassword: e.target.value })); if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' })); }}
-                      className={`pl-10 pr-10 ${errors.confirmPassword ? 'border-destructive' : 'focus:border-primary'}`} required />
-                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
+                      className={`pl-10 pr-12 ${errors.confirmPassword ? 'border-destructive' : 'focus:border-primary'}`} required />
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
@@ -328,8 +328,8 @@ const Signup = () => {
               <div className="mt-4 text-center">
                 <p className="text-xs text-muted-foreground">
                   By signing up, you agree to our{' '}
-                  <Link to="/terms" className="text-primary hover:text-primary/80">Terms of Service</Link>{' '}and{' '}
-                  <Link to="/privacy" className="text-primary hover:text-primary/80">Privacy Policy</Link>
+                  <Link to="/terms-of-service" className="text-primary hover:text-primary/80">Terms of Service</Link>{' '}and{' '}
+                  <Link to="/privacy-policy" className="text-primary hover:text-primary/80">Privacy Policy</Link>
                 </p>
               </div>
             </CardContent>

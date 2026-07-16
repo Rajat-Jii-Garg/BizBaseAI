@@ -126,8 +126,8 @@ const Login = () => {
       <SEOHead title="Login" description="Sign in to your BizBase AI account. Access your professional network, manage businesses, and grow your career." path="/login" />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2 mb-6 group">
+        <div className="text-center mb-8 -mt-4 md:mt-0">
+          <Link to="/" className="inline-flex items-center space-x-2 mb-4 md:mb-6 group">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
               <Sparkles className="w-7 h-7 text-white animate-pulse" />
             </div>
@@ -164,7 +164,11 @@ const Login = () => {
                       setLoginData(prev => ({ ...prev, email: e.target.value }));
                       if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
                     }}
-                    className={`pl-10 transition-all duration-200 ${errors.email ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    className={`pl-10 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
+                      errors.email
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'focus:border-blue-500'
+                    }`}
                     required
                   />
                 </div>
@@ -184,13 +188,17 @@ const Login = () => {
                       setLoginData(prev => ({ ...prev, password: e.target.value }));
                       if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
                     }}
-                    className={`pl-10 pr-10 transition-all duration-200 ${errors.password ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'}`}
+                    className={`pl-10 pr-11 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
+                      errors.password
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'focus:border-blue-500'
+                    }`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -198,18 +206,16 @@ const Login = () => {
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   <Switch
                     id="remember-me"
                     checked={loginData.rememberMe}
                     onCheckedChange={(checked) => setLoginData(prev => ({ ...prev, rememberMe: checked }))}
                   />
-                  <Label htmlFor="remember-me" className="text-sm text-gray-600">Remember me</Label>
+                  <Label htmlFor="remember-me" className="text-[13px] md:text-sm text-gray-600 whitespace-nowrap">Remember me</Label>
                 </div>
-                <Link to="/forget-password" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                  Forget password?
-                </Link>
+                <Link to="/forget-password" className="text-[13px] md:text-sm text-blue-600 hover:text-blue-800 transition-colors whitespace-nowrap">Forget password?</Link>
               </div>
               
               <Button 
