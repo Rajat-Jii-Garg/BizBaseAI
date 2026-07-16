@@ -39,7 +39,7 @@ const Hero = () => {
 
           {/* Main Headline */}
           <div className="space-y-3 sm:space-y-4 max-w-3xl mx-auto">
-            <h1 className="text-[2.65rem] leading-[1.05] sm:text-5xl md:text-6xl lg:text-[4rem] font-extrabold leading-[1.15] tracking-[-0.04em]">
+            <h1 className="text-[2rem] sm:text-5xl md:text-6xl lg:text-[3rem] font-extrabold leading-[1.15] tracking-[-0.04em]">
               <span className="text-foreground">Build Meaningful Connections,
                 <br />
                 <span className="md:ml-0">Discover Opportunities</span>
@@ -50,7 +50,7 @@ const Hero = () => {
               </span>
             </h1>
 
-            <p className="text-[17px] sm:text-lg text-muted-foreground max-w-xl sm:max-w-2xl mx-auto leading-8">
+            <p className="text-[13px] sm:text-lg text-muted-foreground max-w-xl sm:max-w-2xl mx-auto leading-1.25">
               Build your professional identity, connect with smart people, discover opportunities, manage your business, and grow faster with AI — in BizBase.
             </p>
           </div>
