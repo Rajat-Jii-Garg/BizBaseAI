@@ -58,9 +58,9 @@ const CTA = () => {
   return (
     <section
       id="cta"
-      className="py-24 relative overflow-hidden"
+      className="py-0 md:py-24 relative overflow-hidden"
     >
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-0 sm:px-6 lg:px-8">
         {/* <div className="text-center mb-20">
           <div className="inline-block px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-6">
             <Sparkles className="w-4 h-4 inline mr-2" />
@@ -116,7 +116,7 @@ const CTA = () => {
 
         {/* CTA */}
         <div className="text-center">
-          <div className="rounded-none md:rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-500 p-10 md:p-16 text-white shadow-2xl">
+          <div className="rounded-none md:rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-500 p=[1.5rem] sm:px-8 sm:py-14 md:p-16 text-white shadow-2xl">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Ready to grow with BizBase?</h3>
             <p className="text-sm sm:text-base md:text-lg opacity-90 max-w-xl mx-auto mb-8">
               Join a growing community of professionals, freelancers and founders building their future on BizBase — free forever.

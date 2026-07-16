@@ -51,7 +51,7 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="py-20 bg-gradient-to-br from-white via-slate-50 to-blue-50/30">
+    <section id="features" className="py-[3rem] bg-gradient-to-br from-white via-slate-50 to-blue-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
           <h2 className="text-[2rem] sm:text-4xl md:text-5xl font-black mb-4 sm:mb-5 leading-tight">
