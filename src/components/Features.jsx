@@ -66,15 +66,15 @@ const Features = () => {
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
           {benefits.map((benefit, index) => (
-            <Card key={index} className="group card-professional hover:shadow-xl h-full">
-              <CardContent className="p-4 sm:p-5 lg:p-6 text-center flex flex-col items-center h-full">
+            <Card key={index} className="group card-professional hover:shadow-xl h-full min-h-[140px] sm:min-h-[220px]">
+              <CardContent className="p-4 sm:p-5 lg:p-6 text-center flex flex-col items-center justify-center h-full">
                 <div className={`w-11 h-11 sm:w-12 sm:h-12 lg:w-14 lg:h-14 mx-auto mb-3 sm:mb-4 rounded-xl bg-gradient-to-r ${benefit.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                   <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
                 </div>
                 <h3 className="text-[15px] sm:text-base lg:text-lg font-bold mb-2 text-slate-800 group-hover:text-blue-600 transition-colors leading-snug">
                   {benefit.title}
                 </h3>
-               <p className="text-[11.3px] sm:text-[13px] lg:text-sm text-slate-600 leading-1.2 max-w-[220px] mx-auto">
+               <p className="hidden sm:block text-[13px] lg:text-sm text-slate-600 leading-relaxed max-w-[220px] mx-auto">
                   {benefit.description}
                 </p>
               </CardContent>
