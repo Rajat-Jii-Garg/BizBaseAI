@@ -9,7 +9,7 @@ const CommunityBanner = () => {
           <div className="flex flex-col gap-[16px] md:gap-8">
 
             {/* Top row: Logo + Name/Description */}
-            <div className="flex flex-col md:flex-row items-center justify-center gap-[8px] md:gap-8">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-[8px] md:gap-4">
 
               {/* Logo — circle, bigger, top-aligned */}
               <div className="flex-shrink-0 md:mt-1">
