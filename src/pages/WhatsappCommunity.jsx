@@ -67,34 +67,13 @@ const JsonLd = () => {
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'Event',
-        name: 'Founder’s Meet 2026',
+        '@type': 'Organization',
+        name: "Founder’s Meet 2026",
         description:
           '100+ Founders, Entrepreneurs and Professionals connect every week — real conversations, referrals, and opportunities.',
-        eventSchedule: {
-          '@type': 'Schedule',
-          repeatFrequency: 'P1W',
-          byDay: 'https://schema.org/Saturday',
-        },
-        eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
-        eventStatus: 'https://schema.org/EventScheduled',
-        location: {
-          '@type': 'VirtualLocation',
-          url: WHATSAPP_URL,
-        },
-        organizer: {
-          '@type': 'Organization',
-          name: 'BizBase',
-          url: 'https://bizbase-ai.vercel.app',
-        },
+        url:`https://bizbase-ai.vercel.app${CANONICAL_PATH}`,
         image: OG_IMAGE,
-        offers: {
-          '@type': 'Offer',
-          price: '0',
-          priceCurrency: 'INR',
-          availability: 'https://schema.org/InStock',
-          url: `https://bizbase-ai.vercel.app${CANONICAL_PATH}`,
-        },
+        sameAs: WHATSAPP_URL,
       },
       {
         '@type': 'FAQPage',
@@ -113,7 +92,6 @@ const JsonLd = () => {
     />
   );
 };
-
 const JoinButton = ({ size = 'lg', className = '' }) => (
   <a
     href={WHATSAPP_URL}
