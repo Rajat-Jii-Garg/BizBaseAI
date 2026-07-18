@@ -163,7 +163,7 @@ const WhatsappCommunity = () => {
           <div className="grid md:grid-cols-[auto,1fr] gap-8 md:gap-12 items-center">
             <div className="mx-auto md:mx-0 w-40 h-40 sm:w-48 sm:h-48 rounded-full ring-1 ring-[#0F766E]/10 shadow-xl shadow-emerald-900/5 bg-white overflow-hidden">
               <img
-                src={foundersLogo.url}
+                src={"/images/foundersMeet2026.png"}
                 alt="Founder's Meet 2026 official community badge"
                 className="w-full h-full object-contain p-2"
                 width={192}
