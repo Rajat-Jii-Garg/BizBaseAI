@@ -93,14 +93,12 @@
   }
 
   body {
-    background: linear-gradient(135deg,
-      #fefefe 0%,
-      #f8fafc 20%,
-      #f1f5f9 40%,
-      #e2e8f0 60%,
-      #f0f9ff 80%,
-      #fefefe 100%
-    );
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #f7f4ff 0%, transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, #ecfdf5 0%, transparent 55%),
+      linear-gradient(180deg, #fafbfc 0%, #ffffff 100%);
+    background-attachment: fixed;
+
     color: hsl(var(--foreground));
     font-family: 'Inter', 'system-ui', 'sans-serif';
     min-height: 100vh;
