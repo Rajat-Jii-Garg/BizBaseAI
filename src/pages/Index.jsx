@@ -10,6 +10,7 @@ import CTA from '@/components/CTA';
 import WhoIsItFor from '@/components/WhoIsItFor';
 import HowItWorks from '@/components/HowItWorks';
 import CallToAction from '@/components/CallToAction';
+import CommunityBanner from '@/components/CommunityBanner';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 
@@ -28,6 +29,7 @@ const Index = () => {
       <CTA />
       <WhoIsItFor />
       <HowItWorks />
+      <CommunityBanner />
       <CallToAction />
 
       {/* Quick Auth Links Section */}
