@@ -11,11 +11,10 @@ import {
   ArrowRight,
   CheckCircle2,
 } from 'lucide-react';
-import foundersLogo from '@/assets/founders-meet-2026.png.asset.json';
 
 const WHATSAPP_URL = 'https://chat.whatsapp.com/C2ovqcxBJBsCOTAVbTZyBC';
 const CANONICAL_PATH = '/whatsappcommunity';
-const OG_IMAGE = `https://bizbase-ai.vercel.app${foundersLogo.url}`;
+const OG_IMAGE = '/images/foundersMeet2026.png';
 
 const expectations = [
   {

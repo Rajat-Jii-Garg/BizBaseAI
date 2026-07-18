@@ -215,7 +215,7 @@ const Login = () => {
                         rememberMe: !prev.rememberMe,
                       }))
                     }
-                    className={`w-5 h-5 md:w-[22px] md:h-[22px]
+                    className={`w-2 h-2 md:w-[22px] md:h-[22px]
                       rounded-md border-2
                       flex items-center justify-center
                       transition-all duration-200
