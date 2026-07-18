@@ -20,7 +20,7 @@ const expectations = [
   {
     icon: Calendar,
     title: 'Weekly live sessions',
-    body: 'Every week a focused meet with founders and operators — practical topics, no fluff.',
+    body: 'Every week a focused meet with founders and operators - practical topics, no fluff.',
   },
   {
     icon: Handshake,
@@ -42,7 +42,7 @@ const expectations = [
 const faqs = [
   {
     q: 'Is it free to join?',
-    a: 'Yes. Founder’s Meet 2026 is 100% free. There are no subscription fees, hidden charges, or paywalls.',
+    a: 'Yes. Founders Meet 2026 is 100% free. There are no subscription fees, hidden charges, or paywalls.',
   },
   {
     q: 'How often do sessions happen?',
@@ -50,7 +50,7 @@ const faqs = [
   },
   {
     q: 'Who is this community for?',
-    a: 'Founders, aspiring founders, entrepreneurs, freelancers and working professionals in India who want real conversations, referrals and opportunities — not passive scrolling.',
+    a: 'Founders, aspiring founders, entrepreneurs, freelancers and working professionals in India who want real conversations, referrals and opportunities - not passive scrolling.',
   },
   {
     q: 'Do I need to be on BizBase to join?',
@@ -68,7 +68,7 @@ const JsonLd = () => {
     '@graph': [
       {
         '@type': 'Organization',
-        name: "Founder’s Meet 2026",
+        name: "Founder's Meet 2026",
         description:
           '100+ Founders, Entrepreneurs and Professionals connect every week — real conversations, referrals, and opportunities.',
         url:`https://bizbase-ai.vercel.app${CANONICAL_PATH}`,
@@ -118,8 +118,8 @@ const WhatsappCommunity = () => {
   return (
     <div className="min-h-screen">
       <SEOHead
-        title="Founder's Meet 2026 — Weekly Founders & Entrepreneurs Community"
-        description="Join Founder's Meet 2026 — India's growing weekly community of 100+ founders, entrepreneurs and professionals. Real conversations, referrals and opportunities. Free to join."
+        title="Founder's Meet 2026 - Weekly Founders & Entrepreneurs Community"
+        description="Join Founder's Meet 2026 - India's growing weekly community of 100+ founders, entrepreneurs and professionals. Real conversations, referrals and opportunities. Free to join."
         path={CANONICAL_PATH}
         image={OG_IMAGE}
         type="website"
@@ -151,13 +151,13 @@ const WhatsappCommunity = () => {
             <div className="text-center md:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white ring-1 ring-[#0F766E]/15 text-xs font-medium text-[#0F766E] mb-5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Now accepting members — India
+                Now accepting members - India
               </div>
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 leading-[1.05]">
                 Join Founder&apos;s Meet 2026
               </h1>
               <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-                100+ Founders, Entrepreneurs and Professionals connect every week — real conversations, referrals, and opportunities. Join India&apos;s #1 growing community and never miss a session.
+                100+ Founders, Entrepreneurs and Professionals connect every week - real conversations, referrals, and opportunities. Join India&apos;s #1 growing community and never miss a session.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                 <JoinButton />
