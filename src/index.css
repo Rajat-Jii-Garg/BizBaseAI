@@ -363,13 +363,13 @@
 
 /* Professional selection */
 ::selection {
-  background: rgba(37, 99, 235, 0.25);
-  color: #1e40af;
+  background: rgba(15, 118, 110, 0.22);
+  color: #0F766E;
 }
 
 ::-moz-selection {
-  background: rgba(37, 99, 235, 0.25);
-  color: #1e40af;
+  background: rgba(15, 118, 110, 0.22);
+  color: #0F766E;
 }
 
 /* Custom utilities */
@@ -378,7 +378,7 @@
 }
 
 .border-gradient {
-  border-image: linear-gradient(45deg, #2563eb, #7c3aed, #06b6d4) 1;
+  border-image: linear-gradient(45deg, #0F766E, #6D5EF7, #F59E0B) 1;
 }
 
 /* Input focus styles */
@@ -387,9 +387,10 @@
 }
 
 .input-focus:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+  border-color: #0F766E;
 }
+
 
 /* Button loading spinner */
 .btn-loading {
