@@ -47,9 +47,10 @@ const Jobs = () => {
     filterJobs();
   }, [jobs, searchTerm, selectedIndustry, selectedJobType, selectedWorkMode, selectedExperience]);
 
+  const INDIA_RE = /(india|bharat|bangalore|bengaluru|mumbai|delhi|gurgaon|gurugram|noida|hyderabad|chennai|pune|kolkata|ahmedabad|jaipur|kochi|cochin|indore|chandigarh|lucknow|nagpur|coimbatore|trivandrum|thiruvananthapuram|mysore|mysuru|vadodara|surat|bhubaneswar|visakhapatnam|vizag|goa|kerala|gujarat|maharashtra|karnataka|tamil nadu|telangana|punjab|haryana|rajasthan|uttar pradesh|west bengal|odisha)/i;
+
   const fetchJobs = async () => {
     try {
-      // Fetch all jobs (active + closed); closed ones are shown with a Closed badge.
       const { data, error } = await supabase
         .from('jobs')
         .select('*')
@@ -58,7 +59,11 @@ const Jobs = () => {
         .limit(500);
 
       if (error) throw error;
-      setJobs(data || []);
+      // India-only: keep internal jobs (posted on BizBase) + external whose location matches India.
+      const indiaOnly = (data || []).filter(
+        (j) => j.source === 'internal' || INDIA_RE.test(j.location || '')
+      );
+      setJobs(indiaOnly);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast.error('Failed to fetch jobs');
