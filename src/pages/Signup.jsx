@@ -22,6 +22,8 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
+  const [emailAvailable, setEmailAvailable] = useState(null);
+  const [checkingEmail, setCheckingEmail] = useState(false);
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -37,6 +39,44 @@ const Signup = () => {
   const validatePhone = (phone) => /^[+]?[\d\s\-\(\)]{10,}$/.test(phone);
   const validatePassword = (password) => password.length >= 8;
   const validateUsername = (username) => username.length >= 3 && /^[a-z0-9_]+$/.test(username);
+
+  const checkEmailAvailability = useCallback(async (email) => {
+    if (!email || !validateEmail(email)) {
+      setEmailAvailable(null);
+      setErrors(prev => ({
+        ...prev,
+        email: ""
+      }));
+      return;
+    }
+    setCheckingEmail(true);
+    try {
+      const { data, error } = await supabase.rpc(
+        "is_email_available",
+        {
+          check_email: email
+        }
+      );
+      if (error) throw error;
+      setEmailAvailable(data);
+      if (data === false) {
+        setErrors(prev => ({
+          ...prev,
+          email: "Email already exists, please try to login."
+        }));
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          email: ""
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+      setEmailAvailable(null);
+    } finally {
+      setCheckingEmail(false);
+    }
+  }, []);
 
   const checkUsernameAvailability = useCallback(async (username) => {
     if (!username || username.length < 3) {
@@ -82,6 +122,17 @@ const Signup = () => {
     return () => clearTimeout(timer);
   }, [signupData.username, checkUsernameAvailability]);
 
+  useEffect(() => {
+    if (!signupData.email) {
+      setEmailAvailable(null);
+      return;
+    }
+    const timer = setTimeout(() => {
+      checkEmailAvailability(signupData.email);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [signupData.email, checkEmailAvailability]);
+
 
   const handleUsernameChange = (value) => {
     const sanitized = value
@@ -109,6 +160,7 @@ const Signup = () => {
     else if (!validateUsername(signupData.username)) newErrors.username = 'Invalid username';
     else if (usernameAvailable === false) newErrors.username = 'This username is already in use.';
     if (!signupData.email) newErrors.email = 'Email required';
+    else if(emailAvailable===false) newErrors.email="Email already exists, please login with this email.";
     else if (!validateEmail(signupData.email)) newErrors.email = 'Invalid email';
     if (!signupData.phone) newErrors.phone = 'Phone required';
     if (!signupData.password) newErrors.password = 'Password required';
@@ -120,7 +172,16 @@ const Signup = () => {
       setLoading(false);
       return;
     }
-
+    await checkUsernameAvailability(signupData.username);
+    await checkEmailAvailability(signupData.email);
+    if(usernameAvailable===false){
+      setLoading(false);
+      return;
+    }
+    if(emailAvailable===false){
+      setLoading(false);
+      return;
+    }
     try {
       const { data, error } = await supabase.auth.signUp({
         email: signupData.email,
@@ -309,8 +370,8 @@ const Signup = () => {
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input id="email" type="email" placeholder="Enter your email" value={signupData.email}
-                      onChange={(e) => { setSignupData(prev => ({ ...prev, email: e.target.value })); if (errors.email) setErrors(prev => ({ ...prev, email: '' })); }}
-                      className={`pl-10 placeholder:text-[13px] md:placeholder:text-sm ${errors.email ? 'border-destructive' : ''}`} required />
+                      onChange={(e) => { setSignupData(prev => ({ ...prev, email: e.target.value.trim().toLowerCase() })); setEmailAvailable(null); setErrors(prev => ({ ...prev, email: '' })); }}
+                      className={`pl-10 pr-10 placeholder:text-[13px] md:placeholder:text-sm ${errors.email ? "border-red-500" : emailAvailable===true ? "border-green-500" : emailAvailable===false ? "border-red-500" : "" }`} required />
                   </div>
                   {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
                 </div>
