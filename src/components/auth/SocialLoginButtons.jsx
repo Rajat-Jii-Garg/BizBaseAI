@@ -82,49 +82,6 @@ const SocialLoginButtons = () => {
             </div>
           )}
         </Button>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleMicrosoftLogin}
-            disabled={loading === 'microsoft'}
-            className="border-gray-300 hover:bg-gray-50 transition-all duration-200"
-          >
-            {loading === 'microsoft' ? (
-              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="#f35325" d="M1 1h10v10H1z"/>
-                  <path fill="#81bc06" d="M13 1h10v10H13z"/>
-                  <path fill="#05a6f0" d="M1 13h10v10H1z"/>
-                  <path fill="#ffba08" d="M13 13h10v10H13z"/>
-                </svg>
-                <span className="text-sm">Microsoft</span>
-              </div>
-            )}
-          </Button>
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleLinkedInLogin}
-            disabled={loading === 'linkedin'}
-            className="border-gray-300 hover:bg-gray-50 transition-all duration-200"
-          >
-            {loading === 'linkedin' ? (
-              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="#0077b5" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
-                <span className="text-sm">LinkedIn</span>
-              </div>
-            )}
-          </Button>
-        </div>
       </div>
     </>
   );
