@@ -45,7 +45,7 @@ import MessagesButton from './MessagesButton';
 import SearchBar from './SearchBar';
 
 const DashboardLayout = ({ children }) => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth(); 
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
@@ -219,7 +219,7 @@ const DashboardLayout = ({ children }) => {
       </nav>
 
       {/* Navigation Bar - All screens with horizontal scroll */}
-      <div className="bg-white border-b border-gray-100 shadow-sm fixed top-[70px]  sm:top-16 left-0 right-0 z-40 px-2 sm:px-0">
+      <div className="bg-white border-b border-gray-100 shadow-sm fixed top-[65.2px]  sm:top-16 left-0 right-0 z-40 px-2 sm:px-0">
         <div className="w-full max-w-7xl mx-auto px-0 sm:px-4 lg:px-8">
           <div className="flex items-center justify-start lg:justify-center h-11 sm:h-12 overflow-x-auto scroll-smooth scrollbar-hide [scrollbar-width:none]">
             <div className="flex items-center space-x-2 sm:space-x-1 px-2 sm:px-1  lg:px-1 min-w-max">
