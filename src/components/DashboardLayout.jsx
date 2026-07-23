@@ -78,10 +78,10 @@ const DashboardLayout = ({ children }) => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ overflowX: 'clip' }}>
+    <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden" style={{ overflowX: 'clip' }}>
       {/* Enhanced Header */}
       <nav className="bg-white shadow-lg border-b-2 border-blue-100 fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo & Brand */}
             <div className="flex items-center space-x-4">
@@ -219,17 +219,17 @@ const DashboardLayout = ({ children }) => {
       </nav>
 
       {/* Navigation Bar - All screens with horizontal scroll */}
-      <div className="bg-white border-b border-gray-100 shadow-sm fixed top-16 left-0 right-0 z-40">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-          <div className="flex items-center justify-start lg:justify-center h-10 sm:h-11 overflow-x-auto scrollbar-hide">
-            <div className="flex items-center space-x-1 px-1">
+      <div className="bg-white border-b border-gray-100 shadow-sm fixed top-[70px]  sm:top-16 left-0 right-0 z-40 px-2 sm:px-0">
+        <div className="w-full max-w-7xl mx-auto px-0 sm:px-4 lg:px-8">
+          <div className="flex items-center justify-start lg:justify-center h-11 sm:h-12 overflow-x-auto scroll-smooth scrollbar-hide [scrollbar-width:none]">
+            <div className="flex items-center space-x-2 sm:space-x-1 px-2 sm:px-1  lg:px-1 min-w-max">
               {menuItems.map((item, index) => (
                 <button
                   key={index}
                   className={`${
-                    isActive(item.path) 
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md' 
-                      : 'hover:bg-gray-100 text-gray-600'
+                    isActive(item.path)
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-200/60'
+                      : 'hover:bg-gray-50 hover:text-black text-gray-600'
                   } transition-all duration-200 whitespace-nowrap px-2 sm:px-3 lg:px-4 h-7 sm:h-8 rounded-lg font-medium text-[11px] sm:text-xs lg:text-sm flex-shrink-0 inline-flex items-center`}
                   onClick={() => navigate(item.path)}
                 >
@@ -243,7 +243,8 @@ const DashboardLayout = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 pt-[128px]" style={{ overflowX: 'clip' }}>
+      <main className="flex-1 pt-[125px] sm:pt-[128px] lg:pt-[128px] w-full
+overflow-x-hidden" style={{ overflowX: 'clip' }}>
         {children}
       </main>
     </div>

@@ -1,65 +1,46 @@
-import React, { useState, useEffect, useCallback } from "react";
-import SEOHead from '@/components/SEOHead';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
-import {
-  BarChart3,
-  Users,
-  Calendar,
-  TrendingUp,
-  Target,
-  Plus,
-  Eye,
-  X,
-  Trophy,
-  Loader2,
-  User,
-  UserPlus,
-  Brain,
-  Sparkles,
-  Zap,
-  MessageSquare,
-  Bell,
-  Settings,
-  Award,
-  Briefcase,
-  Globe,
-  BookOpen,
-  Lightbulb,
-  RefreshCw,
-  Edit,
-  ArrowUp
-} from "lucide-react";
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedPostComposer from '@/components/EnhancedPostComposer';
-import TrackedPostCard from '@/components/TrackedPostCard';
-import MobileCreatorFAB from '@/components/MobileCreatorFAB';
-import FullPagePostCreator from '@/components/FullPagePostCreator';
 import FullPageCommunityPostCreator from '@/components/FullPageCommunityPostCreator';
 import FullPageEventCreator from '@/components/FullPageEventCreator';
 import FullPageJobCreator from '@/components/FullPageJobCreator';
-import ConnectionsList from '@/components/ConnectionsList';
-import AINetworkingAssistant from '@/components/AINetworkingAssistant';
+import FullPagePostCreator from '@/components/FullPagePostCreator';
+import MobileCreatorFAB from '@/components/MobileCreatorFAB';
+import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
+import ReferralWidget from '@/components/ReferralWidget';
+import SEOHead from '@/components/SEOHead';
+import TrackedPostCard from '@/components/TrackedPostCard';
 import TrendingHashtags from '@/components/TrendingHashtags';
-import { usePosts } from '@/hooks/usePosts';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from '@/components/ui/badge';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import UsernameSetupModal from '@/components/UsernameSetupModal';
+import WelcomeFlow from '@/components/WelcomeFlow';
+import WhoViewedProfile from '@/components/WhoViewedProfile';
+import { useAuth } from '@/contexts/AuthContext';
 import { useConnections } from '@/hooks/useConnections';
 import { usePersonalizedFeed } from '@/hooks/usePersonalizedFeed';
+import { usePosts } from '@/hooks/usePosts';
 import { supabase } from '@/integrations/supabase/client';
-import WelcomeFlow from '@/components/WelcomeFlow';
-import ProfileCompletionBanner from '@/components/ProfileCompletionBanner';
-import NetworkSuggestions from '@/components/NetworkSuggestions';
-import QuickProfileActions from '@/components/QuickProfileActions';
-import UsernameSetupModal from '@/components/UsernameSetupModal';
-import WhoViewedProfile from '@/components/WhoViewedProfile';
-import AchievementBadges from '@/components/AchievementBadges';
-import PowerScoreCard from '@/components/PowerScoreCard';
-import ReferralWidget from '@/components/ReferralWidget';
+import {
+  ArrowUp,
+  Award,
+  BarChart3,
+  Brain,
+  Edit,
+  Loader2,
+  MessageSquare,
+  RefreshCw,
+  Sparkles,
+  TrendingUp,
+  UserPlus,
+  Users,
+  X,
+  Zap
+} from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
@@ -338,36 +319,36 @@ const Dashboard = () => {
         onClose={() => setShowUsernameModal(false)} 
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ overflowX: 'clip' }}>
-        <div className="max-w-7xl mx-auto px-0 sm:px-4 lg:px-8 py-0 sm:py-6">
+        <div className="w-full lg:max-w-7xl lg:mx-auto px-0 sm:px-4 lg:px-8 py-0 sm:py-6">
           {/* Profile Completion Banner */}
           <ProfileCompletionBanner />
 
           {/* Welcome Banner */}
           {showWelcome && (
-            <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-xl sm:shadow-2xl overflow-hidden relative rounded-2xl sm:rounded-3xl mx-2 sm:mx-0">
+            <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-lg sm:shadow-xl sm:shadow-2xl overflow-hidden relative rounded-2xl sm:rounded-3xl mx-2 sm:mx-0">
               <div className="absolute inset-0 opacity-20">
                 <div className="w-full h-full bg-gradient-to-r from-blue-400/20 to-purple-400/20"></div>
               </div>
-              <CardContent className="p-4 sm:p-6 relative z-10">
+              <CardContent className="relative z-10 px-1 py-0 sm:px-7 sm:py-5 lg:px-8 lg:py-2">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute top-4 right-4 text-white hover:bg-white/20 rounded-full h-8 w-8"
+                  className="absolute top-1 sm:top-4 right-1 sm:right-4 text-white hover:bg-white/20 rounded-full h-5 w-5 sm:h-8 sm:w-8"
                   onClick={() => setShowWelcome(false)}
                 >
                   <X className="w-4 h-4" />
                 </Button>
-                <div className="flex items-start sm:items-center justify-between pr-10 sm:pr-12">
+                <div className="flex items-center justify-between pr-[35px] sm:pr-12 min-h-[92px] sm:min-h-[84px] lg:min-h-[86px]">
                   <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
                     <div className="hidden sm:flex p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
                       <Brain className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-3xl sm:text-2xl font-bold leading-tight mb-2">
+                      <h2 className="font-bold leading-tight text-[22.5px] sm:text-2xl lg:text-3xl mb-1 tracking-tight">
                         {/* <Sparkles className="w-6 h-6" /> */}
-                        Welcome to BizBase AI, {profile?.full_name?.split(' ')[0] || 'Professional'}!
+                        Welcome to BizBase, {profile?.full_name?.split(' ')[0] || 'Professional'}!
                       </h2>
-                      <p className="text-white/90 text-base sm:text-lg leading-7 max-w-sm">
+                      <p className="text-white/85 text-[13px] sm:text-[15px] lg:text-[14px] leading-4 max-w-[420px] sm:max-w-[580px] lg:max-w-[720px]">
                         🚀 Experience next-generation professional networking with AI-powered insights
                       </p>
                     </div>
@@ -378,7 +359,7 @@ const Dashboard = () => {
           )}
 
           {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 sm:gap-6">
             {/* Left Sidebar - Profile & Stats */}
             <div className="hidden lg:block lg:col-span-3 space-y-6">
               <Card className="bg-white shadow-xl border-0 overflow-hidden">
