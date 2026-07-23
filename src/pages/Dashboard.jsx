@@ -344,11 +344,11 @@ const Dashboard = () => {
 
           {/* Welcome Banner */}
           {showWelcome && (
-            <Card className="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl overflow-hidden relative">
+            <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-xl sm:shadow-2xl overflow-hidden relative rounded-2xl sm:rounded-3xl mx-2 sm:mx-0">
               <div className="absolute inset-0 opacity-20">
                 <div className="w-full h-full bg-gradient-to-r from-blue-400/20 to-purple-400/20"></div>
               </div>
-              <CardContent className="p-6 relative z-10">
+              <CardContent className="p-4 sm:p-6 relative z-10">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -357,17 +357,17 @@ const Dashboard = () => {
                 >
                   <X className="w-4 h-4" />
                 </Button>
-                <div className="flex items-center justify-between pr-12">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                <div className="flex items-start sm:items-center justify-between pr-10 sm:pr-12">
+                  <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
+                    <div className="hidden sm:flex p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
                       <Brain className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                        <Sparkles className="w-6 h-6" />
+                      <h2 className="text-3xl sm:text-2xl font-bold leading-tight mb-2">
+                        {/* <Sparkles className="w-6 h-6" /> */}
                         Welcome to BizBase AI, {profile?.full_name?.split(' ')[0] || 'Professional'}!
                       </h2>
-                      <p className="text-white/90 text-lg">
+                      <p className="text-white/90 text-base sm:text-lg leading-7 max-w-sm">
                         🚀 Experience next-generation professional networking with AI-powered insights
                       </p>
                     </div>
@@ -566,7 +566,7 @@ const Dashboard = () => {
                     {!hasMore && personalizedPosts.length > 0 && (
                       <div className="text-center py-6">
                         <p className="text-gray-500 text-sm">You've seen all the latest posts!</p>
-                        <Button variant="ghost" size="sm" className="mt-2" onClick={refreshFeed}>
+                        <Button variant="ghost" size="sm" className="absolute top-3 right-3 sm:top-4 sm:right-4 text-white hover:bg-white/20 rounded-full h-7 w-7 sm:h-8 sm:w-8" onClick={refreshFeed}>
                           <RefreshCw className="w-4 h-4 mr-2" />
                           Refresh for new content
                         </Button>
