@@ -325,19 +325,13 @@ const Dashboard = () => {
 
           {/* Welcome Banner */}
           {showWelcome && (
-<<<<<<< HEAD
             <Card className="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl overflow-hidden relative">
-=======
             <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-lg sm:shadow-xl sm:shadow-2xl overflow-hidden relative rounded-2xl sm:rounded-3xl mx-2 sm:mx-0">
->>>>>>> 6cc51e21b730835f53729738e29b8348796a455d
               <div className="absolute inset-0 opacity-20">
                 <div className="w-full h-full bg-gradient-to-r from-blue-400/20 to-purple-400/20"></div>
               </div>
-<<<<<<< HEAD
               <CardContent className="p-6 relative z-10">
-=======
               <CardContent className="relative z-10 px-1 py-0 sm:px-7 sm:py-5 lg:px-8 lg:py-2">
->>>>>>> 6cc51e21b730835f53729738e29b8348796a455d
                 <Button
                   variant="ghost"
                   size="icon"
@@ -346,33 +340,24 @@ const Dashboard = () => {
                 >
                   <X className="w-4 h-4" />
                 </Button>
-<<<<<<< HEAD
                 <div className="flex items-center justify-between pr-12">
                   <div className="flex items-center space-x-4">
                     <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
-=======
                 <div className="flex items-center justify-between pr-[35px] sm:pr-12 min-h-[92px] sm:min-h-[84px] lg:min-h-[86px]">
                   <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
                     <div className="hidden sm:flex p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
->>>>>>> 6cc51e21b730835f53729738e29b8348796a455d
                       <Brain className="w-8 h-8 text-white" />
                     </div>
                     <div>
-<<<<<<< HEAD
                       <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
                         <Sparkles className="w-6 h-6" />
                         Welcome to BizBase AI, {profile?.full_name?.split(' ')[0] || 'Professional'}!
-=======
                       <h2 className="font-bold leading-tight text-[22.5px] sm:text-2xl lg:text-3xl mb-1 tracking-tight">
                         {/* <Sparkles className="w-6 h-6" /> */}
                         Welcome to BizBase, {profile?.full_name?.split(' ')[0] || 'Professional'}!
->>>>>>> 6cc51e21b730835f53729738e29b8348796a455d
                       </h2>
-<<<<<<< HEAD
                       <p className="text-white/90 text-lg">
-=======
                       <p className="text-white/85 text-[13px] sm:text-[15px] lg:text-[14px] leading-4 max-w-[420px] sm:max-w-[580px] lg:max-w-[720px]">
->>>>>>> 6cc51e21b730835f53729738e29b8348796a455d
                         🚀 Experience next-generation professional networking with AI-powered insights
                       </p>
                     </div>
