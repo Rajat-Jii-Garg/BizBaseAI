@@ -441,6 +441,13 @@ const Jobs = () => {
                   )}
 
                   <div className="flex flex-wrap gap-2 mt-2">
+                    <Button
+                      size="sm"
+                      onClick={(e) => { e.stopPropagation(); openJob(job); }}
+                      className="text-xs h-8 rounded-full gap-1"
+                    >
+                      View Details
+                    </Button>
                     {closed ? (
                       <Button variant="outline" size="sm" disabled className="text-xs h-8 rounded-full gap-1">
                         <Lock className="h-3 w-3" /> Hiring Closed
@@ -448,15 +455,16 @@ const Jobs = () => {
                     ) : appliedJobs.has(job.id) ? (
                       <Button variant="outline" size="sm" disabled className="text-xs h-8 rounded-full">Applied</Button>
                     ) : (
-                      <Button size="sm" onClick={() => handleApplyJob(job)} className="text-xs h-8 rounded-full gap-1">
+                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleApplyJob(job); }} className="text-xs h-8 rounded-full gap-1">
                         {job.source && job.source !== 'internal' ? (<>Apply <ExternalLink className="h-3 w-3" /></>) : 'Apply Now'}
                       </Button>
                     )}
-                    <Button variant="outline" size="sm" onClick={() => handleShareJob(job)} className="text-xs h-8 rounded-full gap-1">
+                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleShareJob(job); }} className="text-xs h-8 rounded-full gap-1">
                       <Share2 className="h-3 w-3" /> Share
                     </Button>
                   </div>
                 </CardContent>
+
               </Card>
               );
             })}
