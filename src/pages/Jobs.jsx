@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -18,6 +20,8 @@ import { buildShareUrl } from '@/lib/siteUrl';
 
 const Jobs = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [savedJobs, setSavedJobs] = useState(new Set());
@@ -213,6 +217,13 @@ const Jobs = () => {
     }
   };
 
+  // Open the dedicated BizBase job page (SEO-friendly slug URL)
+  const openJob = (job) => {
+    if (job.slug) navigate(`/jobs/${job.slug}`);
+    else navigate(`/jobs?job=${job.id}`);
+  };
+
+
   const formatSalary = (min, max, currency) => {
     const cur = currency || 'INR';
     const fmt = (n) => new Intl.NumberFormat(cur === 'INR' ? 'en-IN' : 'en-US').format(n);
@@ -371,17 +382,19 @@ const Jobs = () => {
             {filteredJobs.map((job) => {
               const closed = !job.is_active || (job.application_deadline && new Date(job.application_deadline) < new Date());
               return (
-              <Card key={job.id} className={`hover:shadow-md transition-shadow border-border/50 ${closed ? 'opacity-70' : ''}`}>
+              <Card
+                key={job.id}
+                onClick={() => openJob(job)}
+                className={`hover:shadow-md transition-shadow border-border/50 cursor-pointer ${closed ? 'opacity-70' : ''}`}
+              >
                 <CardContent className="p-3 sm:p-5">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                        <h3
-                          className="text-sm sm:text-base font-semibold text-foreground cursor-pointer hover:text-primary truncate"
-                          onClick={() => incrementJobViews(job.id)}
-                        >
+                        <h3 className="text-sm sm:text-base font-semibold text-foreground hover:text-primary truncate">
                           {job.title}
                         </h3>
+
                         {closed && (
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-muted text-muted-foreground border-muted-foreground/30 gap-0.5">
                             <Lock className="h-2.5 w-2.5" /> Closed
@@ -404,9 +417,10 @@ const Jobs = () => {
                         <span className="hidden md:flex items-center gap-1"><Users className="h-3 w-3" />{job.applications_count} apps</span>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => handleSaveJob(job.id)}>
+                    <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}>
                       {savedJobs.has(job.id) ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
                     </Button>
+
                   </div>
 
                   <p className="text-xs sm:text-sm text-muted-foreground mb-3 line-clamp-2">{job.description}</p>
@@ -438,6 +452,13 @@ const Jobs = () => {
                   )}
 
                   <div className="flex flex-wrap gap-2 mt-2">
+                    <Button
+                      size="sm"
+                      onClick={(e) => { e.stopPropagation(); openJob(job); }}
+                      className="text-xs h-8 rounded-full gap-1"
+                    >
+                      View Details
+                    </Button>
                     {closed ? (
                       <Button variant="outline" size="sm" disabled className="text-xs h-8 rounded-full gap-1">
                         <Lock className="h-3 w-3" /> Hiring Closed
@@ -445,15 +466,16 @@ const Jobs = () => {
                     ) : appliedJobs.has(job.id) ? (
                       <Button variant="outline" size="sm" disabled className="text-xs h-8 rounded-full">Applied</Button>
                     ) : (
-                      <Button size="sm" onClick={() => handleApplyJob(job)} className="text-xs h-8 rounded-full gap-1">
+                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleApplyJob(job); }} className="text-xs h-8 rounded-full gap-1">
                         {job.source && job.source !== 'internal' ? (<>Apply <ExternalLink className="h-3 w-3" /></>) : 'Apply Now'}
                       </Button>
                     )}
-                    <Button variant="outline" size="sm" onClick={() => handleShareJob(job)} className="text-xs h-8 rounded-full gap-1">
+                    <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleShareJob(job); }} className="text-xs h-8 rounded-full gap-1">
                       <Share2 className="h-3 w-3" /> Share
                     </Button>
                   </div>
                 </CardContent>
+
               </Card>
               );
             })}

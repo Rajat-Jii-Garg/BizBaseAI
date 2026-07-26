@@ -2852,6 +2852,7 @@ export type Database = {
         Args: { _business_id: string; _user_id: string }
         Returns: boolean
       }
+      is_email_available: { Args: { check_email: string }; Returns: boolean }
       is_username_available: {
         Args: { check_username: string }
         Returns: boolean
