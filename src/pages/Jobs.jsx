@@ -371,17 +371,19 @@ const Jobs = () => {
             {filteredJobs.map((job) => {
               const closed = !job.is_active || (job.application_deadline && new Date(job.application_deadline) < new Date());
               return (
-              <Card key={job.id} className={`hover:shadow-md transition-shadow border-border/50 ${closed ? 'opacity-70' : ''}`}>
+              <Card
+                key={job.id}
+                onClick={() => openJob(job)}
+                className={`hover:shadow-md transition-shadow border-border/50 cursor-pointer ${closed ? 'opacity-70' : ''}`}
+              >
                 <CardContent className="p-3 sm:p-5">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                        <h3
-                          className="text-sm sm:text-base font-semibold text-foreground cursor-pointer hover:text-primary truncate"
-                          onClick={() => incrementJobViews(job.id)}
-                        >
+                        <h3 className="text-sm sm:text-base font-semibold text-foreground hover:text-primary truncate">
                           {job.title}
                         </h3>
+
                         {closed && (
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-muted text-muted-foreground border-muted-foreground/30 gap-0.5">
                             <Lock className="h-2.5 w-2.5" /> Closed
