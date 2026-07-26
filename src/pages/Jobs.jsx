@@ -406,9 +406,10 @@ const Jobs = () => {
                         <span className="hidden md:flex items-center gap-1"><Users className="h-3 w-3" />{job.applications_count} apps</span>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => handleSaveJob(job.id)}>
+                    <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}>
                       {savedJobs.has(job.id) ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
                     </Button>
+
                   </div>
 
                   <p className="text-xs sm:text-sm text-muted-foreground mb-3 line-clamp-2">{job.description}</p>
