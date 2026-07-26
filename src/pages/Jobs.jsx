@@ -20,6 +20,8 @@ import { buildShareUrl } from '@/lib/siteUrl';
 
 const Jobs = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [savedJobs, setSavedJobs] = useState(new Set());
