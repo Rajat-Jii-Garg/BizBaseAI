@@ -217,6 +217,13 @@ const Jobs = () => {
     }
   };
 
+  // Open the dedicated BizBase job page (SEO-friendly slug URL)
+  const openJob = (job) => {
+    if (job.slug) navigate(`/jobs/${job.slug}`);
+    else navigate(`/jobs?job=${job.id}`);
+  };
+
+
   const formatSalary = (min, max, currency) => {
     const cur = currency || 'INR';
     const fmt = (n) => new Intl.NumberFormat(cur === 'INR' ? 'en-IN' : 'en-US').format(n);
