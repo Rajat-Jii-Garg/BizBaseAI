@@ -8,15 +8,19 @@ import { MapPin, Clock, Building, Users, Eye, Briefcase, Calendar, Share2, Exter
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
 import { CANONICAL_SITE_URL, buildShareUrl } from '@/lib/siteUrl';
+import { useAuth } from '@/contexts/AuthContext';
+import LoginModal from '@/components/LoginModal';
 
 const BASE_URL = CANONICAL_SITE_URL;
 
 const JobDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [job, setJob] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -106,6 +110,7 @@ const JobDetail = () => {
 
   const handleApply = () => {
     if (isClosed) { toast.error('This job is closed'); return; }
+    if (!user) { setShowLoginModal(true); return; }
     if (job?.external_url) {
       window.open(job.external_url, '_blank', 'noopener,noreferrer');
     } else {
