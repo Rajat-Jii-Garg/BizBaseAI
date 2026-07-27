@@ -24,7 +24,12 @@ serve(async (req) => {
     "jobs", "my-businesses", "business-setup", "sitemap",
   ];
 
+  const cities = ["bangalore","mumbai","delhi","gurgaon","noida","hyderabad","pune","chennai","kolkata","ahmedabad","jaipur","remote"];
+  const roles = ["software-developer","data-analyst","digital-marketing","sales-executive","graphic-designer","hr-recruiter","accountant","customer-support","internship","fresher"];
+
   let urls = staticPages.map((p) => `<url><loc>${baseUrl}/${p}</loc><changefreq>weekly</changefreq><priority>${p === "" ? "1.0" : "0.7"}</priority></url>`);
+  cities.forEach((c) => urls.push(`<url><loc>${baseUrl}/jobs-in/${c}</loc><changefreq>daily</changefreq><priority>0.9</priority></url>`));
+  roles.forEach((r) => urls.push(`<url><loc>${baseUrl}/jobs-for/${r}</loc><changefreq>daily</changefreq><priority>0.9</priority></url>`));
 
   // Profiles
   const { data: profiles } = await supabase.from("profiles").select("username, updated_at").not("username", "is", null);
