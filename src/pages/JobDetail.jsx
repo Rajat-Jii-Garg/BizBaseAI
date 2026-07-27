@@ -394,6 +394,8 @@ const JobDetail = () => {
         </Button>
         <Button variant="outline" size="icon" onClick={handleShare} aria-label="Share"><Share2 className="h-4 w-4" /></Button>
       </div>
+
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
     </div>
   );
 };
