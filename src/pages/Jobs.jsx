@@ -18,6 +18,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import CreateJobModal from '@/components/CreateJobModal';
 import SEOHead from '@/components/SEOHead';
 import { buildShareUrl } from '@/lib/siteUrl';
+import LoginModal from '@/components/LoginModal';
 
 const Jobs = () => {
   const { user } = useAuth();
@@ -39,6 +40,7 @@ const Jobs = () => {
     resume_url: ''
   });
   const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     fetchJobs();
