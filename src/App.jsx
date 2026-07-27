@@ -149,6 +149,10 @@ const App = () => (
               <Route path="/jobs" element={<Jobs />} />
               {/* Public job detail page (SEO indexable) */}
               <Route path="/jobs/:slug" element={<JobDetail />} />
+              {/* SEO landing pages: city + role job hubs */}
+              <Route path="/jobs-in/:slug" element={<JobsLanding kind="city" />} />
+              <Route path="/jobs-for/:slug" element={<JobsLanding kind="role" />} />
+
               <Route path="/dashboard/crm" element={
                 <ProtectedRoute>
                   <CRM />
