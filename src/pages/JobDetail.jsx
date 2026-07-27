@@ -8,15 +8,19 @@ import { MapPin, Clock, Building, Users, Eye, Briefcase, Calendar, Share2, Exter
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
 import { CANONICAL_SITE_URL, buildShareUrl } from '@/lib/siteUrl';
+import { useAuth } from '@/contexts/AuthContext';
+import LoginModal from '@/components/LoginModal';
 
 const BASE_URL = CANONICAL_SITE_URL;
 
 const JobDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [job, setJob] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -106,6 +110,7 @@ const JobDetail = () => {
 
   const handleApply = () => {
     if (isClosed) { toast.error('This job is closed'); return; }
+    if (!user) { setShowLoginModal(true); return; }
     if (job?.external_url) {
       window.open(job.external_url, '_blank', 'noopener,noreferrer');
     } else {
@@ -220,18 +225,19 @@ const JobDetail = () => {
                 <p className="text-sm font-semibold text-foreground mt-0.5">{new Date(job.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</p>
               </div>
               <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
-                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Eye className="h-3 w-3" /> Views</div>
-                <p className="text-sm font-semibold text-foreground mt-0.5">{job.views_count || 0}</p>
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Briefcase className="h-3 w-3" /> Job type</div>
+                <p className="text-sm font-semibold text-foreground mt-0.5 truncate capitalize">{(job.job_type || '—').replace('-', ' ')}</p>
               </div>
               <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
-                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Users className="h-3 w-3" /> Applied</div>
-                <p className="text-sm font-semibold text-foreground mt-0.5">{job.applications_count || 0}</p>
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Users className="h-3 w-3" /> Experience</div>
+                <p className="text-sm font-semibold text-foreground mt-0.5 truncate capitalize">{(job.experience_level || '—').replace('-', ' ')}</p>
               </div>
               <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
                 <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Building className="h-3 w-3" /> Industry</div>
                 <p className="text-sm font-semibold text-foreground mt-0.5 truncate capitalize">{job.industry || '—'}</p>
               </div>
             </div>
+
 
             {salaryStr && (
               <div className="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 text-green-700 dark:text-green-400 px-3 py-1.5 font-semibold text-sm mb-4">
@@ -294,6 +300,53 @@ const JobDetail = () => {
           </Card>
         )}
 
+        {/* Benefits */}
+        {Array.isArray(job.benefits) && job.benefits.length > 0 && (
+          <Card className="border-border/60">
+            <CardContent className="p-5 sm:p-8">
+              <h2 className="text-lg font-semibold mb-3 text-foreground">Benefits &amp; perks</h2>
+              <ul className="space-y-2">
+                {job.benefits.map((b, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> {b}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Job overview */}
+        <Card className="border-border/60">
+          <CardContent className="p-5 sm:p-8">
+            <h2 className="text-lg font-semibold mb-3 text-foreground">Job overview</h2>
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              {[
+                ['Company', job.company_name],
+                ['Location', job.location],
+                ['Work mode', (job.work_mode || '').replace('-', ' ')],
+                ['Employment type', (job.job_type || '').replace('-', ' ')],
+                ['Experience level', (job.experience_level || '').replace('-', ' ')],
+                ['Industry', job.industry],
+                ['Salary', salaryStr || 'Not disclosed'],
+                ['Posted on', new Date(job.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })],
+                ['Apply before', job.application_deadline ? new Date(job.application_deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Open until filled'],
+                ['Status', isClosed ? 'Hiring closed' : 'Actively hiring'],
+              ].filter(([, v]) => v).map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-4 border-b border-border/40 pb-2">
+                  <dt className="text-muted-foreground">{k}</dt>
+                  <dd className="font-medium text-foreground text-right capitalize">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="text-xs text-muted-foreground mt-4">
+              Listing verified and published by BizBase. Applying takes you to the employer's official application page.
+            </p>
+          </CardContent>
+        </Card>
+
+
+
         {/* Sticky apply CTA bottom */}
         <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardContent className="p-5 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -341,6 +394,8 @@ const JobDetail = () => {
         </Button>
         <Button variant="outline" size="icon" onClick={handleShare} aria-label="Share"><Share2 className="h-4 w-4" /></Button>
       </div>
+
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
     </div>
   );
 };

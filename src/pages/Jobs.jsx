@@ -18,6 +18,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import CreateJobModal from '@/components/CreateJobModal';
 import SEOHead from '@/components/SEOHead';
 import { buildShareUrl } from '@/lib/siteUrl';
+import LoginModal from '@/components/LoginModal';
 
 const Jobs = () => {
   const { user } = useAuth();
@@ -39,6 +40,7 @@ const Jobs = () => {
     resume_url: ''
   });
   const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     fetchJobs();
@@ -153,12 +155,13 @@ const Jobs = () => {
       toast.error('This job is closed');
       return;
     }
+    // Must be signed in to apply (internal or external)
+    if (!user) { setShowLoginModal(true); return; }
     // External jobs: open original posting in new tab
     if (job.source && job.source !== 'internal' && job.external_url) {
       window.open(job.external_url, '_blank', 'noopener,noreferrer');
       return;
     }
-    if (!user) { toast.error('Please login to apply'); return; }
     setApplicationData({ ...applicationData, job_id: job.id });
     setShowApplicationModal(true);
   };
@@ -414,8 +417,6 @@ const Jobs = () => {
                         <span className="flex items-center gap-1"><Building className="h-3 w-3" />{job.company_name}</span>
                         <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{job.location}</span>
                         <span className="hidden sm:flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(job.created_at).toLocaleDateString('en-IN')}</span>
-                        <span className="hidden md:flex items-center gap-1"><Eye className="h-3 w-3" />{job.views_count}</span>
-                        <span className="hidden md:flex items-center gap-1"><Users className="h-3 w-3" />{job.applications_count} apps</span>
                       </div>
                     </div>
                     <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}>
@@ -541,6 +542,8 @@ const Jobs = () => {
               </div>
             </DialogContent>
           </Dialog>
+
+          {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
         </div>
       </div>
     </DashboardLayout>
