@@ -220,18 +220,19 @@ const JobDetail = () => {
                 <p className="text-sm font-semibold text-foreground mt-0.5">{new Date(job.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</p>
               </div>
               <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
-                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Eye className="h-3 w-3" /> Views</div>
-                <p className="text-sm font-semibold text-foreground mt-0.5">{job.views_count || 0}</p>
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Briefcase className="h-3 w-3" /> Job type</div>
+                <p className="text-sm font-semibold text-foreground mt-0.5 truncate capitalize">{(job.job_type || '—').replace('-', ' ')}</p>
               </div>
               <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
-                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Users className="h-3 w-3" /> Applied</div>
-                <p className="text-sm font-semibold text-foreground mt-0.5">{job.applications_count || 0}</p>
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Users className="h-3 w-3" /> Experience</div>
+                <p className="text-sm font-semibold text-foreground mt-0.5 truncate capitalize">{(job.experience_level || '—').replace('-', ' ')}</p>
               </div>
               <div className="rounded-xl bg-muted/50 border border-border/40 p-3">
                 <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"><Building className="h-3 w-3" /> Industry</div>
                 <p className="text-sm font-semibold text-foreground mt-0.5 truncate capitalize">{job.industry || '—'}</p>
               </div>
             </div>
+
 
             {salaryStr && (
               <div className="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 text-green-700 dark:text-green-400 px-3 py-1.5 font-semibold text-sm mb-4">
