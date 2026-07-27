@@ -542,6 +542,8 @@ const Jobs = () => {
               </div>
             </DialogContent>
           </Dialog>
+
+          {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
         </div>
       </div>
     </DashboardLayout>
