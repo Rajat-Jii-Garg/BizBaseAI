@@ -300,6 +300,53 @@ const JobDetail = () => {
           </Card>
         )}
 
+        {/* Benefits */}
+        {Array.isArray(job.benefits) && job.benefits.length > 0 && (
+          <Card className="border-border/60">
+            <CardContent className="p-5 sm:p-8">
+              <h2 className="text-lg font-semibold mb-3 text-foreground">Benefits &amp; perks</h2>
+              <ul className="space-y-2">
+                {job.benefits.map((b, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> {b}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Job overview */}
+        <Card className="border-border/60">
+          <CardContent className="p-5 sm:p-8">
+            <h2 className="text-lg font-semibold mb-3 text-foreground">Job overview</h2>
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              {[
+                ['Company', job.company_name],
+                ['Location', job.location],
+                ['Work mode', (job.work_mode || '').replace('-', ' ')],
+                ['Employment type', (job.job_type || '').replace('-', ' ')],
+                ['Experience level', (job.experience_level || '').replace('-', ' ')],
+                ['Industry', job.industry],
+                ['Salary', salaryStr || 'Not disclosed'],
+                ['Posted on', new Date(job.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })],
+                ['Apply before', job.application_deadline ? new Date(job.application_deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Open until filled'],
+                ['Status', isClosed ? 'Hiring closed' : 'Actively hiring'],
+              ].filter(([, v]) => v).map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-4 border-b border-border/40 pb-2">
+                  <dt className="text-muted-foreground">{k}</dt>
+                  <dd className="font-medium text-foreground text-right capitalize">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="text-xs text-muted-foreground mt-4">
+              Listing verified and published by BizBase. Applying takes you to the employer's official application page.
+            </p>
+          </CardContent>
+        </Card>
+
+
+
         {/* Sticky apply CTA bottom */}
         <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
           <CardContent className="p-5 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
