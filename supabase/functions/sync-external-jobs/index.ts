@@ -175,7 +175,7 @@ async function fetchJooble(): Promise<JobRow[]> {
   const rows: JobRow[] = [];
   const keywords = ["software developer", "sales", "marketing", "accountant", "designer", "internship", "customer support", "data analyst"];
   for (const kw of keywords) {
-    const res = await fetch(`https://in.jooble.org/api/${key}`, {
+    const res = await fetch(`https://jooble.org/api/${key}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ keywords: kw, location: "India", page: "1" }),
