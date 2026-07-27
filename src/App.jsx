@@ -31,6 +31,7 @@ import BusinessSetup from "./pages/BusinessSetup";
 import BusinessLayout from "./components/BusinessLayout";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
+import JobsLanding from "./pages/JobsLanding";
 import CRM from "./pages/CRM";
 import Projects from "./pages/Projects";
 import HR from "./pages/HR";
@@ -148,6 +149,10 @@ const App = () => (
               <Route path="/jobs" element={<Jobs />} />
               {/* Public job detail page (SEO indexable) */}
               <Route path="/jobs/:slug" element={<JobDetail />} />
+              {/* SEO landing pages: city + role job hubs */}
+              <Route path="/jobs-in/:slug" element={<JobsLanding kind="city" />} />
+              <Route path="/jobs-for/:slug" element={<JobsLanding kind="role" />} />
+
               <Route path="/dashboard/crm" element={
                 <ProtectedRoute>
                   <CRM />

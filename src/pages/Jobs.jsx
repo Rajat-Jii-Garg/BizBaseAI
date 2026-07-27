@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { JOB_CITIES, JOB_ROLES } from './JobsLanding';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -489,7 +490,25 @@ const Jobs = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Internal SEO hub links */}
+            <div className="pt-6">
+              <h2 className="text-sm font-semibold text-foreground mb-3">Popular job searches in India</h2>
+              <div className="flex flex-wrap gap-2">
+                {JOB_CITIES.map((c) => (
+                  <Link key={c.slug} to={`/jobs-in/${c.slug}`} className="px-3 py-1.5 rounded-full border border-border text-xs hover:border-primary hover:text-primary transition-colors">
+                    Jobs in {c.name}
+                  </Link>
+                ))}
+                {JOB_ROLES.map((r) => (
+                  <Link key={r.slug} to={`/jobs-for/${r.slug}`} className="px-3 py-1.5 rounded-full border border-border text-xs hover:border-primary hover:text-primary transition-colors">
+                    {r.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
+
 
           {/* Application Modal */}
           <Dialog open={showApplicationModal} onOpenChange={setShowApplicationModal}>
