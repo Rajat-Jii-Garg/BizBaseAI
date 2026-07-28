@@ -1,5 +1,5 @@
 import React from 'react';
-import logoAsset from '@/assets/bizbase-logo.png.asset.json';
+import logoAsset from '@/assets/bizbase-logo.png';
 
 /**
  * BizBase brand mark + wordmark.
