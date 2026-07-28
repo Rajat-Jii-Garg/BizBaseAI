@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import SEOHead from '@/components/SEOHead';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -12,7 +11,6 @@ import HowItWorks from '@/components/HowItWorks';
 import CallToAction from '@/components/CallToAction';
 import CommunityBanner from '@/components/CommunityBanner';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
 
 const Index = () => {
   return (
