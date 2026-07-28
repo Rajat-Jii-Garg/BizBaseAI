@@ -40,7 +40,7 @@ const Navbar = ({ variant = 'default' }) => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Solutions
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
             </a>
 
             {/* Company dropdown */}
@@ -74,7 +74,7 @@ const Navbar = ({ variant = 'default' }) => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Blogs
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
             </Link>
 
             {/* Community */}
@@ -83,7 +83,7 @@ const Navbar = ({ variant = 'default' }) => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Founders Community
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
             </Link>
 
             {/* Who is BizBase for? */}
@@ -92,7 +92,7 @@ const Navbar = ({ variant = 'default' }) => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Who is BizBase for?
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
             </a>
           </div>
           
@@ -100,14 +100,14 @@ const Navbar = ({ variant = 'default' }) => {
           <div className="hidden md:flex items-center space-x-3">
             <Link to="/login">
               <Button variant="ghost" className={`flex items-center space-x-2 rounded-xl font-semibold px-6 ${
-                isHero ? 'text-white/70 hover:text-white hover:bg-white/[0.08]' : 'text-slate-700 hover:text-blue-600 hover:bg-blue-50'
+                isHero ? 'text-white/70 hover:text-white hover:bg-white/[0.08]' : 'text-slate-700 hover:text-primary hover:bg-secondary'
               }`}>
                 <LogIn className="w-4 h-4" />
                 <span>Login</span>
               </Button>
             </Link>
             <Link to="/signup">
-              <Button className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white font-semibold px-6 py-2 rounded-lg border-0 shadow-md shadow-violet-200/40 hover:shadow-lg transition-all duration-300 text-sm">
+              <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white font-semibold px-6 py-2 rounded-lg border-0 shadow-md hover:shadow-lg transition-all duration-300 text-sm">
                 Get Started Free
               </Button>
             </Link>
@@ -145,7 +145,7 @@ const Navbar = ({ variant = 'default' }) => {
               <Button variant="ghost" className="w-full text-sm">Login</Button>
             </Link>
             <Link to="/signup" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm">
+              <Button className="w-full bg-primary text-white text-sm">
                 Get Started Free
               </Button>
             </Link>
