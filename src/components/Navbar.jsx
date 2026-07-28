@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, Sparkles, Menu, X } from 'lucide-react';
+import { LogIn, Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import BrandLogo from '@/components/BrandLogo';
 
 const Navbar = ({ variant = 'default' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -10,26 +11,15 @@ const Navbar = ({ variant = 'default' }) => {
   const isHero = variant === 'hero';
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-slate-100 shadow-sm transition-colors duration-300">
+    <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-border transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-[52px] sm:h-16">
+        <div className="flex justify-between items-center h-[56px] sm:h-16">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
-            <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl ${
-              isHero ? 'bg-gradient-to-br from-blue-500 to-violet-500' : 'bg-gradient-to-br from-blue-600 to-purple-600'
-            }`}>
-              <Sparkles className="w-4 h-4 sm:w-7 sm:h-7 text-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className={`text-[1.45rem] sm:text-2xl font-black bg-clip-text text-transparent ${
-                isHero ? 'bg-gradient-to-r from-blue-400 to-violet-400' : 'bg-gradient-to-r from-blue-600 to-purple-600'
-              }`}>
-                BizBase
-              </span>
-              <span className={`text-[8px] sm:text-xs font-medium -mt-1 ${isHero ? 'text-white/40' : 'text-slate-500'}`}>Build • Scale • Automate</span>
-            </div>
+          <Link to="/" className="flex items-center">
+            <BrandLogo showTagline />
           </Link>
+
           
           {/* Desktop Navigation */}
           {/* <div className="hidden md:flex items-center space-x-8">
