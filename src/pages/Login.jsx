@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
+import BrandLogo from '@/components/BrandLogo';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
@@ -140,7 +141,7 @@ const Login = () => {
           </div>
         )}
 
-        <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
+        <Card className="border border-border shadow-sm bg-white rounded-2xl">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-center text-xl">Login</CardTitle>
           </CardHeader>
@@ -162,7 +163,7 @@ const Login = () => {
                     className={`pl-10 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.email
                         ? 'border-red-500 focus:border-red-500'
-                        : 'focus:border-blue-500'
+                        : 'focus:border-primary'
                     }`}
                     required
                   />
@@ -186,7 +187,7 @@ const Login = () => {
                     className={`pl-10 pr-12 md:pr-11 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.password
                         ? 'border-red-500 focus:border-red-500'
-                        : 'focus:border-blue-500'
+                        : 'focus:border-primary'
                     }`}
                     required
                   />
@@ -217,7 +218,7 @@ const Login = () => {
                       transition-all duration-200
                       ${
                         loginData.rememberMe
-                          ? "bg-blue-600 border-blue-600"
+                          ? "bg-primary border-primary"
                           : "bg-white border-gray-300"
                       }`}
                   >
@@ -239,12 +240,12 @@ const Login = () => {
                     Remember me
                   </Label>
                 </div>
-                <Link to="/forget-password" className="text-[12px] md:text-sm text-blue-600 hover:text-blue-800 leading-none whitespace-nowrap">Forget password?</Link>
+                <Link to="/forget-password" className="text-[12px] md:text-sm text-primary hover:text-primary/80 leading-none whitespace-nowrap">Forget password?</Link>
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full h-11 rounded-xl font-semibold transition-all duration-200"
                 disabled={loading}
               >
                 {loading ? (
@@ -264,7 +265,7 @@ const Login = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                <Link to="/signup" className="text-primary hover:text-primary/80 font-medium transition-colors">
                   Register here
                 </Link>
               </p>
