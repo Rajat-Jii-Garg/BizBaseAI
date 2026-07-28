@@ -20,8 +20,8 @@ export default {
         },
         extend: {
             fontFamily: {
-                display: ['Inter', 'system-ui', 'sans-serif'],
-                sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                display: ['"Instrument Serif"', 'Georgia', 'serif'],
+                sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
             },
             fontSize: {
                 'xs': ['0.75rem', { lineHeight: '1rem' }],

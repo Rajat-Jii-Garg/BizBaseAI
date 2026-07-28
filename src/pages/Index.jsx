@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import SEOHead from '@/components/SEOHead';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -12,7 +11,6 @@ import HowItWorks from '@/components/HowItWorks';
 import CallToAction from '@/components/CallToAction';
 import CommunityBanner from '@/components/CommunityBanner';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
 
 const Index = () => {
   return (
@@ -32,22 +30,6 @@ const Index = () => {
       <CommunityBanner />
       <CallToAction />
 
-      {/* Quick Auth Links Section */}
-      <section className="py-8 md:py-16 lg:py-16 bg-muted/50">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-8">
-            Ready to Get Started?
-          </h2>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white">
-              <Link to="/signup">Create Free Account</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/login">Sign In</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>

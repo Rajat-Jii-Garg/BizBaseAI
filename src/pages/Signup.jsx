@@ -4,13 +4,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Sparkles, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight, AtSign, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight, AtSign, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import FeatureHighlight from '@/components/auth/FeatureHighlight';
 import { supabase } from '@/integrations/supabase/client';
 import SEOHead from '@/components/SEOHead';
+import BrandLogo from '@/components/BrandLogo';
 
 const Signup = () => {
   const [signupData, setSignupData] = useState({
@@ -285,7 +286,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex">
+    <div className="min-h-screen bg-white flex">
       <SEOHead title="Sign Up - Create Your Account" description="Join BizBase AI - the AI-powered professional networking platform." path="/signup" />
       <div className="hidden lg:flex lg:w-1/2">
         <FeatureHighlight />
@@ -294,16 +295,11 @@ const Signup = () => {
       <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <Link to="/" className="inline-flex items-center space-x-2 mb-6 group">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Sparkles className="w-7 h-7 text-white animate-pulse" />
-              </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                BizBase
-              </span>
+            <Link to="/" className="inline-flex items-center mb-6 group">
+              <BrandLogo textClass="text-2xl sm:text-3xl" size="w-11 h-11 sm:w-12 sm:h-12" />
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Your Account</h1>
-            <p className="text-gray-600">Join thousands of professionals growing with BizBase</p>
+            <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">Create your account</h1>
+            <p className="text-sm text-muted-foreground">Free forever. No limits, no credits, no card.</p>
           </div>
 
           {errors.general && (
@@ -312,7 +308,7 @@ const Signup = () => {
             </div>
           )}
 
-          <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
+          <Card className="border border-border shadow-sm bg-white rounded-2xl">
             <CardHeader className="space-y-1 pb-4">
               <CardTitle className="text-center text-xl">Sign Up</CardTitle>
             </CardHeader>
@@ -417,7 +413,7 @@ const Signup = () => {
                   {errors.confirmPassword && <p className="text-destructive text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
                 
-                <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]" disabled={loading}>
+                <Button type="submit" className="w-full h-11 rounded-xl font-semibold transition-all duration-200" disabled={loading}>
                   {loading ? (
                     <div className="flex items-center space-x-2">
                       <Loader2 className="w-4 h-4 animate-spin" />

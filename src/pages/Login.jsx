@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
+import BrandLogo from '@/components/BrandLogo';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
@@ -123,20 +124,16 @@ const Login = () => {
   return (
     <>
       <SEOHead title="Login" description="Sign in to your BizBase AI account. Access your professional network, manage businesses, and grow your career." path="/login" />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8 -mt-4 md:mt-0">
-          <Link to="/" className="inline-flex items-center space-x-2 mb-4 md:mb-6 group">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Sparkles className="w-7 h-7 text-white animate-pulse" />
-            </div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              BizBase
-            </span>
+          <Link to="/" className="inline-flex items-center mb-4 md:mb-6 group">
+            <BrandLogo textClass="text-2xl sm:text-3xl" size="w-11 h-11 sm:w-12 sm:h-12" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Login to your BizBase account</p>
+          <h1 className="font-display text-3xl md:text-4xl text-foreground mb-2">Welcome back</h1>
+          <p className="text-sm text-muted-foreground">Sign in to continue building on BizBase</p>
         </div>
+
 
         {errors.general && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -144,7 +141,7 @@ const Login = () => {
           </div>
         )}
 
-        <Card className="border-0 shadow-2xl backdrop-blur-sm bg-white/90">
+        <Card className="border border-border shadow-sm bg-white rounded-2xl">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-center text-xl">Login</CardTitle>
           </CardHeader>
@@ -166,7 +163,7 @@ const Login = () => {
                     className={`pl-10 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.email
                         ? 'border-red-500 focus:border-red-500'
-                        : 'focus:border-blue-500'
+                        : 'focus:border-primary'
                     }`}
                     required
                   />
@@ -190,7 +187,7 @@ const Login = () => {
                     className={`pl-10 pr-12 md:pr-11 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.password
                         ? 'border-red-500 focus:border-red-500'
-                        : 'focus:border-blue-500'
+                        : 'focus:border-primary'
                     }`}
                     required
                   />
@@ -221,7 +218,7 @@ const Login = () => {
                       transition-all duration-200
                       ${
                         loginData.rememberMe
-                          ? "bg-blue-600 border-blue-600"
+                          ? "bg-primary border-primary"
                           : "bg-white border-gray-300"
                       }`}
                   >
@@ -243,12 +240,12 @@ const Login = () => {
                     Remember me
                   </Label>
                 </div>
-                <Link to="/forget-password" className="text-[12px] md:text-sm text-blue-600 hover:text-blue-800 leading-none whitespace-nowrap">Forget password?</Link>
+                <Link to="/forget-password" className="text-[12px] md:text-sm text-primary hover:text-primary/80 leading-none whitespace-nowrap">Forget password?</Link>
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full h-11 rounded-xl font-semibold transition-all duration-200"
                 disabled={loading}
               >
                 {loading ? (
@@ -268,7 +265,7 @@ const Login = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                <Link to="/signup" className="text-primary hover:text-primary/80 font-medium transition-colors">
                   Register here
                 </Link>
               </p>
