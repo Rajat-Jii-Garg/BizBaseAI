@@ -14,7 +14,7 @@ const BrandLogo = ({
 }) => (
   <span className={`inline-flex items-center gap-2.5 ${className}`}>
     <img
-      src={logoAsset.url}
+      src={logoAsset}
       alt="BizBase logo"
       width={44}
       height={44}
