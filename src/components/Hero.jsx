@@ -80,13 +80,14 @@ const Hero = () => {
           {/* Stats — real, honest */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 pt-8 max-w-2xl mx-auto">
             {[
-              { value: '15+', label: 'AI Features', icon: Brain, color: 'text-violet-500', bg: 'from-violet-50 to-violet-100/50' },
-              { value: '8+', label: 'Core Products', icon: Sparkles, color: 'text-blue-500', bg: 'from-blue-50 to-blue-100/50' },
-              { value: '100%', label: 'Free Access', icon: Shield, color: 'text-emerald-500', bg: 'from-emerald-50 to-emerald-100/50' },
-              { value: '24/7', label: 'AI Assistance', icon: Zap, color: 'text-cyan-500', bg: 'from-cyan-50 to-cyan-100/50' }
+              { value: '15+', label: 'AI Features', icon: Brain, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+              { value: '8+', label: 'Core Products', icon: Sparkles, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+              { value: '100%', label: 'Free Access', icon: Shield, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+              { value: '24/7', label: 'AI Assistance', icon: Zap, color: 'text-slate-700', bg: 'bg-slate-100' }
             ].map((stat, index) => (
-              <div key={index} className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all duration-500">
-                <div className={`w-8 h-8 mx-auto mb-2 rounded-lg bg-gradient-to-br ${stat.bg} flex items-center justify-center`}>
+              <div key={index} className="bg-white rounded-xl p-3.5 border border-slate-200 hover:border-slate-300 transition-all duration-300">
+                <div className={`w-8 h-8 mx-auto mb-2 rounded-lg ${stat.bg} flex items-center justify-center`}>
+
                   <stat.icon className={`w-4 h-4 ${stat.color}`} />
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-foreground mb-0.5">{stat.value}</div>
@@ -157,7 +158,8 @@ const Hero = () => {
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent" />
+
     </section>
   );
 };
