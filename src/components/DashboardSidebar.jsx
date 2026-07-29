@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import BizBaseMark from '@/components/BizBaseMark';
 
 const DashboardSidebar = () => {
   const location = useLocation();
