@@ -1,11 +1,13 @@
 import React from 'react';
 
-// BizBase brand mark: 4-point sparkle with a small companion star
+// BizBase brand mark: bold geometric "B" with rounded double-lobe counters
 const BizBaseMark = ({ className = 'w-6 h-6' }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-    <path d="M12 2.2c.3 0 .56.2.64.49l1.19 4.02a3.2 3.2 0 0 0 2.18 2.18l4.02 1.19a.67.67 0 0 1 0 1.28l-4.02 1.19a3.2 3.2 0 0 0-2.18 2.18l-1.19 4.02a.67.67 0 0 1-1.28 0l-1.19-4.02a3.2 3.2 0 0 0-2.18-2.18L3.97 11.36a.67.67 0 0 1 0-1.28l4.02-1.19a3.2 3.2 0 0 0 2.18-2.18l1.19-4.02c.08-.29.34-.49.64-.49Z" />
-    <path d="M18.9 2.1c.13 0 .24.09.28.21l.33 1.08 1.08.33a.29.29 0 0 1 0 .56l-1.08.33-.33 1.08a.29.29 0 0 1-.56 0l-.33-1.08-1.08-.33a.29.29 0 0 1 0-.56l1.08-.33.33-1.08a.29.29 0 0 1 .28-.21Z" />
-    <path d="M5.6 16.9c.13 0 .24.08.28.21l.26.84.84.26a.29.29 0 0 1 0 .56l-.84.26-.26.84a.29.29 0 0 1-.56 0l-.26-.84-.84-.26a.29.29 0 0 1 0-.56l.84-.26.26-.84a.29.29 0 0 1 .28-.21Z" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M4.2 5.6 6.9 2.8A3 3 0 0 1 9 2h5.4a5.3 5.3 0 0 1 3.9 8.9 5.3 5.3 0 0 1-3.9 8.9H9a3 3 0 0 1-2.1-.9L4.2 16v-4.6l2.7-2.8V5.6ZM9.5 5.6v4h4.7a2 2 0 0 0 0-4H9.5Zm0 8.8v4h4.7a2 2 0 0 0 0-4H9.5Z"
+    />
   </svg>
 );
 
