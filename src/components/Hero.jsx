@@ -13,14 +13,15 @@ const Hero = () => {
         <div className="text-center space-y-6 pt-6 sm:pt-8 lg:pt-10">
 
           {/* Announcement pill */}
-          <div className="inline-flex items-center gap-1.5 bg-violet-50 border border-violet-100 text-violet-600 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium">
+          <div className="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200 text-slate-700 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium">
             <span className="flex h-1.5 w-1.5 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
             </span>
             <span>Trusted by Professionals & Businesses</span>
-            <ChevronRight className="w-3 h-3 text-violet-400/60" />
+            <ChevronRight className="w-3 h-3 text-slate-400" />
           </div>
+
 
           {/* Main Headline */}
           <div className="space-y-3 sm:space-y-4 max-w-3xl mx-auto">
@@ -30,9 +31,10 @@ const Hero = () => {
                 <span className="md:ml-0">Discover Opportunities</span>
               </span>
               <br />
-              <span className="bg-gradient-to-r from-violet-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-                Grow your Career & Business
+              <span className="text-indigo-600">
+                Grow your Career &amp; Business
               </span>
+
             </h1>
 
             <p className="text-[13px] sm:text-lg text-muted-foreground max-w-xl sm:max-w-2xl mx-auto leading-1.25">
@@ -50,7 +52,7 @@ const Hero = () => {
             </Link>
 
             <Link to="/signup">
-              <Button size="default" className="bg-gradient-to-r from-violet-600 via-indigo-500 to-blue-500 hover:from-violet-700 hover:via-indigo-600 hover:to-blue-600 text-white w-[260px] sm:w-auto h-14 text-sm font-semibold rounded-[18px] shadow-lg shadow-violet-200/50 hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 border-0">
+              <Button size="default" className="bg-indigo-600 hover:bg-indigo-700 text-white w-[260px] sm:w-auto h-14 text-sm font-semibold rounded-[18px] shadow-md shadow-indigo-200/60 hover:shadow-lg transition-all duration-300 border-0">
                 <Rocket className="w-4 h-4 mr-1.5" />
                 Get Started Free
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
