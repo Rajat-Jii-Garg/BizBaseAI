@@ -167,7 +167,7 @@ const Login = () => {
                     className={`pl-10 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.email
                         ? 'border-red-500 focus:border-red-500'
-                        : 'focus:border-blue-500'
+                        : 'focus:border-indigo-500'
                     }`}
                     required
                   />
@@ -191,7 +191,7 @@ const Login = () => {
                     className={`pl-10 pr-12 md:pr-11 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.password
                         ? 'border-red-500 focus:border-red-500'
-                        : 'focus:border-blue-500'
+                        : 'focus:border-indigo-500'
                     }`}
                     required
                   />
@@ -222,7 +222,7 @@ const Login = () => {
                       transition-all duration-200
                       ${
                         loginData.rememberMe
-                          ? "bg-blue-600 border-blue-600"
+                          ? "bg-indigo-600 border-indigo-600"
                           : "bg-white border-gray-300"
                       }`}
                   >
@@ -244,12 +244,12 @@ const Login = () => {
                     Remember me
                   </Label>
                 </div>
-                <Link to="/forget-password" className="text-[12px] md:text-sm text-blue-600 hover:text-blue-800 leading-none whitespace-nowrap">Forget password?</Link>
+                <Link to="/forget-password" className="text-[12px] md:text-sm text-indigo-600 hover:text-indigo-700 leading-none whitespace-nowrap">Forget password?</Link>
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duration-200"
                 disabled={loading}
               >
                 {loading ? (
@@ -269,7 +269,7 @@ const Login = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
                   Register here
                 </Link>
               </p>
