@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Sparkles, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight, AtSign, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight, AtSign, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import BizBaseMark from '@/components/BizBaseMark';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
@@ -285,7 +286,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex">
+    <div className="min-h-screen bg-white flex">
       <SEOHead title="Sign Up - Create Your Account" description="Join BizBase AI - the AI-powered professional networking platform." path="/signup" />
       <div className="hidden lg:flex lg:w-1/2">
         <FeatureHighlight />
@@ -295,12 +296,13 @@ const Signup = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center space-x-2 mb-6 group">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Sparkles className="w-7 h-7 text-white animate-pulse" />
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                <BizBaseMark className="w-7 h-7 text-white" />
               </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-3xl font-bold text-slate-900">
                 BizBase
               </span>
+
             </Link>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Your Account</h1>
             <p className="text-gray-600">Join thousands of professionals growing with BizBase</p>
@@ -417,7 +419,7 @@ const Signup = () => {
                   {errors.confirmPassword && <p className="text-destructive text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
                 
-                <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]" disabled={loading}>
+                <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duration-200" disabled={loading}>
                   {loading ? (
                     <div className="flex items-center space-x-2">
                       <Loader2 className="w-4 h-4 animate-spin" />

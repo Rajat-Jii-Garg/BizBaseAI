@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
+import BizBaseMark from '@/components/BizBaseMark';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
@@ -123,17 +124,18 @@ const Login = () => {
   return (
     <>
       <SEOHead title="Login" description="Sign in to your BizBase AI account. Access your professional network, manage businesses, and grow your career." path="/login" />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8 -mt-4 md:mt-0">
           <Link to="/" className="inline-flex items-center space-x-2 mb-4 md:mb-6 group">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Sparkles className="w-7 h-7 text-white animate-pulse" />
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+              <BizBaseMark className="w-7 h-7 text-white" />
             </div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-3xl font-bold text-slate-900">
               BizBase
             </span>
           </Link>
+
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Login to your BizBase account</p>
         </div>
@@ -166,7 +168,7 @@ const Login = () => {
                     className={`pl-10 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.email
                         ? 'border-red-500 focus:border-red-500'
-                        : 'focus:border-blue-500'
+                        : 'focus:border-indigo-500'
                     }`}
                     required
                   />
@@ -190,7 +192,7 @@ const Login = () => {
                     className={`pl-10 pr-12 md:pr-11 text-sm placeholder:text-[13px] md:placeholder:text-sm transition-all duration-200 h-10 md:h-11${
                       errors.password
                         ? 'border-red-500 focus:border-red-500'
-                        : 'focus:border-blue-500'
+                        : 'focus:border-indigo-500'
                     }`}
                     required
                   />
@@ -221,7 +223,7 @@ const Login = () => {
                       transition-all duration-200
                       ${
                         loginData.rememberMe
-                          ? "bg-blue-600 border-blue-600"
+                          ? "bg-indigo-600 border-indigo-600"
                           : "bg-white border-gray-300"
                       }`}
                   >
@@ -243,12 +245,12 @@ const Login = () => {
                     Remember me
                   </Label>
                 </div>
-                <Link to="/forget-password" className="text-[12px] md:text-sm text-blue-600 hover:text-blue-800 leading-none whitespace-nowrap">Forget password?</Link>
+                <Link to="/forget-password" className="text-[12px] md:text-sm text-indigo-600 hover:text-indigo-700 leading-none whitespace-nowrap">Forget password?</Link>
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duration-200"
                 disabled={loading}
               >
                 {loading ? (
@@ -268,7 +270,7 @@ const Login = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
                   Register here
                 </Link>
               </p>

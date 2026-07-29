@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, Sparkles, Menu, X } from 'lucide-react';
+import { LogIn, Menu, X } from 'lucide-react';
+import BizBaseMark from '@/components/BizBaseMark';
 import { Link } from 'react-router-dom';
 
 const Navbar = ({ variant = 'default' }) => {
@@ -19,7 +20,7 @@ const Navbar = ({ variant = 'default' }) => {
             <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl ${
               isHero ? 'bg-gradient-to-br from-blue-500 to-violet-500' : 'bg-gradient-to-br from-blue-600 to-purple-600'
             }`}>
-              <Sparkles className="w-4 h-4 sm:w-7 sm:h-7 text-white" />
+              <BizBaseMark className="w-4 h-4 sm:w-7 sm:h-7 text-white" />
             </div>
             <div className="flex flex-col">
               <span className={`text-[1.45rem] sm:text-2xl font-black bg-clip-text text-transparent ${
