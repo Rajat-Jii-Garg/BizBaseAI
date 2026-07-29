@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, Sparkles, Menu, X } from 'lucide-react';
+import { LogIn, Menu, X } from 'lucide-react';
+import BizBaseMark from '@/components/BizBaseMark';
 import { Link } from 'react-router-dom';
 
 const Navbar = ({ variant = 'default' }) => {
