@@ -2,34 +2,38 @@ import React from 'react';
 import { GraduationCap, Briefcase, Rocket, Building2, Lightbulb, Users } from 'lucide-react';
 
 const audiences = [
-  { icon: GraduationCap, title: 'Students & Freshers', desc: 'Build a real profile before your first job, find internships, and learn from people already in the industry.' },
-  { icon: Users, title: 'Working Professionals', desc: 'Grow your network beyond your office, share what you know, and stay in front of better opportunities.' },
-  { icon: Briefcase, title: 'Freelancers', desc: 'Show your work, get discovered by clients, and manage projects and payments in one place.' },
-  { icon: Rocket, title: 'Founders', desc: 'Meet co-founders, early hires and investors. Build visibility for what you are shipping.' },
-  { icon: Lightbulb, title: 'Career Switchers', desc: 'Test a new field, talk to people doing it, and get an AI plan for the skills you are missing.' },
-  { icon: Building2, title: 'Business Owners', desc: 'List your business, capture leads, and run day-to-day operations from a free workspace.' },
+  { icon: Rocket, title: 'Founders', desc: 'Build startups, raise visibility, connect with investors and grow faster together.', color: 'from-violet-500 to-purple-500' },
+  { icon: Lightbulb, title: 'Entrepreneurs', desc: 'Validate ideas, build businesses, find partners and scale with AI-powered tools.', color: 'from-blue-500 to-cyan-500' },
+  { icon: Briefcase, title: 'Freelancers', desc: 'Showcase skills, find clients, manage projects and grow your freelance career.', color: 'from-amber-500 to-orange-500' },
+  { icon: GraduationCap, title: 'Students', desc: 'Build your profile, learn from communities, find internships and start your career.', color: 'from-emerald-500 to-teal-500' },
+  { icon: Building2, title: 'Business Owners', desc: 'Manage operations, grow revenue, automate workflows and scale your business effortlessly.', color: 'from-indigo-500 to-blue-500' },
+  { icon: Users, title: 'Working Professionals', desc: 'Grow your network, share insights, discover opportunities and advance your career.', color: 'from-rose-500 to-pink-500' },
 ];
 
 const WhoIsItFor = () => {
   return (
-    <section id="who-is-it-for" className="py-16 sm:py-24 bg-white border-t border-border">
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mb-12">
-          <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-primary mb-3">Who it&apos;s for</p>
-          <h2 className="font-display text-[2.1rem] sm:text-5xl leading-[1.1] text-foreground">
-            If you are building a career in India, you belong here
+    <section id="who-is-it-for" className="py-10 sm:py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-600 px-3.5 py-1.5 rounded-full text-xs font-medium mb-4">
+            Built for everyone
+          </div>
+          <h2 className="text-3xl md:text-5xl font-black mb-4 bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+            Who is BizBase for?
           </h2>
-          <p className="mt-4 text-[15px] sm:text-base text-muted-foreground leading-relaxed">
-            No invites, no gatekeeping, no paid tiers. Anyone can join and start on day one.
+          <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto">
+            Whether you're starting out or scaling up — BizBase has a home for you. No invites. No limits.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
           {audiences.map((a, i) => (
-            <div key={i} className="rounded-2xl border border-border bg-white p-6 hover:border-primary/40 hover:shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)] transition-all duration-300">
-              <a.icon className="w-5 h-5 text-primary mb-4" />
-              <h3 className="text-[17px] font-semibold text-foreground mb-2 tracking-[-0.01em]">{a.title}</h3>
-              <p className="text-[13.5px] text-muted-foreground leading-relaxed">{a.desc}</p>
+            <div key={i} className="group relative bg-slate-50/70 hover:bg-white border border-slate-100 hover:border-slate-200 hover:shadow-lg rounded-2xl p-4 sm:p-6 min-h-[120px] sm:min-h-[240px] transition-all duration-300">
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${a.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <a.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <h3 className="text-[15px] sm:text-lg font-bold text-slate-900 mb-2 leading-tight">{a.title}</h3>
+              <p className="hidden sm:block text-sm text-slate-600 leading-relaxed">{a.desc}</p>
             </div>
           ))}
         </div>

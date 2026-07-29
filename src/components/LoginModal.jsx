@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { X } from 'lucide-react';
-import BrandLogo from '@/components/BrandLogo';
 
 const LoginModal = ({ onClose }) => {
   const navigate = useNavigate();
@@ -18,17 +17,16 @@ const LoginModal = ({ onClose }) => {
         </button>
 
         <div className="mb-5">
-          <div className="flex justify-center mb-4">
-            <BrandLogo showText={false} size="w-14 h-14" />
+          <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl font-bold text-primary">B</span>
           </div>
-          <h2 className="font-display text-2xl text-foreground mb-1.5">
+          <h2 className="text-lg sm:text-xl font-bold text-foreground mb-1.5">
             Join BizBase to continue
           </h2>
           <p className="text-sm text-muted-foreground">
             Create your professional presence and engage with posts.
           </p>
         </div>
-
 
         <button
           onClick={() => navigate("/login")}

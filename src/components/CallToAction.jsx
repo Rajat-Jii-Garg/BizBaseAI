@@ -1,52 +1,128 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const CallToAction = () => {
-  const steps = [
-    { n: '01', t: 'Create your profile', d: 'Name, skills, what you are looking for. Two minutes.' },
-    { n: '02', t: 'Follow the right people', d: 'Communities and connections in your field, suggested for you.' },
-    { n: '03', t: 'Apply and show up', d: 'Fresh Indian jobs daily, plus posts and events worth your time.' },
+  const benefits = [
+    'Smart Connections',
+    'Jobs & Opportunities',
+    'AI-Powered Career Assistant',
+    'Active Communities & Events',
+    'Business Management Dashboard'
   ];
 
   return (
-    <section id="cta" className="py-16 sm:py-24 bg-white border-t border-border">
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-border bg-secondary/50 px-6 py-12 sm:px-14 sm:py-16">
-          <div className="max-w-3xl">
-            <h2 className="font-display text-[2.2rem] sm:text-5xl leading-[1.08] text-foreground">
-              Start today. It stays free.
-            </h2>
-            <p className="mt-4 text-[15px] sm:text-lg text-muted-foreground leading-relaxed max-w-xl">
-              BizBase is built for people who are still climbing — so there are no paywalls,
-              no credits and no premium plan hiding the useful parts.
-            </p>
+    <section id="cta" className="py-10 md:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.1%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
 
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link to="/signup" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto h-14 px-8 rounded-xl text-[15px] font-semibold shadow-lg shadow-primary/20">
-                  Create free account
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-              <Link to="/login" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 rounded-xl text-[15px] font-semibold bg-white border-border">
-                  I already have an account
-                </Button>
-              </Link>
-            </div>
+      {/* Top Left Glow */}
+      <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-cyan-400/20 blur-[120px]" />
+      {/* Bottom Right Glow */}
+      <div className="absolute -bottom-40 -right-40 w-[550px] h-[550px] rounded-full bg-violet-500/20 blur-[140px]" />
+      {/* Center Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full bg-blue-400/10 blur-[150px]" />
+
+      <div className="absolute top-24 left-20 w-4 h-4 rounded-full bg-white/30"></div>
+      <div className="absolute bottom-40 left-1/4 w-3 h-3 rounded-full bg-cyan-300/40"></div>
+      <div className="absolute top-32 right-20 w-5 h-5 rounded-full bg-purple-300/30"></div>
+      <div className="absolute bottom-20 right-1/3 w-2 h-2 rounded-full bg-white/40"></div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center space-x-1.5 md:space-x-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 md:px-6 md:py-3 rounded-full mb-5 md:mb-8">
+            <Sparkles className="w-3.5 h-3.5 md:w-5 md:h-5 text-white" />
+            <span className="text-[11px] md:text-base text-white font-medium whitespace-nowrap">Trusted by Professionals & Businesses</span>
           </div>
 
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-8 border-t border-border pt-10">
-            {steps.map((s) => (
-              <div key={s.n}>
-                <span className="font-display text-3xl text-primary">{s.n}</span>
-                <h3 className="mt-2 text-[16px] font-semibold text-foreground">{s.t}</h3>
-                <p className="mt-1.5 text-[13.5px] text-muted-foreground leading-relaxed">{s.d}</p>
+          <h2 className="text-[1.45rem] md:text-5xl lg:text-6xl leading-[1.2] md:leading-tight tracking-tight font-bold text-white mb-4 md:mb-6">
+            Join Thousands of Professionals
+            <br />
+            Building Their Future with BizBase
+          </h2>
+
+          <p className="text-[0.82rem] md:text-xl text-blue-100 mb-8 md:mb-16 max-w-3xl mx-auto leading-6 md:leading-relaxed px-1">
+            Create your professional profile, discover opportunities, connect with the right people, manage your business, and use AI to grow faster — all from one free platform.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <div className="space-y-6 order-2 lg:order-1 max-w-[500px]">
+            <h3 className="text-[1.7rem] md:text-3xl font-bold text-white mb-5 md:mb-6">Why professionals choose BizBase:</h3>
+            <div className="space-y-3 md:space-y-5">
+              {benefits.map((benefit, index) => (
+                <div key={index} className="flex items-center space-x-2.5 md:space-x-3">
+                  <CheckCircle className="w-5 h-5 md:w-6 md:h-6 text-green-400 flex-shrink-0" />
+                  <span className="text-[0.92rem] md:text-lg leading-[1.2] md:leading-5 text-blue-100">{benefit}</span>
+                </div>
+              ))}
+            </div>
+            
+            {/* <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mt-8">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-white mb-2">$0</div>
+                <div className="text-blue-200 mb-4">for your first 14 days</div>
+                <div className="text-sm text-blue-300">Then starting from $29/month</div>
               </div>
-            ))}
+            </div> */}
+          </div>
+          
+          <div className="flex flex-col items-center lg:items-start order-1 lg:order-2">
+            <div className="w-full max-w-[480px] bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-[36px] md:py-12 shadow-2xl">
+              <div className="space-y-6">
+                <Link to="/signup">
+                  <Button size="lg" className="w-full bg-white text-slate-900 hover:bg-slate-100 rounded-2xl h-16 text-lg font-semibold transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-2xl border border-slate-200">
+                    Create Free Account
+                    <ArrowRight className="w-6 h-6 ml-3" />
+                  </Button>
+                </Link>
+               
+                <div className="text-center">
+                  <div className="text-blue-200 text-sm mb-4"></div>
+                  <Link to="/login">
+                    <Button size="lg" className="w-full bg-white text-slate-900 hover:bg-slate-100 rounded-2xl h-16 text-lg font-semibold transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-2xl border border-slate-200">
+                      Login →
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 w-full max-w-[480px] text-center text-blue-100 text-sm leading-4 space-y-2">
+              <p>🚀 Build Your Professional Identity</p>
+              <p>🤖 AI Powered Growth</p>
+              <p>🔒 Enterprise Grade Security</p>
+              <p>🌍 Access Anywhere Anytime</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-center mt-[3rem] md:mt-20">
+          <p className="text-blue-100 text-[0.86rem] md:text-base font-medium max-w-4xl mx-auto leading-6 md:leading-relaxed px-2">
+            Trusted by Founders, Entrepreneurs, Freelancers, Professionals and Businesses across India.
+            Build smart identity, meaningful connections, discover opportunities, grow your business.
+          </p>
+          <div className="mt-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8 max-w-4xl mx-auto">
+              <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md py-8 px-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:bg-white/20">
+                <div className="text-3xl font-bold text-white mb-2">15+</div>
+                <div className="text-blue-200 text-sm">AI Features</div>
+              </div>
+              <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md py-8 px-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:bg-white/20">
+                <div className="text-3xl font-bold text-white mb-2">8+</div>
+                <div className="text-blue-200 text-sm">Core Products</div>
+              </div>
+              <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md py-8 px-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:bg-white/20">
+                <div className="text-3xl font-bold text-white mb-2">100%</div>
+                <div className="text-blue-200 text-sm">Free Access</div>
+              </div>
+              <div className="rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md py-8 px-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:bg-white/20">
+                <div className="text-3xl font-bold text-white mb-2">24/7</div>
+                <div className="text-blue-200 text-sm">AI Assistance</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

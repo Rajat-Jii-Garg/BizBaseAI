@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, Menu, X } from 'lucide-react';
+import { LogIn, Sparkles, Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import BrandLogo from '@/components/BrandLogo';
 
 const Navbar = ({ variant = 'default' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -11,15 +10,26 @@ const Navbar = ({ variant = 'default' }) => {
   const isHero = variant === 'hero';
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-border transition-colors duration-300">
+    <nav className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-slate-100 shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-[56px] sm:h-16">
+        <div className="flex justify-between items-center h-[52px] sm:h-16">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <BrandLogo showTagline />
+          <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+            <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl ${
+              isHero ? 'bg-gradient-to-br from-blue-500 to-violet-500' : 'bg-gradient-to-br from-blue-600 to-purple-600'
+            }`}>
+              <Sparkles className="w-4 h-4 sm:w-7 sm:h-7 text-white" />
+            </div>
+            <div className="flex flex-col">
+              <span className={`text-[1.45rem] sm:text-2xl font-black bg-clip-text text-transparent ${
+                isHero ? 'bg-gradient-to-r from-blue-400 to-violet-400' : 'bg-gradient-to-r from-blue-600 to-purple-600'
+              }`}>
+                BizBase
+              </span>
+              <span className={`text-[8px] sm:text-xs font-medium -mt-1 ${isHero ? 'text-white/40' : 'text-slate-500'}`}>Build • Scale • Automate</span>
+            </div>
           </Link>
-
           
           {/* Desktop Navigation */}
           {/* <div className="hidden md:flex items-center space-x-8">
@@ -40,7 +50,7 @@ const Navbar = ({ variant = 'default' }) => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Solutions
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
             </a>
 
             {/* Company dropdown */}
@@ -74,7 +84,7 @@ const Navbar = ({ variant = 'default' }) => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Blogs
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
             </Link>
 
             {/* Community */}
@@ -83,7 +93,7 @@ const Navbar = ({ variant = 'default' }) => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Founders Community
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
             </Link>
 
             {/* Who is BizBase for? */}
@@ -92,7 +102,7 @@ const Navbar = ({ variant = 'default' }) => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               Who is BizBase for?
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
             </a>
           </div>
           
@@ -100,14 +110,14 @@ const Navbar = ({ variant = 'default' }) => {
           <div className="hidden md:flex items-center space-x-3">
             <Link to="/login">
               <Button variant="ghost" className={`flex items-center space-x-2 rounded-xl font-semibold px-6 ${
-                isHero ? 'text-white/70 hover:text-white hover:bg-white/[0.08]' : 'text-slate-700 hover:text-primary hover:bg-secondary'
+                isHero ? 'text-white/70 hover:text-white hover:bg-white/[0.08]' : 'text-slate-700 hover:text-blue-600 hover:bg-blue-50'
               }`}>
                 <LogIn className="w-4 h-4" />
                 <span>Login</span>
               </Button>
             </Link>
             <Link to="/signup">
-              <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white font-semibold px-6 py-2 rounded-lg border-0 shadow-md hover:shadow-lg transition-all duration-300 text-sm">
+              <Button className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white font-semibold px-6 py-2 rounded-lg border-0 shadow-md shadow-violet-200/40 hover:shadow-lg transition-all duration-300 text-sm">
                 Get Started Free
               </Button>
             </Link>
@@ -145,7 +155,7 @@ const Navbar = ({ variant = 'default' }) => {
               <Button variant="ghost" className="w-full text-sm">Login</Button>
             </Link>
             <Link to="/signup" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full bg-primary text-white text-sm">
+              <Button className="w-full bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm">
                 Get Started Free
               </Button>
             </Link>
