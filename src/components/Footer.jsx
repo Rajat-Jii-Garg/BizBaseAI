@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Sparkles, Twitter, Linkedin, Github, Mail } from 'lucide-react';
+import { Twitter, Linkedin, Github, Mail } from 'lucide-react';
+import BizBaseMark from '@/components/BizBaseMark';
 
 const Footer = () => {
   return (
@@ -10,7 +11,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-[#42d8d8] to-[#275acb] rounded-xl flex items-center justify-center shadow">
-                <Sparkles className="w-5 h-5 text-white drop-shadow" />
+                <BizBaseMark className="w-5 h-5 text-white drop-shadow" />
               </div>
               <span className="text-xl font-extrabold font-display bg-gradient-to-r from-[#4df1bd] via-[#469cff] to-[#245ade] bg-clip-text text-transparent select-none">
                 BizBase

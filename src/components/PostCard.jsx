@@ -6,18 +6,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MoreHorizontal, CheckCircle } from 'lucide-react';
 import PostEngagementActions from './PostEngagementActions';
 import { useNavigate } from 'react-router-dom';
+import { formatTimeAgo } from '@/lib/timeAgo';
 
 const PostCard = ({ post, onEngagementUpdate }) => {
   const navigate = useNavigate();
-  const formatTimeAgo = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'now';
-    if (diffInHours < 24) return `${diffInHours}h`;
-    return `${Math.floor(diffInHours / 24)}d`;
-  };
+
 
   return (
     <Card className="bg-white border border-gray-200 transition-shadow rounded-none sm:rounded-xl shadow-none sm:shadow-sm hover:shadow-none sm:hover:shadow-md">

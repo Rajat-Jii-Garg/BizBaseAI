@@ -65,15 +65,6 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
     checkConnectionStatus();
   }, [user?.id, post.user_id]);
 
-  const formatTimeAgo = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'now';
-    if (diffInHours < 24) return `${diffInHours}h`;
-    return `${Math.floor(diffInHours / 24)}d`;
-  };
 
   const handlePostClick = () => {
     if (post.profiles?.username) {
