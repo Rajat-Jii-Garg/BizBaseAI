@@ -2,27 +2,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogIn, ArrowRight, Sparkles, Zap, TrendingUp, Shield, Globe, Rocket, CheckCircle, Users, Brain, ChevronRight } from 'lucide-react';
-
-const FloatingIcon = ({ icon: Icon, className, size = 'w-12 h-12', iconSize = 'w-5 h-5', color = 'text-violet-500', bg = 'bg-violet-50' }) => (
-  <div className={`absolute ${className} ${size} rounded-2xl ${bg} border border-violet-100/50 shadow-lg shadow-violet-100/30 flex items-center justify-center`}>
-    <Icon className={`${iconSize} ${color}`} />
-  </div>
-);
+import { LogIn, ArrowRight, Sparkles, Zap, TrendingUp, Shield, Rocket, CheckCircle, Brain, ChevronRight } from 'lucide-react';
 
 const Hero = () => {
   return (
     <section className="relative min-h-[90vh] lg:min-h-screen pt-14 pb-16 overflow-hidden bg-white">
-      {/* Subtle radial glow */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse,rgba(124,58,237,0.04)_0%,transparent_70%)]" />
 
-      {/* Floating Icons */}
-      <FloatingIcon icon={Sparkles} className="hidden lg:flex top-32 left-[8%] animate-[float_6s_ease-in-out_infinite]" color="text-violet-500" bg="bg-violet-50" />
-      <FloatingIcon icon={Zap} className="hidden lg:flex top-[55%] left-[5%] animate-[float_5s_ease-in-out_infinite_1s]" color="text-blue-500" bg="bg-blue-50" size="w-10 h-10" iconSize="w-4 h-4" />
-      <FloatingIcon icon={Brain} className="hidden lg:flex top-28 right-[6%] animate-[float_7s_ease-in-out_infinite_0.5s]" color="text-violet-400" bg="bg-violet-50/80" />
-      <FloatingIcon icon={Users} className="hidden lg:flex top-[50%] right-[5%] animate-[float_5.5s_ease-in-out_infinite_1.5s]" color="text-violet-500" bg="bg-violet-50" />
-      <FloatingIcon icon={TrendingUp} className="hidden lg:flex bottom-[20%] right-[8%] animate-[float_6.5s_ease-in-out_infinite_2s]" color="text-blue-500" bg="bg-blue-50" size="w-11 h-11" />
-      <FloatingIcon icon={Shield} className="hidden lg:flex bottom-[28%] left-[10%] animate-[float_7s_ease-in-out_infinite_0.8s] hidden md:flex" color="text-indigo-400" bg="bg-indigo-50" size="w-9 h-9" iconSize="w-4 h-4" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-6 pt-6 sm:pt-8 lg:pt-10">
