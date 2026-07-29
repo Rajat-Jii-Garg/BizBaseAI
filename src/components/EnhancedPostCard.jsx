@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import PostEngagementActions from './PostEngagementActions';
 
 import { useNavigate } from 'react-router-dom';
+import { formatTimeAgo } from '@/lib/timeAgo';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
