@@ -34,12 +34,22 @@ const SearchBar = () => {
   }, []);
 
   useEffect(() => {
-    if (searchQuery.length > 2) {
-      performSearch();
-    } else {
-      setSearchResults({ users: [], jobs: [], events: [], hashtags: [], companies: [] });
-      setShowResults(false);
-    }
+    const timer = setTimeout(() => {
+      if (searchQuery.trim().length > 2) {
+        performSearch();
+      } else {
+        setSearchResults({
+          users: [],
+          jobs: [],
+          events: [],
+          hashtags: [],
+          companies: []
+        });
+        setShowResults(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
   const performSearch = async () => {
@@ -53,12 +63,13 @@ const SearchBar = () => {
         .select('id, username, full_name, current_position, avatar_url, company_name, location')
         .or(
           `full_name.ilike.%${searchQuery}%,username.ilike.%${searchQuery}%,current_position.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%`)
-        .limit(5);
+        .order("full_name", { ascending: true })
+        .limit(8);
 
       // Search jobs
       const { data: jobs } = await supabase
         .from('jobs')
-        .select('id, title, company_name, location, job_type, salary_min, salary_max')
+        .select('id, slug, title, company_name, location, job_type, salary_min, salary_max')
         .or(`title.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%,skills_required.cs.{${searchQuery}}`)
         .eq('is_active', true)
         .limit(5);
@@ -117,12 +128,11 @@ const SearchBar = () => {
     
     switch (type) {
       case 'user':
-        if (item.username) {
-          navigate(`/${item.username}`);
-        }
+        if (!item.username) return;
+        navigate(`/${item.username}`);
         break;
       case 'job':
-        navigate(`/jobs?job=${item.id}`);
+        navigate(`/jobs/${item.slug}`);
         break;
       case 'event':
         navigate(`/events?event=${item.id}`);
@@ -131,7 +141,7 @@ const SearchBar = () => {
         navigate(`/feed?hashtag=${item.name}`);
         break;
       case 'company':
-        navigate(`/search?q=${encodeURIComponent(item.name)}&type=company`);
+        navigate(`/business/${item.slug}`);
         break;
       default:
         break;
@@ -139,7 +149,14 @@ const SearchBar = () => {
   };
 
   const clearSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
+    setSearchResults({
+      users: [],
+      jobs: [],
+      events: [],
+      hashtags: [],
+      companies: []
+    });
     setShowResults(false);
   };
 
@@ -206,7 +223,7 @@ const SearchBar = () => {
                     <div
                       key={user.id}
                       onClick={() => handleResultClick('user', user)}
-                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-50/50 hover:shadow-sm group rounded-xl cursor-pointer transition-all duration-200"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-blue-50/50 hover:shadow-sm group rounded-xl cursor-pointer transition-all duration-200"
                     >
                       <Avatar className="h-8 w-8 sm:h-9 sm:w-9 ring-2 ring-white shadow-sm">
                         <AvatarImage src={user.avatar_url} />
@@ -245,13 +262,13 @@ const SearchBar = () => {
                     <div
                       key={job.id}
                       onClick={() => handleResultClick('job', job)}
-                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-green-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-green-50/50rounded-lg cursor-pointer transition-all duration-200 group"
                     >
                       <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-green-600 transition-colors">{job.title}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate  transition-colors">{job.title}</p>
                         <p className="text-[10px] sm:text-xs text-gray-500 truncate">{job.company_name}</p>
                       </div>
                       <div className="text-right">
@@ -279,13 +296,13 @@ const SearchBar = () => {
                     <div
                       key={event.id}
                       onClick={() => handleResultClick('event', event)}
-                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-purple-50/50 rounded-lg cursor-pointer transition-all duration-200 group"
                     >
                       <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-purple-600 transition-colors">{event.title}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate transition-colors">{event.title}</p>
                         <p className="text-[10px] sm:text-xs text-gray-500 truncate">{new Date(event.date).toLocaleDateString()}</p>
                       </div>
                       <Badge variant="outline" className="text-[9px] sm:text-[10px] px-1.5 py-0 h-4 sm:h-5 bg-purple-50 border-purple-200 text-purple-700">{event.type}</Badge>
@@ -305,13 +322,13 @@ const SearchBar = () => {
                     <div
                       key={hashtag.id}
                       onClick={() => handleResultClick('hashtag', hashtag)}
-                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-blue-50/50 rounded-lg cursor-pointer transition-all duration-200 group"
                     >
                       <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">#{hashtag.name}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 transition-colors">#{hashtag.name}</p>
                         <p className="text-[10px] sm:text-xs text-gray-500">{hashtag.usage_count} posts</p>
                       </div>
                     </div>
@@ -330,13 +347,13 @@ const SearchBar = () => {
                     <div
                       key={company.id}
                       onClick={() => handleResultClick('company', company)}
-                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-orange-50/50rounded-lg cursor-pointer transition-all duration-200 group"
                     >
                       <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-orange-400 to-amber-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-orange-600 transition-colors">{company.name}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate  transition-colors">{company.name}</p>
                         <p className="text-[10px] sm:text-xs text-gray-500">Company</p>
                       </div>
                     </div>
