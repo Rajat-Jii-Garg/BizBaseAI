@@ -312,10 +312,10 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <SEOHead title="Dashboard" description="Your BizBase AI dashboard - manage connections, track analytics, and grow your professional network." path="/dashboard" />
+      <SEOHead title="Feed" description="Your BizBase AI dashboard - Manage connections, track analytics, and grow your professional network." path="/dashboard" />
       <WelcomeFlow />
-      <UsernameSetupModal 
-        open={showUsernameModal} 
+      <UsernameSetupModal
+        open={showUsernameModal}
         onClose={() => setShowUsernameModal(false)} 
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" style={{ overflowX: 'clip' }}>
