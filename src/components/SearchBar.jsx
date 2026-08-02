@@ -51,12 +51,8 @@ const SearchBar = () => {
       const { data: users } = await supabase
         .from('profiles')
         .select('id, username, full_name, current_position, avatar_url, company_name, location')
-        .or(`
-          full_name.ilike.%${searchQuery}%,
-          username.ilike.%${searchQuery}%,
-          current_position.ilike.%${searchQuery}%,
-          company_name.ilike.%${searchQuery}%`
-        )
+        .or(
+          `full_name.ilike.%${searchQuery}%,username.ilike.%${searchQuery}%,current_position.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%`)
         .limit(5);
 
       // Search jobs
