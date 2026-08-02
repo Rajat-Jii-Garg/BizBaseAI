@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -13,10 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { 
-  Bell, 
-  MessageSquare, 
-  Network, 
+import {
+  Bell,
+  MessageSquare,
   Search,
   Menu,
   Settings,
@@ -86,16 +85,23 @@ const DashboardLayout = ({ children }) => {
             {/* Logo & Brand */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 ml-0">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl">
-                  <Network className="w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 text-white" />
+                
+                <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center">
+                  <img
+                    src="/images/logo_icon.png"
+                    alt="BizBase Logo"
+                    className="w-full h-full object-contain"
+                    draggable={false}
+                  />
                 </div>
+                
                 <div className="hidden md:block">
                   <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
                     BizBase
                   </span>
-                  <div className="text-xs text-gray-500 -mt-1 flex items-center gap-1">
-                    <Brain className="w-3 h-3" />
-                    AI Professional Network
+                  <div className="text-[10px] text-gray-500 -mt-1 flex items-center gap-1">
+                    {/* <Brain className="w-3 h-3" /> */}
+                    Smart Networking
                   </div>
                 </div>
               </div>

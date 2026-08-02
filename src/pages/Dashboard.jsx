@@ -326,7 +326,7 @@ const Dashboard = () => {
           {/* Welcome Banner */}
           {showWelcome && (
             // <Card className="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-2xl overflow-hidden relative">
-            <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-lg sm:shadow-xl sm:shadow-2xl overflow-hidden relative rounded-2xl sm:rounded-3xl mx-2 sm:mx-0">
+            <Card className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0 shadow-lg  sm:shadow-2xl overflow-hidden relative rounded-2xl sm:rounded-3xl mx-2 sm:mx-0">
               <div className="absolute inset-0 opacity-20">
                 <div className="w-full h-full bg-gradient-to-r from-blue-400/20 to-purple-400/20"></div>
               </div>

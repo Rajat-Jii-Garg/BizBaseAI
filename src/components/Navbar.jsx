@@ -17,18 +17,22 @@ const Navbar = ({ variant = 'default' }) => {
 
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
-            <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl ${
+            {/* <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl ${
               isHero ? 'bg-gradient-to-br from-blue-500 to-violet-500' : 'bg-gradient-to-br from-blue-600 to-purple-600'
             }`}>
               <BizBaseMark className="w-4 h-4 sm:w-7 sm:h-7 text-white" />
+            </div> */}
+            <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center">
+              <BizBaseMark />
             </div>
+
             <div className="flex flex-col">
               <span className={`text-[1.45rem] sm:text-2xl font-black bg-clip-text text-transparent ${
                 isHero ? 'bg-gradient-to-r from-blue-400 to-violet-400' : 'bg-gradient-to-r from-blue-600 to-purple-600'
               }`}>
                 BizBase
               </span>
-              <span className={`text-[8px] sm:text-xs font-medium -mt-1 ${isHero ? 'text-white/40' : 'text-slate-500'}`}>Build • Scale • Automate</span>
+              <span className={`text-[8px] sm:text-[10px] font-medium -mt-1 ${isHero ? 'text-white/40' : 'text-slate-500'}`}>Build • Scale • Automate</span>
             </div>
           </Link>
           
