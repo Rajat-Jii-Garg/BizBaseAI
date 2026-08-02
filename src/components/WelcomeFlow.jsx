@@ -8,12 +8,12 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  User, 
-  Briefcase, 
-  MapPin, 
-  Mail, 
-  Phone, 
+import {
+  User,
+  Briefcase,
+  MapPin,
+  Mail,
+  Phone,
   Sparkles,
   CheckCircle,
   ArrowRight

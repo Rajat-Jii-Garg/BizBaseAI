@@ -186,7 +186,7 @@ const SearchBar = () => {
             variant="ghost"
             size="sm"
             onClick={clearSearch}
-            className="absolute right-2 sm:right-3 lg:right-4 top-1/2 -translate-y-1/2 px-1 hover:bg-gray-100 rounded-lg"
+            className="absolute right-2 sm:right-3 lg:right-4 top-1/2 -translate-y-1/2 px-1 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-black transition-colors duration-100"
           >
             <X className="h-4 w-4" />
           </Button>

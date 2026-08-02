@@ -30,8 +30,8 @@ const UsernameSetupModal = ({ open, onClose }) => {
     
     setCheckingUsername(true);
     try {
-      const { data, error } = await supabase.rpc('is_username_available', { 
-        check_username: usernameToCheck 
+      const { data, error } = await supabase.rpc('is_username_available', {
+        check_username: usernameToCheck
       });
       
       if (error) throw error;
@@ -61,8 +61,8 @@ const UsernameSetupModal = ({ open, onClose }) => {
   };
 
   const handleSave = async () => {
-    if (!username || username.length < 3) {
-      toast.error('Username must be at least 3 characters');
+    if (!username || username.length < 5) {
+      toast.error('Username must be at least 5 characters');
       return;
     }
 
@@ -93,27 +93,32 @@ const UsernameSetupModal = ({ open, onClose }) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onClose();
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             Set Your Username
           </DialogTitle>
-          <DialogDescription>
+          {/* <DialogDescription>
             Choose a unique username for your BizBase profile. This will be your public identity on the platform.
-          </DialogDescription>
+          </DialogDescription> */}
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Username:</Label>
             <div className="relative">
               <AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="username"
                 type="text"
-                placeholder="Choose a unique username"
+                placeholder="Enter your username"
                 value={username}
                 onChange={(e) => handleUsernameChange(e.target.value)}
                 className={`pl-10 pr-10 ${
@@ -128,28 +133,28 @@ const UsernameSetupModal = ({ open, onClose }) => {
                 {!checkingUsername && usernameAvailable === false && <XCircle className="h-4 w-4 text-destructive" />}
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
+            {/* <p className="text-xs text-muted-foreground">
               Your profile URL: bizbase.com/@{username || 'username'}
-            </p>
+            </p> */}
             {usernameAvailable === false && (
               <p className="text-xs text-destructive">This username is already taken</p>
             )}
           </div>
 
-          <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground">
+          {/* <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground">
             <p className="font-medium text-foreground mb-1">Username rules:</p>
             <ul className="list-disc list-inside space-y-1">
               <li>At least 3 characters long</li>
               <li>Only lowercase letters, numbers, and underscores</li>
               <li>Must be unique across all users and businesses</li>
             </ul>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex justify-end">
-          <Button 
-            onClick={handleSave} 
-            disabled={!username || username.length < 3 || usernameAvailable !== true || saving}
+          <Button
+            onClick={handleSave}
+            disabled={!username || username.length < 5 || usernameAvailable !== true || saving}
             className="min-w-[120px]"
           >
             {saving ? (
