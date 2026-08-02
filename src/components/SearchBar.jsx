@@ -123,8 +123,6 @@ const SearchBar = () => {
       case 'user':
         if (item.username) {
           navigate(`/${item.username}`);
-        } else {
-          navigate(`/profile-preview/${item.id}`);
         }
         break;
       case 'job':
