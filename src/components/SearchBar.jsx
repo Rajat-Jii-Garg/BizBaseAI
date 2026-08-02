@@ -50,8 +50,13 @@ const SearchBar = () => {
       // Search users/profiles
       const { data: users } = await supabase
         .from('profiles')
-        .select('id, full_name, current_position, avatar_url, company_name, location')
-        .or(`full_name.ilike.%${searchQuery}%,current_position.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%`)
+        .select('id, username, full_name, current_position, avatar_url, company_name, location')
+        .or(`
+          full_name.ilike.%${searchQuery}%,
+          username.ilike.%${searchQuery}%,
+          current_position.ilike.%${searchQuery}%,
+          company_name.ilike.%${searchQuery}%`
+        )
         .limit(5);
 
       // Search jobs
@@ -116,7 +121,11 @@ const SearchBar = () => {
     
     switch (type) {
       case 'user':
-        navigate(`/profile/${item.id}`);
+        if (item.username) {
+          navigate(`/${item.username}`);
+        } else {
+          navigate(`/profile-preview/${item.id}`);
+        }
         break;
       case 'job':
         navigate(`/jobs?job=${item.id}`);
@@ -158,7 +167,7 @@ const SearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchQuery.length > 2 && setShowResults(true)}
-          className="block w-full pl-7 sm:pl-9 lg:pl-11 pr-10 sm:pr-12 lg:pr-14 py-1.5 sm:py-2 lg:py-3 border border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-gray-200 transition-all text-sm sm:text-base lg:text-lg"
+          className="block w-full pl-7 sm:pl-9 lg:pl-11 pr-10 sm:pr-12 lg:pr-14 py-1.5 sm:py-2 lg:py-3 border border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl bg-white focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-gray-200 transition-all text-sm sm:text-sm lg:text-base placeholder:text-[12px] sm:placeholder:text-[13px] lg:placeholder:text-[14px]"
         />
         {searchQuery && (
           <Button
@@ -171,7 +180,7 @@ const SearchBar = () => {
             <X className="h-4 w-4" />
           </Button>
         )}
-        {/* <Button 
+        {/* <Button
           type="submit"
           size="sm"
           className="absolute right-1 top-1 bottom-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg lg:rounded-xl px-3 lg:px-5 shadow-sm"
@@ -183,16 +192,11 @@ const SearchBar = () => {
       {/* Search Results Dropdown */}
       {showResults && (
         <div className="fixed md:absolute top-[68px] md:top-full left-0 right-0 md:left-1/2 md:-translate-x-1/2 mx-2 sm:mx-3 md:mx-0 w-auto md:w-[480px] lg:w-[560px] mt-0 md:mt-2 max-h-[70vh] md:max-h-[65vh] bg-white/95 backdrop-blur-xl rounded-xl md:rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100]">
-          {/* Premium Header */}
-          <div className="px-3 py-2 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100 flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-            <span className="text-xs font-medium text-gray-600">Search Results</span>
-          </div>
           
           <ScrollArea className="max-h-[calc(70vh-40px)] md:max-h-[calc(65vh-40px)]">
           {loading ? (
             <div className="p-6 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent mx-auto"></div>
               <p className="text-xs text-gray-500 mt-2">Searching...</p>
             </div>
           ) : hasResults ? (
@@ -208,7 +212,7 @@ const SearchBar = () => {
                     <div
                       key={user.id}
                       onClick={() => handleResultClick('user', user)}
-                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent rounded-lg cursor-pointer transition-all duration-200 group"
+                      className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-50/50 hover:shadow-sm group rounded-xl cursor-pointer transition-all duration-200"
                     >
                       <Avatar className="h-8 w-8 sm:h-9 sm:w-9 ring-2 ring-white shadow-sm">
                         <AvatarImage src={user.avatar_url} />
@@ -217,9 +221,9 @@ const SearchBar = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">{user.full_name}</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate  transition-colors">{user.full_name}</p>
                         <p className="text-[10px] sm:text-xs text-gray-500 truncate">
-                          {user.current_position && user.company_name 
+                          {user.current_position && user.company_name
                             ? `${user.current_position} at ${user.company_name}`
                             : user.current_position || user.company_name || 'Professional'
                           }
