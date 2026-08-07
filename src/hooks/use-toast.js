@@ -8,9 +8,9 @@ function useToast() {
   return {
     toast: (props) => {
       if (props?.variant === 'destructive') {
-        return sonnerToast.error(props.title, { description: props.description });
+        return sonnerToast.error(props.title);
       }
-      return sonnerToast(props?.title, { description: props?.description });
+      return sonnerToast(props?.title);
     },
     toasts: [],
     dismiss: sonnerToast.dismiss,
@@ -20,9 +20,9 @@ function useToast() {
 // Direct toast function for simpler usage
 const toast = (props) => {
   if (props?.variant === 'destructive') {
-    return sonnerToast.error(props.title, { description: props.description });
+    return sonnerToast.error(props.title);
   }
-  return sonnerToast(props?.title, { description: props?.description });
+  return sonnerToast(props?.title);
 };
 
 export { useToast, toast };

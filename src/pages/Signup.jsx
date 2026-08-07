@@ -202,9 +202,7 @@ const Signup = () => {
 
       // Check if user needs email confirmation or was auto-confirmed
       if (data?.user?.identities?.length === 0) {
-        toast.error("Account already exists", {
-          description: "This email is already registered. Please login instead.",
-        });
+        toast.error("Account already exists");
         navigate(
           redirect
             ? `/login?redirect=${encodeURIComponent(redirect)}`
@@ -214,9 +212,7 @@ const Signup = () => {
       }
 
       if (data?.session) {
-        toast.success("Account Created!", {
-          description: "Welcome to BizBase!"
-        });
+        toast.success("Account Created Successfully!");
 
         if (redirect) {
           const {
@@ -239,8 +235,7 @@ const Signup = () => {
         }
       } else {
         // Needs email confirmation
-        toast.success("Check your email!", {
-          description: "We've sent a confirmation link to " + signupData.email + ". Click the link to activate your account.",
+        toast.success("Verification Email Sent!", {
           duration: 10000,
         });
         navigate(
@@ -274,11 +269,9 @@ const Signup = () => {
     } catch (error) {
       console.error('Signup error:', error);
       if (error.message?.includes('sending confirmation email')) {
-        toast.error("Email service error", {
-          description: "Could not send confirmation email. Please try again later or contact support.",
-        });
+        toast.error("Verification Email not Sent!");
       } else {
-        toast.error("Signup failed", { description: error.message });
+        toast.error(error.message);
       }
     } finally {
       setLoading(false);

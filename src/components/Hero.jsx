@@ -1,8 +1,7 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogIn, ArrowRight, Sparkles, Zap, TrendingUp, Shield, Rocket, CheckCircle, Brain, ChevronRight } from 'lucide-react';
+import { ArrowRight, Brain, CheckCircle, ChevronRight, LogIn, Rocket, Shield, Sparkles, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
@@ -45,7 +44,7 @@ const Hero = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-3 justify-center items-center pt-1">
             <Link to="/login">
-              <Button size="default" variant="outline" className="w-[210px] sm:w-auto h-14 rounded-2xl rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-bold transition-all duration-300">
+              <Button size="default" variant="outline" className="w-[210px] sm:w-auto h-14 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 hover:!text-slate-900 font-bold transition-all duration-200">
                 <LogIn className="w-4 h-4" />
                 Login
               </Button>

@@ -22,13 +22,9 @@ const ForgetPassword = () => {
     });
 
     if (error) {
-      toast.error("Error sending recovery email", {
-        description: error.message,
-      });
+      toast.error(error.message);
     } else {
-      toast.success("Reset link sent!", {
-        description: "Check your email to reset your password.",
-      });
+      toast.success("Password Reset link sent!");
     }
 
     setLoading(false);

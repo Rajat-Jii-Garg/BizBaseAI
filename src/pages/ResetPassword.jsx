@@ -34,7 +34,7 @@ const ResetPassword = () => {
           new URLSearchParams(window.location.hash.replace(/^#/, "")).get("error_description");
 
         if (errorDescription) {
-          toast.error("Reset link invalid or expired", { description: errorDescription });
+          toast.error("Reset link invalid or expired");
           navigate("/forget-password");
           return;
         }
@@ -43,7 +43,7 @@ const ResetPassword = () => {
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
           if (error) {
-            toast.error("Reset link invalid or expired", { description: error.message });
+            toast.error("Reset link invalid or expired");
             navigate("/forget-password");
             return;
           }
@@ -136,14 +136,12 @@ const ResetPassword = () => {
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      toast.error("Failed to update password", { description: error.message });
+      toast.error("Failed to update password");
       setLoading(false);
       return;
     }
 
-    toast.success("Password updated successfully", {
-      description: "Please sign in with your new password.",
-    });
+    toast.success("Password updated successfully");
     // Sign out the recovery session so the user logs in fresh
     await supabase.auth.signOut();
     navigate("/login");

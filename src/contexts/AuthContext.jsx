@@ -1,7 +1,6 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext(undefined);
 
@@ -44,7 +43,7 @@ export const AuthProvider = ({ children }) => {
         current_position: ""
       });
     } catch (err) {
-      console.error('Catch error fetching profile:', err);
+      console.error('Error fetching profile: ', err);
       setProfile(null);
     }
   };
@@ -106,7 +105,7 @@ export const AuthProvider = ({ children }) => {
         }
       })
       .catch(err => {
-        console.error("Session fetch error:", err);
+        console.error("Session fetch error: ", err);
         if (mounted) setLoading(false);
       });
 
@@ -137,11 +136,11 @@ export const AuthProvider = ({ children }) => {
         },
       });
       if (error) {
-        toast.error('Signup Error', { description: error.message });
+        console.error(error);
       }
       return { error };
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('Signup error: ', error);
       return { error };
     }
   };
@@ -154,15 +153,11 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (error) {
-        console.error('Login error:', error);
-        toast.error('Login Error', { description: error.message });
-      } else {
-        toast.success('Welcome Back!', { description: 'Successfully signed in to BizBase.' });
+        console.error("Login error:", error);
       }
-
       return { error };
     } catch (error) {
-      console.error('Login catch error:', error);
+      console.error('Login error: ', error);
       return { error };
     }
   };
@@ -170,10 +165,8 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      toast.success('Signed Out', { description: 'Successfully signed out from BizBase.' });
     } catch (error) {
-      console.error('Signout error:', error);
-      toast.error('Error', { description: 'Failed to sign out.' });
+      console.error('Signout error: ', error);
     }
   };
 
@@ -183,14 +176,9 @@ export const AuthProvider = ({ children }) => {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
-      if (error) {
-        toast.error('Error', { description: error.message });
-      } else {
-        toast.success('Password Reset', { description: 'Check your email for reset instructions.' });
-      }
-
       return { error };
     } catch (error) {
+      console.error('Password reset error: ', error);
       return { error };
     }
   };
@@ -200,17 +188,13 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await supabase.functions.invoke('send-otp', {
         body: { email, purpose }
       });
-
       if (error) {
         throw error;
       }
-
       console.log('OTP Response:', data);
-
       return { error: null };
     } catch (error) {
-      console.error('Send OTP error:', error);
-      toast.error("Error", { description: "Failed to send OTP. Please try again." });
+      console.error('Send OTP error: ', error);
       return { error };
     }
   };
@@ -227,7 +211,7 @@ export const AuthProvider = ({ children }) => {
 
       return { error: null, success: data?.success };
     } catch (error) {
-      console.error('Verify OTP error:', error);
+      console.error('Verify OTP error: ', error);
       return { error, success: false };
     }
   };

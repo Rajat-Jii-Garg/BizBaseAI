@@ -94,9 +94,7 @@ const Login = () => {
         setErrors({ general: error.message });
       }
     } else {
-        toast.success("Welcome back!", {
-          description: "Successfully signed in to BizBase."
-        });
+        toast.success("Login Successfully!");
 
         if (redirect) {
           const {
