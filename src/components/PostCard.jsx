@@ -56,7 +56,9 @@ const PostCard = ({ post, onEngagementUpdate }) => {
         <div className="mb-4 cursor-pointer"
           onClick={() => {
             if (post.profiles?.username) {
-              navigate(`/${post.profiles.username}/${post.id}`);
+              navigate(`/${post.profiles.username}/post/${post.id}`);
+            } else {
+              navigate(`/post/${post.id}`);
             }
           }}
         >
@@ -76,9 +78,13 @@ const PostCard = ({ post, onEngagementUpdate }) => {
           likesCount={post.likes_count || 0}
           commentsCount={post.comments_count || 0}
           sharesCount={post.shares_count || 0}
+          repostsCount={post.reposts_count || 0}
           userHasLiked={post.user_has_liked || false}
+          userHasReposted={post.user_has_reposted || false}
+          originalPost={post}
           onEngagementUpdate={onEngagementUpdate}
         />
+
       </CardContent>
     </Card>
   );

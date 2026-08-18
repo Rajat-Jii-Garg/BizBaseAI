@@ -245,7 +245,9 @@ const App = () => (
               <Route path="/admin-login" element={<AdminLogin />} />
 
               {/* Username-based profile route - must be LAST to avoid conflicts */}
+              <Route path="/post/:postId" element={<PostRedirect />} />
               <Route path="/:username/post/:postId" element={<SinglePostPage />} />
+
               <Route path="/:username" element={<UsernameProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
