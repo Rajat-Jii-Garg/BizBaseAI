@@ -56,6 +56,7 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { buildShareUrl } from '@/lib/siteUrl';
 
 const ProfilePage = ({ userId }) => {
   const { user, profile: authProfile } = useAuth();
@@ -327,7 +328,7 @@ const ProfilePage = ({ userId }) => {
   };
 
   const handleShare = () => {
-    const profileUrl = `${window.location.origin}/${profile.username}`;
+    const profileUrl = buildShareUrl(`/${profile.username}`);
     navigator.clipboard.writeText(profileUrl);
     toast({ title: 'Link copied!', description: 'Profile link copied to clipboard' });
   };

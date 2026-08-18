@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { buildShareUrl } from '@/lib/siteUrl';
 
 export const usePostEngagement = () => {
   const { user, profile } = useAuth();
@@ -95,7 +96,7 @@ export const usePostEngagement = () => {
         console.error("Username not found for post");
         return false;
       }
-      const postUrl = `${window.location.origin}/${username}/${postId}`;
+      const postUrl = buildShareUrl(`/${username}/post/${postId}`);
       
       try {
         await navigator.clipboard.writeText(postUrl);

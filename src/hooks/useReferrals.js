@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { buildShareUrl } from '@/lib/siteUrl';
 
 export const useReferrals = () => {
   const { user, profile } = useAuth();
@@ -58,7 +59,7 @@ export const useReferrals = () => {
     if (!user) return '';
     let code = referralCode;
     if (!code) code = await generateCode();
-    return `${window.location.origin}/signup?ref=${code}`;
+    return buildShareUrl(`/signup?ref=${code}`);
   }, [user, referralCode, generateCode]);
 
   // Called during signup to track a referral
