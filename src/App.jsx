@@ -65,6 +65,8 @@ import {
 // Username profile resolver
 import UsernameProfile from "./pages/UsernameProfile";
 import SinglePostPage from "./pages/SinglePostPage";
+import PostRedirect from "./pages/PostRedirect";
+
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -245,7 +247,9 @@ const App = () => (
               <Route path="/admin-login" element={<AdminLogin />} />
 
               {/* Username-based profile route - must be LAST to avoid conflicts */}
+              <Route path="/post/:postId" element={<PostRedirect />} />
               <Route path="/:username/post/:postId" element={<SinglePostPage />} />
+
               <Route path="/:username" element={<UsernameProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

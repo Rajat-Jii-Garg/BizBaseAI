@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import CommentItem from './CommentItem';
 import ShareModal from './ShareModal';
+import { buildShareUrl } from '@/lib/siteUrl';
+
 
 const MAX_VISIBLE_COMMENTS = 3;
 
@@ -90,12 +92,52 @@ const PostEngagementActions = ({
     setLocalUserHasReposted(userHasReposted);
   }, [likesCount, commentsCount, sharesCount, repostsCount, userHasLiked, userHasReposted]);
 
-  // Build share URL
+  // Build share URL (always canonical domain, never the preview host)
   useEffect(() => {
-    if (originalPost?.profiles?.username) {
-      setPostShareUrl(`${window.location.origin}/${originalPost.profiles.username}/post/${postId}`);
-    }
+    let cancelled = false;
+
+    const resolveUrl = async () => {
+      const known = originalPost?.profiles?.username;
+      if (known) {
+        setPostShareUrl(buildShareUrl(`/${known}/post/${postId}`));
+        return;
+      }
+
+      // Fallback: resolve the author's username from the post itself
+      try {
+        let authorId = originalPost?.user_id;
+        if (!authorId) {
+          const { data: postRow } = await supabase
+            .from('posts')
+            .select('user_id')
+            .eq('id', postId)
+            .maybeSingle();
+          authorId = postRow?.user_id;
+        }
+
+        if (authorId) {
+          const { data: prof } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', authorId)
+            .maybeSingle();
+
+          if (!cancelled && prof?.username) {
+            setPostShareUrl(buildShareUrl(`/${prof.username}/post/${postId}`));
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Error building share URL:', err);
+      }
+
+      if (!cancelled) setPostShareUrl(buildShareUrl(`/post/${postId}`));
+    };
+
+    resolveUrl();
+    return () => { cancelled = true; };
   }, [originalPost, postId]);
+
 
   const handleUpvote = async () => {
     const wasLiked = localUserHasLiked;

@@ -14,6 +14,7 @@ import { formatTimeAgo } from '@/lib/timeAgo';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { buildShareUrl } from '@/lib/siteUrl';
 
 const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const navigate = useNavigate();
@@ -142,7 +143,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const handleCopyLink = () => {
     if (!post.profiles?.username) return;
 
-    const postUrl = `${window.location.origin}/${post.profiles.username}/post/${post.id}`;
+    const postUrl = buildShareUrl(`/${post.profiles.username}/post/${post.id}`);
     navigator.clipboard.writeText(postUrl);
   };
 

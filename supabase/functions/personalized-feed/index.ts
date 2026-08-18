@@ -198,10 +198,12 @@ serve(async (req) => {
         }
       }
 
-      // Don't show user's own posts at top
+      // Always surface the user's own posts (fresh ones pinned near the top)
       if (post.user_id === user.id) {
-        score -= 5;
+        score += hoursOld < 48 ? 60 : 10;
+        reasons.push("your_post");
       }
+
 
       return {
         post_id: post.id,

@@ -56,6 +56,7 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { buildShareUrl } from '@/lib/siteUrl';
 
 const ProfilePage = ({ userId }) => {
   const { user, profile: authProfile } = useAuth();
@@ -205,13 +206,16 @@ const ProfilePage = ({ userId }) => {
         .single();
 
       const postIds = postsData.map(post => post.id);
-      const { data: likes } = await supabase
-        .from('post_likes')
-        .select('post_id')
-        .eq('user_id', user.id)
-        .in('post_id', postIds);
+      let likedPostIds = new Set();
+      if (user?.id) {
+        const { data: likes } = await supabase
+          .from('post_likes')
+          .select('post_id')
+          .eq('user_id', user.id)
+          .in('post_id', postIds);
+        likedPostIds = new Set(likes?.map(like => like.post_id) || []);
+      }
 
-      const likedPostIds = new Set(likes?.map(like => like.post_id) || []);
 
       const enrichedPosts = postsData.map(post => ({
         ...post,
@@ -324,7 +328,7 @@ const ProfilePage = ({ userId }) => {
   };
 
   const handleShare = () => {
-    const profileUrl = `${window.location.origin}/${profile.username}`;
+    const profileUrl = buildShareUrl(`/${profile.username}`);
     navigator.clipboard.writeText(profileUrl);
     toast({ title: 'Link copied!', description: 'Profile link copied to clipboard' });
   };
