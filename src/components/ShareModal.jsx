@@ -3,6 +3,8 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Link, MessageSquare, Send, Mail, Instagram, Linkedin, Facebook, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { buildShareUrl } from '@/lib/siteUrl';
+
 
 const ShareModal = ({ postShareUrl, onClose }) => {
   const { user } = useAuth();
@@ -23,16 +25,18 @@ const ShareModal = ({ postShareUrl, onClose }) => {
     fetchConnections();
   }, [user]);
 
+  const canonicalUrl = postShareUrl || buildShareUrl(window.location.pathname);
+
   const handleCopy = async (e) => {
     e.stopPropagation();
-    const url = postShareUrl || window.location.href;
-    await navigator.clipboard.writeText(url);
+    await navigator.clipboard.writeText(canonicalUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const shareText = encodeURIComponent(`Check this out on BizBase - the next-gen professional network! 🚀`);
-  const shareUrl = encodeURIComponent(postShareUrl || window.location.href);
+  const shareUrl = encodeURIComponent(canonicalUrl);
+
 
   const platforms = [
     {

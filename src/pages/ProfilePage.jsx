@@ -205,13 +205,16 @@ const ProfilePage = ({ userId }) => {
         .single();
 
       const postIds = postsData.map(post => post.id);
-      const { data: likes } = await supabase
-        .from('post_likes')
-        .select('post_id')
-        .eq('user_id', user.id)
-        .in('post_id', postIds);
+      let likedPostIds = new Set();
+      if (user?.id) {
+        const { data: likes } = await supabase
+          .from('post_likes')
+          .select('post_id')
+          .eq('user_id', user.id)
+          .in('post_id', postIds);
+        likedPostIds = new Set(likes?.map(like => like.post_id) || []);
+      }
 
-      const likedPostIds = new Set(likes?.map(like => like.post_id) || []);
 
       const enrichedPosts = postsData.map(post => ({
         ...post,

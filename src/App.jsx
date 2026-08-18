@@ -65,6 +65,8 @@ import {
 // Username profile resolver
 import UsernameProfile from "./pages/UsernameProfile";
 import SinglePostPage from "./pages/SinglePostPage";
+import PostRedirect from "./pages/PostRedirect";
+
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
