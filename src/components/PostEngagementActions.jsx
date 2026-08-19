@@ -162,6 +162,7 @@ const PostEngagementActions = ({
   };
 
   const handleFeedback = async () => {
+    if (!requireAuth()) return;
     if (commentText.trim()) {
       await addComment(postId, commentText);
       setCommentText('');
