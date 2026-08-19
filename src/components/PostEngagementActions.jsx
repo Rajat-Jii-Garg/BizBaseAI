@@ -365,6 +365,9 @@ const PostEngagementActions = ({
           onClose={() => setShowShareModal(false)}
         />
       )}
+
+      {/* Login prompt for guests */}
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
     </div>
   );
 };
