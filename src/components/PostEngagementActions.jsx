@@ -42,6 +42,7 @@ const PostEngagementActions = ({
 
   const [showShareModal, setShowShareModal] = useState(false);
   const [postShareUrl, setPostShareUrl] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const fetchComments = useCallback(async () => {
     setLoadingComments(true);
