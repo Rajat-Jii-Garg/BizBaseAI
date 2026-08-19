@@ -209,7 +209,7 @@ const DashboardHeader = () => {
               variant="outline"
               size="default"
               onClick={() => navigate('/business-setup')}
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-4 py-2.5 font-semibold rounded-lg transition-all duration-200"
+              className="border-primary text-primary hover:bg-primary/10 hover:text-primary px-4 py-2.5 font-semibold rounded-lg transition-all duration-200"
             >
               🏢 Register Business
             </Button>

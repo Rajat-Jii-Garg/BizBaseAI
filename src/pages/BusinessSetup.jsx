@@ -586,7 +586,7 @@ const BusinessSetup = () => {
 
   return (
     <DashboardLayout>
-      <SEOHead title="Register Your Business" description="Set up your business on BizBase AI. Create your business profile and start growing." path="/business-setup" />
+      <SEOHead title="Business Registration" description="Set up your business on BizBase. Create your business profile and start growing." path="/business-setup" />
       <LaunchingSoonOverlay
         title="Business Registration — Launching Soon"
         subtitle="We are finalising the business onboarding flow. Meanwhile, build your personal brand & smart network on BizBase — that's where real opportunities are happening right now."
