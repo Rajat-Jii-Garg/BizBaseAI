@@ -176,33 +176,33 @@ const DashboardLayout = ({ children }) => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate(`/${profile.username}`)} className="cursor-pointer p-3">
+                  <DropdownMenuItem onClick={() => navigate(`/${profile.username}`)} className="cursor-pointer p-3 text-black-700 hover:bg-violet-100 hover:text-black-900 focus:bg-violet-100 focus:text-black-900 transition-colors duration-150">
                     <User className="mr-3 h-4 w-4" />
                     <span>My Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/ai-assistant')} className="cursor-pointer p-3">
+                  <DropdownMenuItem onClick={() => navigate('/ai-assistant')} className="cursor-pointer p-3 text-black-700 hover:bg-violet-100 hover:text-black-900 focus:bg-violet-100 focus:text-black-900 transition-colors duration-150">
                     <Brain className="mr-3 h-4 w-4" />
                     <span>AI Assistant</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/business')} className="cursor-pointer p-3">
+                  <DropdownMenuItem onClick={() => navigate('/business')} className="cursor-pointer p-3 text-black-700 hover:bg-violet-100 hover:text-black-900 focus:bg-violet-100 focus:text-black-900 transition-colors duration-150">
                     <Building2 className="mr-3 h-4 w-4 text-indigo-600" />
                     <span>Go to Business Dashboard</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer p-3">
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer p-3 text-black-700 hover:bg-violet-100 hover:text-black-900 focus:bg-violet-100 focus:text-black-900 transition-colors duration-150">
                     <Settings className="mr-3 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  <DropdownMenuItem className="cursor-pointer p-3 text-black-700 hover:bg-violet-100 hover:text-black-900 focus:bg-violet-100 focus:text-black-900 transition-colors duration-150">
                     <Shield className="mr-3 h-4 w-4" />
                     <span>Privacy & Security</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-3">
+                  <DropdownMenuItem className="cursor-pointer p-3 text-black-700 hover:bg-violet-100 hover:text-black-900 focus:bg-violet-100 focus:text-black-900 transition-colors duration-150">
                     <HelpCircle className="mr-3 h-4 w-4" />
                     <span>Help & Support</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 focus:text-red-600 p-3">
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer p-3 text-red-600 hover:bg-red-500 hover:text-white focus:bg-red-500 focus:text-white transition-colors duration-150">
                     <LogOut className="mr-3 h-4 w-4" />
                     <span>Sign Out</span>
                   </DropdownMenuItem>
