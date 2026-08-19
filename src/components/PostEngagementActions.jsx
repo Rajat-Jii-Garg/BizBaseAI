@@ -141,7 +141,16 @@ const PostEngagementActions = ({
   }, [originalPost, postId]);
 
 
+  const requireAuth = () => {
+    if (!user) {
+      setShowLoginModal(true);
+      return false;
+    }
+    return true;
+  };
+
   const handleUpvote = async () => {
+    if (!requireAuth()) return;
     const wasLiked = localUserHasLiked;
     await toggleLike(postId);
     if (wasLiked) {
