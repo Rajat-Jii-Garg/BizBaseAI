@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import CommentItem from './CommentItem';
 import ShareModal from './ShareModal';
+import LoginModal from './LoginModal';
 import { buildShareUrl } from '@/lib/siteUrl';
 
 
