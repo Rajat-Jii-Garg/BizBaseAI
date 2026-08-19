@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import CommentItem from './CommentItem';
 import ShareModal from './ShareModal';
+import LoginModal from './LoginModal';
 import { buildShareUrl } from '@/lib/siteUrl';
 
 
@@ -41,6 +42,7 @@ const PostEngagementActions = ({
 
   const [showShareModal, setShowShareModal] = useState(false);
   const [postShareUrl, setPostShareUrl] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const fetchComments = useCallback(async () => {
     setLoadingComments(true);
@@ -139,7 +141,16 @@ const PostEngagementActions = ({
   }, [originalPost, postId]);
 
 
+  const requireAuth = () => {
+    if (!user) {
+      setShowLoginModal(true);
+      return false;
+    }
+    return true;
+  };
+
   const handleUpvote = async () => {
+    if (!requireAuth()) return;
     const wasLiked = localUserHasLiked;
     await toggleLike(postId);
     if (wasLiked) {
@@ -151,6 +162,7 @@ const PostEngagementActions = ({
   };
 
   const handleFeedback = async () => {
+    if (!requireAuth()) return;
     if (commentText.trim()) {
       await addComment(postId, commentText);
       setCommentText('');
@@ -160,7 +172,9 @@ const PostEngagementActions = ({
   };
 
   const handleShare = async () => {
+    // Guests can still copy/share the link, we just don't record it
     setShowShareModal(true);
+    if (!user) return;
     const result = await sharePost(postId);
     if (result !== false) {
       setLocalShares(prev => prev + 1);
@@ -168,6 +182,7 @@ const PostEngagementActions = ({
   };
 
   const handleRepost = async () => {
+    if (!requireAuth()) return;
     const result = await repostPost(postId, originalPost);
     if (result === "added") {
       setLocalReposts(prev => prev + 1);
@@ -350,6 +365,9 @@ const PostEngagementActions = ({
           onClose={() => setShowShareModal(false)}
         />
       )}
+
+      {/* Login prompt for guests */}
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
     </div>
   );
 };

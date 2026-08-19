@@ -241,9 +241,14 @@ const SinglePostPage = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground mb-4 text-center">
-                Log in to share your feedback.
-              </p>
+              <div className="mb-4 flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-muted/30 px-4 py-4 text-center">
+                <p className="text-xs text-muted-foreground">
+                  Log in to upvote, share feedback and connect.
+                </p>
+                <Button size="sm" onClick={() => setShowLoginModal(true)}>
+                  Log in to continue
+                </Button>
+              </div>
             )}
 
             {/* Comments List */}
