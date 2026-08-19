@@ -172,7 +172,9 @@ const PostEngagementActions = ({
   };
 
   const handleShare = async () => {
+    // Guests can still copy/share the link, we just don't record it
     setShowShareModal(true);
+    if (!user) return;
     const result = await sharePost(postId);
     if (result !== false) {
       setLocalShares(prev => prev + 1);
@@ -180,6 +182,7 @@ const PostEngagementActions = ({
   };
 
   const handleRepost = async () => {
+    if (!requireAuth()) return;
     const result = await repostPost(postId, originalPost);
     if (result === "added") {
       setLocalReposts(prev => prev + 1);
