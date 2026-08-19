@@ -206,7 +206,7 @@ const UserProfileDropdown = () => {
             
             {/* Go to Business Dashboard - Always visible */}
             <button 
-              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground"
               onClick={handleGoToBusinessDashboard}
               disabled={loadingBusinesses}
             >
