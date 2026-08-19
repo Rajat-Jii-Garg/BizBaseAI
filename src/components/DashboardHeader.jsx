@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { Menu, Search } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import GlobalSearchModal from "./GlobalSearchModal";
 import ThemeSwitcher from "./ThemeSwitcher";
 import UserProfileDropdown from "./UserProfileDropdown";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 // Custom event name for business updates
 export const BUSINESS_UPDATED_EVENT = 'bizbase-business-updated';
@@ -209,7 +209,7 @@ const DashboardHeader = () => {
               variant="outline"
               size="default"
               onClick={() => navigate('/business-setup')}
-              className="border-primary text-primary hover:bg-primary/10 hover:text-primary hover:border-primary/60 px-4 py-2.5 font-semibold rounded-lg transition-all duration-200"
+              className="border-primary text-primary hover:bg-primary/10 hover:text-primary px-4 py-2.5 font-semibold rounded-lg transition-all duration-200"
             >
               🏢 Register Business
             </Button>

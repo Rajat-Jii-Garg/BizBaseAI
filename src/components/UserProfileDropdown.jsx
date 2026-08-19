@@ -186,7 +186,7 @@ const UserProfileDropdown = () => {
           </div>
           
           <div className="py-1">
-            <button className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+            <button className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground"
               onClick={() => {
                 if (profile?.username) {
                   navigate(`/${profile.username}`);
@@ -197,8 +197,8 @@ const UserProfileDropdown = () => {
               <User className="w-4 h-4" /> My Profile
             </button>
 
-            <button 
-              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+            <button
+              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground"
               onClick={() => { navigate('/ai-assistant'); setOpen(false); }}
             >
               <Brain className="w-4 h-4" /> AI Assistant
@@ -210,7 +210,7 @@ const UserProfileDropdown = () => {
               onClick={handleGoToBusinessDashboard}
               disabled={loadingBusinesses}
             >
-              <Building2 className="w-4 h-4" /> 
+              <Building2 className="w-4 h-4" />
               {loadingBusinesses ? (
                 'Loading...'
               ) : hasBusinesses ? (
@@ -227,8 +227,8 @@ const UserProfileDropdown = () => {
               )}
             </button>
             
-            <button 
-              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground" 
+            <button
+              className="flex w-full px-4 py-2 gap-3 hover:bg-accent items-center text-sm text-foreground"
               onClick={() => { navigate('/settings'); setOpen(false); }}
             >
               <Settings className="w-4 h-4" /> Settings
@@ -236,8 +236,8 @@ const UserProfileDropdown = () => {
           </div>
           
           <div className="border-t border-border">
-            <button 
-              className="flex w-full px-4 py-2 gap-3 text-destructive hover:bg-destructive/10 items-center text-sm" 
+            <button
+              className="flex w-full px-4 py-2 gap-3 text-destructive hover:bg-destructive/10 items-center text-sm"
               onClick={handleSignOut}
             >
               <LogOut className="w-4 h-4" /> Logout

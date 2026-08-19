@@ -1,10 +1,6 @@
 
-import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,34 +9,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/contexts/AuthContext';
 import {
-  Bell,
-  MessageSquare,
-  Search,
-  Menu,
-  Settings,
-  LogOut,
-  User,
-  Home,
-  Users,
-  Calendar,
-  X,
-  ChevronDown,
-  Edit,
-  Shield,
-  CreditCard,
-  HelpCircle,
-  Building2,
-  TrendingUp,
-  Briefcase,
-  Target,
-  Star,
-  Zap,
   Brain,
-  Sparkles
+  Briefcase,
+  Building2,
+  Calendar,
+  ChevronDown,
+  HelpCircle,
+  Home,
+  LogOut,
+  Settings,
+  Shield,
+  Sparkles,
+  TrendingUp,
+  User,
+  Users
 } from 'lucide-react';
-import NotificationButton from './NotificationButton';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MessagesButton from './MessagesButton';
+import NotificationButton from './NotificationButton';
 import SearchBar from './SearchBar';
 
 const DashboardLayout = ({ children }) => {
@@ -124,7 +113,7 @@ const DashboardLayout = ({ children }) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-2 border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
+                  className="border-2 border-green-200 text-green-700 hover:text-green-700 hover:bg-green-50 hover:border-green-300"
                   onClick={handleRegisterBusiness}
                 >
                   <Building2 className="w-4 h-4 mr-2" />
@@ -154,9 +143,10 @@ const DashboardLayout = ({ children }) => {
                       <p className="text-sm font-semibold text-gray-900">
                         {profile?.full_name || 'Professional User'}
                       </p>
-                      <p className="text-xs text-gray-500 flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" />
-                        AI Enhanced
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        {/* <Sparkles className="w-3 h-3" /> */}
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Active
                       </p>
                     </div>
                     <ChevronDown className="w-4 h-4 text-gray-400 hidden lg:block" />
