@@ -44,15 +44,15 @@ import ProfileDashboard from "./pages/ProfileDashboard";
 import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 import Leaderboard from "./pages/Leaderboard";
 import Referrals from "./pages/Referrals";
-import Blog from "./pages/Blog";
+import Articles from "./pages/Articles";
 import WhatsappCommunity from './pages/WhatsappCommunity';
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 
 // Business pages
-import { 
-  BusinessDashboard, 
+import {
+  BusinessDashboard,
   MyBusinesses,
   BusinessCRM,
   BusinessFinance,
@@ -183,7 +183,7 @@ const App = () => (
               <Route path="/demo" element={<Demo />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
-              <Route path="/blog" element={<Blog />} />
+              <Route path="/articles" element={<Articles />} />
               <Route path="/about" element={<About />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />

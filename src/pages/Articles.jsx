@@ -9,7 +9,7 @@ import { BookOpen, Clock, Eye, ArrowRight, Search, TrendingUp } from 'lucide-rea
 import { Input } from '@/components/ui/input';
 import SEOHead from '@/components/SEOHead';
 
-const Blog = () => {
+const Articles = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -91,7 +91,7 @@ const Blog = () => {
           .order('created_at', { ascending: false });
         setPosts(data || []);
       } catch (err) {
-        console.error('Error fetching blogs:', err);
+        console.error('Error fetching articles:', err);
       } finally {
         setLoading(false);
       }
@@ -118,22 +118,22 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <SEOHead title="Blog - Professional Insights & Career Tips" description="Read expert articles on professional networking, career growth, business strategies, and AI-powered insights on BizBase AI." path="/blog" />
+      <SEOHead title="Articles - Today's trends on BizBase" description="Read expert articles on professional networking, career growth, business strategies, and AI-powered insights on BizBase AI." path="/blog" />
       <Navbar />
       
       {/* Hero */}
       <section className="pt-28 pb-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <Badge className="mb-4 bg-blue-100 text-blue-700">
+          {/* <Badge className="mb-4 bg-blue-100 text-blue-700">
             <BookOpen className="w-3 h-3 mr-1" />
             BizBase Blog
-          </Badge>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+          </Badge> */}
+          {/* <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
             Insights for <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Professionals</span>
-          </h1>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          </h1> */}
+          {/* <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             Expert tips on networking, career growth, and business development to help you succeed.
-          </p>
+          </p> */}
           <div className="max-w-md mx-auto relative">
             <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
             <Input
@@ -212,4 +212,4 @@ const Blog = () => {
   );
 };
 
-export default Blog;
+export default Articles;

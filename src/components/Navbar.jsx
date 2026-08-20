@@ -83,12 +83,12 @@ const Navbar = ({ variant = 'default' }) => {
               )}
             </div>
 
-            {/* Blogs */}
+            {/* Articles */}
             <Link
-              to="/blog"
+              to="/articles"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
-              Blogs
+              Articles
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 group-hover:w-full transition-all duration-300" />
             </Link>
 
