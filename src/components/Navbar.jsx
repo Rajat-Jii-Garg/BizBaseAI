@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import BizBaseMark from '@/components/BizBaseMark';
 import { Button } from '@/components/ui/button';
 import { LogIn, Menu, X } from 'lucide-react';
-import BizBaseMark from '@/components/BizBaseMark';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const Navbar = ({ variant = 'default' }) => {
@@ -146,8 +146,8 @@ const Navbar = ({ variant = 'default' }) => {
           <Link to="/" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
             Company
           </Link>
-          <Link to="/blog" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
-            Blogs
+          <Link to="/articles" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
+            Articles
           </Link>
           <Link to="/whatsappcommunity" className="block text-sm font-medium text-muted-foreground py-2" onClick={() => setMobileOpen(false)}>
             Community
