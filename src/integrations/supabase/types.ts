@@ -1809,6 +1809,137 @@ export type Database = {
         }
         Relationships: []
       }
+      founder_ask_responses: {
+        Row: {
+          ask_id: string
+          created_at: string
+          id: string
+          message: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ask_id: string
+          created_at?: string
+          id?: string
+          message: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ask_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "founder_ask_responses_ask_id_fkey"
+            columns: ["ask_id"]
+            isOneToOne: false
+            referencedRelation: "founder_asks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      founder_asks: {
+        Row: {
+          city: string | null
+          created_at: string
+          description: string
+          id: string
+          kind: string
+          responses_count: number
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          kind?: string
+          responses_count?: number
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          kind?: string
+          responses_count?: number
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      founder_profiles: {
+        Row: {
+          city: string | null
+          created_at: string
+          funding_stage: string | null
+          id: string
+          industry: string | null
+          is_hiring: boolean
+          looking_for: string[]
+          pitch: string | null
+          stage: string
+          startup_name: string
+          tagline: string | null
+          team_size: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          funding_stage?: string | null
+          id?: string
+          industry?: string | null
+          is_hiring?: boolean
+          looking_for?: string[]
+          pitch?: string | null
+          stage?: string
+          startup_name: string
+          tagline?: string | null
+          team_size?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          funding_stage?: string | null
+          id?: string
+          industry?: string | null
+          is_hiring?: boolean
+          looking_for?: string[]
+          pitch?: string | null
+          stage?: string
+          startup_name?: string
+          tagline?: string | null
+          team_size?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       hashtags: {
         Row: {
           created_at: string
