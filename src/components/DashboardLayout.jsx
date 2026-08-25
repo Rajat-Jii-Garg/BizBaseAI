@@ -24,7 +24,9 @@ import {
   Sparkles,
   TrendingUp,
   User,
-  Users
+  Users,
+  Rocket
+
 } from 'lucide-react';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
