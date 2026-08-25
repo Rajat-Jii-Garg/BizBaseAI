@@ -189,6 +189,8 @@ const App = () => (
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/whatsappcommunity" element={<WhatsappCommunity />} />
+              <Route path="/founders" element={<Founders />} />
+              <Route path="/founders/board" element={<Founders />} />
               
               <Route path="/leaderboard" element={
                 <ProtectedRoute>
