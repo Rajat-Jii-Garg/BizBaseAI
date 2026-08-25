@@ -46,6 +46,7 @@ import Leaderboard from "./pages/Leaderboard";
 import Referrals from "./pages/Referrals";
 import Articles from "./pages/Articles";
 import WhatsappCommunity from './pages/WhatsappCommunity';
+import Founders from './pages/Founders';
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
