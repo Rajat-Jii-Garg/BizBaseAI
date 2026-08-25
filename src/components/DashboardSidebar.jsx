@@ -16,6 +16,7 @@ import {
   Brain,
   Trophy,
   Gift,
+  Rocket,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +29,7 @@ const DashboardSidebar = () => {
   
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Rocket, label: 'Founders Hub', path: '/founders' },
     { icon: Building2, label: 'My Businesses', path: '/my-businesses' },
     { icon: Users, label: 'My Network', path: '/network' },
     { icon: Briefcase, label: 'Jobs', path: '/jobs' },

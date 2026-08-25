@@ -46,6 +46,7 @@ import Leaderboard from "./pages/Leaderboard";
 import Referrals from "./pages/Referrals";
 import Articles from "./pages/Articles";
 import WhatsappCommunity from './pages/WhatsappCommunity';
+import Founders from './pages/Founders';
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -188,6 +189,8 @@ const App = () => (
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/whatsappcommunity" element={<WhatsappCommunity />} />
+              <Route path="/founders" element={<Founders />} />
+              <Route path="/founders/board" element={<Founders />} />
               
               <Route path="/leaderboard" element={
                 <ProtectedRoute>

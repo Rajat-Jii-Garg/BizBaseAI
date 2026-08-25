@@ -24,7 +24,9 @@ import {
   Sparkles,
   TrendingUp,
   User,
-  Users
+  Users,
+  Rocket
+
 } from 'lucide-react';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -57,6 +59,7 @@ const DashboardLayout = ({ children }) => {
     { icon: Home, label: 'Home', path: '/dashboard', isActive: true },
     { icon: Users, label: 'My Network', path: '/connections' },
     { icon: Users, label: 'Communities', path: '/communities' },
+    { icon: Rocket, label: 'Founders', path: '/founders' },
   { icon: Briefcase, label: 'Jobs', path: '/jobs' },
     { icon: Calendar, label: 'Events', path: '/events' },
     { icon: TrendingUp, label: 'Insights', path: '/insights' },
