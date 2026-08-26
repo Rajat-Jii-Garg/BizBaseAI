@@ -33,7 +33,7 @@ export const LOOKING_FOR_OPTIONS = [
   'Partnerships',
 ];
 
-const PROFILE_FIELDS = 'id, full_name, username, avatar_url, current_position, location';
+const PROFILE_FIELDS = 'id, full_name, username, avatar_url, current_position, company_name';
 
 /** Attach author profiles to a list of rows keyed by user_id. */
 const withAuthors = async (rows) => {
