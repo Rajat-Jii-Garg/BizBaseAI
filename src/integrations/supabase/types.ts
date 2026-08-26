@@ -107,6 +107,286 @@ export type Database = {
         }
         Relationships: []
       }
+      business_activities: {
+        Row: {
+          action: string
+          actor_id: string | null
+          business_id: string
+          created_at: string
+          detail: string | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          business_id: string
+          created_at?: string
+          detail?: string | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          business_id?: string
+          created_at?: string
+          detail?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_activities_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_customers: {
+        Row: {
+          billing_address: string | null
+          business_id: string
+          city: string | null
+          company: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          tax_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_address?: string | null
+          business_id: string
+          city?: string | null
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          tax_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_address?: string | null
+          business_id?: string
+          city?: string | null
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          tax_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_customers_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_invites: {
+        Row: {
+          accepted_at: string | null
+          business_id: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          role: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          business_id: string
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          business_id?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_invites_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_invoice_items: {
+        Row: {
+          amount: number
+          business_id: string
+          created_at: string
+          description: string
+          id: string
+          invoice_id: string
+          product_id: string | null
+          quantity: number
+          rate: number
+          tax_rate: number
+        }
+        Insert: {
+          amount?: number
+          business_id: string
+          created_at?: string
+          description: string
+          id?: string
+          invoice_id: string
+          product_id?: string | null
+          quantity?: number
+          rate?: number
+          tax_rate?: number
+        }
+        Update: {
+          amount?: number
+          business_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          product_id?: string | null
+          quantity?: number
+          rate?: number
+          tax_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_invoice_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "business_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_invoice_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "business_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_invoices: {
+        Row: {
+          amount_paid: number
+          business_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          customer_name: string | null
+          due_date: string | null
+          id: string
+          invoice_number: string
+          issue_date: string
+          notes: string | null
+          status: string
+          subtotal: number
+          tax_amount: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number
+          business_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number: string
+          issue_date?: string
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number
+          business_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_number?: string
+          issue_date?: string
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_invoices_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "business_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_leads: {
         Row: {
           assigned_to: string | null
@@ -114,11 +394,13 @@ export type Database = {
           company: string | null
           created_at: string
           email: string | null
+          expected_close_date: string | null
           id: string
           name: string
           notes: string | null
           phone: string | null
           source: string | null
+          stage: string
           status: string | null
           updated_at: string
           value: number | null
@@ -129,11 +411,13 @@ export type Database = {
           company?: string | null
           created_at?: string
           email?: string | null
+          expected_close_date?: string | null
           id?: string
           name: string
           notes?: string | null
           phone?: string | null
           source?: string | null
+          stage?: string
           status?: string | null
           updated_at?: string
           value?: number | null
@@ -144,11 +428,13 @@ export type Database = {
           company?: string | null
           created_at?: string
           email?: string | null
+          expected_close_date?: string | null
           id?: string
           name?: string
           notes?: string | null
           phone?: string | null
           source?: string | null
+          stage?: string
           status?: string | null
           updated_at?: string
           value?: number | null
@@ -170,6 +456,68 @@ export type Database = {
           },
           {
             foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_products: {
+        Row: {
+          business_id: string
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          kind: string
+          name: string
+          price: number
+          sku: string | null
+          stock_quantity: number | null
+          tax_rate: number
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          kind?: string
+          name: string
+          price?: number
+          sku?: string | null
+          stock_quantity?: number | null
+          tax_rate?: number
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          kind?: string
+          name?: string
+          price?: number
+          sku?: string | null
+          stock_quantity?: number | null
+          tax_rate?: number
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_products_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
@@ -403,17 +751,23 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          currency: string
+          default_tax_rate: number
           description: string
           email: string
           followers_count: number | null
           id: string
           industry: string
+          is_public: boolean
           is_verified: boolean | null
           logo_url: string | null
           name: string
+          offering_type: string
           owner_id: string
           phone: string
           status: string
+          tax_mode: string
+          tax_number: string | null
           updated_at: string
           username: string | null
           views_count: number | null
@@ -427,17 +781,23 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          currency?: string
+          default_tax_rate?: number
           description: string
           email: string
           followers_count?: number | null
           id?: string
           industry: string
+          is_public?: boolean
           is_verified?: boolean | null
           logo_url?: string | null
           name: string
+          offering_type?: string
           owner_id: string
           phone: string
           status?: string
+          tax_mode?: string
+          tax_number?: string | null
           updated_at?: string
           username?: string | null
           views_count?: number | null
@@ -451,17 +811,23 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          currency?: string
+          default_tax_rate?: number
           description?: string
           email?: string
           followers_count?: number | null
           id?: string
           industry?: string
+          is_public?: boolean
           is_verified?: boolean | null
           logo_url?: string | null
           name?: string
+          offering_type?: string
           owner_id?: string
           phone?: string
           status?: string
+          tax_mode?: string
+          tax_number?: string | null
           updated_at?: string
           username?: string | null
           views_count?: number | null
@@ -3391,6 +3757,10 @@ export type Database = {
       calculate_profile_completion: {
         Args: { profile_id: string }
         Returns: number
+      }
+      can_manage_business: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: boolean
       }
       create_notification: {
         Args: {
