@@ -17,10 +17,19 @@ import {
   User, Mail, Phone, Globe, Linkedin, Camera, CheckCircle, XCircle, Loader2, AtSign
 } from 'lucide-react';
 
-const ProfileEditModal = ({ children, onProfileUpdate }) => {
+const ProfileEditModal = ({ children, onProfileUpdate, open: controlledOpen, onOpenChange: controlledOnOpenChange }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = (value) => {
+    if (isControlled) {
+      controlledOnOpenChange?.(value);
+    } else {
+      setInternalOpen(value);
+    }
+  };
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
 
@@ -159,53 +168,148 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
   }, [profile.username, originalUsername]);
 
   const handleSaveProfile = async () => {
-    // Check if username is being changed and is available
-    if (profile.username && profile.username !== originalUsername && usernameAvailable === false) {
+    if (!user?.id) {
       toast({
-        title: "Error",
-        description: "Username is not available",
-        variant: "destructive"
+        title: 'Error',
+        description: 'You must be logged in to update your profile.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const username = profile.username?.trim().toLowerCase() || '';
+
+    if (
+      username &&
+      username !== originalUsername?.toLowerCase() &&
+      usernameAvailable === false
+    ) {
+      toast({
+        title: 'Username unavailable',
+        description: 'Please choose another username.',
+        variant: 'destructive'
       });
       return;
     }
 
     try {
       setLoading(true);
-      
-      const { error } = await supabase
+
+      /*
+      * Only update fields that belong to the profile form.
+      * Do not blindly send database/system fields.
+      */
+      const profileUpdate = {
+        full_name: profile.full_name?.trim() || '',
+        username,
+        profession: profile.profession?.trim() || '',
+        bio: profile.bio?.trim() || '',
+        about: profile.about?.trim() || '',
+        location: profile.location?.trim() || '',
+        belongs_to: profile.belongs_to?.trim() || '',
+        email: profile.email?.trim() || user.email || '',
+        phone: profile.phone?.trim() || '',
+        website: profile.website?.trim() || '',
+        linkedin_url: profile.linkedin_url?.trim() || '',
+        current_position: profile.current_position?.trim() || '',
+        company_name: profile.company_name?.trim() || '',
+        industry: profile.industry?.trim() || ''
+      };
+
+      /*
+      * Calculate completion score from the actual saved data.
+      */
+      const completionFields = [
+        ['full_name', 10],
+        ['email', 5],
+        ['avatar_url', 10],
+        ['bio', 15],
+        ['current_position', 15],
+        ['company_name', 15],
+        ['location', 10],
+        ['phone', 5],
+        ['linkedin_url', 10],
+        ['website', 10]
+      ];
+
+      let completionScore = 0;
+
+      completionFields.forEach(([field, weight]) => {
+        const value =
+          field === 'avatar_url'
+            ? profile.avatar_url
+            : profileUpdate[field];
+
+        if (
+          value !== null &&
+          value !== undefined &&
+          String(value).trim().length > 0
+        ) {
+          completionScore += weight;
+        }
+      });
+
+      completionScore = Math.min(completionScore, 100);
+
+      profileUpdate.profile_completion_score = completionScore;
+
+      const { data: savedProfile, error } = await supabase
         .from('profiles')
-        .update(profile)
-        .eq('id', user.id);
+        .update(profileUpdate)
+        .eq('id', user.id)
+        .select()
+        .single();
 
       if (error) {
-        // Handle unique constraint error
-        if (error.message?.includes('Username already taken')) {
+        console.error('Profile update error:', error);
+
+        if (
+          error.code === '23505' ||
+          error.message?.toLowerCase().includes('username')
+        ) {
           toast({
-            title: "Error",
-            description: "This username is already taken",
-            variant: "destructive"
+            title: 'Username unavailable',
+            description: 'This username is already taken.',
+            variant: 'destructive'
           });
           return;
         }
+
         throw error;
       }
 
+      /*
+      * Update local state immediately.
+      */
+      setProfile(savedProfile);
+      setOriginalUsername(savedProfile.username || '');
+      setUsernameAvailable(true);
+
+      /*
+      * Tell parent that profile changed.
+      */
+      if (onProfileUpdate) {
+        await onProfileUpdate(savedProfile);
+      }
+
       toast({
-        title: "Success",
-        description: "Profile updated successfully"
+        title: 'Profile updated',
+        description: 'Your profile has been saved successfully.'
       });
 
-      if (onProfileUpdate) {
-        onProfileUpdate();
-      }
-      
+      /*
+      * Close modal only after successful save.
+      */
       setOpen(false);
+
     } catch (error) {
       console.error('Error updating profile:', error);
+
       toast({
-        title: "Error",
-        description: "Failed to update profile: " + error.message,
-        variant: "destructive"
+        title: 'Error',
+        description:
+          error?.message || 'Failed to update your profile.',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -410,11 +514,42 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
     }
   };
 
+  const handleDeleteExperience = async (experienceId) => {
+    try {
+      const { error } = await supabase
+        .from('user_experience')
+        .delete()
+        .eq('id', experienceId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setExperience((prev) =>
+        prev.filter((item) => item.id !== experienceId)
+      );
+
+      toast({
+        title: 'Success',
+        description: 'Experience removed successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting experience:', error);
+
+      toast({
+        title: 'Error',
+        description: 'Failed to remove experience',
+        variant: 'destructive'
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      {!isControlled && children && (
+        <DialogTrigger asChild>
+          {children}
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -710,7 +845,9 @@ const ProfileEditModal = ({ children, onProfileUpdate }) => {
                           <p className="text-sm mt-2">{exp.description}</p>
                         )}
                       </div>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm"
+                        onClick={() => handleDeleteExperience(exp.id)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
