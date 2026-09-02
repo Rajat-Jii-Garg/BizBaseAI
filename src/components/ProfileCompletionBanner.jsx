@@ -182,7 +182,13 @@ const ProfileCompletionBanner = () => {
           </div>
           <div className="flex items-center space-x-2 w-full md:w-auto">
             <Button
-              onClick={() => navigate('/profile-dashboard')}
+              onClick={() => {
+                if (profile?.username) {
+                  navigate(`/@${profile.username}`);
+                } else {
+                  navigate('/settings');
+                }
+              }}
               className="bg-primary hover:bg-primary/90 flex-1 md:flex-none text-sm"
               size="sm"
             >
