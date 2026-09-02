@@ -239,19 +239,6 @@ const ProfileEditor = ({ profile, onUpdate }) => {
     }
   };
 
-      onUpdate();
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile: " + error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -343,7 +330,7 @@ const ProfileEditor = ({ profile, onUpdate }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+              <label className="text-sm font-medium mb-2 flex items-center gap-2">
                 <AtSign className="h-4 w-4" />
                 Username
               </label>
