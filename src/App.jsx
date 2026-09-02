@@ -60,8 +60,13 @@ import {
   BusinessTeam,
   BusinessServices,
   BusinessProjects,
-  BusinessSettings
+  BusinessSettings,
+  BusinessCatalog,
+  BusinessCustomers,
+  BusinessInvoices
 } from "./pages/Businesses";
+import CompanyPage from "./pages/CompanyPage";
+
 // Username profile resolver
 import UsernameProfile from "./pages/UsernameProfile";
 import SinglePostPage from "./pages/SinglePostPage";
@@ -226,11 +231,16 @@ const App = () => (
                 <Route path="dashboard" element={<BusinessDashboard />} />
                 <Route path="crm" element={<BusinessCRM />} />
                 <Route path="finance" element={<BusinessFinance />} />
+                <Route path="invoices" element={<BusinessInvoices />} />
+                <Route path="catalog" element={<BusinessCatalog />} />
+                <Route path="customers" element={<BusinessCustomers />} />
                 <Route path="team" element={<BusinessTeam />} />
                 <Route path="projects" element={<BusinessProjects />} />
                 <Route path="settings" element={<BusinessSettings />} />
                 <Route path="services" element={<BusinessServices />} />
               </Route>
+              <Route path="/company/:username" element={<CompanyPage />} />
+
               {/* Admin Panel Routes */}
               <Route path="/admin-panel" element={<AdminLayout />}>
                 <Route index element={<AdminDashboard />} />
