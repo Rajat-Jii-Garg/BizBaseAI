@@ -386,10 +386,10 @@ const Dashboard = () => {
                   {profile?.username && (
                     <p className="text-sm text-primary font-medium mb-1 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => navigate(`/${profile?.username}`)}>@{profile.username}</p>
                   )}
-                  <p className="text-xs sm:text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
+                  {/* <p className="text-xs sm:text-sm text-gray-600 mb-3 flex items-center justify-center gap-2">
                     <Award className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
                     AI-Enhanced Profile
-                  </p>
+                  </p> */}
                   <div className="flex justify-center gap-4 mb-4">
                     <div className="text-center">
                       <div className="text-base sm:text-lg font-bold text-blue-600">{connections.length}</div>
