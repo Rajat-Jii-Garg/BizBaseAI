@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavLink, useParams, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Briefcase, FolderKanban, Users, UserPlus, 
-  DollarSign, Settings, ArrowLeft, Building2, X
+  LayoutDashboard, Briefcase, FolderKanban, Users, UserPlus,
+  DollarSign, Settings, ArrowLeft, Building2, X, Package, Contact, FileText, ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -21,6 +21,9 @@ const BusinessSidebar = ({ onClose }) => {
     { icon: FolderKanban, label: 'Projects', path: `/business/${slug}/projects` },
     { icon: Users, label: 'Team', path: `/business/${slug}/team` },
     { icon: UserPlus, label: 'CRM / Leads', path: `/business/${slug}/crm` },
+    { icon: Package, label: 'Catalog', path: `/business/${slug}/catalog` },
+    { icon: Contact, label: 'Customers', path: `/business/${slug}/customers` },
+    { icon: FileText, label: 'Invoices', path: `/business/${slug}/invoices` },
     { icon: DollarSign, label: 'Finance', path: `/business/${slug}/finance` },
   ];
 
@@ -100,6 +103,15 @@ const BusinessSidebar = ({ onClose }) => {
 
       {/* Footer */}
       <div className="p-2 border-t border-border space-y-1.5">
+        <a
+          href={`/company/${slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+          View public page
+        </a>
         <Button variant="outline" size="sm" className="w-full justify-start text-xs h-8" onClick={handleBackToPersonal}>
           <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
           Back to Personal
