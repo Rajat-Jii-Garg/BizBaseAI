@@ -8,3 +8,6 @@ export { default as BusinessServices } from './BusinessServices';
 export { default as BusinessProjects } from './BusinessProjects';
 export { default as BusinessSettings } from './BusinessSettings';
 export { default as BusinessRedirect } from './BusinessRedirect';
+export { default as BusinessCatalog } from './BusinessCatalog';
+export { default as BusinessCustomers } from './BusinessCustomers';
+export { default as BusinessInvoices } from './BusinessInvoices';
