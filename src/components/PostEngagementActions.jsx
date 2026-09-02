@@ -11,7 +11,6 @@ import ShareModal from './ShareModal';
 import LoginModal from './LoginModal';
 import { buildShareUrl } from '@/lib/siteUrl';
 
-
 const MAX_VISIBLE_COMMENTS = 3;
 
 const PostEngagementActions = ({
@@ -229,53 +228,108 @@ const PostEngagementActions = ({
 
       {/* Action Buttons Row */}
       <div className="flex items-center justify-between border-t border-border/50 mt-1 pt-1">
+        {/* UPVOTE */}
         <Button
           variant="ghost"
           size="sm"
-          className={`flex-1 h-8 sm:h-9 hover:bg-muted/50 ${
-            localUserHasLiked ? 'text-blue-600' : 'text-muted-foreground'
-          }`}
+          className={`flex-1 h-8 sm:h-9
+            !text-muted-foreground
+            hover:!text-black
+            dark:hover:!text-white
+            hover:bg-muted/50
+            ${
+              localUserHasLiked
+                ? '!text-blue-600 hover:!text-blue-700'
+                : ''
+            }`}
           onClick={handleUpvote}
           disabled={loading}
         >
-          <ArrowBigUp className={`w-4 h-4 sm:w-5 sm:h-5 ${localUserHasLiked ? 'fill-current' : ''}`} />
-          <span className="text-xs font-medium hidden sm:inline sm:ml-1">Upvote</span>
+          <ArrowBigUp
+            className={`w-4 h-4 sm:w-5 sm:h-5 ${
+              localUserHasLiked
+                ? 'fill-current'
+                : ''
+            }`}
+          />
+
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">
+            Upvote
+          </span>
         </Button>
 
+        {/* FEEDBACK */}
         <Button
           variant="ghost"
           size="sm"
-          className={`flex-1 h-8 sm:h-9 hover:bg-muted/50 ${
-            showCommentInput ? 'text-blue-600 bg-blue-50/50' : 'text-muted-foreground'
-          }`}
-          onClick={() => setShowCommentInput(!showCommentInput)}
+          className={`flex-1 h-8 sm:h-9
+            !text-muted-foreground
+            hover:!text-black
+            dark:hover:!text-white
+            hover:bg-muted/50
+            ${
+              showCommentInput
+                ? '!text-blue-600 hover:!text-blue-700 bg-blue-50/50'
+                : ''
+            }`}
+          onClick={() =>
+            setShowCommentInput(!showCommentInput)
+          }
         >
           <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
-          <span className="text-xs font-medium hidden sm:inline sm:ml-1">Feedback</span>
+
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">
+            Feedback
+          </span>
         </Button>
 
+        {/* REPOST */}
         <Button
           variant="ghost"
           size="sm"
-          className={`flex-1 h-8 sm:h-9 hover:bg-muted/50 ${
-            localUserHasReposted ? 'text-green-600' : 'text-muted-foreground'
-          }`}
+          className={`flex-1 h-8 sm:h-9
+            !text-muted-foreground
+            hover:!text-black
+            dark:hover:!text-white
+            hover:bg-muted/50
+            ${
+              localUserHasReposted
+                ? '!text-green-600 hover:!text-green-700'
+                : ''
+            }`}
           onClick={handleRepost}
           disabled={loading}
         >
-          <Repeat2 className={`w-4 h-4 sm:w-5 sm:h-5 ${localUserHasReposted ? 'text-green-600' : ''}`} />
-          <span className="text-xs font-medium hidden sm:inline sm:ml-1">{localUserHasReposted ? 'Reposted' : 'Repost'}</span>
+          <Repeat2 className="w-4 h-4 sm:w-5 sm:h-5" />
+
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">
+            {localUserHasReposted
+              ? 'Reposted'
+              : 'Repost'}
+          </span>
         </Button>
 
+        {/* SHARE */}
         <Button
           variant="ghost"
           size="sm"
-          className="flex-1 h-8 sm:h-9 hover:bg-muted/50 text-muted-foreground"
+          className="
+            flex-1
+            h-8
+            sm:h-9
+            !text-muted-foreground
+            hover:!text-black
+            dark:hover:!text-white
+            hover:bg-muted/50
+          "
           onClick={handleShare}
           disabled={loading}
         >
           <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-          <span className="text-xs font-medium hidden sm:inline sm:ml-1">Share</span>
+
+          <span className="text-xs font-medium hidden sm:inline sm:ml-1">
+            Share
+          </span>
         </Button>
       </div>
 

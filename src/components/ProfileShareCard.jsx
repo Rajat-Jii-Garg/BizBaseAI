@@ -24,7 +24,7 @@ const ProfileShareCard = ({ open, onClose, profile }) => {
   if (!profile) return null;
 
   const username = profile.username || '';
-  const profileUrl = `https://bizbase-ai.lovable.app/@${username}`;
+  const profileUrl = `https://bizbase-ai.vercel.app/${username}`;
   const shareText = `Check out ${profile.full_name || 'my profile'} on BizBase — the AI-powered professional network 🚀`;
 
   const handleDownload = async () => {
@@ -148,9 +148,9 @@ const ProfileShareCard = ({ open, onClose, profile }) => {
             <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
               <div className="flex items-center justify-between rounded-xl bg-white/10 backdrop-blur-md p-3 border border-white/15">
                 <div className="text-left">
-                  <p className="text-[10px] uppercase tracking-wider text-white/60">Connect with me</p>
-                  <p className="text-xs font-semibold mt-0.5">bizbase-ai.lovable.app</p>
-                  <p className="text-[10px] text-white/70">/@{username || 'username'}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-white/60">Connect with me -</p>
+                  <p className="text-xs font-semibold mt-0.5">on BizBase</p>
+                  <p className="text-[10px] text-white/70">/{username || 'username'}</p>
                 </div>
                 <div className="bg-white p-1.5 rounded-md shadow-md">
                   <QRCodeSVG value={profileUrl} size={56} level="M" />

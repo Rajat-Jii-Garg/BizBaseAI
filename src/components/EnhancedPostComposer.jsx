@@ -393,6 +393,7 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-2 sm:space-x-3">
+
             <input
               ref={fileInputRef}
               type="file"
@@ -400,6 +401,7 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
               onChange={(e) => handleMediaUpload(e, 'image')}
               className="hidden"
             />
+
             <input
               ref={videoInputRef}
               type="file"
@@ -407,40 +409,90 @@ const EnhancedPostComposer = ({ onCreatePost }) => {
               onChange={(e) => handleMediaUpload(e, 'video')}
               className="hidden"
             />
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-blue-600 hover:bg-blue-50 h-10 px-4"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Camera className="w-5 h-5 mr-2" />
-              {/* <span className="hidden sm:inline text-sm font-medium">Photo</span> */}
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-green-600 hover:bg-green-50 h-10 px-4"
-              onClick={() => videoInputRef.current?.click()}
-            >
-              <Video className="w-5 h-5 mr-2" />
-              {/* <span className="hidden sm:inline text-sm font-medium">Video</span> */}
-            </Button>
+
+            {/* IMAGE */}
             <Button
+              type="button"
               variant="ghost"
               size="sm"
-              className="text-purple-600 hover:bg-purple-50 h-10 px-4"
+              onClick={() => fileInputRef.current?.click()}
+              className="
+                h-10 w-10 p-0
+                text-blue-600
+                hover:!text-blue-600
+                hover:!bg-blue-50
+                focus-visible:!text-blue-600
+                focus-visible:ring-2
+                focus-visible:ring-blue-200
+                transition-all duration-200
+              "
+              aria-label="Add image"
+            >
+              <Camera className="w-5 h-5" />
+            </Button>
+
+            {/* VIDEO */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => videoInputRef.current?.click()}
+              className="
+                h-10 w-10 p-0
+                text-green-600
+                hover:!text-green-600
+                hover:!bg-green-50
+                focus-visible:!text-green-600
+                focus-visible:ring-2
+                focus-visible:ring-green-200
+                transition-all duration-200
+              "
+              aria-label="Add video"
+            >
+              <Video className="w-5 h-5" />
+            </Button>
+
+            {/* AI */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => setShowAIPopup(true)}
+              className="
+                h-10 px-3
+                text-purple-600
+                hover:!text-purple-600
+                hover:!bg-purple-50
+                focus-visible:!text-purple-600
+                focus-visible:ring-2
+                focus-visible:ring-purple-200
+                transition-all duration-200
+              "
+              aria-label="Rewrite with AI"
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              <span className="hidden sm:inline text-sm font-medium">AI</span>
+              <span className="hidden sm:inline text-sm font-medium">
+                AI
+              </span>
             </Button>
+
           </div>
-          
+
+          {/* POST BUTTON */}
           <Button 
+            type="button"
             onClick={handleSubmit}
             disabled={(!content.trim() && !mediaFile) || loading}
             size="sm"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50 h-10 px-6 font-medium w-full sm:w-auto"
+            className="
+              bg-gradient-to-r from-blue-600 to-purple-600
+              hover:from-blue-700 hover:to-purple-700
+              text-white
+              disabled:opacity-50
+              h-10 px-6
+              font-medium
+              w-full sm:w-auto
+            "
           >
             {loading ? (
               <>
