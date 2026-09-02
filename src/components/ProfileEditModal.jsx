@@ -569,146 +569,302 @@ const ProfileEditModal = ({ children, onProfileUpdate, open: controlledOpen, onO
           </TabsList>
 
           {/* Basic Information */}
-          <TabsContent value="basic" className="space-y-4">
+          <TabsContent value="basic" className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Full Name */}
               <div>
                 <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  value={profile.full_name || ''}
-                  onChange={(e) => setProfile({...profile, full_name: e.target.value})}
-                  placeholder="Enter your full name"
+                <Input id="full_name" value={profile.full_name || ''}
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      full_name: e.target.value
+                    })
+                  }
+                  placeholder="Enter full name"
                 />
               </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="username" className="flex items-center gap-2">
+
+              {/* Username */}
+              <div>
+                <Label
+                  htmlFor="username"
+                  className="flex items-center gap-2"
+                >
                   <AtSign className="h-4 w-4" />
                   Username
                 </Label>
+
                 <div className="relative">
                   <Input
                     id="username"
                     value={profile.username || ''}
-                    onChange={(e) => setProfile({...profile, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')})}
-                    placeholder="your_unique_username"
+                    onChange={(e) =>
+                      setProfile({
+                        ...profile,
+                        username: e.target.value
+                          .toLowerCase()
+                          .replace(/[^a-z0-9_]/g, '')
+                      })
+                    }
+                    placeholder="Enter your username"
                     className={`pr-10 ${
-                      usernameAvailable === true ? 'border-green-500 focus:ring-green-500' : 
-                      usernameAvailable === false ? 'border-destructive focus:ring-destructive' : ''
+                      usernameAvailable === true
+                        ? 'border-green-500 focus:ring-green-500'
+                        : usernameAvailable === false
+                          ? 'border-destructive focus:ring-destructive'
+                          : ''
                     }`}
                   />
+
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {checkingUsername && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-                    {!checkingUsername && usernameAvailable === true && <CheckCircle className="h-4 w-4 text-green-500" />}
-                    {!checkingUsername && usernameAvailable === false && <XCircle className="h-4 w-4 text-destructive" />}
+                    {checkingUsername && (
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
+
+                    {!checkingUsername &&
+                      usernameAvailable === true && (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      )}
+
+                    {!checkingUsername &&
+                      usernameAvailable === false && (
+                        <XCircle className="h-4 w-4 text-destructive" />
+                      )}
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {profile.username && (
-                    <>
-                      Your profile URL: <span className="font-medium">domain.com/@{profile.username}</span>
-                      {usernameAvailable === false && <span className="text-destructive ml-2">• Username not available</span>}
-                      {usernameAvailable === true && <span className="text-green-500 ml-2">• Username available</span>}
-                    </>
-                  )}
-                  {!profile.username && 'Choose a unique username (lowercase letters, numbers, underscores only)'}
-                </p>
+
+                {profile.username && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {usernameAvailable === false && (
+                      <span className="text-destructive">
+                        Username not available
+                      </span>
+                    )}
+
+                    {usernameAvailable === true && (
+                      <span className="text-green-500">
+                        Username available
+                      </span>
+                    )}
+                  </p>
+                )}
               </div>
+
+            </div>
+
+
+            {/* Row 2 — Profession + Location */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               <div>
-                <Label htmlFor="profession">Profession</Label>
+                <Label htmlFor="profession">
+                  Profession
+                </Label>
+
                 <Input
                   id="profession"
                   value={profile.profession || ''}
-                  onChange={(e) => setProfile({...profile, profession: e.target.value})}
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      profession: e.target.value
+                    })
+                  }
                   placeholder="e.g. Senior Product Manager"
                 />
               </div>
+
               <div>
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="location">
+                  Location
+                </Label>
+
                 <Input
                   id="location"
                   value={profile.location || ''}
-                  onChange={(e) => setProfile({...profile, location: e.target.value})}
-                  placeholder="e.g. San Francisco, CA"
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      location: e.target.value
+                    })
+                  }
+                  placeholder="e.g. Bhadra, Rajasthan"
                 />
               </div>
+
+            </div>
+
+
+            {/* Row 3 — Current Position + Company */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               <div>
-                <Label htmlFor="current_position">Current Position</Label>
+                <Label htmlFor="current_position">
+                  Current Position
+                </Label>
+
                 <Input
                   id="current_position"
                   value={profile.current_position || ''}
-                  onChange={(e) => setProfile({...profile, current_position: e.target.value})}
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      current_position: e.target.value
+                    })
+                  }
                   placeholder="Current job title"
                 />
               </div>
+
               <div>
-                <Label htmlFor="company_name">Company</Label>
+                <Label htmlFor="company_name">
+                  Company
+                </Label>
+
                 <Input
                   id="company_name"
                   value={profile.company_name || ''}
-                  onChange={(e) => setProfile({...profile, company_name: e.target.value})}
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      company_name: e.target.value
+                    })
+                  }
                   placeholder="Current company"
                 />
               </div>
+
+            </div>
+
+
+            {/* Row 4 — Email + Phone */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">
+                  Email
+                </Label>
+
                 <Input
                   id="email"
                   type="email"
                   value={profile.email || ''}
-                  onChange={(e) => setProfile({...profile, email: e.target.value})}
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      email: e.target.value
+                    })
+                  }
                   placeholder="your.email@example.com"
                 />
               </div>
+
               <div>
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone">
+                  Phone
+                </Label>
+
                 <Input
                   id="phone"
                   value={profile.phone || ''}
-                  onChange={(e) => setProfile({...profile, phone: e.target.value})}
-                  placeholder="+1 (555) 123-4567"
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      phone: e.target.value
+                    })
+                  }
+                  placeholder="+91 98765 43210"
                 />
               </div>
+
+            </div>
+
+
+            {/* Row 5 — Website + LinkedIn */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               <div>
-                <Label htmlFor="website">Website</Label>
+                <Label htmlFor="website">
+                  Website
+                </Label>
+
                 <Input
                   id="website"
                   value={profile.website || ''}
-                  onChange={(e) => setProfile({...profile, website: e.target.value})}
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      website: e.target.value
+                    })
+                  }
                   placeholder="https://yourwebsite.com"
                 />
               </div>
+
               <div>
-                <Label htmlFor="linkedin_url">LinkedIn URL</Label>
+                <Label htmlFor="linkedin_url">
+                  LinkedIn URL
+                </Label>
+
                 <Input
                   id="linkedin_url"
                   value={profile.linkedin_url || ''}
-                  onChange={(e) => setProfile({...profile, linkedin_url: e.target.value})}
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      linkedin_url: e.target.value
+                    })
+                  }
                   placeholder="https://linkedin.com/in/yourprofile"
                 />
               </div>
+
             </div>
-            
+
+
+            {/* Row 6 — Bio */}
             <div>
-              <Label htmlFor="bio">Bio</Label>
+              <Label htmlFor="bio">
+                Bio
+              </Label>
+
               <Textarea
                 id="bio"
                 value={profile.bio || ''}
-                onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    bio: e.target.value
+                  })
+                }
                 placeholder="Brief description about yourself"
-                rows={3}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="about">About</Label>
-              <Textarea
-                id="about"
-                value={profile.about || ''}
-                onChange={(e) => setProfile({...profile, about: e.target.value})}
-                placeholder="Detailed description about your professional background"
                 rows={4}
               />
             </div>
+
+
+            {/* Row 7 — About */}
+            <div>
+              <Label htmlFor="about">
+                About
+              </Label>
+
+              <Textarea
+                id="about"
+                value={profile.about || ''}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    about: e.target.value
+                  })
+                }
+                placeholder="Detailed description about your professional background"
+                rows={5}
+              />
+            </div>
+
           </TabsContent>
 
           {/* Skills */}
