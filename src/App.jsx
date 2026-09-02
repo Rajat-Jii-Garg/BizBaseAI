@@ -60,8 +60,13 @@ import {
   BusinessTeam,
   BusinessServices,
   BusinessProjects,
-  BusinessSettings
+  BusinessSettings,
+  BusinessCatalog,
+  BusinessCustomers,
+  BusinessInvoices
 } from "./pages/Businesses";
+import CompanyPage from "./pages/CompanyPage";
+
 // Username profile resolver
 import UsernameProfile from "./pages/UsernameProfile";
 import SinglePostPage from "./pages/SinglePostPage";
