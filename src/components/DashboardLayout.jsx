@@ -26,7 +26,7 @@ import {
   User,
   Users
 } from 'lucide-react';
-import React from 'react';
+import React, { useEffect }  from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import MessagesButton from './MessagesButton';
 import NotificationButton from './NotificationButton';
