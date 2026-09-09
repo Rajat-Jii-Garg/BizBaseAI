@@ -6,22 +6,21 @@ import NotFound from "@/pages/NotFound";
 
 const PostRedirect = () => {
   const { postId } = useParams();
-
   const [target, setTarget] = useState(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-
     const resolvePost = async () => {
       if (!postId) {
-        if (!cancelled) setFailed(true);
+        if (!cancelled) {
+          setFailed(true);
+        }
         return;
       }
-
       try {
         /*
-         * 1. Find the post.
+         * Find actual post.
          */
         const { data: post, error: postError } = await supabase
           .from("posts")
@@ -31,48 +30,51 @@ const PostRedirect = () => {
 
         if (postError) {
           console.error("Post redirect query failed:", postError);
-
-          if (!cancelled) setFailed(true);
+          if (!cancelled) {
+            setFailed(true);
+          }
           return;
         }
-
         if (!post?.id || !post?.user_id) {
-          if (!cancelled) setFailed(true);
+          if (!cancelled) {
+            setFailed(true);
+          }
           return;
         }
 
         /*
-         * 2. Find actual post owner.
+         * Find actual post owner.
          */
         const { data: owner, error: ownerError } = await supabase
           .from("profiles")
           .select("username")
           .eq("id", post.user_id)
           .maybeSingle();
-
         if (ownerError) {
           console.error("Post owner query failed:", ownerError);
-
-          if (!cancelled) setFailed(true);
+          if (!cancelled) {
+            setFailed(true);
+          }
           return;
         }
-
         if (!owner?.username) {
-          if (!cancelled) setFailed(true);
+          if (!cancelled) {
+            setFailed(true);
+          }
           return;
         }
-
         /*
-         * 3. Build canonical URL.
+         * Canonical public URL.
          */
-        const canonicalUrl = `/${encodeURIComponent(owner.username)}/post/${encodeURIComponent(post.id)}`;
+        const canonicalUrl = `/${encodeURIComponent(
+          owner.username,
+        )}/post/${encodeURIComponent(post.id)}`;
 
         if (!cancelled) {
           setTarget(canonicalUrl);
         }
       } catch (error) {
         console.error("Unexpected post redirect error:", error);
-
         if (!cancelled) {
           setFailed(true);
         }

@@ -4,8 +4,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from '@/contexts/AuthContext';
-import { BusinessProvider } from '@/contexts/BusinessContext';
+import { AuthProvider } from "@/contexts/AuthContext";
+import { BusinessProvider } from "@/contexts/BusinessContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 
@@ -45,7 +45,7 @@ import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 import Leaderboard from "./pages/Leaderboard";
 import Referrals from "./pages/Referrals";
 import Articles from "./pages/Articles";
-import WhatsappCommunity from './pages/WhatsappCommunity';
+import WhatsappCommunity from "./pages/WhatsappCommunity";
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -63,7 +63,7 @@ import {
   BusinessSettings,
   BusinessCatalog,
   BusinessCustomers,
-  BusinessInvoices
+  BusinessInvoices,
 } from "./pages/Businesses";
 import CompanyPage from "./pages/CompanyPage";
 
@@ -71,7 +71,6 @@ import CompanyPage from "./pages/CompanyPage";
 import UsernameProfile from "./pages/UsernameProfile";
 import SinglePostPage from "./pages/SinglePostPage";
 import PostRedirect from "./pages/PostRedirect";
-
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -103,11 +102,14 @@ const App = () => (
               <Route path="/forget-password" element={<ForgetPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/network" element={<Network />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
               {/* View other user profile */}
               {/* <Route path="/profile/:userId" element={
                 <ProtectedRoute>
@@ -119,72 +121,111 @@ const App = () => (
                   <ProfilePreviewPage />
                 </ProtectedRoute>
               }/> */}
-              <Route path="/messages" element={
-                <ProtectedRoute>
-                  <Messages />
-                </ProtectedRoute>
-              } />
-              <Route path="/notifications" element={
-                <ProtectedRoute>
-                  <Notifications />
-                </ProtectedRoute>
-              } />
-              <Route path="/connections" element={
-                <ProtectedRoute>
-                  <Connections />
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/messages"
+                element={
+                  <ProtectedRoute>
+                    <Messages />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Notifications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/connections"
+                element={
+                  <ProtectedRoute>
+                    <Connections />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/communities" element={<Communities />} />
               <Route path="/communities/:id" element={<Community />} />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/events" element={<Events />} />
-              <Route path="/insights" element={
-                <ProtectedRoute>
-                  <Insights />
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/insights"
+                element={
+                  <ProtectedRoute>
+                    <Insights />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/ai-assistant" element={<AIAssistant />} />
-              <Route path="/business-setup" element={
-                <ProtectedRoute>
-                  <BusinessSetup />
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/business-setup"
+                element={
+                  <ProtectedRoute>
+                    <BusinessSetup />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/jobs" element={<Jobs />} />
               {/* Public job detail page (SEO indexable) */}
               <Route path="/jobs/:slug" element={<JobDetail />} />
               {/* SEO landing pages: city + role job hubs */}
-              <Route path="/jobs-in/:slug" element={<JobsLanding kind="city" />} />
-              <Route path="/jobs-for/:slug" element={<JobsLanding kind="role" />} />
+              <Route
+                path="/jobs-in/:slug"
+                element={<JobsLanding kind="city" />}
+              />
+              <Route
+                path="/jobs-for/:slug"
+                element={<JobsLanding kind="role" />}
+              />
 
-              <Route path="/dashboard/crm" element={
-                <ProtectedRoute>
-                  <CRM />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/projects" element={
-                <ProtectedRoute>
-                  <Projects />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/hr" element={
-                <ProtectedRoute>
-                  <HR />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/finance" element={
-                <ProtectedRoute>
-                  <Finance />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/settings" element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/dashboard/crm"
+                element={
+                  <ProtectedRoute>
+                    <CRM />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/projects"
+                element={
+                  <ProtectedRoute>
+                    <Projects />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/hr"
+                element={
+                  <ProtectedRoute>
+                    <HR />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/finance"
+                element={
+                  <ProtectedRoute>
+                    <Finance />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/demo" element={<Demo />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
@@ -192,41 +233,59 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
-              <Route path="/whatsappcommunity" element={<WhatsappCommunity />} />
-              
-              <Route path="/leaderboard" element={
-                <ProtectedRoute>
-                  <Leaderboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/referrals" element={
-                <ProtectedRoute>
-                  <Referrals />
-                </ProtectedRoute>
-              } />
+              <Route
+                path="/whatsappcommunity"
+                element={<WhatsappCommunity />}
+              />
+
+              <Route
+                path="/leaderboard"
+                element={
+                  <ProtectedRoute>
+                    <Leaderboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/referrals"
+                element={
+                  <ProtectedRoute>
+                    <Referrals />
+                  </ProtectedRoute>
+                }
+              />
               {/* <Route path="/profile-dashboard" element={
                 <ProtectedRoute>
                   <ProfileDashboard />
                 </ProtectedRoute>
               } /> */}
-              
-              {/* Business Routes */}
-              <Route path="/my-businesses" element={
-                <ProtectedRoute>
-                  <MyBusinesses />
-                </ProtectedRoute>
-              } />
-              <Route path="/business" element={
-                <ProtectedRoute>
-                  <BusinessRedirect />
-                </ProtectedRoute>
-              } />
 
-              <Route path="/business/:slug" element={
-                <ProtectedRoute>
-                  <BusinessLayout />
-                </ProtectedRoute>
-              }>
+              {/* Business Routes */}
+              <Route
+                path="/my-businesses"
+                element={
+                  <ProtectedRoute>
+                    <MyBusinesses />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/business"
+                element={
+                  <ProtectedRoute>
+                    <BusinessRedirect />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/business/:slug"
+                element={
+                  <ProtectedRoute>
+                    <BusinessLayout />
+                  </ProtectedRoute>
+                }
+              >
                 <Route index element={<BusinessDashboard />} />
                 <Route path="dashboard" element={<BusinessDashboard />} />
                 <Route path="crm" element={<BusinessCRM />} />
@@ -258,7 +317,10 @@ const App = () => (
 
               {/* Username-based profile route - must be LAST to avoid conflicts */}
               <Route path="/post/:postId" element={<PostRedirect />} />
-              <Route path="/:username/post/:postId" element={<SinglePostPage />} />
+              <Route
+                path="/:username/post/:postId"
+                element={<SinglePostPage />}
+              />
 
               <Route path="/:username" element={<UsernameProfile />} />
               <Route path="*" element={<NotFound />} />
