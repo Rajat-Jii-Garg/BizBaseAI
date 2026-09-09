@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bell, Heart, MessageCircle, Share2, UserPlus, Calendar, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { getNotificationPath } from "@/lib/notificationNavigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const NotificationsCenter = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -77,7 +80,7 @@ const NotificationsCenter = () => {
       if (userIds.length > 0) {
         const { data: usersData } = await supabase
           .from('profiles')
-          .select('id, full_name, avatar_url')
+          .select('id, full_name, avatar_url, username')
           .in('id', userIds);
         
         relatedUsers = usersData || [];
@@ -121,6 +124,23 @@ const NotificationsCenter = () => {
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification) return;
+
+    if (!notification.read) {
+      await markAsRead(notification.id);
+    }
+
+    const path = getNotificationPath(notification);
+
+    if (!path) {
+      return;
+    }
+
+    setOpen(false);
+    navigate(path);
   };
 
   const markAllAsRead = async () => {
@@ -240,7 +260,7 @@ const NotificationsCenter = () => {
                     className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
                       !notification.read ? 'bg-blue-50' : ''
                     }`}
-                    onClick={() => !notification.read && markAsRead(notification.id)}
+                    onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-shrink-0">

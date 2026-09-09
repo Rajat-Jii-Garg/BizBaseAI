@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import SEOHead from '@/components/SEOHead';
+import { getNotificationPath } from '@/lib/notificationNavigation';
 
 const Notifications = () => {
   const { user } = useAuth();
@@ -100,15 +101,51 @@ const Notifications = () => {
     }
   };
 
-  const markAsRead = async (id) => {
-    await supabase.from('notifications').update({ read: true }).eq('id', id);
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  cconst markAsRead = async (id) => {
+    if (!user || !id) return;
+
+    const { error } = await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error marking notification as read:', error);
+      return;
+    }
+
+    setNotifications(prev =>
+      prev.map(n =>
+        n.id === id
+          ? { ...n, read: true }
+          : n
+      )
+    );
   };
 
   const markAllAsRead = async () => {
     await supabase.from('notifications').update({ read: true }).eq('user_id', user?.id).eq('read', false);
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     toast.success('All notifications marked as read');
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification) return;
+
+    // Mark as read first
+    if (!notification.read) {
+      await markAsRead(notification.id);
+    }
+
+    // Resolve correct destination
+    const path = getNotificationPath(notification);
+
+    if (!path) {
+      return;
+    }
+
+    navigate(path);
   };
 
   const getIcon = (type) => {
@@ -206,12 +243,7 @@ const Notifications = () => {
                     className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                       !n.read ? 'bg-primary/5 border-primary/20' : 'bg-card border-border hover:bg-muted/50'
                     }`}
-                    onClick={() => {
-                      if (!n.read) markAsRead(n.id);
-                      if (n.related_id && n.related_user?.username) {
-                        navigate(`/${n.related_user.username}/post/${n.related_id}`);
-                      }
-                    }}
+                    onClick={() => handleNotificationClick(n)}
                   >
                     <Avatar className="h-9 w-9 flex-shrink-0">
                       <AvatarImage src={n.related_user?.avatar_url} />
