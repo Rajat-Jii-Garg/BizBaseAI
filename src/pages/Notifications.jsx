@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell, Heart, MessageSquare, UserPlus, Share2, Check, X, Loader2, CheckCheck } from 'lucide-react';
+import { Bell, Heart, MessageSquare, UserPlus, Share2, Check, X, Loader2, CheckCheck, Eye, Award  } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -124,6 +124,8 @@ const Notifications = () => {
       community: <Bell className="w-4 h-4 text-cyan-500" />,
     };
     return icons[type] || <Bell className="w-4 h-4 text-muted-foreground" />;
+    profile_view: <Eye className="w-4 h-4 text-slate-500" />,
+    endorsement: <Award className="w-4 h-4 text-amber-500" />,
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
