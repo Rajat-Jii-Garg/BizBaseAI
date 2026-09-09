@@ -14,7 +14,46 @@ import CommunityBanner from '@/components/CommunityBanner';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import LoginModal from '@/components/LoginModal';
+import Loader from '@/components/Loader';
+
 const Index = () => {
+    const { user, loading } = useAuth();
+    const navigate = useNavigate();
+    const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+    // Redirect logic
+    useEffect(() => {
+      if (loading) return;
+
+      if (user) {
+        navigate('/dashboard', { replace: true }); // Case 1: already logged-in
+        return;
+      }
+
+      const hasLoggedInBefore = localStorage.getItem('bb_returning_user');
+      if (hasLoggedInBefore) {
+        navigate('/login', { replace: true }); // Case 2: logged out user
+      }
+      // Case 3: naya user -> yahin rukega, home dikhega
+    }, [user, loading, navigate]);
+
+    // 7-second login popup (sirf first-time users ke liye)
+    useEffect(() => {
+      if (loading || user) return;
+      if (localStorage.getItem('bb_returning_user')) return;
+
+      const timer = setTimeout(() => setShowLoginPopup(true), 7000);
+      return () => clearTimeout(timer);
+    }, [loading, user]);
+
+    if (loading) return <Loader />;
+    if (user) return null; // dashboard pe navigate ho raha hai, flash mat dikhao
+    if (localStorage.getItem('bb_returning_user')) return null; // login pe navigate ho raha hai
+
   return (
     <div className="min-h-screen bg-white">
       <SEOHead
@@ -50,6 +89,7 @@ const Index = () => {
       </section>
 
       <Footer />
+      {showLoginPopup && <LoginModal onClose={() => setShowLoginPopup(false)} />}
     </div>
   );
 };

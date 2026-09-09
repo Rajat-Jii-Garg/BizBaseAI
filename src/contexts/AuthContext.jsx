@@ -70,6 +70,7 @@ export const AuthProvider = ({ children }) => {
       // Do NOT use window.location.href here as it causes full page reload loops
 
       if (currentUser) {
+        localStorage.setItem('bb_returning_user', 'true');
         setTimeout(() => {
           if (mounted) {
             fetchUserProfile(currentUser.id).finally(() => {
@@ -96,6 +97,7 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
         
         if (currentUser) {
+          localStorage.setItem('bb_returning_user', 'true');
           // Fetch profile before marking as loaded
           fetchUserProfile(currentUser.id).finally(() => {
             if (mounted) setLoading(false);
