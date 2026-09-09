@@ -31,13 +31,21 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import MessagesButton from './MessagesButton';
 import NotificationButton from './NotificationButton';
 import SearchBar from './SearchBar';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 const DashboardLayout = ({ children }) => {
-  const { user, profile, signOut } = useAuth(); 
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
+
+  const { subscribeToPush } = usePushNotifications();
+
+  useEffect(() => {
+    const timer = setTimeout(() => subscribeToPush(), 3000); // dashboard load hone ke 3 sec baad browser permission popup aayega
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
