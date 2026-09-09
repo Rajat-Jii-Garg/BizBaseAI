@@ -30,8 +30,8 @@ BEGIN
     SELECT full_name INTO endorser_name FROM public.profiles WHERE id = NEW.endorser_id;
     PERFORM public.create_notification(
       NEW.endorsed_user_id, 'endorsement',
-      COALESCE(endorser_name, 'Someone') || ' endorsed your skill: ' || COALESCE(NEW.skill_name, ''),
-      COALESCE(endorser_name, 'Someone') || ' endorsed you for ' || COALESCE(NEW.skill_name, 'a skill') || '.',
+      COALESCE(endorser_name, 'Someone') || ' endorsed your skill: ' || COALESCE(NEW.skill, ''),
+      COALESCE(endorser_name, 'Someone') || ' endorsed you for ' || COALESCE(NEW.skill, 'a skill') || '.',
       NULL, NEW.endorser_id
     );
   END IF;

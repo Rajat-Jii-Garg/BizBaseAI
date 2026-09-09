@@ -122,10 +122,10 @@ const Notifications = () => {
       event: <Bell className="w-4 h-4 text-yellow-500" />,
       job_application: <Bell className="w-4 h-4 text-emerald-500" />,
       community: <Bell className="w-4 h-4 text-cyan-500" />,
+      profile_view: <Eye className="w-4 h-4 text-slate-500" />,
+      endorsement: <Award className="w-4 h-4 text-amber-500" />,
     };
     return icons[type] || <Bell className="w-4 h-4 text-muted-foreground" />;
-    profile_view: <Eye className="w-4 h-4 text-slate-500" />,
-    endorsement: <Award className="w-4 h-4 text-amber-500" />,
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
