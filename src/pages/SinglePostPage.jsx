@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import LoginModal from "@/components/LoginModal";
@@ -19,6 +19,7 @@ const SinglePostPage = () => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [canonicalPath, setCanonicalPath] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
@@ -47,19 +48,43 @@ const SinglePostPage = () => {
         }
 
         // Fetch profile separately
-        const { data: profileData } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from("profiles")
-          .select("id, username, full_name, avatar_url, current_position, is_verified")
+          .select(
+            "id, username, full_name, avatar_url, current_position, is_verified"
+          )
           .eq("id", postData.user_id)
           .maybeSingle();
 
-        if (!profileData || profileData.username?.toLowerCase() !== username?.toLowerCase()) {
+        if (profileError || !profileData?.username) {
+          console.error("Unable to resolve post owner:", profileError);
           setNotFound(true);
           setLoading(false);
           return;
         }
 
         postData.profiles = profileData;
+
+        /*
+        * Always use the actual post owner's username.
+        *
+        * This also repairs old/broken notification URLs such as:
+        *
+        * /manangarg11/post/POST_ID
+        *
+        * when Manan is only the actor and not the post owner.
+        */
+        const canonicalUrl =
+          `/${encodeURIComponent(profileData.username)}/post/${postId}`;
+
+        if (
+          profileData.username?.toLowerCase() !==
+          username?.toLowerCase()
+        ) {
+          setCanonicalPath(canonicalUrl);
+          setLoading(false);
+          return;
+        }
 
         // Check if current user has liked/reposted
         if (user) {
@@ -170,6 +195,10 @@ const SinglePostPage = () => {
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
+
+  if (canonicalPath) {
+    return <Navigate to={canonicalPath} replace />;
+  }
 
   if (notFound) return <NotFound />;
 

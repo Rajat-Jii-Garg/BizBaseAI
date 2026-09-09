@@ -1,15 +1,10 @@
-const POST_NOTIFICATION_TYPES = new Set([
-  'like',
-  'comment',
-  'share',
-  'repost',
-]);
+const POST_NOTIFICATION_TYPES = new Set(["like", "comment", "share", "repost"]);
 
 const PROFILE_NOTIFICATION_TYPES = new Set([
-  'connection',
-  'follow',
-  'profile_view',
-  'endorsement',
+  "connection",
+  "follow",
+  "profile_view",
+  "endorsement",
 ]);
 
 export const getNotificationPath = (notification) => {
@@ -19,69 +14,68 @@ export const getNotificationPath = (notification) => {
   const relatedId = notification.related_id;
   const relatedUsername = notification.related_user?.username;
 
-  // ---------------------------------------------------------
-  // Post-related notifications
-  // IMPORTANT:
-  // related_id = POST ID
-  // related_user = ACTOR
-  //
-  // Never build /actor/post/id here.
-  // /post/:postId resolves the real post owner.
-  // ---------------------------------------------------------
-  if (
-    POST_NOTIFICATION_TYPES.has(type) &&
-    relatedId
-  ) {
-    return `/post/${relatedId}`;
+  /*
+   * IMPORTANT:
+   *
+   * related_user_id = person who performed the action.
+   * related_id = actual POST ID.
+   *
+   * Therefore NEVER create:
+   *
+   * /actor-username/post/post-id
+   *
+   * because actor may not be the post owner.
+   *
+   * Always start with the post ID.
+   */
+  if (POST_NOTIFICATION_TYPES.has(type) && relatedId) {
+    return `/post/${encodeURIComponent(relatedId)}`;
   }
 
-  // ---------------------------------------------------------
-  // Messages
-  // ---------------------------------------------------------
-  if (type === 'message') {
-    return '/messages';
+  /*
+   * Messages
+   */
+  if (type === "message") {
+    return "/messages";
   }
 
-  // ---------------------------------------------------------
-  // Events
-  // ---------------------------------------------------------
-  if (type === 'event') {
+  /*
+   * Events
+   */
+  if (type === "event") {
     if (relatedId) {
       return `/events?event=${encodeURIComponent(relatedId)}`;
     }
 
-    return '/events';
+    return "/events";
   }
 
-  // ---------------------------------------------------------
-  // Job applications
-  // ---------------------------------------------------------
-  if (type === 'job_application') {
+  /*
+   * Job applications
+   */
+  if (type === "job_application") {
     if (relatedId) {
       return `/jobs?job=${encodeURIComponent(relatedId)}`;
     }
 
-    return '/jobs';
+    return "/jobs";
   }
 
-  // ---------------------------------------------------------
-  // Communities
-  // ---------------------------------------------------------
-  if (type === 'community') {
+  /*
+   * Communities
+   */
+  if (type === "community") {
     if (relatedId) {
       return `/communities/${encodeURIComponent(relatedId)}`;
     }
 
-    return '/communities';
+    return "/communities";
   }
 
-  // ---------------------------------------------------------
-  // User/profile related notifications
-  // ---------------------------------------------------------
-  if (
-    PROFILE_NOTIFICATION_TYPES.has(type) &&
-    relatedUsername
-  ) {
+  /*
+   * Profile-related notifications
+   */
+  if (PROFILE_NOTIFICATION_TYPES.has(type) && relatedUsername) {
     return `/${encodeURIComponent(relatedUsername)}`;
   }
 

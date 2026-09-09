@@ -1,42 +1,116 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import NotFound from '@/pages/NotFound';
+import React, { useEffect, useState } from "react";
+import { useParams, Navigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import NotFound from "@/pages/NotFound";
 
-// Resolves /post/:postId -> /:username/post/:postId (canonical public URL)
 const PostRedirect = () => {
   const { postId } = useParams();
+
   const [target, setTarget] = useState(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    const resolve = async () => {
-      const { data: post } = await supabase
-        .from('posts')
-        .select('user_id')
-        .eq('id', postId)
-        .maybeSingle();
+    let cancelled = false;
 
-      if (!post) return setFailed(true);
+    const resolvePost = async () => {
+      if (!postId) {
+        setFailed(true);
+        return;
+      }
 
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', post.user_id)
-        .maybeSingle();
+      try {
+        /*
+         * Step 1:
+         * Find the actual post.
+         */
+        const { data: post, error: postError } = await supabase
+          .from("posts")
+          .select("id, user_id")
+          .eq("id", postId)
+          .maybeSingle();
 
-      if (prof?.username) setTarget(`/${prof.username}/post/${postId}`);
-      else setFailed(true);
+        if (postError) {
+          console.error("Post resolution error:", postError);
+
+          if (!cancelled) {
+            setFailed(true);
+          }
+
+          return;
+        }
+
+        if (!post?.user_id) {
+          if (!cancelled) {
+            setFailed(true);
+          }
+
+          return;
+        }
+
+        /*
+         * Step 2:
+         * Find the actual owner username.
+         */
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("username")
+          .eq("id", post.user_id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("Post owner resolution error:", profileError);
+
+          if (!cancelled) {
+            setFailed(true);
+          }
+
+          return;
+        }
+
+        if (!profile?.username) {
+          if (!cancelled) {
+            setFailed(true);
+          }
+
+          return;
+        }
+
+        /*
+         * Step 3:
+         * Build canonical public post URL.
+         */
+        const canonicalUrl = `/${encodeURIComponent(profile.username)}/post/${post.id}`;
+
+        if (!cancelled) {
+          setTarget(canonicalUrl);
+        }
+      } catch (error) {
+        console.error("Unexpected error resolving post:", error);
+
+        if (!cancelled) {
+          setFailed(true);
+        }
+      }
     };
-    resolve();
+
+    resolvePost();
+
+    return () => {
+      cancelled = true;
+    };
   }, [postId]);
 
-  if (failed) return <NotFound />;
-  if (target) return <Navigate to={target} replace />;
+  if (failed) {
+    return <NotFound />;
+  }
+
+  if (target) {
+    return <Navigate to={target} replace />;
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <Loader2 className="w-8 h-8 animate-spin text-primary" />
     </div>
   );
