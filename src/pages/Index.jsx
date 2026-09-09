@@ -1,58 +1,50 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import SEOHead from '@/components/SEOHead';
-import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
-import Features from '@/components/Features';
+import React from "react";
+import { Link } from "react-router-dom";
+import SEOHead from "@/components/SEOHead";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import Features from "@/components/Features";
 // import ProductPreview from '@/components/ProductPreview';
-import CTA from '@/components/CTA';
-import WhoIsItFor from '@/components/WhoIsItFor';
-import HowItWorks from '@/components/HowItWorks';
-import CallToAction from '@/components/CallToAction';
-import CommunityBanner from '@/components/CommunityBanner';
-import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
+import CTA from "@/components/CTA";
+import WhoIsItFor from "@/components/WhoIsItFor";
+import HowItWorks from "@/components/HowItWorks";
+import CallToAction from "@/components/CallToAction";
+import CommunityBanner from "@/components/CommunityBanner";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import LoginModal from '@/components/LoginModal';
-import Loader from '@/components/Loader';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import LoginModal from "@/components/LoginModal";
+import Loader from "@/components/Loader";
 
 const Index = () => {
-    const { user, loading } = useAuth();
-    const navigate = useNavigate();
-    const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-    // Redirect logic
-    useEffect(() => {
-      if (loading) return;
+  // Redirect logic
+  useEffect(() => {
+    if (loading) return;
 
-      if (user) {
-        navigate('/dashboard', { replace: true }); // Case 1: already logged-in
-        return;
-      }
+    if (user) {
+      navigate("/dashboard", { replace: true }); // Case 1: already logged-in
+    }
+    // Case 2 aur Case 3 dono ab home page pe hi rukenge
+  }, [user, loading, navigate]);
 
-      const hasLoggedInBefore = localStorage.getItem('bb_returning_user');
-      if (hasLoggedInBefore) {
-        navigate('/login', { replace: true }); // Case 2: logged out user
-      }
-      // Case 3: naya user -> yahin rukega, home dikhega
-    }, [user, loading, navigate]);
+  useEffect(() => {
+    if (loading || user) return;
 
-    // 7-second login popup (sirf first-time users ke liye)
-    useEffect(() => {
-      if (loading || user) return;
-      if (localStorage.getItem('bb_returning_user')) return;
+    const hasLoggedInBefore = localStorage.getItem("bb_returning_user");
+    const delay = hasLoggedInBefore ? 5000 : 7000; // returning user = 5 sec, new user = 7 sec
+    const timer = setTimeout(() => setShowLoginPopup(true), delay);
+    return () => clearTimeout(timer);
+  }, [loading, user]);
 
-      const timer = setTimeout(() => setShowLoginPopup(true), 7000);
-      return () => clearTimeout(timer);
-    }, [loading, user]);
-
-    if (loading) return <Loader />;
-    if (user) return null; // dashboard pe navigate ho raha hai, flash mat dikhao
-    if (localStorage.getItem('bb_returning_user')) return null; // login pe navigate ho raha hai
+  if (loading) return <Loader />;
+  if (user) return null;
 
   return (
     <div className="min-h-screen bg-white">
@@ -78,7 +70,11 @@ const Index = () => {
             Ready to Get Started?
           </h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white">
+            <Button
+              asChild
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+            >
               <Link to="/signup">Create Free Account</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
@@ -89,7 +85,9 @@ const Index = () => {
       </section>
 
       <Footer />
-      {showLoginPopup && <LoginModal onClose={() => setShowLoginPopup(false)} />}
+      {showLoginPopup && (
+        <LoginModal onClose={() => setShowLoginPopup(false)} />
+      )}
     </div>
   );
 };
