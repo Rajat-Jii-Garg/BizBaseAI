@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import SEOHead from "@/components/SEOHead";
 import { getNotificationPath } from "@/lib/notificationNavigation";
+import { resolveNotificationPath } from "@/lib/notificationNavigation";
 
 const Notifications = () => {
   const { user } = useAuth();
@@ -152,7 +153,7 @@ const Notifications = () => {
   };
 
   const markAsRead = async (id) => {
-    if (!user || !id) return;
+    if (!user || !id) return false;
 
     const { error } = await supabase
       .from("notifications")
@@ -162,12 +163,44 @@ const Notifications = () => {
 
     if (error) {
       console.error("Error marking notification as read:", error);
-      return;
+      return false;
     }
 
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
+
+    return true;
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification) return;
+    try {
+      /*
+       * Mark notification as read.
+       */
+      if (!notification.read) {
+        await markAsRead(notification.id);
+      }
+      /*
+       * Resolve the REAL destination from the database.
+       */
+      const path = await resolveNotificationPath(notification);
+      /*
+       * No destination available.
+       */
+      if (!path) {
+        toast.error("This notification is no longer available.");
+        return;
+      }
+      /*
+       * Navigate using React Router.
+       */
+      navigate(path);
+    } catch (error) {
+      console.error("Notification navigation failed:", error);
+      toast.error("Unable to open this notification.");
+    }
   };
 
   const markAllAsRead = async () => {
@@ -178,27 +211,6 @@ const Notifications = () => {
       .eq("read", false);
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     toast.success("All notifications marked as read");
-  };
-
-  const handleNotificationClick = async (notification) => {
-    if (!notification) return;
-
-    if (!notification.read) {
-      await markAsRead(notification.id);
-    }
-
-    const path = getNotificationPath(notification);
-
-    if (!path) {
-      console.warn(
-        'No navigation target for notification:',
-        notification
-      );
-      return;
-    }
-
-    setOpen(false);
-    navigate(path);
   };
 
   const getIcon = (type) => {
@@ -330,7 +342,7 @@ const Notifications = () => {
                         ? "bg-primary/5 border-primary/20"
                         : "bg-card border-border hover:bg-muted/50"
                     }`}
-                    onClick={() => handleNotificationClick(notification)}
+                    onClick={() => handleNotificationClick(n)}
                   >
                     <Avatar className="h-9 w-9 flex-shrink-0">
                       <AvatarImage src={n.related_user?.avatar_url} />

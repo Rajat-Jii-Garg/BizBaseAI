@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Bell, Heart, MessageCircle, Share2, UserPlus, Calendar, X } from "lucide-react";
+import {
+  Bell,
+  Heart,
+  MessageCircle,
+  Share2,
+  UserPlus,
+  Calendar,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { getNotificationPath } from "@/lib/notificationNavigation";
@@ -8,12 +16,12 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
+import { resolveNotificationPath } from "@/lib/notificationNavigation";
 
 const NotificationsCenter = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,21 +40,21 @@ const NotificationsCenter = () => {
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      
+
       // Set up real-time subscription
       const channel = supabase
-        .channel('notifications-changes')
+        .channel("notifications-changes")
         .on(
-          'postgres_changes',
+          "postgres_changes",
           {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${user.id}`
+            event: "INSERT",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${user.id}`,
           },
           () => {
             fetchNotifications();
-          }
+          },
         )
         .subscribe();
 
@@ -58,46 +66,46 @@ const NotificationsCenter = () => {
 
   const fetchNotifications = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       // First get notifications
       const { data: notificationsData, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .from("notifications")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
         .limit(20);
 
       if (error) throw error;
 
       // Then get related user profiles
-      const userIds = notificationsData
-        ?.map(n => n.related_user_id)
-        .filter(Boolean) || [];
+      const userIds =
+        notificationsData?.map((n) => n.related_user_id).filter(Boolean) || [];
 
       let relatedUsers = [];
       if (userIds.length > 0) {
         const { data: usersData } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url, username')
-          .in('id', userIds);
-        
+          .from("profiles")
+          .select("id, full_name, avatar_url, username")
+          .in("id", userIds);
+
         relatedUsers = usersData || [];
       }
 
-      const formattedNotifications = notificationsData?.map(notification => ({
-        ...notification,
-        content: notification.content || '',
-        related_user: notification.related_user_id 
-          ? relatedUsers.find(u => u.id === notification.related_user_id)
-          : undefined
-      })) || [];
+      const formattedNotifications =
+        notificationsData?.map((notification) => ({
+          ...notification,
+          content: notification.content || "",
+          related_user: notification.related_user_id
+            ? relatedUsers.find((u) => u.id === notification.related_user_id)
+            : undefined,
+        })) || [];
 
       setNotifications(formattedNotifications);
-      setUnreadCount(formattedNotifications.filter(n => !n.read).length);
+      setUnreadCount(formattedNotifications.filter((n) => !n.read).length);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error("Error fetching notifications:", error);
       // Show basic notifications functionality even if fetch fails
       setNotifications([]);
       setUnreadCount(0);
@@ -107,74 +115,95 @@ const NotificationsCenter = () => {
   };
 
   const markAsRead = async (notificationId) => {
+    if (!user || !notificationId) return false;
+
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from("notifications")
         .update({ read: true })
-        .eq('id', notificationId);
+        .eq("id", notificationId)
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
-      setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId ? { ...n, read: true } : n
-        )
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)),
       );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+
+      return true;
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error("Error marking notification as read:", error);
+
+      return false;
     }
   };
 
   const handleNotificationClick = async (notification) => {
     if (!notification) return;
 
-    if (!notification.read) {
-      await markAsRead(notification.id);
+    try {
+      if (!notification.read) {
+        await markAsRead(notification.id);
+      }
+
+      const path = await resolveNotificationPath(notification);
+
+      if (!path) {
+        toast({
+          title: "Notification unavailable",
+          description:
+            "The content related to this notification could not be found.",
+        });
+        return;
+      }
+
+      setOpen(false);
+      navigate(path);
+    } catch (error) {
+      console.error("Notification navigation failed:", error);
+
+      toast({
+        title: "Unable to open notification",
+        description: "Something went wrong while opening this notification.",
+        variant: "destructive",
+      });
     }
-
-    const path = getNotificationPath(notification);
-
-    if (!path) {
-      return;
-    }
-
-    setOpen(false);
-    navigate(path);
   };
 
   const markAllAsRead = async () => {
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from("notifications")
         .update({ read: true })
-        .eq('user_id', user?.id)
-        .eq('read', false);
+        .eq("user_id", user?.id)
+        .eq("read", false);
 
       if (error) throw error;
 
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
-      
+
       toast({
-        title: "All notifications marked as read"
+        title: "All notifications marked as read",
       });
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      console.error("Error marking all notifications as read:", error);
     }
   };
 
   const getNotificationIcon = (type) => {
     switch (type) {
-      case 'like':
+      case "like":
         return <Heart className="w-4 h-4 text-red-500" />;
-      case 'comment':
+      case "comment":
         return <MessageCircle className="w-4 h-4 text-blue-500" />;
-      case 'share':
+      case "share":
         return <Share2 className="w-4 h-4 text-green-500" />;
-      case 'follow':
+      case "follow":
         return <UserPlus className="w-4 h-4 text-purple-500" />;
-      case 'event':
+      case "event":
         return <Calendar className="w-4 h-4 text-orange-500" />;
       default:
         return <Bell className="w-4 h-4 text-gray-500" />;
@@ -189,7 +218,7 @@ const NotificationsCenter = () => {
     const diffInHours = Math.floor(diffInMinutes / 60);
     const diffInDays = Math.floor(diffInHours / 24);
 
-    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInDays < 7) return `${diffInDays}d ago`;
@@ -208,11 +237,11 @@ const NotificationsCenter = () => {
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
           <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center p-0">
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </Badge>
         )}
       </Button>
-      
+
       {open && (
         <div className="absolute right-0 mt-3 w-96 bg-white rounded-xl shadow-lg ring-1 ring-black/10 z-50 animate-fade-in max-h-96 overflow-hidden">
           <div className="p-4 border-b border-gray-100">
@@ -220,9 +249,9 @@ const NotificationsCenter = () => {
               <h3 className="font-semibold text-gray-900">Notifications</h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={markAllAsRead}
                     className="text-xs text-blue-600 hover:text-blue-700"
                   >
@@ -239,7 +268,7 @@ const NotificationsCenter = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="max-h-80 overflow-y-auto">
             {loading ? (
               <div className="p-4 text-center text-gray-500">
@@ -250,15 +279,18 @@ const NotificationsCenter = () => {
               <div className="p-8 text-center text-gray-500">
                 <Bell className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p className="text-sm">No notifications yet</p>
-                <p className="text-xs mt-1">You'll see notifications here when others interact with your content</p>
+                <p className="text-xs mt-1">
+                  You'll see notifications here when others interact with your
+                  content
+                </p>
               </div>
             ) : (
               <ul className="divide-y divide-gray-100">
                 {notifications.map((notification) => (
-                  <li 
-                    key={notification.id} 
+                  <li
+                    key={notification.id}
                     className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
-                      !notification.read ? 'bg-blue-50' : ''
+                      !notification.read ? "bg-blue-50" : ""
                     }`}
                     onClick={() => handleNotificationClick(notification)}
                   >
@@ -266,9 +298,12 @@ const NotificationsCenter = () => {
                       <div className="flex-shrink-0">
                         {notification.related_user?.avatar_url ? (
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={notification.related_user.avatar_url} />
+                            <AvatarImage
+                              src={notification.related_user.avatar_url}
+                            />
                             <AvatarFallback>
-                              {notification.related_user.full_name?.charAt(0) || 'U'}
+                              {notification.related_user.full_name?.charAt(0) ||
+                                "U"}
                             </AvatarFallback>
                           </Avatar>
                         ) : (
@@ -277,7 +312,7 @@ const NotificationsCenter = () => {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           {getNotificationIcon(notification.type)}
@@ -303,17 +338,17 @@ const NotificationsCenter = () => {
               </ul>
             )}
           </div>
-          
+
           {notifications.length > 0 && (
             <div className="p-3 border-t border-gray-100 text-center">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="text-blue-600 hover:text-blue-700"
                 onClick={() => {
                   setOpen(false);
                   // Navigate to full notifications page
-                  window.location.href = '/notifications';
+                  window.location.href = "/notifications";
                 }}
               >
                 View all notifications

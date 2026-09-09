@@ -15,14 +15,13 @@ const PostRedirect = () => {
 
     const resolvePost = async () => {
       if (!postId) {
-        setFailed(true);
+        if (!cancelled) setFailed(true);
         return;
       }
 
       try {
         /*
-         * Step 1:
-         * Find the actual post.
+         * 1. Find the post.
          */
         const { data: post, error: postError } = await supabase
           .from("posts")
@@ -31,62 +30,48 @@ const PostRedirect = () => {
           .maybeSingle();
 
         if (postError) {
-          console.error("Post resolution error:", postError);
+          console.error("Post redirect query failed:", postError);
 
-          if (!cancelled) {
-            setFailed(true);
-          }
-
+          if (!cancelled) setFailed(true);
           return;
         }
 
-        if (!post?.user_id) {
-          if (!cancelled) {
-            setFailed(true);
-          }
-
+        if (!post?.id || !post?.user_id) {
+          if (!cancelled) setFailed(true);
           return;
         }
 
         /*
-         * Step 2:
-         * Find the actual owner username.
+         * 2. Find actual post owner.
          */
-        const { data: profile, error: profileError } = await supabase
+        const { data: owner, error: ownerError } = await supabase
           .from("profiles")
           .select("username")
           .eq("id", post.user_id)
           .maybeSingle();
 
-        if (profileError) {
-          console.error("Post owner resolution error:", profileError);
+        if (ownerError) {
+          console.error("Post owner query failed:", ownerError);
 
-          if (!cancelled) {
-            setFailed(true);
-          }
-
+          if (!cancelled) setFailed(true);
           return;
         }
 
-        if (!profile?.username) {
-          if (!cancelled) {
-            setFailed(true);
-          }
-
+        if (!owner?.username) {
+          if (!cancelled) setFailed(true);
           return;
         }
 
         /*
-         * Step 3:
-         * Build canonical public post URL.
+         * 3. Build canonical URL.
          */
-        const canonicalUrl = `/${encodeURIComponent(profile.username)}/post/${post.id}`;
+        const canonicalUrl = `/${encodeURIComponent(owner.username)}/post/${encodeURIComponent(post.id)}`;
 
         if (!cancelled) {
           setTarget(canonicalUrl);
         }
       } catch (error) {
-        console.error("Unexpected error resolving post:", error);
+        console.error("Unexpected post redirect error:", error);
 
         if (!cancelled) {
           setFailed(true);

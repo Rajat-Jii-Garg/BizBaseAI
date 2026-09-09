@@ -51,13 +51,20 @@ const SinglePostPage = () => {
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select(
-            "id, username, full_name, avatar_url, current_position, is_verified"
+            "id, username, full_name, avatar_url, current_position, is_verified",
           )
           .eq("id", postData.user_id)
           .maybeSingle();
 
-        if (profileError || !profileData?.username) {
-          console.error("Unable to resolve post owner:", profileError);
+        if (profileError) {
+          console.error("Error loading post owner:", profileError);
+
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
+
+        if (!profileData?.username) {
           setNotFound(true);
           setLoading(false);
           return;
@@ -66,21 +73,38 @@ const SinglePostPage = () => {
         postData.profiles = profileData;
 
         /*
-        * Always use the actual post owner's username.
-        *
-        * This also repairs old/broken notification URLs such as:
-        *
-        * /manangarg11/post/POST_ID
-        *
-        * when Manan is only the actor and not the post owner.
-        */
-        const canonicalUrl =
-          `/${encodeURIComponent(profileData.username)}/post/${postId}`;
+         * Canonical URL:
+         *
+         * The username MUST always belong to the
+         * actual owner of the post.
+         */
+        const canonicalUrl = `/${encodeURIComponent(profileData.username)}/post/${encodeURIComponent(postData.id)}`;
 
+        /*
+         * If the URL contains the wrong username,
+         * automatically repair it instead of showing 404.
+         */
         if (
-          profileData.username?.toLowerCase() !==
-          username?.toLowerCase()
+          profileData.username.toLowerCase() !==
+          String(username || "").toLowerCase()
         ) {
+          setCanonicalPath(canonicalUrl);
+          setLoading(false);
+          return;
+        }
+
+        /*
+         * Always use the actual post owner's username.
+         *
+         * This also repairs old/broken notification URLs such as:
+         *
+         * /manangarg11/post/POST_ID
+         *
+         * when Manan is only the actor and not the post owner.
+         */
+        const canonicalUrl = `/${encodeURIComponent(profileData.username)}/post/${postId}`;
+
+        if (profileData.username?.toLowerCase() !== username?.toLowerCase()) {
           setCanonicalPath(canonicalUrl);
           setLoading(false);
           return;
@@ -89,8 +113,18 @@ const SinglePostPage = () => {
         // Check if current user has liked/reposted
         if (user) {
           const [likeRes, repostRes] = await Promise.all([
-            supabase.from("post_likes").select("id").eq("post_id", postId).eq("user_id", user.id).maybeSingle(),
-            supabase.from("post_reposts").select("id").eq("post_id", postId).eq("user_id", user.id).maybeSingle(),
+            supabase
+              .from("post_likes")
+              .select("id")
+              .eq("post_id", postId)
+              .eq("user_id", user.id)
+              .maybeSingle(),
+            supabase
+              .from("post_reposts")
+              .select("id")
+              .eq("post_id", postId)
+              .eq("user_id", user.id)
+              .maybeSingle(),
           ]);
           postData.user_has_liked = !!likeRes.data;
           postData.user_has_reposted = !!repostRes.data;
@@ -135,7 +169,7 @@ const SinglePostPage = () => {
         data?.map((comment) => ({
           ...comment,
           profiles: profiles?.find((p) => p.id === comment.user_id),
-        })) || []
+        })) || [],
       );
     } catch (err) {
       console.error("Error fetching comments:", err);
@@ -180,7 +214,9 @@ const SinglePostPage = () => {
       setCommentText("");
       await fetchComments();
       setPost((prev) =>
-        prev ? { ...prev, comments_count: (prev.comments_count || 0) + 1 } : prev
+        prev
+          ? { ...prev, comments_count: (prev.comments_count || 0) + 1 }
+          : prev,
       );
     } catch (err) {
       console.error("Error adding comment:", err);
