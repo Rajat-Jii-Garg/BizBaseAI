@@ -89,50 +89,8 @@ const Messages = () => {
   const selectedConversationRef = useRef(null);
 
   useEffect(() => {
-    if (!user?.id) return;
-
-    fetchConversations();
-    fetchUnreadCounts();
-
-    setupCallListener();
-    setupConversationsRealtime();
-
-    return () => {
-      try {
-        if (callChannelRef.current) {
-          callChannelRef.current.unsubscribe();
-          supabase.removeChannel(callChannelRef.current);
-          callChannelRef.current = null;
-        }
-
-        if (conversationsRealtimeRef.current) {
-          supabase.removeChannel(conversationsRealtimeRef.current);
-          conversationsRealtimeRef.current = null;
-        }
-
-        if (incomingMessagesRealtimeRef.current) {
-          supabase.removeChannel(incomingMessagesRealtimeRef.current);
-          incomingMessagesRealtimeRef.current = null;
-        }
-
-        if (messageChannelRef.current) {
-          supabase.removeChannel(messageChannelRef.current);
-          messageChannelRef.current = null;
-        }
-      } catch (error) {
-        console.warn("Realtime cleanup error:", error);
-      }
-
-      if (webrtcManagerRef.current) {
-        webrtcManagerRef.current.cleanup();
-        webrtcManagerRef.current = null;
-      }
-
-      pendingRemoteIceRef.current = [];
-      pendingOfferRef.current = null;
-      callerIdRef.current = null;
-    };
-  }, [user?.id, setupConversationsRealtime]);
+    selectedConversationRef.current = selectedConversation;
+  }, [selectedConversation]);
 
   // Real-time subscription for all conversations and messages
   const setupConversationsRealtime = useCallback(() => {
@@ -317,61 +275,109 @@ const Messages = () => {
   //     markMessagesAsRead(selectedConversation.id);
   //   }}
   useEffect(() => {
-    if (!selectedConversation) return;
-
-    // Fetch messages immediately when conversation is selected
-    fetchMessages(selectedConversation.id);
-    markMessagesAsRead(selectedConversation.id);
-
-    // Clear unread count for this conversation
-    setUnreadCounts((prev) => ({
-      ...prev,
-      [selectedConversation.id]: 0,
-    }));
-
-    // 🛑 Clean old channel
-    if (messageChannelRef.current) {
-      supabase.removeChannel(messageChannelRef.current);
+    if (!selectedConversation?.id) {
+      setMessages([]);
+      return;
     }
 
-    // Set up real-time subscription for messages in this conversation
-    messageChannelRef.current = supabase
-      .channel(`messages-${selectedConversation.id}-${Date.now()}`)
+    const conversationId = selectedConversation.id;
+
+    selectedConversationRef.current = selectedConversation;
+
+    fetchMessages(conversationId);
+
+    markMessagesAsRead(conversationId);
+
+    setUnreadCounts((prev) => ({
+      ...prev,
+      [conversationId]: 0,
+    }));
+
+    if (messageChannelRef.current) {
+      supabase.removeChannel(messageChannelRef.current);
+
+      messageChannelRef.current = null;
+    }
+
+    const channel = supabase
+      .channel(`conversation-messages-${conversationId}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "messages",
-          filter: `conversation_id=eq.${selectedConversation.id}`,
+          filter: `conversation_id=eq.${conversationId}`,
         },
-        (payload) => {
-          const msg = payload.new;
-          console.log("Real-time message received:", msg);
+        async (payload) => {
+          const message = payload.new;
+
+          if (message.conversation_id !== conversationId) {
+            return;
+          }
 
           setMessages((prev) => {
-            if (prev.some((m) => m.id === msg.id)) return prev;
-            return [...prev, msg];
+            if (prev.some((item) => item.id === message.id)) {
+              return prev;
+            }
+
+            return [...prev, message];
           });
 
-          scrollToBottom();
+          if (message.sender_id !== user.id) {
+            try {
+              await supabase.rpc("mark_message_delivered", {
+                p_message_id: message.id,
+              });
 
-          // Mark as read if it's from the other user
-          if (msg.sender_id !== user.id) {
-            markMessagesAsRead(selectedConversation.id);
+              await supabase.rpc("mark_conversation_read", {
+                p_conversation_id: conversationId,
+              });
+            } catch (error) {
+              console.error("Message acknowledgement failed:", error);
+            }
           }
+
+          requestAnimationFrame(scrollToBottom);
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const updatedMessage = payload.new;
+
+          setMessages((prev) =>
+            prev.map((message) =>
+              message.id === updatedMessage.id
+                ? {
+                    ...message,
+                    ...updatedMessage,
+                  }
+                : message,
+            ),
+          );
         },
       )
       .subscribe((status) => {
-        console.log("Message channel status:", status);
+        console.log("Conversation message realtime:", status);
       });
 
+    messageChannelRef.current = channel;
+
     return () => {
-      if (messageChannelRef.current) {
-        supabase.removeChannel(messageChannelRef.current);
+      supabase.removeChannel(channel);
+
+      if (messageChannelRef.current === channel) {
+        messageChannelRef.current = null;
       }
     };
-  }, [selectedConversation?.id]);
+  }, [selectedConversation?.id, user?.id]);
 
   useEffect(() => {
     scrollToBottom();
@@ -765,6 +771,22 @@ const Messages = () => {
     }
   };
 
+  useEffect(() => {
+    const conversationId = searchParams.get("conversation");
+
+    if (!conversationId || conversations.length === 0) {
+      return;
+    }
+
+    const conversation = conversations.find(
+      (item) => item.id === conversationId,
+    );
+
+    if (conversation && selectedConversation?.id !== conversation.id) {
+      setSelectedConversation(conversation);
+    }
+  }, [searchParams, conversations, selectedConversation?.id]);
+
   const fetchUnreadCounts = async () => {
     if (!user?.id) return;
 
@@ -1087,6 +1109,52 @@ const Messages = () => {
       : conversation.participant1;
   };
 
+  useEffect(() => {
+    if (!user?.id) return;
+
+    fetchConversations();
+    fetchUnreadCounts();
+
+    setupCallListener();
+    setupConversationsRealtime();
+
+    return () => {
+      try {
+        if (callChannelRef.current) {
+          callChannelRef.current.unsubscribe();
+          supabase.removeChannel(callChannelRef.current);
+          callChannelRef.current = null;
+        }
+
+        if (conversationsRealtimeRef.current) {
+          supabase.removeChannel(conversationsRealtimeRef.current);
+          conversationsRealtimeRef.current = null;
+        }
+
+        if (incomingMessagesRealtimeRef.current) {
+          supabase.removeChannel(incomingMessagesRealtimeRef.current);
+          incomingMessagesRealtimeRef.current = null;
+        }
+
+        if (messageChannelRef.current) {
+          supabase.removeChannel(messageChannelRef.current);
+          messageChannelRef.current = null;
+        }
+      } catch (error) {
+        console.warn("Realtime cleanup error:", error);
+      }
+
+      if (webrtcManagerRef.current) {
+        webrtcManagerRef.current.cleanup();
+        webrtcManagerRef.current = null;
+      }
+
+      pendingRemoteIceRef.current = [];
+      pendingOfferRef.current = null;
+      callerIdRef.current = null;
+    };
+  }, [user?.id, setupConversationsRealtime]);
+
   const filteredConversations = conversations.filter((conv) => {
     const otherParticipant = getOtherParticipant(conv);
     return otherParticipant?.full_name
@@ -1397,16 +1465,45 @@ const Messages = () => {
                                   <p className="text-sm leading-relaxed">
                                     {message.content}
                                   </p>
-                                  <span
-                                    className={`text-xs mt-1 block ${isOwn ? "opacity-70" : "text-muted-foreground"}`}
+                                  <div
+                                    className={`flex items-center justify-end gap-1 text-xs mt-1 ${
+                                      isOwn
+                                        ? "opacity-75"
+                                        : "text-muted-foreground"
+                                    }`}
                                   >
-                                    {new Date(
-                                      message.created_at,
-                                    ).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
-                                  </span>
+                                    <span>
+                                      {new Date(
+                                        message.created_at,
+                                      ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </span>
+
+                                    {isOwn && (
+                                      <span
+                                        title={
+                                          message.read_at
+                                            ? "Read"
+                                            : message.delivered_at
+                                              ? "Delivered"
+                                              : "Sent"
+                                        }
+                                        className={
+                                          message.read_at
+                                            ? "font-semibold"
+                                            : "opacity-70"
+                                        }
+                                      >
+                                        {message.read_at
+                                          ? "✓✓"
+                                          : message.delivered_at
+                                            ? "✓✓"
+                                            : "✓"}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
