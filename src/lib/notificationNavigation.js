@@ -103,7 +103,11 @@ export const resolveNotificationPath = async (notification) => {
    * MESSAGE NOTIFICATIONS
    */
   if (type === "message") {
-    return "/messages";
+    return relatedId
+      ? `/messages?conversation=${encodeURIComponent(
+          relatedId
+        )}`
+      : "/messages";
   }
 
   /*
