@@ -43,10 +43,12 @@ import DashboardLayout from "@/components/DashboardLayout";
 import CallModal from "@/components/CallModal";
 import SEOHead from "@/components/SEOHead";
 import { WebRTCManager } from "@/utils/webrtc";
+import { useOnlinePresence } from "@/hooks/useOnlinePresence";
 
 const Messages = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const onlineUserIds = useOnlinePresence();
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -72,6 +74,9 @@ const Messages = () => {
   const webrtcManagerRef = useRef(null);
   const callChannelRef = useRef(null);
   const [unreadCounts, setUnreadCounts] = useState({});
+  const [otherTyping, setOtherTyping] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
   const pendingOfferRef = useRef(null); // Store offer from caller
   const callerIdRef = useRef(null); // Store caller ID
   const pendingRemoteIceRef = useRef([]); // queue ICE candidates that arrive before manager exists
@@ -87,6 +92,8 @@ const Messages = () => {
   const messageChannelRef = useRef(null);
 
   const selectedConversationRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+  const lastTypingSentRef = useRef(0);
 
   useEffect(() => {
     selectedConversationRef.current = selectedConversation;
@@ -275,27 +282,23 @@ const Messages = () => {
   //     markMessagesAsRead(selectedConversation.id);
   //   }}
   useEffect(() => {
-    if (!selectedConversation?.id) {
+    if (!selectedConversation?.id || !user?.id) {
       setMessages([]);
+      setHasMoreMessages(false);
+      setOtherTyping(false);
       return;
     }
 
     const conversationId = selectedConversation.id;
-
     selectedConversationRef.current = selectedConversation;
+    setOtherTyping(false);
 
     fetchMessages(conversationId);
-
     markMessagesAsRead(conversationId);
-
-    setUnreadCounts((prev) => ({
-      ...prev,
-      [conversationId]: 0,
-    }));
+    setUnreadCounts((prev) => ({ ...prev, [conversationId]: 0 }));
 
     if (messageChannelRef.current) {
       supabase.removeChannel(messageChannelRef.current);
-
       messageChannelRef.current = null;
     }
 
@@ -311,16 +314,10 @@ const Messages = () => {
         },
         async (payload) => {
           const message = payload.new;
-
-          if (message.conversation_id !== conversationId) {
-            return;
-          }
+          if (message.conversation_id !== conversationId) return;
 
           setMessages((prev) => {
-            if (prev.some((item) => item.id === message.id)) {
-              return prev;
-            }
-
+            if (prev.some((item) => item.id === message.id)) return prev;
             return [...prev, message];
           });
 
@@ -329,10 +326,10 @@ const Messages = () => {
               await supabase.rpc("mark_message_delivered", {
                 p_message_id: message.id,
               });
-
               await supabase.rpc("mark_conversation_read", {
                 p_conversation_id: conversationId,
               });
+              setUnreadCounts((prev) => ({ ...prev, [conversationId]: 0 }));
             } catch (error) {
               console.error("Message acknowledgement failed:", error);
             }
@@ -351,19 +348,24 @@ const Messages = () => {
         },
         (payload) => {
           const updatedMessage = payload.new;
-
           setMessages((prev) =>
             prev.map((message) =>
               message.id === updatedMessage.id
-                ? {
-                    ...message,
-                    ...updatedMessage,
-                  }
+                ? { ...message, ...updatedMessage }
                 : message,
             ),
           );
         },
       )
+      .on("broadcast", { event: "typing" }, ({ payload }) => {
+        if (payload?.userId === user.id) return;
+        setOtherTyping(true);
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(
+          () => setOtherTyping(false),
+          3000,
+        );
+      })
       .subscribe((status) => {
         console.log("Conversation message realtime:", status);
       });
@@ -371,11 +373,11 @@ const Messages = () => {
     messageChannelRef.current = channel;
 
     return () => {
+      clearTimeout(typingTimeoutRef.current);
+      setOtherTyping(false);
       supabase.removeChannel(channel);
-
-      if (messageChannelRef.current === channel) {
+      if (messageChannelRef.current === channel)
         messageChannelRef.current = null;
-      }
     };
   }, [selectedConversation?.id, user?.id]);
 
@@ -771,22 +773,6 @@ const Messages = () => {
     }
   };
 
-  useEffect(() => {
-    const conversationId = searchParams.get("conversation");
-
-    if (!conversationId || conversations.length === 0) {
-      return;
-    }
-
-    const conversation = conversations.find(
-      (item) => item.id === conversationId,
-    );
-
-    if (conversation && selectedConversation?.id !== conversation.id) {
-      setSelectedConversation(conversation);
-    }
-  }, [searchParams, conversations, selectedConversation?.id]);
-
   const fetchUnreadCounts = async () => {
     if (!user?.id) return;
 
@@ -807,35 +793,56 @@ const Messages = () => {
     }
   };
 
+  const MESSAGES_PAGE_SIZE = 50;
+
   const fetchMessages = async (conversationId) => {
     if (!conversationId) return;
-
     try {
       const { data, error } = await supabase
         .from("messages")
         .select(
-          `
-          id,
-          conversation_id,
-          sender_id,
-          receiver_id,
-          content,
-          created_at,
-          delivered_at,
-          read,
-          read_at
-        `,
+          `id, conversation_id, sender_id, receiver_id, content, created_at, delivered_at, read, read_at`,
         )
         .eq("conversation_id", conversationId)
-        .order("created_at", {
-          ascending: true,
-        });
-
+        .order("created_at", { ascending: false })
+        .limit(MESSAGES_PAGE_SIZE);
       if (error) throw error;
-
-      setMessages(data || []);
+      setMessages((data || []).slice().reverse());
+      setHasMoreMessages((data || []).length === MESSAGES_PAGE_SIZE);
     } catch (error) {
       console.error("Error fetching messages:", error);
+    }
+  };
+
+  const loadOlderMessages = async () => {
+    if (!selectedConversation?.id || messages.length === 0 || loadingOlder)
+      return;
+    setLoadingOlder(true);
+    try {
+      const oldest = messages[0].created_at;
+      const { data, error } = await supabase
+        .from("messages")
+        .select(
+          `id, conversation_id, sender_id, receiver_id, content, created_at, delivered_at, read, read_at`,
+        )
+        .eq("conversation_id", selectedConversation.id)
+        .lt("created_at", oldest)
+        .order("created_at", { ascending: false })
+        .limit(MESSAGES_PAGE_SIZE);
+      if (error) throw error;
+      const older = (data || []).slice().reverse();
+      setMessages((prev) => {
+        const existingIds = new Set(prev.map((message) => message.id));
+        return [
+          ...older.filter((message) => !existingIds.has(message.id)),
+          ...prev,
+        ];
+      });
+      setHasMoreMessages((data || []).length === MESSAGES_PAGE_SIZE);
+    } catch (error) {
+      console.error("Error loading older messages:", error);
+    } finally {
+      setLoadingOlder(false);
     }
   };
 
@@ -1110,14 +1117,40 @@ const Messages = () => {
   };
 
   useEffect(() => {
-    if (!user?.id) return;
+    const conversationId = searchParams.get("conversation");
+    if (!conversationId || conversations.length === 0) return;
+    const conversation = conversations.find(
+      (item) => item.id === conversationId,
+    );
+    if (conversation && selectedConversation?.id !== conversation.id) {
+      setSelectedConversation(conversation);
+    }
+  }, [searchParams, conversations, selectedConversation?.id]);
 
+  useEffect(() => {
+    if (!user?.id) return;
+    const resync = () => {
+      if (document.visibilityState === "visible") {
+        fetchConversations();
+        fetchUnreadCounts();
+        if (selectedConversationRef.current?.id)
+          fetchMessages(selectedConversationRef.current.id);
+      }
+    };
+    document.addEventListener("visibilitychange", resync);
+    window.addEventListener("online", resync);
+    return () => {
+      document.removeEventListener("visibilitychange", resync);
+      window.removeEventListener("online", resync);
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
     fetchConversations();
     fetchUnreadCounts();
-
     setupCallListener();
     setupConversationsRealtime();
-
     return () => {
       try {
         if (callChannelRef.current) {
@@ -1125,17 +1158,14 @@ const Messages = () => {
           supabase.removeChannel(callChannelRef.current);
           callChannelRef.current = null;
         }
-
         if (conversationsRealtimeRef.current) {
           supabase.removeChannel(conversationsRealtimeRef.current);
           conversationsRealtimeRef.current = null;
         }
-
         if (incomingMessagesRealtimeRef.current) {
           supabase.removeChannel(incomingMessagesRealtimeRef.current);
           incomingMessagesRealtimeRef.current = null;
         }
-
         if (messageChannelRef.current) {
           supabase.removeChannel(messageChannelRef.current);
           messageChannelRef.current = null;
@@ -1143,12 +1173,11 @@ const Messages = () => {
       } catch (error) {
         console.warn("Realtime cleanup error:", error);
       }
-
       if (webrtcManagerRef.current) {
         webrtcManagerRef.current.cleanup();
         webrtcManagerRef.current = null;
       }
-
+      clearTimeout(typingTimeoutRef.current);
       pendingRemoteIceRef.current = [];
       pendingOfferRef.current = null;
       callerIdRef.current = null;
@@ -1296,17 +1325,7 @@ const Messages = () => {
                               ? "bg-primary/5 border-l-4 border-primary shadow-sm"
                               : "hover:bg-accent/50"
                           }`}
-                          onClick={() => {
-                            setSelectedConversation(conversation);
-                            fetchMessages(conversation.id);
-                            markMessagesAsRead(conversation.id);
-
-                            // Reset unread for that conversation
-                            setUnreadCounts((prev) => ({
-                              ...prev,
-                              [conversation.id]: 0,
-                            }));
-                          }}
+                          onClick={() => setSelectedConversation(conversation)}
                         >
                           <div className="flex items-center space-x-3">
                             <div className="relative">
@@ -1319,11 +1338,18 @@ const Messages = () => {
                                     "U"}
                                 </AvatarFallback>
                               </Avatar>
-                              <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-background rounded-full"></div>
+                              <div
+                                className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background ${onlineUserIds.has(otherParticipant?.id) ? "bg-green-500" : "bg-muted-foreground"}`}
+                              ></div>
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">
                                 {otherParticipant?.full_name || "Unknown User"}
+                              </p>
+                              <p className="text-[11px] text-muted-foreground">
+                                {onlineUserIds.has(otherParticipant?.id)
+                                  ? "Online"
+                                  : "Offline"}
                               </p>
                               <div className="flex items-center justify-between">
                                 <p className="text-xs text-muted-foreground truncate">
@@ -1369,16 +1395,28 @@ const Messages = () => {
                             )?.full_name?.charAt(0) || "U"}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-background rounded-full"></div>
+                        <div
+                          className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background ${onlineUserIds.has(getOtherParticipant(selectedConversation)?.id) ? "bg-green-500" : "bg-muted-foreground"}`}
+                        ></div>
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground">
                           {getOtherParticipant(selectedConversation)
                             ?.full_name || "Unknown User"}
                         </h3>
-                        <p className="text-xs text-muted-foreground">
-                          Active now
-                        </p>
+                        {otherTyping ? (
+                          <p className="text-xs text-primary animate-pulse">
+                            typing...
+                          </p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">
+                            {onlineUserIds.has(
+                              getOtherParticipant(selectedConversation)?.id,
+                            )
+                              ? "Online"
+                              : "Offline"}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center space-x-1">
@@ -1408,6 +1446,20 @@ const Messages = () => {
 
                   {/* Messages */}
                   <ScrollArea className="flex-1 h-0 p-4 bg-accent/5">
+                    {hasMoreMessages && (
+                      <div className="text-center py-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={loadOlderMessages}
+                          disabled={loadingOlder}
+                        >
+                          {loadingOlder
+                            ? "Loading..."
+                            : "Load earlier messages"}
+                        </Button>
+                      </div>
+                    )}
                     {messages.length === 0 ? (
                       <div className="flex items-center justify-center h-full">
                         <div className="text-center">
@@ -1466,11 +1518,7 @@ const Messages = () => {
                                     {message.content}
                                   </p>
                                   <div
-                                    className={`flex items-center justify-end gap-1 text-xs mt-1 ${
-                                      isOwn
-                                        ? "opacity-75"
-                                        : "text-muted-foreground"
-                                    }`}
+                                    className={`flex items-center justify-end gap-1 text-xs mt-1 ${isOwn ? "opacity-75" : "text-muted-foreground"}`}
                                   >
                                     <span>
                                       {new Date(
@@ -1480,7 +1528,6 @@ const Messages = () => {
                                         minute: "2-digit",
                                       })}
                                     </span>
-
                                     {isOwn && (
                                       <span
                                         title={
@@ -1553,7 +1600,21 @@ const Messages = () => {
                         <Textarea
                           placeholder="Type a message..."
                           value={newMessage}
-                          onChange={(e) => setNewMessage(e.target.value)}
+                          onChange={(e) => {
+                            setNewMessage(e.target.value);
+                            const now = Date.now();
+                            if (
+                              messageChannelRef.current &&
+                              now - lastTypingSentRef.current > 2000
+                            ) {
+                              lastTypingSentRef.current = now;
+                              messageChannelRef.current.send({
+                                type: "broadcast",
+                                event: "typing",
+                                payload: { userId: user.id },
+                              });
+                            }
+                          }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
                               e.preventDefault();
