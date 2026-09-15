@@ -934,6 +934,7 @@ export type Database = {
           id: string
           joined_at: string | null
           role: string | null
+          status: string
           user_id: string
         }
         Insert: {
@@ -941,6 +942,7 @@ export type Database = {
           id?: string
           joined_at?: string | null
           role?: string | null
+          status?: string
           user_id: string
         }
         Update: {
@@ -948,6 +950,7 @@ export type Database = {
           id?: string
           joined_at?: string | null
           role?: string | null
+          status?: string
           user_id?: string
         }
         Relationships: [
@@ -2868,6 +2871,7 @@ export type Database = {
       posts: {
         Row: {
           comments_count: number | null
+          community_id: string | null
           content: string
           created_at: string
           id: string
@@ -2882,6 +2886,7 @@ export type Database = {
         }
         Insert: {
           comments_count?: number | null
+          community_id?: string | null
           content: string
           created_at?: string
           id?: string
@@ -2896,6 +2901,7 @@ export type Database = {
         }
         Update: {
           comments_count?: number | null
+          community_id?: string | null
           content?: string
           created_at?: string
           id?: string

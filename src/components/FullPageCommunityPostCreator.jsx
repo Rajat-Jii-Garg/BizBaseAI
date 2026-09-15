@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
+import {
   X, Video, Hash, AtSign, Loader2, Sparkles, Send, XCircle, Camera, Users, ArrowRight
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -191,10 +191,21 @@ const FullPageCommunityPostCreator = ({ isOpen, onClose }) => {
     try {
       let mediaUrl = null;
       if (mediaFile) mediaUrl = await uploadMedia();
-      const communityName = communities.find(c => c.id === selectedCommunity)?.name || '';
-      // Post with community tag in content
-      await createPost(`[Community: ${communityName}]\n\n${content}`, mediaUrl);
-      toast.success(`Post published in ${communityName}!`);
+      const communityName =
+        communities.find(
+          c => c.id === selectedCommunity
+        )?.name || '';
+
+      await createPost(
+        content,
+        mediaUrl,
+        mediaType,
+        selectedCommunity
+      );
+
+      toast.success(
+        `Post published in ${communityName}!`
+      );
       setContent(''); setSelectedCommunity(''); removeMedia();
       onClose();
     } catch (error) { toast.error('Failed to create post'); }

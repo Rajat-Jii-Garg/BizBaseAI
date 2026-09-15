@@ -114,7 +114,7 @@ export const usePosts = () => {
     }
   };
 
-  const createPost = async (content, imageUrl, mediaType) => {
+  const createPost = async (content, imageUrl, mediaType, communityId = null) => {
     if (!user) {
       toast.error("Error", { description: "You must be logged in to create posts" });
       return;
@@ -129,7 +129,8 @@ export const usePosts = () => {
           {
             user_id: user.id,
             content,
-            image_url: imageUrl || null
+            image_url: imageUrl || null,
+            community_id: communityId || null
           }
         ])
         .select()
