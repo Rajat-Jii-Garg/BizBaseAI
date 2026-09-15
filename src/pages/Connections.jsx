@@ -1,31 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import {
-  useNavigate,
-  useSearchParams
-} from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { toast } from 'sonner';
-
 import { useAuth } from '@/contexts/AuthContext';
-
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage
-} from '@/components/ui/avatar';
-
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from '@/components/ui/tabs';
-
 import {
   Users,
   Search,
@@ -38,7 +22,7 @@ import {
   UserCheck,
   Sparkles,
   Clock,
-  Send
+  Send,
 } from 'lucide-react';
 
 import SEOHead from '@/components/SEOHead';
@@ -46,34 +30,27 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { useConnections } from '@/hooks/useConnections';
 import { supabase } from '@/integrations/supabase/client';
 
+const MAX_ABOUT_WORDS = 7;
+
 const Connections = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
   const { user } = useAuth();
 
-  const [searchTerm, setSearchTerm] =
-    useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [messageLoadingId, setMessageLoadingId] = useState(null);
 
-  const [messageLoadingId, setMessageLoadingId] =
-    useState(null);
+  const tabFromUrl = searchParams.get('tab');
 
-  const tabFromUrl =
-    searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(
+    tabFromUrl === 'received' || tabFromUrl === 'sent'
+      ? 'requests'
+      : 'connections'
+  );
 
-  const [activeTab, setActiveTab] =
-    useState(
-      tabFromUrl === 'received'
-        ? 'requests'
-        : 'connections'
-    );
-
-  const [requestsSubTab, setRequestsSubTab] =
-    useState(
-      tabFromUrl === 'sent'
-        ? 'sent'
-        : 'received'
-    );
+  const [requestsSubTab, setRequestsSubTab] = useState(
+    tabFromUrl === 'sent' ? 'sent' : 'received'
+  );
 
   useEffect(() => {
     if (tabFromUrl === 'received') {
@@ -103,13 +80,9 @@ const Connections = () => {
   } = useConnections();
 
   const getProfilePath = (profile) => {
-    if (profile?.username) {
-      return `/@${encodeURIComponent(
-        profile.username
-      )}`;
-    }
+    if (!profile?.username) return null;
 
-    return null;
+    return `/${encodeURIComponent(profile.username)}`;
   };
 
   const openProfile = (profile) => {
@@ -125,19 +98,46 @@ const Connections = () => {
     );
   };
 
-  const getProfileAbout = (profile) => {
-    return (
-      profile?.about?.trim() ||
-      profile?.bio?.trim() ||
-      profile?.username ||
-      'BizBase member'
-    );
+  const getProfileAbout = (profile) =>
+    profile?.about?.trim() ||
+    profile?.bio?.trim() ||
+    profile?.username ||
+    'BizBase member';
+
+  const getAboutPreview = (profile) => {
+    const about = getProfileAbout(profile);
+
+    const isFallback =
+      !profile?.about?.trim() &&
+      !profile?.bio?.trim();
+
+    if (isFallback || !about) {
+      return {
+        text: about,
+        hasMore: false,
+      };
+    }
+
+    const words = about
+      .split(/\s+/)
+      .filter(Boolean);
+
+    if (words.length <= MAX_ABOUT_WORDS) {
+      return {
+        text: about,
+        hasMore: false,
+      };
+    }
+
+    return {
+      text: `${words
+        .slice(0, MAX_ABOUT_WORDS)
+        .join(' ')}…`,
+      hasMore: true,
+    };
   };
 
-  const getInitials = (
-    name,
-    username
-  ) => {
+  const getInitials = (name, username) => {
     const value =
       name?.trim() ||
       username?.trim() ||
@@ -151,46 +151,42 @@ const Connections = () => {
       .slice(0, 2);
   };
 
-  const filteredConnections =
-    connections.filter((conn) => {
+  const getConnectionProfile = (conn) =>
+    conn.requester_profile?.id === user?.id
+      ? conn.addressee_profile
+      : conn.requester_profile;
+
+  const filteredConnections = useMemo(() => {
+    const query = searchTerm
+      .toLowerCase()
+      .trim();
+
+    if (!query) {
+      return connections;
+    }
+
+    return connections.filter((conn) => {
       const profile =
-        conn.requester_profile?.id ===
-        user?.id
-          ? conn.addressee_profile
-          : conn.requester_profile;
+        getConnectionProfile(conn);
 
-      const query =
-        searchTerm
-          .toLowerCase()
-          .trim();
-
-      if (!query) return true;
-
-      return (
-        profile?.full_name
-          ?.toLowerCase()
-          .includes(query) ||
-        profile?.username
-          ?.toLowerCase()
-          .includes(query) ||
-        profile?.about
-          ?.toLowerCase()
-          .includes(query) ||
-        profile?.bio
-          ?.toLowerCase()
-          .includes(query) ||
-        profile?.current_position
-          ?.toLowerCase()
-          .includes(query) ||
-        profile?.location
-          ?.toLowerCase()
-          .includes(query)
+      return [
+        profile?.full_name,
+        profile?.username,
+        profile?.about,
+        profile?.bio,
+        profile?.current_position,
+        profile?.location,
+      ].some((value) =>
+        value?.toLowerCase().includes(query)
       );
     });
+  }, [
+    connections,
+    searchTerm,
+    user?.id,
+  ]);
 
-  const handleMessage = async (
-    profile
-  ) => {
+  const handleMessage = async (profile) => {
     if (
       !user?.id ||
       !profile?.id ||
@@ -199,19 +195,16 @@ const Connections = () => {
       return;
     }
 
-    setMessageLoadingId(
-      profile.id
-    );
+    setMessageLoadingId(profile.id);
 
     try {
       const {
         data: conversation,
-        error
+        error,
       } = await supabase.rpc(
         'get_or_create_direct_conversation',
         {
-          p_other_user_id:
-            profile.id,
+          p_other_user_id: profile.id,
         }
       );
 
@@ -247,30 +240,33 @@ const Connections = () => {
 
   const ProfileCard = ({
     profile,
+    actions,
     ringClass =
       'ring-primary/20',
     fallbackGradient =
       'bg-gradient-to-br from-[#5B6CFF] to-[#8B5CF6]',
-    actions,
   }) => {
     if (!profile) {
       return null;
     }
 
+    const displayName =
+      profile.full_name?.trim() ||
+      profile.username ||
+      'BizBase member';
+
+    const preview =
+      getAboutPreview(profile);
+
     return (
-      <Card className="group overflow-hidden border-border bg-card shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
-        {/* Banner */}
+      <Card className="group overflow-hidden border-border bg-card shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full flex flex-col">
         <button
           type="button"
           className="relative block w-full h-20 lg:h-24 overflow-hidden text-left"
           onClick={() =>
             openProfile(profile)
           }
-          aria-label={`Open ${
-            profile.full_name ||
-            profile.username ||
-            'user'
-          } profile`}
+          aria-label={`Open ${displayName} profile`}
         >
           {profile.banner_url ? (
             <img
@@ -286,20 +282,15 @@ const Connections = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
         </button>
 
-        <CardContent className="px-3 lg:px-4 pb-4 pt-0">
-          {/* Profile picture */}
-          <div className="-mt-8 lg:-mt-9 relative flex justify-center">
+        <CardContent className="px-3 lg:px-4 pb-4 pt-0 flex-1 flex flex-col">
+          <div className="-mt-8 lg:-mt-9 relative flex justify-center shrink-0">
             <button
               type="button"
               className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               onClick={() =>
                 openProfile(profile)
               }
-              aria-label={`Open ${
-                profile.full_name ||
-                profile.username ||
-                'user'
-              } profile`}
+              aria-label={`Open ${displayName} profile`}
             >
               <Avatar
                 className={`h-16 w-16 lg:h-[72px] lg:w-[72px] border-4 border-background shadow-md ring-2 ${ringClass} bg-background`}
@@ -309,11 +300,7 @@ const Connections = () => {
                     profile.avatar_url ||
                     undefined
                   }
-                  alt={
-                    profile.full_name ||
-                    profile.username ||
-                    'BizBase user'
-                  }
+                  alt={displayName}
                   className="object-cover"
                 />
 
@@ -329,57 +316,62 @@ const Connections = () => {
             </button>
           </div>
 
-          {/* Name */}
           <div className="text-center mt-2 min-w-0">
             <button
               type="button"
-              className="block w-full text-center font-semibold text-sm lg:text-base text-foreground truncate hover:text-primary transition-colors focus:outline-none focus-visible:underline"
+              className="block w-full text-center font-semibold text-sm lg:text-[15px] text-foreground truncate hover:text-primary transition-colors focus:outline-none focus-visible:underline"
               onClick={() =>
                 openProfile(profile)
               }
+              title={displayName}
             >
-              {profile.full_name ||
-                profile.username ||
-                'BizBase member'}
+              {displayName}
             </button>
 
-            {/* About / Bio / Username */}
             <button
               type="button"
-              className="block w-full mt-1 text-xs lg:text-sm text-muted-foreground line-clamp-2 min-h-[32px] hover:text-foreground transition-colors"
+              className="block w-full mt-1 text-[11px] sm:text-xs leading-4 text-muted-foreground min-h-[32px] line-clamp-2 hover:text-foreground transition-colors focus:outline-none"
               onClick={() =>
                 openProfile(profile)
               }
-              title={getProfileAbout(
-                profile
-              )}
+              title={
+                profile?.about?.trim() ||
+                profile?.bio?.trim() ||
+                profile?.username ||
+                'BizBase member'
+              }
             >
-              {getProfileAbout(
-                profile
+              {preview.text}
+
+              {preview.hasMore && (
+                <span className="font-medium text-primary whitespace-nowrap">
+                  {' '}
+                  see more...
+                </span>
               )}
             </button>
           </div>
 
-          {actions}
+          <div className="mt-auto pt-3">
+            {actions}
+          </div>
         </CardContent>
       </Card>
     );
   };
 
   const SuggestionCard = ({
-    profile
+    profile,
   }) => (
     <ProfileCard
       profile={profile}
       actions={
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-2">
           <Button
             size="sm"
             className="flex-1 h-9 text-xs sm:text-sm bg-[#5B6CFF] hover:bg-[#4A5AEE] text-white"
             onClick={() =>
-              sendRequest(
-                profile.id
-              )
+              sendRequest(profile.id)
             }
           >
             <UserPlus className="w-3.5 h-3.5 mr-1.5" />
@@ -409,13 +401,14 @@ const Connections = () => {
   );
 
   const ConnectedCard = ({
-    conn
+    conn,
   }) => {
     const profile =
-      conn.requester_profile?.id ===
-      user?.id
-        ? conn.addressee_profile
-        : conn.requester_profile;
+      getConnectionProfile(conn);
+
+    if (!profile) {
+      return null;
+    }
 
     return (
       <ProfileCard
@@ -424,19 +417,19 @@ const Connections = () => {
         fallbackGradient="bg-gradient-to-br from-[#10B981] to-[#059669]"
         actions={
           <Button
-            className="w-full mt-4 h-9 text-xs sm:text-sm"
+            className="w-full h-9 text-xs sm:text-sm"
             variant="outline"
             size="sm"
             disabled={
               messageLoadingId ===
-              profile?.id
+              profile.id
             }
             onClick={() =>
               handleMessage(profile)
             }
           >
             {messageLoadingId ===
-            profile?.id ? (
+            profile.id ? (
               <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
             ) : (
               <MessageSquare className="w-3.5 h-3.5 mr-1.5" />
@@ -451,12 +444,16 @@ const Connections = () => {
 
   const RequestCard = ({
     req,
-    type
+    type,
   }) => {
     const profile =
       type === 'received'
         ? req.requester_profile
         : req.addressee_profile;
+
+    if (!profile) {
+      return null;
+    }
 
     return (
       <ProfileCard
@@ -473,7 +470,7 @@ const Connections = () => {
         }
         actions={
           type === 'received' ? (
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-2">
               <Button
                 className="flex-1 h-9 text-xs sm:text-sm bg-[#10B981] hover:bg-[#059669] text-white"
                 size="sm"
@@ -502,7 +499,7 @@ const Connections = () => {
               </Button>
             </div>
           ) : (
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -523,8 +520,8 @@ const Connections = () => {
                   )
                 }
                 aria-label={`Withdraw request to ${
-                  profile?.full_name ||
-                  profile?.username ||
+                  profile.full_name ||
+                  profile.username ||
                   'user'
                 }`}
               >
@@ -551,9 +548,7 @@ const Connections = () => {
       <div className="max-w-7xl mx-auto p-3 sm:p-4 lg:p-6 space-y-4 lg:space-y-6">
         <Tabs
           value={activeTab}
-          onValueChange={
-            setActiveTab
-          }
+          onValueChange={setActiveTab}
         >
           <TabsList className="grid w-full grid-cols-3 h-9 sm:h-10 lg:h-11 p-1 bg-muted/50 rounded-xl">
             <TabsTrigger
@@ -597,7 +592,7 @@ const Connections = () => {
               value="requests"
               className="text-[10px] sm:text-xs lg:text-sm rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
-              <UserPlus className="w-3.5 h-3.5 lg:w-4 lg:h-4 mr-1 lg:mr-2" />
+              <UserPlus className="w-3.5 h-3.5 lg:w-4 lg:h-4 mr-1 lg:ml-2" />
 
               <span className="hidden sm:inline">
                 Requests
@@ -617,7 +612,6 @@ const Connections = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* SUGGESTIONS */}
           <TabsContent
             value="suggestions"
             className="mt-4"
@@ -700,7 +694,6 @@ const Connections = () => {
             )}
           </TabsContent>
 
-          {/* CONNECTED */}
           <TabsContent
             value="connections"
             className="mt-4"
@@ -782,7 +775,6 @@ const Connections = () => {
             )}
           </TabsContent>
 
-          {/* REQUESTS */}
           <TabsContent
             value="requests"
             className="mt-4"
@@ -926,7 +918,9 @@ const Connections = () => {
                         key={
                           req.id
                         }
-                        req={req}
+                        req={
+                          req
+                        }
                         type="sent"
                       />
                     )

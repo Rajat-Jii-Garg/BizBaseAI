@@ -1,7 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  supabase,
+} from '@/integrations/supabase/client';
+
+import {
+  useAuth,
+} from '@/contexts/AuthContext';
+
+import {
+  toast,
+} from 'sonner';
 
 const PROFILE_FIELDS = `
   id,
@@ -21,12 +33,35 @@ const PROFILE_FIELDS = `
 export const useConnections = () => {
   const { user } = useAuth();
 
-  const [connections, setConnections] = useState([]);
-  const [receivedRequests, setReceivedRequests] = useState([]);
-  const [sentRequests, setSentRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [suggestions, setSuggestions] = useState([]);
-  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [
+    connections,
+    setConnections,
+  ] = useState([]);
+
+  const [
+    receivedRequests,
+    setReceivedRequests,
+  ] = useState([]);
+
+  const [
+    sentRequests,
+    setSentRequests,
+  ] = useState([]);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    suggestions,
+    setSuggestions,
+  ] = useState([]);
+
+  const [
+    suggestionsLoading,
+    setSuggestionsLoading,
+  ] = useState(false);
 
   const fetchConnections = async () => {
     if (!user) {
@@ -35,16 +70,30 @@ export const useConnections = () => {
     }
 
     try {
-      const { data: connectionsData, error: connectionsError } =
-        await supabase
-          .from('connections')
-          .select('*')
-          .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
-          .order('created_at', { ascending: false });
+      const {
+        data: connectionsData,
+        error: connectionsError,
+      } = await supabase
+        .from('connections')
+        .select('*')
+        .or(
+          `requester_id.eq.${user.id},addressee_id.eq.${user.id}`
+        )
+        .order(
+          'created_at',
+          {
+            ascending: false,
+          }
+        );
 
-      if (connectionsError) throw connectionsError;
+      if (connectionsError) {
+        throw connectionsError;
+      }
 
-      if (!connectionsData || connectionsData.length === 0) {
+      if (
+        !connectionsData ||
+        connectionsData.length === 0
+      ) {
         setConnections([]);
         setReceivedRequests([]);
         setSentRequests([]);
@@ -52,294 +101,542 @@ export const useConnections = () => {
         return;
       }
 
-      const userIds = new Set();
+      const userIds =
+        new Set();
 
-      connectionsData.forEach((conn) => {
-        if (conn.requester_id !== user.id) {
-          userIds.add(conn.requester_id);
+      connectionsData.forEach(
+        (conn) => {
+          if (
+            conn.requester_id !==
+            user.id
+          ) {
+            userIds.add(
+              conn.requester_id
+            );
+          }
+
+          if (
+            conn.addressee_id !==
+            user.id
+          ) {
+            userIds.add(
+              conn.addressee_id
+            );
+          }
         }
-
-        if (conn.addressee_id !== user.id) {
-          userIds.add(conn.addressee_id);
-        }
-      });
-
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select(PROFILE_FIELDS)
-        .in('id', Array.from(userIds));
-
-      if (profilesError) throw profilesError;
-
-      const profilesMap = Object.fromEntries(
-        (profilesData || []).map((profile) => [profile.id, profile])
       );
 
-      const enrichedConnections = connectionsData.map((conn) => ({
-        ...conn,
-        requester_profile: profilesMap[conn.requester_id] || null,
-        addressee_profile: profilesMap[conn.addressee_id] || null,
-      }));
+      const {
+        data: profilesData,
+        error: profilesError,
+      } = await supabase
+        .from('profiles')
+        .select(
+          PROFILE_FIELDS
+        )
+        .in(
+          'id',
+          Array.from(
+            userIds
+          )
+        );
+
+      if (profilesError) {
+        throw profilesError;
+      }
+
+      const profilesMap =
+        Object.fromEntries(
+          (
+            profilesData ||
+            []
+          ).map(
+            (profile) => [
+              profile.id,
+              profile,
+            ]
+          )
+        );
+
+      const enrichedConnections =
+        connectionsData.map(
+          (conn) => ({
+            ...conn,
+
+            requester_profile:
+              profilesMap[
+                conn.requester_id
+              ] || null,
+
+            addressee_profile:
+              profilesMap[
+                conn.addressee_id
+              ] || null,
+          })
+        );
 
       const accepted = [];
       const received = [];
       const sent = [];
 
-      enrichedConnections.forEach((conn) => {
-        if (conn.status === 'accepted') {
-          accepted.push(conn);
-        }
-
-        if (conn.status === 'pending') {
-          if (conn.addressee_id === user.id) {
-            received.push(conn);
+      enrichedConnections.forEach(
+        (conn) => {
+          if (
+            conn.status ===
+            'accepted'
+          ) {
+            accepted.push(
+              conn
+            );
           }
 
-          if (conn.requester_id === user.id) {
-            sent.push(conn);
+          if (
+            conn.status ===
+            'pending'
+          ) {
+            if (
+              conn.addressee_id ===
+              user.id
+            ) {
+              received.push(
+                conn
+              );
+            }
+
+            if (
+              conn.requester_id ===
+              user.id
+            ) {
+              sent.push(
+                conn
+              );
+            }
           }
         }
-      });
+      );
 
-      setConnections(accepted);
-      setReceivedRequests(received);
-      setSentRequests(sent);
+      setConnections(
+        accepted
+      );
+
+      setReceivedRequests(
+        received
+      );
+
+      setSentRequests(
+        sent
+      );
     } catch (error) {
-      console.error('Error fetching connections:', error);
+      console.error(
+        'Error fetching connections:',
+        error
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchSuggestions = async () => {
-    if (!user) return;
-
-    setSuggestionsLoading(true);
-
-    try {
-      const { data: userProfile } = await supabase
-        .from('profiles')
-        .select('industry')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      const {
-        data: existingConnections,
-        error: existingConnectionsError,
-      } = await supabase
-        .from('connections')
-        .select('requester_id, addressee_id')
-        .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
-
-      if (existingConnectionsError) {
-        throw existingConnectionsError;
+  const fetchSuggestions =
+    async () => {
+      if (!user) {
+        return;
       }
 
-      const excludedUserIds = new Set([user.id]);
+      setSuggestionsLoading(
+        true
+      );
 
-      (existingConnections || []).forEach((conn) => {
-        excludedUserIds.add(conn.requester_id);
-        excludedUserIds.add(conn.addressee_id);
-      });
+      try {
+        const {
+          data: userProfile,
+        } = await supabase
+          .from('profiles')
+          .select(
+            'industry'
+          )
+          .eq(
+            'id',
+            user.id
+          )
+          .maybeSingle();
 
-      let query = supabase
-        .from('profiles')
-        .select(PROFILE_FIELDS)
-        .not('id', 'eq', user.id);
+        const {
+          data: existingConnections,
+          error:
+            existingConnectionsError,
+        } = await supabase
+          .from('connections')
+          .select(
+            'requester_id, addressee_id'
+          )
+          .or(
+            `requester_id.eq.${user.id},addressee_id.eq.${user.id}`
+          );
 
-      if (excludedUserIds.size > 1) {
-        const ids = Array.from(excludedUserIds).join(',');
+        if (
+          existingConnectionsError
+        ) {
+          throw existingConnectionsError;
+        }
 
-        query = query.not(
-          'id',
-          'in',
-          `(${ids})`
+        const excludedUserIds =
+          new Set([
+            user.id,
+          ]);
+
+        (
+          existingConnections ||
+          []
+        ).forEach(
+          (conn) => {
+            excludedUserIds.add(
+              conn.requester_id
+            );
+
+            excludedUserIds.add(
+              conn.addressee_id
+            );
+          }
         );
-      }
 
-      const { data: allProfiles, error } = await query
-        .order('created_at', { ascending: false })
-        .limit(40);
+        let query =
+          supabase
+            .from(
+              'profiles'
+            )
+            .select(
+              PROFILE_FIELDS
+            )
+            .not(
+              'id',
+              'eq',
+              user.id
+            );
 
-      if (error) throw error;
+        if (
+          excludedUserIds.size >
+          1
+        ) {
+          const ids =
+            Array.from(
+              excludedUserIds
+            ).join(',');
 
-      const sameIndustry = (allProfiles || []).filter(
-        (profile) =>
-          userProfile?.industry &&
-          profile.industry === userProfile.industry
-      );
+          query = query.not(
+            'id',
+            'in',
+            `(${ids})`
+          );
+        }
 
-      const otherProfiles = (allProfiles || []).filter(
-        (profile) =>
-          !userProfile?.industry ||
-          profile.industry !== userProfile.industry
-      );
+        const {
+          data: allProfiles,
+          error,
+        } = await query
+          .order(
+            'created_at',
+            {
+              ascending: false,
+            }
+          )
+          .limit(40);
 
-      setSuggestions(
-        [...sameIndustry, ...otherProfiles].slice(0, 12)
-      );
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-    } finally {
-      setSuggestionsLoading(false);
-    }
-  };
-
-  const removeSuggestion = (profileId) => {
-    setSuggestions((previous) =>
-      previous.filter((profile) => profile.id !== profileId)
-    );
-
-    toast.success('Suggestion removed');
-  };
-
-  const connect = async (addresseeId) => {
-    if (!user || !addresseeId || addresseeId === user.id) {
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .insert({
-          requester_id: user.id,
-          addressee_id: addresseeId,
-          status: 'pending',
-        });
-
-      if (error) {
-        if (error.code === '23505') {
-          toast.error('Connection request already exists');
-        } else {
+        if (error) {
           throw error;
         }
-      } else {
-        toast.success('Connection request sent');
 
-        setSuggestions((previous) =>
+        const sameIndustry =
+          (
+            allProfiles ||
+            []
+          ).filter(
+            (profile) =>
+              userProfile?.industry &&
+              profile.industry ===
+                userProfile.industry
+          );
+
+        const otherProfiles =
+          (
+            allProfiles ||
+            []
+          ).filter(
+            (profile) =>
+              !userProfile?.industry ||
+              profile.industry !==
+                userProfile.industry
+          );
+
+        setSuggestions(
+          [
+            ...sameIndustry,
+            ...otherProfiles,
+          ].slice(0, 12)
+        );
+      } catch (error) {
+        console.error(
+          'Error fetching suggestions:',
+          error
+        );
+      } finally {
+        setSuggestionsLoading(
+          false
+        );
+      }
+    };
+
+  const removeSuggestion =
+    (profileId) => {
+      setSuggestions(
+        (previous) =>
           previous.filter(
-            (profile) => profile.id !== addresseeId
+            (profile) =>
+              profile.id !==
+              profileId
           )
+      );
+
+      toast.success(
+        'Suggestion removed'
+      );
+    };
+
+  const connect =
+    async (
+      addresseeId
+    ) => {
+      if (
+        !user ||
+        !addresseeId ||
+        addresseeId ===
+          user.id
+      ) {
+        return;
+      }
+
+      try {
+        const {
+          error,
+        } = await supabase
+          .from(
+            'connections'
+          )
+          .insert({
+            requester_id:
+              user.id,
+            addressee_id:
+              addresseeId,
+            status:
+              'pending',
+          });
+
+        if (error) {
+          if (
+            error.code ===
+            '23505'
+          ) {
+            toast.error(
+              'Connection request already exists'
+            );
+          } else {
+            throw error;
+          }
+        } else {
+          toast.success(
+            'Connection request sent'
+          );
+
+          setSuggestions(
+            (previous) =>
+              previous.filter(
+                (profile) =>
+                  profile.id !==
+                  addresseeId
+              )
+          );
+
+          await fetchConnections();
+        }
+      } catch (error) {
+        console.error(
+          'Error sending connection request:',
+          error
+        );
+
+        toast.error(
+          'Failed to send connection request'
+        );
+
+        throw error;
+      }
+    };
+
+  const acceptRequest =
+    async (
+      connectionId
+    ) => {
+      try {
+        const {
+          error,
+        } = await supabase
+          .from(
+            'connections'
+          )
+          .update({
+            status:
+              'accepted',
+          })
+          .eq(
+            'id',
+            connectionId
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        toast.success(
+          'Connection request accepted'
         );
 
         await fetchConnections();
+      } catch (error) {
+        console.error(
+          'Error accepting request:',
+          error
+        );
+
+        toast.error(
+          'Failed to accept request'
+        );
       }
-    } catch (error) {
-      console.error(
-        'Error sending connection request:',
-        error
-      );
+    };
 
-      toast.error('Failed to send connection request');
+  const rejectRequest =
+    async (
+      connectionId
+    ) => {
+      try {
+        const {
+          error,
+        } = await supabase
+          .from(
+            'connections'
+          )
+          .update({
+            status:
+              'rejected',
+          })
+          .eq(
+            'id',
+            connectionId
+          );
 
-      throw error;
-    }
-  };
+        if (error) {
+          throw error;
+        }
 
-  const acceptRequest = async (connectionId) => {
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .update({ status: 'accepted' })
-        .eq('id', connectionId);
+        toast.success(
+          'Connection request declined'
+        );
 
-      if (error) throw error;
+        await fetchConnections();
+      } catch (error) {
+        console.error(
+          'Error rejecting request:',
+          error
+        );
 
-      toast.success('Connection request accepted');
+        toast.error(
+          'Failed to decline request'
+        );
+      }
+    };
 
-      await fetchConnections();
-    } catch (error) {
-      console.error(
-        'Error accepting request:',
-        error
-      );
+  const disconnect =
+    async (
+      connectionId
+    ) => {
+      if (
+        !window.confirm(
+          'Are you sure you want to remove this connection?'
+        )
+      ) {
+        return;
+      }
 
-      toast.error('Failed to accept request');
-    }
-  };
+      try {
+        const {
+          error,
+        } = await supabase
+          .from(
+            'connections'
+          )
+          .delete()
+          .eq(
+            'id',
+            connectionId
+          );
 
-  const rejectRequest = async (connectionId) => {
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .update({ status: 'rejected' })
-        .eq('id', connectionId);
+        if (error) {
+          throw error;
+        }
 
-      if (error) throw error;
+        toast.success(
+          'Connection removed successfully'
+        );
 
-      toast.success('Connection request declined');
+        await fetchConnections();
+        await fetchSuggestions();
+      } catch (error) {
+        console.error(
+          'Error removing connection:',
+          error
+        );
 
-      await fetchConnections();
-    } catch (error) {
-      console.error(
-        'Error rejecting request:',
-        error
-      );
+        toast.error(
+          'Failed to remove connection'
+        );
+      }
+    };
 
-      toast.error('Failed to decline request');
-    }
-  };
+  const withdrawRequest =
+    async (
+      connectionId
+    ) => {
+      try {
+        const {
+          error,
+        } = await supabase
+          .from(
+            'connections'
+          )
+          .delete()
+          .eq(
+            'id',
+            connectionId
+          );
 
-  const disconnect = async (connectionId) => {
-    if (
-      !window.confirm(
-        'Are you sure you want to remove this connection?'
-      )
-    ) {
-      return;
-    }
+        if (error) {
+          throw error;
+        }
 
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .delete()
-        .eq('id', connectionId);
+        toast.success(
+          'Connection request withdrawn'
+        );
 
-      if (error) throw error;
+        await fetchConnections();
+      } catch (error) {
+        console.error(
+          'Error withdrawing request:',
+          error
+        );
 
-      toast.success(
-        'Connection removed successfully'
-      );
-
-      await fetchConnections();
-      await fetchSuggestions();
-    } catch (error) {
-      console.error(
-        'Error removing connection:',
-        error
-      );
-
-      toast.error(
-        'Failed to remove connection'
-      );
-    }
-  };
-
-  const withdrawRequest = async (connectionId) => {
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .delete()
-        .eq('id', connectionId);
-
-      if (error) throw error;
-
-      toast.success(
-        'Connection request withdrawn'
-      );
-
-      await fetchConnections();
-    } catch (error) {
-      console.error(
-        'Error withdrawing request:',
-        error
-      );
-
-      toast.error(
-        'Failed to withdraw request'
-      );
-    }
-  };
+        toast.error(
+          'Failed to withdraw request'
+        );
+      }
+    };
 
   useEffect(() => {
     if (!user) {
@@ -347,50 +644,67 @@ export const useConnections = () => {
       return undefined;
     }
 
-    let cancelled = false;
+    let cancelled =
+      false;
 
-    const initialize = async () => {
-      setLoading(true);
+    const initialize =
+      async () => {
+        setLoading(true);
 
-      await fetchConnections();
+        await fetchConnections();
 
-      if (!cancelled) {
-        await fetchSuggestions();
-      }
-    };
+        if (!cancelled) {
+          await fetchSuggestions();
+        }
+      };
 
     initialize();
 
-    const channel = supabase
-      .channel(`connections_${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'connections',
-        },
-        (payload) => {
-          const newRecord = payload.new;
-          const oldRecord = payload.old;
+    const channel =
+      supabase
+        .channel(
+          `connections_${user.id}`
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'connections',
+          },
+          (payload) => {
+            const newRecord =
+              payload.new;
 
-          const affectsCurrentUser =
-            newRecord?.requester_id === user.id ||
-            newRecord?.addressee_id === user.id ||
-            oldRecord?.requester_id === user.id ||
-            oldRecord?.addressee_id === user.id;
+            const oldRecord =
+              payload.old;
 
-          if (affectsCurrentUser) {
-            fetchConnections();
-            fetchSuggestions();
+            const affectsCurrentUser =
+              newRecord?.requester_id ===
+                user.id ||
+              newRecord?.addressee_id ===
+                user.id ||
+              oldRecord?.requester_id ===
+                user.id ||
+              oldRecord?.addressee_id ===
+                user.id;
+
+            if (
+              affectsCurrentUser
+            ) {
+              fetchConnections();
+              fetchSuggestions();
+            }
           }
-        }
-      )
-      .subscribe();
+        )
+        .subscribe();
 
     return () => {
       cancelled = true;
-      supabase.removeChannel(channel);
+
+      supabase.removeChannel(
+        channel
+      );
     };
   }, [user]);
 
@@ -403,13 +717,20 @@ export const useConnections = () => {
     suggestionsLoading,
 
     connect,
-    sendRequest: connect,
+    sendRequest:
+      connect,
+
     acceptRequest,
     rejectRequest,
     disconnect,
     withdrawRequest,
+
     removeSuggestion,
-    refreshAllConnections: fetchConnections,
-    refreshSuggestions: fetchSuggestions,
+
+    refreshAllConnections:
+      fetchConnections,
+
+    refreshSuggestions:
+      fetchSuggestions,
   };
 };
