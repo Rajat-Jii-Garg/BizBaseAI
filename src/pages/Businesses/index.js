@@ -11,3 +11,8 @@ export { default as BusinessRedirect } from './BusinessRedirect';
 export { default as BusinessCatalog } from './BusinessCatalog';
 export { default as BusinessCustomers } from './BusinessCustomers';
 export { default as BusinessInvoices } from './BusinessInvoices';
+
+export { default as BusinessOperations } from './BusinessOperations';
+export { default as BusinessPurchases } from './BusinessPurchases';
+export { default as BusinessBilling } from './BusinessBilling';
+export { default as BusinessGrowth } from './BusinessGrowth';

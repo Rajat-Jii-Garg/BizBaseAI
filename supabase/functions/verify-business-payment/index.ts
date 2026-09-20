@@ -24,12 +24,28 @@ Deno.serve(async (req) => {
     if (!business || business.owner_id !== userData.user.id) throw new Error("Not allowed");
 
     const secret = Deno.env.get("RAZORPAY_KEY_SECRET");
-    if (!secret) throw new Error("Razorpay is not configured");
+    const keyId = Deno.env.get("RAZORPAY_KEY_ID");
+    if (!secret || !keyId) throw new Error("Razorpay is not configured");
     const expected = createHmac("sha256", secret).update(`${razorpay_order_id}|${razorpay_payment_id}`).digest("hex");
     if (expected !== razorpay_signature) throw new Error("Invalid payment signature");
 
+    const orderAuth = btoa(`${keyId}:${secret}`);
+    const orderResponse = await fetch(`https://api.razorpay.com/v1/orders/${razorpay_order_id}`, { headers: { Authorization: `Basic ${orderAuth}` } });
+    const razorpayOrder = await orderResponse.json();
+    if (!orderResponse.ok) throw new Error("Could not verify Razorpay order");
+    if (Number(razorpayOrder.amount) !== 500000 || razorpayOrder.currency !== "INR") throw new Error("Invalid payment amount");
+    if (razorpayOrder.notes?.business_id !== business_id) throw new Error("Payment does not belong to this business");
+
+    const { data: reservation } = await admin.from("business_subscription_payments").select("id,status,amount").eq("razorpay_order_id", razorpay_order_id).eq("business_id", business_id).maybeSingle();
+    if (!reservation) throw new Error("Payment order is not registered for this business");
+    if (reservation.status === "paid") return new Response(JSON.stringify({ success: true, already_processed: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
     const started = new Date();
-    const ends = new Date(started.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const { data: currentPlan } = await admin.from("businesses").select("subscription_ends_at").eq("id", business_id).single();
+    const base = currentPlan?.subscription_ends_at && new Date(currentPlan.subscription_ends_at) > started
+      ? new Date(currentPlan.subscription_ends_at)
+      : started;
+    const ends = new Date(base.getTime() + 30 * 24 * 60 * 60 * 1000);
     const { error } = await admin.from("businesses").update({
       subscription_status: "active",
       subscription_started_at: started.toISOString(),
@@ -37,6 +53,11 @@ Deno.serve(async (req) => {
       plan_name: "Business",
     }).eq("id", business_id);
     if (error) throw error;
+
+    const { error: paymentUpdateError } = await admin.from("business_subscription_payments").update({
+      razorpay_payment_id, status: "paid", paid_at: started.toISOString()
+    }).eq("razorpay_order_id", razorpay_order_id).eq("business_id", business_id);
+    if (paymentUpdateError) throw paymentUpdateError;
 
     await admin.from("business_activities").insert({
       business_id, actor_id: userData.user.id, entity_type: "subscription", action: "activated",

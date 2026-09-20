@@ -64,6 +64,10 @@ import {
   BusinessCatalog,
   BusinessCustomers,
   BusinessInvoices,
+  BusinessOperations,
+  BusinessPurchases,
+  BusinessBilling,
+  BusinessGrowth,
 } from "./pages/Businesses";
 import CompanyPage from "./pages/CompanyPage";
 
@@ -297,6 +301,10 @@ const App = () => (
                 <Route path="projects" element={<BusinessProjects />} />
                 <Route path="settings" element={<BusinessSettings />} />
                 <Route path="services" element={<BusinessServices />} />
+                <Route path="operations" element={<BusinessOperations />} />
+                <Route path="purchases" element={<BusinessPurchases />} />
+                <Route path="growth" element={<BusinessGrowth />} />
+                <Route path="billing" element={<BusinessBilling />} />
               </Route>
               <Route path="/company/:username" element={<CompanyPage />} />
 

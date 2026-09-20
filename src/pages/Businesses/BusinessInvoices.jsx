@@ -39,6 +39,10 @@ const BusinessInvoices = () => {
   const [saving, setSaving] = useState(false);
   const [viewing, setViewing] = useState(null);
   const [viewItems, setViewItems] = useState([]);
+  const [paymentInv, setPaymentInv] = useState(null);
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [paymentSaving, setPaymentSaving] = useState(false);
 
   const [form, setForm] = useState({
     customer_id: '', customer_name: '', invoice_number: '',
@@ -159,42 +163,41 @@ const BusinessInvoices = () => {
   };
 
   const updateStatus = async (inv, status) => {
-    const patch = { status };
-    if (status === 'paid') patch.amount_paid = inv.total;
-    const { error } = await supabase.from('business_invoices').update(patch).eq('id', inv.id);
-    if (error) { toast.error('Could not update'); return; }
-
-    if (status === 'paid' && inv.status !== 'paid') {
-      const { data: existing } = await supabase
-        .from('business_transactions')
-        .select('id')
-        .eq('business_id', businessId)
-        .eq('invoice_number', inv.invoice_number)
-        .eq('type', 'income')
-        .limit(1);
-      if (!existing?.length) {
-        await supabase.from('business_transactions').insert({
-          business_id: businessId,
-          type: 'income',
-          amount: inv.total,
-          description: `Invoice ${inv.invoice_number} — ${inv.customer_name || 'Customer'}`,
-          category: 'Sales',
-          date: new Date().toISOString().slice(0, 10),
-          invoice_number: inv.invoice_number,
-          payment_method: 'recorded'
-        });
-      }
+    if (status === 'paid') {
+      const outstanding = Math.max(0, Number(inv.total || 0) - Number(inv.amount_paid || 0));
+      if (outstanding <= 0) return;
+      setPaymentInv(inv);
+      setPaymentAmount(String(outstanding));
+      return;
     }
-
+    const { error } = await supabase.from('business_invoices').update({ status }).eq('id', inv.id);
+    if (error) { toast.error(error.message); return; }
     await supabase.from('business_activities').insert({
-      business_id: businessId,
-      entity_type: 'invoice',
-      entity_id: inv.id,
-      action: 'status_changed',
+      business_id: businessId, entity_type: 'invoice', entity_id: inv.id, action: 'status_changed',
       detail: `Invoice ${inv.invoice_number} marked ${status.replace('_',' ')}`
     });
+    setInvoices(prev => prev.map(i => i.id === inv.id ? { ...i, status } : i));
+  };
 
-    setInvoices(prev => prev.map(i => i.id === inv.id ? { ...i, ...patch } : i));
+  const recordPayment = async () => {
+    if (!paymentInv) return;
+    const amount = Number(paymentAmount);
+    const outstanding = Math.max(0, Number(paymentInv.total || 0) - Number(paymentInv.amount_paid || 0));
+    if (!amount || amount <= 0 || amount > outstanding + 0.01) return toast.error('Enter a valid payment amount');
+    setPaymentSaving(true);
+    try {
+      const { error } = await supabase.rpc('record_business_invoice_payment', {
+        _invoice_id: paymentInv.id,
+        _amount: amount,
+        _payment_method: paymentMethod,
+        _reference: null,
+      });
+      if (error) throw error;
+      toast.success('Payment recorded');
+      setPaymentInv(null); setPaymentAmount('');
+      await fetchAll();
+    } catch (e) { toast.error(e.message || 'Could not record payment'); }
+    finally { setPaymentSaving(false); }
   };
 
   const remove = async (id) => {
@@ -209,8 +212,8 @@ const BusinessInvoices = () => {
     setViewItems(data || []);
   };
 
-  const paid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + Number(i.total || 0), 0);
-  const outstanding = invoices.filter(i => ['sent', 'overdue'].includes(i.status)).reduce((s, i) => s + Number(i.total || 0), 0);
+  const paid = invoices.reduce((s, i) => s + Number(i.amount_paid || 0), 0);
+  const outstanding = invoices.reduce((s, i) => s + Math.max(0, Number(i.total || 0) - Number(i.amount_paid || 0)), 0);
 
   return (
     <div className="p-3 md:p-5 space-y-4 text-[13px]">
@@ -281,7 +284,10 @@ const BusinessInvoices = () => {
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="p-2.5 text-right">
+                  <td className="p-2.5 text-right whitespace-nowrap">
+                    {Number(inv.total || 0) - Number(inv.amount_paid || 0) > 0.01 && !['draft','cancelled'].includes(inv.status) && (
+                      <Button variant="outline" size="sm" className="h-7 text-[10px] mr-1" onClick={() => { setPaymentInv(inv); setPaymentAmount(String(Math.max(0, Number(inv.total || 0) - Number(inv.amount_paid || 0)))); }}>Record payment</Button>
+                    )}
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => remove(inv.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                   </td>
                 </tr>
@@ -290,6 +296,19 @@ const BusinessInvoices = () => {
           </table>
         </CardContent></Card>
       )}
+
+      {/* Record payment */}
+      <Dialog open={!!paymentInv} onOpenChange={(o) => { if (!o) setPaymentInv(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle className="text-sm">Record payment</DialogTitle></DialogHeader>
+          {paymentInv && <div className="space-y-3">
+            <div className="rounded-lg bg-muted/40 p-3 text-xs"><p className="font-medium">{paymentInv.invoice_number}</p><p className="text-muted-foreground">Outstanding: {formatMoney(Math.max(0, Number(paymentInv.total || 0) - Number(paymentInv.amount_paid || 0)), currency)}</p></div>
+            <div><Label className="text-xs">Amount</Label><Input type="number" min="0.01" value={paymentAmount} onChange={e=>setPaymentAmount(e.target.value)} className="h-8 text-xs mt-1" /></div>
+            <div><Label className="text-xs">Payment method</Label><Select value={paymentMethod} onValueChange={setPaymentMethod}><SelectTrigger className="h-8 text-xs mt-1"><SelectValue /></SelectTrigger><SelectContent>{['upi','cash','bank_transfer','card','other'].map(x=><SelectItem key={x} value={x} className="text-xs">{x.replace('_',' ')}</SelectItem>)}</SelectContent></Select></div>
+            <Button className="w-full h-8 text-xs" disabled={paymentSaving} onClick={recordPayment}>{paymentSaving ? 'Saving…' : 'Record payment'}</Button>
+          </div>}
+        </DialogContent>
+      </Dialog>
 
       {/* Create invoice */}
       <Dialog open={open} onOpenChange={setOpen}>

@@ -2,7 +2,8 @@ import React from 'react';
 import { NavLink, useParams, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Briefcase, FolderKanban, Users, UserPlus,
-  DollarSign, Settings, ArrowLeft, Building2, X, Package, Contact, FileText, ExternalLink
+  DollarSign, Settings, ArrowLeft, Building2, X, Package, Contact, FileText, ExternalLink,
+  ClipboardList, Truck, TrendingUp, CreditCard
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,6 +26,9 @@ const BusinessSidebar = ({ onClose }) => {
     { icon: Contact, label: 'Customers', path: `/business/${slug}/customers` },
     { icon: FileText, label: 'Sales & Invoices', path: `/business/${slug}/invoices` },
     { icon: DollarSign, label: 'Finance & Cashflow', path: `/business/${slug}/finance` },
+    { icon: ClipboardList, label: 'Operations', path: `/business/${slug}/operations` },
+    { icon: Truck, label: 'Purchases', path: `/business/${slug}/purchases` },
+    { icon: TrendingUp, label: 'Growth', path: `/business/${slug}/growth` },
   ];
 
   const handleBackToPersonal = () => { exitBusinessMode(); navigate('/dashboard'); };
@@ -97,6 +101,20 @@ const BusinessSidebar = ({ onClose }) => {
           >
             <Settings className="w-4 h-4" />
             <span className="text-xs">Settings</span>
+          </NavLink>
+          <NavLink
+            to={`/business/${slug}/billing`}
+            onClick={handleNavClick}
+            className={({ isActive }) =>
+              `flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all duration-200 ${
+                isActive
+                  ? 'bg-primary text-primary-foreground font-medium shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`
+            }
+          >
+            <CreditCard className="w-4 h-4" />
+            <span className="text-xs">Billing</span>
           </NavLink>
         </div>
       </nav>

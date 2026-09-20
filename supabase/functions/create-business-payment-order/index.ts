@@ -35,6 +35,12 @@ Deno.serve(async (req) => {
     const order = await response.json();
     if (!response.ok) throw new Error(order?.error?.description || "Could not create payment order");
 
+    const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const { error: recordError } = await admin.from("business_subscription_payments").insert({
+      business_id: business.id, razorpay_order_id: order.id, amount: 5000, currency: "INR", status: "created"
+    });
+    if (recordError) throw new Error("Could not reserve payment order");
+
     return new Response(JSON.stringify({ order, key_id: keyId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ error: e?.message || "Payment order failed" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
