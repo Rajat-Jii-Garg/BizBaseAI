@@ -5,11 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Building2, 
-  Users, 
-  MapPin, 
-  Globe, 
+import {
+  Building2,
+  Users,
+  MapPin,
+  Globe,
   Mail,
   Phone,
   CheckCircle,
@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import SEOHead from '@/components/SEOHead';
 import DashboardLayout from '@/components/DashboardLayout';
-import LaunchingSoonOverlay from '@/components/LaunchingSoonOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,10 +30,12 @@ const BusinessSetup = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
+
   const [formData, setFormData] = useState({
     businessName: '',
     businessUsername: '',
@@ -161,20 +162,24 @@ const BusinessSetup = () => {
     'Other'
   ];
 
-  // Check username availability with debounce
   const checkUsernameAvailability = async (username) => {
     if (!username || username.length < 3) {
       setUsernameAvailable(null);
       return;
     }
-    
+
     setCheckingUsername(true);
+
     try {
-      const { data, error } = await supabase.rpc('is_username_available', { 
-        check_username: username 
-      });
-      
+      const { data, error } = await supabase.rpc(
+        'is_username_available',
+        {
+          check_username: username
+        }
+      );
+
       if (error) throw error;
+
       setUsernameAvailable(data);
     } catch (error) {
       console.error('Error checking username:', error);
@@ -185,380 +190,173 @@ const BusinessSetup = () => {
   };
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    if (field === 'businessUsername') {
+      const sanitized = value
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, '');
+
+      setFormData((prev) => ({
+        ...prev,
+        businessUsername: sanitized
+      }));
+
+      checkUsernameAvailability(sanitized);
+      return;
+    }
+
+    setFormData((prev) => ({
       ...prev,
       [field]: value
     }));
-    
-    // Check username when it changes
-    if (field === 'businessUsername') {
-      const sanitized = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
-      setFormData(prev => ({ ...prev, businessUsername: sanitized }));
-      checkUsernameAvailability(sanitized);
-    }
   };
 
   const handleNext = () => {
     if (!validateStep()) {
       toast({
-        title: "Missing Information",
-        description: "Please fill all required fields before continuing.",
-        variant: "destructive"
+        title: 'Missing Information',
+        description:
+          'Please fill all required fields before continuing.',
+        variant: 'destructive'
       });
+
       return;
     }
+
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
   const handleSubmit = async () => {
     if (!user) {
       toast({
-        title: "Not logged in",
-        description: "Please login to register your business",
-        variant: "destructive"
+        title: 'Not logged in',
+        description:
+          'Please login to register your business.',
+        variant: 'destructive'
       });
+
       return;
     }
 
-    if (usernameAvailable === false) {
+    if (usernameAvailable !== true) {
       toast({
-        title: "Username Not Available",
-        description: "Please choose a different username for your business.",
-        variant: "destructive"
+        title: 'Username Not Available',
+        description:
+          'Please choose a valid and available username.',
+        variant: 'destructive'
       });
+
+      return;
+    }
+
+    if (!validateStep()) {
+      toast({
+        title: 'Missing Information',
+        description:
+          'Please complete all required information.',
+        variant: 'destructive'
+      });
+
       return;
     }
 
     setIsSubmitting(true);
+
     try {
       const { data, error } = await supabase
         .from('businesses')
         .insert({
           owner_id: user.id,
-          name: formData.businessName,
-          username: formData.businessUsername,
+          name: formData.businessName.trim(),
+          username: formData.businessUsername.trim(),
           business_type: formData.businessType,
           industry: formData.industry,
           category: formData.category,
-          description: formData.description,
-          website: formData.website,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          country: formData.country,
+          description: formData.description.trim(),
+          website: formData.website.trim() || null,
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          address: formData.address.trim(),
+          city: formData.city.trim(),
+          country: formData.country.trim(),
           status: 'active'
         })
         .select()
         .single();
 
       if (error) {
-        // Handle specific errors
-        if (error.message.includes('businesses_email_unique') || error.message.includes('duplicate key') && error.message.includes('email')) {
-          throw new Error('This email is already registered with another business.');
+        const message = error.message || '';
+
+        if (
+          message.includes('businesses_email_unique') ||
+          (message.includes('duplicate key') &&
+            message.includes('email'))
+        ) {
+          throw new Error(
+            'This email is already registered with another business.'
+          );
         }
-        if (error.message.includes('businesses_phone_unique') || error.message.includes('duplicate key') && error.message.includes('phone')) {
-          throw new Error('This phone number is already registered with another business.');
+
+        if (
+          message.includes('businesses_phone_unique') ||
+          (message.includes('duplicate key') &&
+            message.includes('phone'))
+        ) {
+          throw new Error(
+            'This phone number is already registered with another business.'
+          );
         }
-        if (error.message.includes('businesses_username_unique') || error.message.includes('Username already taken')) {
-          throw new Error('This username is already taken. Please choose another.');
+
+        if (
+          message.includes('businesses_username_unique') ||
+          message.includes('Username already taken')
+        ) {
+          throw new Error(
+            'This username is already taken. Please choose another.'
+          );
         }
+
         throw error;
       }
 
       toast({
-        title: "Business Registered Successfully 🎉",
-        description: "Welcome to your business dashboard!"
+        title: 'Business Registered Successfully 🎉',
+        description:
+          'Welcome to your business dashboard!'
       });
 
-      // Dispatch custom event to notify header components
-      console.log('BusinessSetup: Dispatching business update event');
-      window.dispatchEvent(new CustomEvent(BUSINESS_UPDATED_EVENT));
+      window.dispatchEvent(
+        new CustomEvent(BUSINESS_UPDATED_EVENT)
+      );
 
-      // Small delay to ensure event is processed, then redirect
-      setTimeout(() => {
-        navigate(`/business/${data.username}/dashboard`);
-      }, 100);
-
+      navigate(
+        `/business/${data.username}/dashboard`
+      );
     } catch (error) {
-      console.error(error);
+      console.error('Business registration error:', error);
+
       toast({
-        title: "Registration Failed",
-        description: error.message || "Something went wrong. Please try again.",
-        variant: "destructive"
+        title: 'Registration Failed',
+        description:
+          error?.message ||
+          'Something went wrong. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-
-  const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Basic Business Information -</h2>
-              <p className="text-gray-600">Fill up basic business details to get started.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="businessName">Business Name *</Label>
-                <Input
-                  id="businessName"
-                  placeholder="Enter your Business name"
-                  value={formData.businessName}
-                  onChange={(e) => handleInputChange('businessName', e.target.value)}
-                />
-              </div>
-              
-              {/* Business Username Field */}
-              <div className="space-y-2">
-                <Label htmlFor="businessUsername">Business Username *</Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">@</span>
-                  <Input
-                    id="businessUsername"
-                    placeholder="yourbusiness"
-                    value={formData.businessUsername}
-                    onChange={(e) => handleInputChange('businessUsername', e.target.value)}
-                    className={`pl-8 ${
-                      usernameAvailable === true ? 'border-green-500 focus:border-green-500' : 
-                      usernameAvailable === false ? 'border-red-500 focus:border-red-500' : ''
-                    }`}
-                  />
-                  {checkingUsername && (
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-                      Checking...
-                    </span>
-                  )}
-                  {!checkingUsername && usernameAvailable === true && (
-                    <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
-                  )}
-                  {!checkingUsername && usernameAvailable === false && (
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 text-sm">
-                      Taken
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-gray-500">
-                  Your business URL: bizbase.com/@{formData.businessUsername || 'yourbusiness'}
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="businessType">Business-Type *</Label>
-                <select
-                  id="businessType"
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={formData.businessType}
-                  onChange={(e) => handleInputChange('businessType', e.target.value)}
-                >
-                  <option value="">Select business type</option>
-                  {businessTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="industry">Industry *</Label>
-                <select
-                  id="industry"
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={formData.industry}
-                  onChange={(e) => handleInputChange('industry', e.target.value)}
-                >
-                  <option value="">Select industry</option>
-                  {industries.map(industry => (
-                    <option key={industry} value={industry}>{industry}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="category">Category *</Label>
-                <select
-                  id="category"
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
-                >
-                  <option value="">Select category</option>
-                  {businessCategories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="description">Business Description *</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe what your business does, your mission, and what makes you unique..."
-                  rows={4}
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Business Contact Information -</h2>
-              <p className="text-gray-600">How your customers and partners reach you?</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="website">Website URL :</Label>
-                <Input
-                  id="website"
-                  type="url"
-                  placeholder="https://yourbusiness.com/"
-                  value={formData.website}
-                  onChange={(e) => handleInputChange('website', e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Business Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="hello@yourbusiness.com"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phone">Business Phone *</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+91 (123) 456-7890"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="city">City *</Label>
-                <Input
-                  id="city"
-                  placeholder="New York"
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="country">Country *</Label>
-                <Input
-                  id="country"
-                  placeholder="United States"
-                  value={formData.country}
-                  onChange={(e) => handleInputChange('country', e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="address">Business Address *</Label>
-                <Textarea
-                  id="address"
-                  placeholder="123 Business Street, Suite 100"
-                  rows={3}
-                  value={formData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify & Submit -</h2>
-              <p className="text-gray-600">Verify your Business Details carefully and Submit Registration!</p>
-            </div>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Business Details :</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">Business Name :</span>
-                    <p className="text-gray-600">{formData.businessName || 'Not provided'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Username :</span>
-                    <p className="text-gray-600">@{formData.businessUsername || 'Not provided'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Industry :</span>
-                    <p className="text-gray-600">{formData.industry || 'Not provided'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Category :</span>
-                    <p className="text-gray-600">{formData.category || 'Not provided'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Business-Type :</span>
-                    <p className="text-gray-600">{formData.businessType || 'Not provided'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Email :</span>
-                    <p className="text-gray-600">{formData.email || 'Not provided'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Phone :</span>
-                    <p className="text-gray-600">{formData.phone || 'Not provided'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">City :</span>
-                    <p className="text-gray-600">{formData.city || 'Not provided'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Country :</span>
-                    <p className="text-gray-600">{formData.country || 'Not provided'}</p>
-                  </div>
-                  <div className="md:col-span-2">
-                    <span className="font-medium">Business Address :</span>
-                    <p className="text-gray-600">{formData.address || 'Not provided'}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   const validateStep = () => {
     if (currentStep === 1) {
-      return (
+      return Boolean(
         formData.businessName.trim() &&
         formData.businessUsername.trim() &&
         formData.businessUsername.length >= 3 &&
@@ -571,11 +369,11 @@ const BusinessSetup = () => {
     }
 
     if (currentStep === 2) {
-      return (
+      return Boolean(
         formData.email.trim() &&
         formData.phone.trim() &&
-        formData.address.trim() && 
-        formData.city.trim() && 
+        formData.address.trim() &&
+        formData.city.trim() &&
         formData.country.trim()
       );
     }
@@ -583,44 +381,549 @@ const BusinessSetup = () => {
     return true;
   };
 
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Basic Business Information
+              </h2>
+
+              <p className="text-gray-600">
+                Fill up your basic business details to get started.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              <div className="space-y-2">
+                <Label htmlFor="businessName">
+                  Business Name *
+                </Label>
+
+                <Input
+                  id="businessName"
+                  placeholder="Enter your Business name"
+                  value={formData.businessName}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'businessName',
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="businessUsername">
+                  Business Username *
+                </Label>
+
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                    @
+                  </span>
+
+                  <Input
+                    id="businessUsername"
+                    placeholder="yourbusiness"
+                    value={formData.businessUsername}
+                    onChange={(e) =>
+                      handleInputChange(
+                        'businessUsername',
+                        e.target.value
+                      )
+                    }
+                    className={`pl-8 ${
+                      usernameAvailable === true
+                        ? 'border-green-500 focus:border-green-500'
+                        : usernameAvailable === false
+                        ? 'border-red-500 focus:border-red-500'
+                        : ''
+                    }`}
+                  />
+
+                  {checkingUsername && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                      Checking...
+                    </span>
+                  )}
+
+                  {!checkingUsername &&
+                    usernameAvailable === true && (
+                      <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                    )}
+
+                  {!checkingUsername &&
+                    usernameAvailable === false && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 text-sm">
+                        Taken
+                      </span>
+                    )}
+                </div>
+
+                <p className="text-xs text-gray-500">
+                  Your business URL: bizbase.com/@
+                  {formData.businessUsername ||
+                    'yourbusiness'}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="businessType">
+                  Business Type *
+                </Label>
+
+                <select
+                  id="businessType"
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={formData.businessType}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'businessType',
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Select business type
+                  </option>
+
+                  {businessTypes.map((type) => (
+                    <option
+                      key={type}
+                      value={type}
+                    >
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="industry">
+                  Industry *
+                </Label>
+
+                <select
+                  id="industry"
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={formData.industry}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'industry',
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Select industry
+                  </option>
+
+                  {industries.map((industry) => (
+                    <option
+                      key={industry}
+                      value={industry}
+                    >
+                      {industry}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">
+                  Category *
+                </Label>
+
+                <select
+                  id="category"
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={formData.category}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'category',
+                      e.target.value
+                    )
+                  }
+                >
+                  <option value="">
+                    Select category
+                  </option>
+
+                  {businessCategories.map((category) => (
+                    <option
+                      key={category}
+                      value={category}
+                    >
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="description">
+                  Business Description *
+                </Label>
+
+                <Textarea
+                  id="description"
+                  placeholder="Describe what your business does, your mission, and what makes you unique..."
+                  rows={4}
+                  value={formData.description}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'description',
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Business Contact Information
+              </h2>
+
+              <p className="text-gray-600">
+                How your customers and partners reach you?
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              <div className="space-y-2">
+                <Label htmlFor="website">
+                  Website URL
+                </Label>
+
+                <Input
+                  id="website"
+                  type="url"
+                  placeholder="https://yourbusiness.com/"
+                  value={formData.website}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'website',
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Business Email *
+                </Label>
+
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="hello@yourbusiness.com"
+                  value={formData.email}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'email',
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">
+                  Business Phone *
+                </Label>
+
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+91 9876543210"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'phone',
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="city">
+                  City *
+                </Label>
+
+                <Input
+                  id="city"
+                  placeholder="Jaipur"
+                  value={formData.city}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'city',
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="country">
+                  Country *
+                </Label>
+
+                <Input
+                  id="country"
+                  placeholder="India"
+                  value={formData.country}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'country',
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="address">
+                  Business Address *
+                </Label>
+
+                <Textarea
+                  id="address"
+                  placeholder="Business address"
+                  rows={3}
+                  value={formData.address}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'address',
+                      e.target.value
+                    )
+                  }
+                />
+              </div>
+
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Verify & Submit
+              </h2>
+
+              <p className="text-gray-600">
+                Verify your business details carefully and
+                submit registration.
+              </p>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  Business Details
+                </CardTitle>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+                  <div>
+                    <span className="font-medium">
+                      Business Name
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.businessName ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-medium">
+                      Username
+                    </span>
+
+                    <p className="text-gray-600">
+                      @{formData.businessUsername ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-medium">
+                      Industry
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.industry ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-medium">
+                      Category
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.category ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-medium">
+                      Business Type
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.businessType ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-medium">
+                      Email
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.email ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-medium">
+                      Phone
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.phone ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-medium">
+                      City
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.city ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-medium">
+                      Country
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.country ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <span className="font-medium">
+                      Business Address
+                    </span>
+
+                    <p className="text-gray-600">
+                      {formData.address ||
+                        'Not provided'}
+                    </p>
+                  </div>
+
+                </div>
+
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <DashboardLayout>
-      <SEOHead title="Business Registration" description="Set up your business on BizBase. Create your business profile and start growing." path="/business-setup" />
-      <LaunchingSoonOverlay
-        title="Business Registration — Launching Soon"
-        subtitle="We are finalising the business onboarding flow. Meanwhile, build your personal brand & smart network on BizBase — that's where real opportunities are happening right now."
-      >
+
+      <SEOHead
+        title="Business Registration"
+        description="Set up your business on BizBase. Create your business profile and start growing."
+        path="/business-setup"
+      />
+
       <div className="max-w-4xl mx-auto p-6">
+
         {/* Header */}
         <div className="text-center mb-8">
+
           <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
             <Building2 className="w-8 h-8 text-blue-600" />
             Register Your Business
           </h1>
-          <p className="text-gray-600 mt-2">Join thousands of Businesses Growing Network with BizBase!</p>
+
+          <p className="text-gray-600 mt-2">
+            Set up your business and start managing it with BizBase.
+          </p>
+
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress */}
         <Card className="mb-8">
           <CardContent className="p-6">
+
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-gray-700">Step {currentStep} of {totalSteps}</span>
-              <span className="text-sm font-medium text-gray-700">{Math.round(progressPercentage)}% complete</span>
+
+              <span className="text-sm font-medium text-gray-700">
+                Step {currentStep} of {totalSteps}
+              </span>
+
+              <span className="text-sm font-medium text-gray-700">
+                {Math.round(progressPercentage)}% complete
+              </span>
+
             </div>
-            <Progress value={progressPercentage} className="h-2" />
+
+            <Progress
+              value={progressPercentage}
+              className="h-2"
+            />
+
           </CardContent>
         </Card>
 
-        {/* Form Content */}
+        {/* Form */}
         <Card>
           <CardContent className="p-8">
             {renderStep()}
           </CardContent>
         </Card>
 
-        {/* Navigation Buttons */}
+        {/* Navigation */}
         <div className="flex justify-between mt-8">
+
           <Button
             variant="outline"
             onClick={handlePrevious}
@@ -630,7 +933,7 @@ const BusinessSetup = () => {
             <ArrowLeft className="w-4 h-4" />
             Previous
           </Button>
-          
+
           {currentStep < totalSteps ? (
             <Button
               onClick={handleNext}
@@ -648,20 +951,24 @@ const BusinessSetup = () => {
             >
               {isSubmitting ? (
                 <>
-                  <span className="animate-spin">⏳</span>
+                  <span className="animate-spin">
+                    ⏳
+                  </span>
                   Registering...
                 </>
               ) : (
                 <>
                   <Rocket className="w-4 h-4" />
-                  Submit Registration
+                  Register Business
                 </>
               )}
             </Button>
           )}
+
         </div>
+
       </div>
-      </LaunchingSoonOverlay>
+
     </DashboardLayout>
   );
 };
