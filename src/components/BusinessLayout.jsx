@@ -18,10 +18,18 @@ const BusinessLayout = () => {
   const [initializing, setInitializing] = useState(true);
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [syncVersion, setSyncVersion] = useState(0);
 
   useEffect(() => {
     if (isMobile) setSidebarOpen(false);
   }, [slug, isMobile]);
+
+  useEffect(() => {
+    let timer;
+    const onChange = () => { clearTimeout(timer); timer = setTimeout(() => setSyncVersion((v) => v + 1), 450); };
+    window.addEventListener('bizbase:business-data-changed', onChange);
+    return () => { clearTimeout(timer); window.removeEventListener('bizbase:business-data-changed', onChange); };
+  }, []);
 
   useEffect(() => {
     const initBusiness = async () => {
@@ -83,8 +91,8 @@ const BusinessLayout = () => {
           </div>
 
           {/* Main Content */}
-          <main className="flex-1 overflow-x-clip overflow-y-auto h-[calc(100vh-41px)]">
-            <Outlet />
+          <main className="flex-1 min-w-0 overflow-x-clip overflow-y-auto h-[calc(100vh-41px)] pb-[env(safe-area-inset-bottom)]">
+            <Outlet key={`${slug}-${syncVersion}`} />
           </main>
         </div>
       </div>

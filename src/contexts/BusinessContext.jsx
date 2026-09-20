@@ -18,6 +18,7 @@ export const BusinessProvider = ({ children }) => {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isBusinessMode, setIsBusinessMode] = useState(false);
+  const [dataVersion, setDataVersion] = useState(0);
 
   // Fetch all businesses owned by the user
   const fetchBusinesses = useCallback(async () => {
@@ -29,14 +30,23 @@ export const BusinessProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('businesses')
-        .select('*')
-        .eq('owner_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setBusinesses(data || []);
+      const [{ data: owned, error: ownedError }, { data: memberships, error: membershipError }] = await Promise.all([
+        supabase.from('businesses').select('*').eq('owner_id', user.id),
+        supabase.from('business_team_members').select('business_id').eq('user_id', user.id).eq('status', 'active')
+      ]);
+      if (ownedError) throw ownedError;
+      if (membershipError) throw membershipError;
+      const memberIds = [...new Set((memberships || []).map((m) => m.business_id).filter(Boolean))];
+      let memberBusinesses = [];
+      if (memberIds.length) {
+        const { data, error } = await supabase.from('businesses').select('*').in('id', memberIds);
+        if (error) throw error;
+        memberBusinesses = data || [];
+      }
+      const merged = [...(owned || []), ...memberBusinesses];
+      const unique = Array.from(new Map(merged.map((b) => [b.id, b])).values())
+        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      setBusinesses(unique);
     } catch (error) {
       console.error('Error fetching businesses:', error);
     } finally {
@@ -155,24 +165,27 @@ export const BusinessProvider = ({ children }) => {
     }
   }, [businesses]);
 
-  // Realtime updates Supabase -
+  // One business-scoped realtime channel keeps every business screen in sync.
   useEffect(() => {
-    if (!user?.id) return;
-
-    const channel = supabase
-      .channel(`user_businesses_${user.id}`)
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'businesses', filter: `owner_id=eq.${user.id}` },
-        () => {
-          fetchBusinesses();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id, fetchBusinesses]);
+    if (!user?.id || !currentBusiness?.id) return;
+    const bid = currentBusiness.id;
+    const tables = [
+      'business_leads','business_customers','business_invoices','business_transactions',
+      'business_products','business_projects','business_activities','business_growth_plans',
+      'business_growth_campaigns','business_alerts','business_team_members','businesses'
+    ];
+    const channel = supabase.channel(`business_live_${bid}`);
+    tables.forEach((table) => {
+      const filter = table === 'businesses' ? `id=eq.${bid}` : `business_id=eq.${bid}`;
+      channel.on('postgres_changes', { event: '*', schema: 'public', table, filter }, () => {
+        setDataVersion((v) => v + 1);
+        window.dispatchEvent(new CustomEvent('bizbase:business-data-changed', { detail: { businessId: bid, table } }));
+        if (table === 'businesses') fetchBusinesses();
+      });
+    });
+    channel.subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user?.id, currentBusiness?.id, fetchBusinesses]);
 
   const value = {
     currentBusiness,
@@ -184,7 +197,8 @@ export const BusinessProvider = ({ children }) => {
     switchBusiness,
     exitBusinessMode,
     isBusinessOwner,
-    hasBusinesses: businesses.length > 0
+    hasBusinesses: businesses.length > 0,
+    dataVersion
   };
 
   return (

@@ -1,43 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React,{useMemo} from 'react';
+import { CalendarClock, CheckCircle2, CreditCard, Download, ShieldCheck, Zap } from 'lucide-react';
+import { Card,CardContent,CardHeader,CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, CreditCard, Loader2, ShieldCheck } from 'lucide-react';
 import { useBusinessContext } from '@/contexts/BusinessContext';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const BusinessBilling = () => {
-  const { currentBusiness } = useBusinessContext();
-  const [paying,setPaying]=useState(false);
-  const [loaded,setLoaded]=useState(false);
-  useEffect(()=>{ const s=document.createElement('script'); s.src='https://checkout.razorpay.com/v1/checkout.js'; s.onload=()=>setLoaded(true); s.onerror=()=>setLoaded(false); document.body.appendChild(s); return()=>s.remove()},[]);
-  const active=currentBusiness?.subscription_status==='active' && currentBusiness?.subscription_ends_at && new Date(currentBusiness.subscription_ends_at)>new Date();
-  const trial=currentBusiness?.subscription_status==='trialing';
-  const pay=async()=>{
-    if(!currentBusiness?.id)return;
-    if(!loaded)return toast.error('Payment checkout could not load. Check your internet connection.');
-    setPaying(true);
-    try{
-      const {data,error}=await supabase.functions.invoke('create-business-payment-order',{body:{business_id:currentBusiness.id}});
-      if(error||data?.error)throw new Error(error?.message||data?.error);
-      const options={
-        key:data.key_id,amount:data.order.amount,currency:data.order.currency,name:'BizBase',description:'Business Plan — 30 days',
-        order_id:data.order.id,prefill:{name:currentBusiness.name,email:currentBusiness.email||''},
-        theme:{color:'#2563eb'},
-        handler:async(response)=>{
-          const {data:verified,error:verifyError}=await supabase.functions.invoke('verify-business-payment',{body:{business_id:currentBusiness.id,...response}});
-          if(verifyError||verified?.error)throw new Error(verifyError?.message||verified?.error);
-          toast.success('Business plan activated for 30 days');window.location.reload();
-        },
-        modal:{ondismiss:()=>setPaying(false)}
-      };
-      const rzp=new window.Razorpay(options);rzp.on('payment.failed',()=>{toast.error('Payment failed. Please try again.');setPaying(false)});rzp.open();
-    }catch(e){toast.error(e.message||'Could not start payment');setPaying(false)}
-  };
-  return <div className="p-4 md:p-6 max-w-[1000px] mx-auto space-y-5">
-    <div><p className="text-xs text-primary font-semibold uppercase tracking-wider">Billing</p><h1 className="text-2xl font-bold">Business plan</h1><p className="text-sm text-muted-foreground mt-1">One workspace for CRM, sales, inventory, finance, team and operations.</p></div>
-    <Card className="border-primary/20"><CardHeader><div className="flex items-center justify-between"><CardTitle className="text-xl">BizBase Business</CardTitle><Badge>{active?'Active':trial?'Free trial':'Inactive'}</Badge></div></CardHeader><CardContent className="space-y-5"><div className="flex items-end gap-2"><span className="text-4xl font-bold">₹5,000</span><span className="text-sm text-muted-foreground mb-1">/ 30 days</span></div><div className="grid sm:grid-cols-2 gap-2 text-sm">{['CRM & leads','Customers & sales','Invoices & payments','Products & inventory','Purchases & suppliers','Team & attendance','Projects & tasks','Business dashboard & reports'].map(x=><div key={x} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-600"/>{x}</div>)}</div>{trial&&currentBusiness?.trial_ends_at&&<p className="text-sm bg-primary/5 rounded-lg p-3">Trial ends on <b>{new Date(currentBusiness.trial_ends_at).toLocaleDateString('en-IN')}</b>. Upgrade now to keep uninterrupted access.</p>}{active&&<p className="text-sm bg-emerald-500/10 rounded-lg p-3">Active until <b>{new Date(currentBusiness.subscription_ends_at).toLocaleDateString('en-IN')}</b>.</p>}<Button size="lg" className="w-full" onClick={pay} disabled={paying||active}>{paying?<><Loader2 className="w-4 h-4 mr-2 animate-spin"/>Opening secure checkout…</>:active?<><ShieldCheck className="w-4 h-4 mr-2"/>Plan active</>:<><CreditCard className="w-4 h-4 mr-2"/>Upgrade for ₹5,000</>}</Button><p className="text-[11px] text-center text-muted-foreground">Secure checkout powered by Razorpay. Configure Razorpay secrets in Supabase Edge Functions before accepting live payments.</p></CardContent></Card>
-  </div>
-};
-export default BusinessBilling;
+export default function BusinessBilling(){
+ const {currentBusiness}=useBusinessContext();
+ const days=useMemo(()=>currentBusiness?.trial_ends_at?Math.max(0,Math.ceil((new Date(currentBusiness.trial_ends_at)-new Date())/86400000)):30,[currentBusiness]);
+ return <div className="p-4 md:p-6 max-w-[1000px] mx-auto space-y-5"><div><p className="text-xs text-primary font-semibold uppercase tracking-[.15em]">Simple billing</p><h1 className="text-2xl font-bold">Use first. Pay later.</h1><p className="text-sm text-muted-foreground mt-1">30 days free. No card. No auto-pay. After the trial, paid features can be used on a transparent usage-based plan.</p></div>
+ <Card className="border-primary/20"><CardContent className="p-6"><div className="flex flex-col md:flex-row md:items-center justify-between gap-4"><div><Badge variant="secondary"><CalendarClock className="w-3 h-3 mr-1"/> {days} days left in free access</Badge><h2 className="text-2xl font-bold mt-3">BizBase Growth Control</h2><p className="text-sm text-muted-foreground mt-1">Core business data and the basic growth loop remain simple and transparent.</p></div><div className="text-right"><p className="text-4xl font-bold">₹0</p><p className="text-xs text-muted-foreground">during trial</p></div></div><div className="grid sm:grid-cols-2 gap-3 mt-6">{['Business Pulse','Lead capture & CRM','Lead Leak Detector','7-Day Growth Plans','Customers & business data','CSV import / export','No credit card','No automatic charge'].map(x=><div key={x} className="flex items-center gap-2 text-sm"><CheckCircle2 className="w-4 h-4 text-emerald-600"/>{x}</div>)}</div></CardContent></Card>
+ <div className="grid md:grid-cols-2 gap-4"><Card><CardHeader><CardTitle className="text-base flex items-center gap-2"><Zap className="w-4 h-4"/>Pay for usage</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">After the free period, advanced execution can be metered by real usage—AI generations, campaign execution, automation runs and connected-channel activity—rather than forcing every business into the same heavy plan.</p><Button className="mt-4" onClick={()=>toast.info('Usage billing will be activated when your trial ends. No automatic payment is taken.')}>View usage model</Button></CardContent></Card><Card><CardHeader><CardTitle className="text-base flex items-center gap-2"><ShieldCheck className="w-4 h-4"/>Your data stays portable</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">BizBase is designed to earn retention through useful workflows, history and automation—not by locking business data behind a wall.</p><Button variant="outline" className="mt-4" onClick={()=>toast.info('Use the Export button in Business Pulse to export your lead data.') }><Download className="w-4 h-4 mr-2"/>Export data</Button></CardContent></Card></div>
+ </div>
+}

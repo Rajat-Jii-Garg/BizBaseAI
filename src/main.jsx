@@ -10,6 +10,10 @@ if (!container) {
 }
 
 const root = ReactDOM.createRoot(container);
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch((error) => console.warn('Service worker registration failed', error)));
+}
+
 root.render(
   <React.StrictMode>
     <App />

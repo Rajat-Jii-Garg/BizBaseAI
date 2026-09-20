@@ -1,5 +1,5 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 
 const corsHeaders = {
@@ -23,7 +23,7 @@ function isRateLimited(userId: string): boolean {
   return entry.count > RATE_LIMIT;
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -73,7 +73,24 @@ serve(async (req) => {
 
     let systemPrompt = '';
     
-    if (mode === 'career-coach') {
+    if (mode === 'business-growth') {
+      systemPrompt = `You are BizBase Growth Operator. Create practical marketing and growth plans for a real business.
+STRICT RULES:
+- Use only the supplied business context; never invent business metrics, customers, channels, or results.
+- Return valid JSON only. No markdown.
+- JSON shape: {"summary":string,"priority":string,"days":[{"day":string,"focus":string,"action":string,"cta":string}],"measurement":string}.
+- Keep actions small enough for a founder or small team to execute.
+- Do not promise guaranteed leads or revenue.
+Business context: ${context || 'No business context supplied'}`;
+    } else if (mode === 'business-operator') {
+      systemPrompt = `You are BizBase Business Operator. Answer questions about the user's business using only the supplied live context.
+STRICT RULES:
+- Never invent numbers or claim an action was completed.
+- Distinguish observed data from recommendations.
+- Give the most useful next action first.
+- Keep the response concise and practical.
+Business context: ${context || 'No live business context supplied'}`;
+    } else if (mode === 'career-coach') {
       systemPrompt = `You are BizAI Career Coach on BizBase platform.
 
 STRICT RULES:

@@ -47,6 +47,8 @@ import Referrals from "./pages/Referrals";
 import Articles from "./pages/Articles";
 import WhatsappCommunity from "./pages/WhatsappCommunity";
 import About from "./pages/About";
+import AppErrorBoundary from "./components/AppErrorBoundary";
+import ConnectivityStatus from "./components/ConnectivityStatus";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 
@@ -91,7 +93,10 @@ import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
+import BusinessGrowthAudit from './pages/BusinessGrowthAudit';
 const App = () => (
+  <AppErrorBoundary>
+  <ConnectivityStatus />
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -264,6 +269,8 @@ const App = () => (
                 </ProtectedRoute>
               } /> */}
 
+              <Route path="/business-growth-audit" element={<BusinessGrowthAudit />} />
+
               {/* Business Routes */}
               <Route
                 path="/my-businesses"
@@ -338,6 +345,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </AppErrorBoundary>
 );
 
 export default App;

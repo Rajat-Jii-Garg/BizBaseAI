@@ -17,18 +17,13 @@ const BusinessSidebar = ({ onClose }) => {
   const isMobile = useIsMobile();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: `/business/${slug}/dashboard` },
-    { icon: Briefcase, label: 'Services', path: `/business/${slug}/services` },
-    { icon: FolderKanban, label: 'Projects', path: `/business/${slug}/projects` },
-    { icon: Users, label: 'People & Team', path: `/business/${slug}/team` },
-    { icon: UserPlus, label: 'CRM & Leads', path: `/business/${slug}/crm` },
-    { icon: Package, label: 'Products & Inventory', path: `/business/${slug}/catalog` },
-    { icon: Contact, label: 'Customers', path: `/business/${slug}/customers` },
-    { icon: FileText, label: 'Sales & Invoices', path: `/business/${slug}/invoices` },
-    { icon: DollarSign, label: 'Finance & Cashflow', path: `/business/${slug}/finance` },
-    { icon: ClipboardList, label: 'Operations', path: `/business/${slug}/operations` },
-    { icon: Truck, label: 'Purchases', path: `/business/${slug}/purchases` },
+    { icon: LayoutDashboard, label: 'Pulse', path: `/business/${slug}/dashboard` },
     { icon: TrendingUp, label: 'Growth', path: `/business/${slug}/growth` },
+    { icon: UserPlus, label: 'Leads', path: `/business/${slug}/crm` },
+    { icon: Users, label: 'Customers', path: `/business/${slug}/customers` },
+    { icon: DollarSign, label: 'Money', path: `/business/${slug}/finance` },
+    { icon: FolderKanban, label: 'Work', path: `/business/${slug}/projects` },
+    { icon: Briefcase, label: 'Team', path: `/business/${slug}/team` },
   ];
 
   const handleBackToPersonal = () => { exitBusinessMode(); navigate('/dashboard'); };
@@ -84,7 +79,7 @@ const BusinessSidebar = ({ onClose }) => {
           </NavLink>
         ))}
 
-        <div className="pt-3">
+        <div className="pt-3 border-t border-border/60 mt-2">
           <p className="px-2.5 py-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
             Settings
           </p>

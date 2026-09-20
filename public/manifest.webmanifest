@@ -1,0 +1,10 @@
+{
+  "name": "BizBase Business Growth Platform",
+  "short_name": "BizBase",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "description": "Business growth control, leads, marketing and operations in one workspace.",
+  "icons": [{"src":"/favicon.ico","sizes":"32x32","type":"image/x-icon"}]
+}

@@ -286,7 +286,10 @@ const BusinessSetup = () => {
           address: formData.address.trim(),
           city: formData.city.trim(),
           country: formData.country.trim(),
-          status: 'active'
+          status: 'active',
+          trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          subscription_status: 'trialing',
+          plan_name: 'Free Trial'
         })
         .select()
         .single();
@@ -964,11 +967,8 @@ const BusinessSetup = () => {
               )}
             </Button>
           )}
-
         </div>
-
       </div>
-
     </DashboardLayout>
   );
 };
