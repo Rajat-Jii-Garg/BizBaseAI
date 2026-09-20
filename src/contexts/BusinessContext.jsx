@@ -63,7 +63,7 @@ export const BusinessProvider = ({ children }) => {
     }
   }, []);
 
-  // Switch to a different business
+  // Switch to a different business. Owners and active team members can enter.
   const switchBusiness = useCallback(async (businessOrSlug) => {
     // Handle both business object and slug string
     const slug = typeof businessOrSlug === 'string' 
@@ -85,15 +85,38 @@ export const BusinessProvider = ({ children }) => {
       business = await fetchBusinessBySlug(slug);
     }
 
-    if (business && business.owner_id === user?.id) {
-      setCurrentBusiness(business);
-      setIsBusinessMode(true);
-      localStorage.setItem('currentBusinessSlug', slug);
-    } else {
+    if (!business || !user?.id) {
       setCurrentBusiness(null);
       setIsBusinessMode(false);
       localStorage.removeItem('currentBusinessSlug');
+      return;
     }
+
+    if (business.owner_id === user.id) {
+      setCurrentBusiness(business);
+      setIsBusinessMode(true);
+      localStorage.setItem('currentBusinessSlug', slug);
+      return;
+    }
+
+    const { data: membership } = await supabase
+      .from('business_team_members')
+      .select('id,status')
+      .eq('business_id', business.id)
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    if (membership) {
+      setCurrentBusiness(business);
+      setIsBusinessMode(true);
+      localStorage.setItem('currentBusinessSlug', slug);
+      return;
+    }
+
+    setCurrentBusiness(null);
+    setIsBusinessMode(false);
+    localStorage.removeItem('currentBusinessSlug');
   }, [fetchBusinessBySlug, user?.id]);
 
   // Exit business mode
@@ -103,7 +126,7 @@ export const BusinessProvider = ({ children }) => {
     localStorage.removeItem('currentBusinessSlug');
   }, []);
 
-  // Check if user owns the business
+  // Used by routing: a business owner is always allowed; team membership is checked asynchronously in switchBusiness.
   const isBusinessOwner = useCallback((slug) => {
     return businesses.some(b => b.username === slug);
   }, [businesses]);

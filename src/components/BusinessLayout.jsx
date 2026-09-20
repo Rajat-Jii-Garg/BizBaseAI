@@ -14,7 +14,7 @@ const BusinessLayout = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { switchBusiness, currentBusiness, loading, isBusinessOwner } = useBusinessContext();
+  const { switchBusiness, currentBusiness, loading } = useBusinessContext();
   const [initializing, setInitializing] = useState(true);
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,10 +35,10 @@ const BusinessLayout = () => {
   }, [slug, user, currentBusiness, switchBusiness, navigate]);
 
   useEffect(() => {
-    if (!loading && !initializing && slug && currentBusiness && !isBusinessOwner(slug)) {
+    if (!loading && !initializing && slug && !currentBusiness) {
       navigate('/dashboard');
     }
-  }, [loading, initializing, slug, isBusinessOwner, navigate]);
+  }, [loading, initializing, slug, currentBusiness, navigate]);
 
   if (loading || initializing) {
     return (

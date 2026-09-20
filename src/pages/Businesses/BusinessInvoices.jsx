@@ -126,6 +126,27 @@ const BusinessInvoices = () => {
       const { error: itemErr } = await supabase.from('business_invoice_items').insert(items);
       if (itemErr) throw itemErr;
 
+      if (form.status === 'paid') {
+        await supabase.from('business_transactions').insert({
+          business_id: businessId,
+          type: 'income',
+          amount: total,
+          description: `Invoice ${invoice.invoice_number} — ${name}`,
+          category: 'Sales',
+          date: form.issue_date || new Date().toISOString().slice(0, 10),
+          invoice_number: invoice.invoice_number,
+          payment_method: 'recorded'
+        });
+      }
+
+      await supabase.from('business_activities').insert({
+        business_id: businessId,
+        entity_type: 'invoice',
+        entity_id: invoice.id,
+        action: 'created',
+        detail: `Invoice ${invoice.invoice_number} created for ${name}`
+      });
+
       toast.success('Invoice created');
       setOpen(false);
       fetchAll();
@@ -142,6 +163,37 @@ const BusinessInvoices = () => {
     if (status === 'paid') patch.amount_paid = inv.total;
     const { error } = await supabase.from('business_invoices').update(patch).eq('id', inv.id);
     if (error) { toast.error('Could not update'); return; }
+
+    if (status === 'paid' && inv.status !== 'paid') {
+      const { data: existing } = await supabase
+        .from('business_transactions')
+        .select('id')
+        .eq('business_id', businessId)
+        .eq('invoice_number', inv.invoice_number)
+        .eq('type', 'income')
+        .limit(1);
+      if (!existing?.length) {
+        await supabase.from('business_transactions').insert({
+          business_id: businessId,
+          type: 'income',
+          amount: inv.total,
+          description: `Invoice ${inv.invoice_number} — ${inv.customer_name || 'Customer'}`,
+          category: 'Sales',
+          date: new Date().toISOString().slice(0, 10),
+          invoice_number: inv.invoice_number,
+          payment_method: 'recorded'
+        });
+      }
+    }
+
+    await supabase.from('business_activities').insert({
+      business_id: businessId,
+      entity_type: 'invoice',
+      entity_id: inv.id,
+      action: 'status_changed',
+      detail: `Invoice ${inv.invoice_number} marked ${status.replace('_',' ')}`
+    });
+
     setInvoices(prev => prev.map(i => i.id === inv.id ? { ...i, ...patch } : i));
   };
 

@@ -19,12 +19,12 @@ const BusinessSidebar = ({ onClose }) => {
     { icon: LayoutDashboard, label: 'Dashboard', path: `/business/${slug}/dashboard` },
     { icon: Briefcase, label: 'Services', path: `/business/${slug}/services` },
     { icon: FolderKanban, label: 'Projects', path: `/business/${slug}/projects` },
-    { icon: Users, label: 'Team', path: `/business/${slug}/team` },
-    { icon: UserPlus, label: 'CRM / Leads', path: `/business/${slug}/crm` },
-    { icon: Package, label: 'Catalog', path: `/business/${slug}/catalog` },
+    { icon: Users, label: 'People & Team', path: `/business/${slug}/team` },
+    { icon: UserPlus, label: 'CRM & Leads', path: `/business/${slug}/crm` },
+    { icon: Package, label: 'Products & Inventory', path: `/business/${slug}/catalog` },
     { icon: Contact, label: 'Customers', path: `/business/${slug}/customers` },
-    { icon: FileText, label: 'Invoices', path: `/business/${slug}/invoices` },
-    { icon: DollarSign, label: 'Finance', path: `/business/${slug}/finance` },
+    { icon: FileText, label: 'Sales & Invoices', path: `/business/${slug}/invoices` },
+    { icon: DollarSign, label: 'Finance & Cashflow', path: `/business/${slug}/finance` },
   ];
 
   const handleBackToPersonal = () => { exitBusinessMode(); navigate('/dashboard'); };
