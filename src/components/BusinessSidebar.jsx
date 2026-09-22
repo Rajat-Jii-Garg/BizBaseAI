@@ -19,7 +19,7 @@ const BusinessSidebar = ({ onClose }) => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Pulse', path: `/business/${slug}/dashboard` },
     { icon: TrendingUp, label: 'Growth', path: `/business/${slug}/growth` },
-    { icon: UserPlus, label: 'Leads', path: `/business/${slug}/crm` },
+    { icon: UserPlus, label: 'Lead Engine', path: `/business/${slug}/leads` },
     { icon: Users, label: 'Customers', path: `/business/${slug}/customers` },
     { icon: DollarSign, label: 'Money', path: `/business/${slug}/finance` },
     { icon: FolderKanban, label: 'Work', path: `/business/${slug}/projects` },

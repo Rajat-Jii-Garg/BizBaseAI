@@ -29,6 +29,8 @@ import Insights from "./pages/Insights";
 import AIAssistant from "./pages/AIAssistant";
 import BusinessSetup from "./pages/BusinessSetup";
 import BusinessLayout from "./components/BusinessLayout";
+import BusinessLeadCenter from "./pages/Businesses/BusinessLeadCenter";
+import LeadCapture from "./pages/LeadCapture";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import JobsLanding from "./pages/JobsLanding";
@@ -270,6 +272,7 @@ const App = () => (
               } /> */}
 
               <Route path="/business-growth-audit" element={<BusinessGrowthAudit />} />
+              <Route path="/lead/:token" element={<LeadCapture />} />
 
               {/* Business Routes */}
               <Route
@@ -300,6 +303,7 @@ const App = () => (
                 <Route index element={<BusinessDashboard />} />
                 <Route path="dashboard" element={<BusinessDashboard />} />
                 <Route path="crm" element={<BusinessCRM />} />
+                <Route path="leads" element={<BusinessLeadCenter />} />
                 <Route path="finance" element={<BusinessFinance />} />
                 <Route path="invoices" element={<BusinessInvoices />} />
                 <Route path="catalog" element={<BusinessCatalog />} />
