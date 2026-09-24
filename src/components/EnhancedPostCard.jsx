@@ -224,9 +224,9 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
                   {post.profiles?.full_name || 'Professional User'}
                 </h4>
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 shrink-0" />
-                {post.is_automated && (
+                {post.community_id && (
                   <Badge variant="secondary" className="h-5 px-1.5 text-[9px] sm:text-[10px] gap-1">
-                    <Bot className="w-3 h-3" /> Automated update
+                    Community Admin
                   </Badge>
                 )}
               </div>
@@ -366,15 +366,21 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
         {post.is_automated && post.source_url && (
           <div className="mt-3 flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            <span>Source: {post.source_name || 'News source'}</span>
+            <span>
+              {post.source_name || "Source"}
+            </span>
+
             <a
               href={post.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) =>
+                e.stopPropagation()
+              }
               className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
             >
-              Read source <ExternalLink className="w-3 h-3" />
+              Read more
+              <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         )}
