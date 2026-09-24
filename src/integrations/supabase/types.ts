@@ -2870,47 +2870,62 @@ export type Database = {
       }
       posts: {
         Row: {
+          automation_type: string | null
           comments_count: number | null
           community_id: string | null
+          community_topic: string | null
           content: string
           created_at: string
           id: string
           image_url: string | null
+          is_automated: boolean
           likes_count: number | null
           repost_of_post_id: string | null
           repost_of_user_id: string | null
           reposts_count: number | null
           shares_count: number | null
+          source_name: string | null
+          source_url: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          automation_type?: string | null
           comments_count?: number | null
           community_id?: string | null
+          community_topic?: string | null
           content: string
           created_at?: string
           id?: string
           image_url?: string | null
+          is_automated?: boolean
           likes_count?: number | null
           repost_of_post_id?: string | null
           repost_of_user_id?: string | null
           reposts_count?: number | null
           shares_count?: number | null
+          source_name?: string | null
+          source_url?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          automation_type?: string | null
           comments_count?: number | null
           community_id?: string | null
+          community_topic?: string | null
           content?: string
           created_at?: string
           id?: string
           image_url?: string | null
+          is_automated?: boolean
           likes_count?: number | null
           repost_of_post_id?: string | null
           repost_of_user_id?: string | null
           reposts_count?: number | null
           shares_count?: number | null
+          source_name?: string | null
+          source_url?: string | null
           updated_at?: string
           user_id?: string
         }

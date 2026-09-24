@@ -1,9 +1,9 @@
-name: BizBase Community News Sync
+name: BizBase Community Content Sync
 
 on:
   workflow_dispatch:
-
   schedule:
+    # Every 2 hours. Non-round minute reduces scheduler congestion.
     - cron: "17 */2 * * *"
 
 jobs:
@@ -20,8 +20,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Run BizBase Community News Sync
+      - name: Publish community news
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/community-news-sync.mjs
+
+      - name: Publish opt-in seed contributor post
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/seed-profile-posts.mjs
