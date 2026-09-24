@@ -1,0 +1,21 @@
+name: BizBase Community News Sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every 3 hours at a non-round minute to reduce GitHub schedule congestion.
+    - cron: '17 */3 * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run community news sync
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/community-news-sync.mjs

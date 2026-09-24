@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2, X, Save, Repeat2 } from 'lucide-react';
+import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2, X, Save, Repeat2, ExternalLink, Bot } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import PostEngagementActions from './PostEngagementActions';
@@ -216,7 +216,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <div className="flex items-center gap-1 sm:gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
                 <h4 
                   className="font-semibold text-foreground text-sm sm:text-base truncate max-w-[180px] sm:max-w-none cursor-pointer hover:text-blue-600 transition-colors"
                   onClick={handleProfileClick}
@@ -224,6 +224,11 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
                   {post.profiles?.full_name || 'Professional User'}
                 </h4>
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 shrink-0" />
+                {post.is_automated && (
+                  <Badge variant="secondary" className="h-5 px-1.5 text-[9px] sm:text-[10px] gap-1">
+                    <Bot className="w-3 h-3" /> Automated update
+                  </Badge>
+                )}
               </div>
               <p className="text-[11px] sm:text-sm text-muted-foreground font-medium">
                 {post.profiles?.current_position || 'Professional Member'}
@@ -358,6 +363,21 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
             </div>
           )}
         </div>
+
+        {post.is_automated && post.source_url && (
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+            <span>Source: {post.source_name || 'News source'}</span>
+            <a
+              href={post.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+            >
+              Read source <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        )}
 
         {/* Post Engagement */}
         <div onClick={(e) => e.stopPropagation()}>
