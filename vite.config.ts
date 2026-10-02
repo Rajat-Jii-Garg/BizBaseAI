@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
+import react from "@vitejs/plugin-react";
+import { fileURLToPath } from "node:url";
 import { componentTagger } from "lovable-tagger";
+
+const srcPath = fileURLToPath(new URL("./src", import.meta.url));
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -21,14 +23,13 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "react": path.resolve(__dirname, "node_modules/react"),
-      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+      "@": srcPath,
+      "react": fileURLToPath(new URL("./node_modules/react", import.meta.url)),
+      "react-dom": fileURLToPath(new URL("./node_modules/react-dom", import.meta.url)),
     },
     dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
-    force: true,
   },
 }));
