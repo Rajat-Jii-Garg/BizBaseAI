@@ -38,3 +38,8 @@ verify_jwt = false
 
 [functions.send-notification-digest]
 verify_jwt = false
+[functions.generate-rss-articles]
+verify_jwt = false
+
+[functions.generate-news-sitemap]
+verify_jwt = false

@@ -47,6 +47,7 @@ import ProfilePreviewPage from "./pages/ProfilePreviewPage";
 import Leaderboard from "./pages/Leaderboard";
 import Referrals from "./pages/Referrals";
 import Articles from "./pages/Articles";
+import ArticleDetail from "./pages/ArticleDetail";
 import WhatsappCommunity from "./pages/WhatsappCommunity";
 import About from "./pages/About";
 import AppErrorBoundary from "./components/AppErrorBoundary";
@@ -241,6 +242,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/articles" element={<Articles />} />
+              <Route path="/articles/:slug" element={<ArticleDetail />} />
               <Route path="/about" element={<About />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />

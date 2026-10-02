@@ -61,45 +61,75 @@ export type Database = {
       }
       blog_posts: {
         Row: {
-          author_id: string
+          author_id: string | null
+          author_name: string
           category: string | null
           content: string
+          content_json: Json
           cover_image_url: string | null
           created_at: string
           excerpt: string | null
           id: string
+          is_ai_assisted: boolean
           is_published: boolean | null
+          meta_description: string | null
+          region: string | null
+          seo_title: string | null
           slug: string
+          source_key: string | null
+          source_name: string | null
+          source_published_at: string | null
+          source_url: string | null
           tags: Json | null
           title: string
           updated_at: string
           views_count: number | null
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
+          author_name?: string
           category?: string | null
           content: string
+          content_json?: Json
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
           id?: string
+          is_ai_assisted?: boolean
           is_published?: boolean | null
+          meta_description?: string | null
+          region?: string | null
+          seo_title?: string | null
           slug: string
+          source_key?: string | null
+          source_name?: string | null
+          source_published_at?: string | null
+          source_url?: string | null
           tags?: Json | null
           title: string
           updated_at?: string
           views_count?: number | null
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
+          author_name?: string
           category?: string | null
           content?: string
+          content_json?: Json
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
           id?: string
+          is_ai_assisted?: boolean
           is_published?: boolean | null
+          meta_description?: string | null
+          region?: string | null
+          seo_title?: string | null
           slug?: string
+          source_key?: string | null
+          source_name?: string | null
+          source_published_at?: string | null
+          source_url?: string | null
           tags?: Json | null
           title?: string
           updated_at?: string
@@ -2870,62 +2900,47 @@ export type Database = {
       }
       posts: {
         Row: {
-          automation_type: string | null
           comments_count: number | null
           community_id: string | null
-          community_topic: string | null
           content: string
           created_at: string
           id: string
           image_url: string | null
-          is_automated: boolean
           likes_count: number | null
           repost_of_post_id: string | null
           repost_of_user_id: string | null
           reposts_count: number | null
           shares_count: number | null
-          source_name: string | null
-          source_url: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          automation_type?: string | null
           comments_count?: number | null
           community_id?: string | null
-          community_topic?: string | null
           content: string
           created_at?: string
           id?: string
           image_url?: string | null
-          is_automated?: boolean
           likes_count?: number | null
           repost_of_post_id?: string | null
           repost_of_user_id?: string | null
           reposts_count?: number | null
           shares_count?: number | null
-          source_name?: string | null
-          source_url?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          automation_type?: string | null
           comments_count?: number | null
           community_id?: string | null
-          community_topic?: string | null
           content?: string
           created_at?: string
           id?: string
           image_url?: string | null
-          is_automated?: boolean
           likes_count?: number | null
           repost_of_post_id?: string | null
           repost_of_user_id?: string | null
           reposts_count?: number | null
           shares_count?: number | null
-          source_name?: string | null
-          source_url?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -3766,6 +3781,10 @@ export type Database = {
       }
     }
     Functions: {
+      increment_blog_post_view: {
+        Args: { p_post_id: string }
+        Returns: undefined
+      }
       award_bizcoins:
         | {
             Args: { _amount: number; _reason?: string; _user_id: string }

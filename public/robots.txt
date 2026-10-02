@@ -22,5 +22,6 @@ Allow: /
 
 # Static sitemap (core pages)
 Sitemap: https://bizbase-ai.vercel.app/sitemap.xml
-# Dynamic sitemap (jobs, profiles, posts, communities)
+Sitemap: https://ahdtenixvhgncwaglxui.supabase.co/functions/v1/generate-news-sitemap
+# Dynamic sitemap (jobs, profiles, communities, articles)
 Sitemap: https://ahdtenixvhgncwaglxui.supabase.co/functions/v1/generate-sitemap
