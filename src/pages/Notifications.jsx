@@ -23,7 +23,6 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import SEOHead from "@/components/SEOHead";
-import { getNotificationPath } from "@/lib/notificationNavigation";
 import { resolveNotificationPath } from "@/lib/notificationNavigation";
 
 const Notifications = () => {
