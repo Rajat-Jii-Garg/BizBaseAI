@@ -5,7 +5,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
 const GEMINI_MODEL =
-  Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash-lite";
+  Deno.env.get("GEMINI_MODEL") || "gemini-3.5-flash-lite";
 
 const AUTOMATION_SECRET =
   Deno.env.get("COMMUNITY_AUTOPILOT_SECRET");
