@@ -4,7 +4,7 @@ import { XMLParser } from "npm:fast-xml-parser@4.5.0";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
-const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash-lite";
+const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-3.5-flash-lite";
 const ARTICLE_CRON_SECRET = Deno.env.get("ARTICLE_CRON_SECRET");
 
 const CORS_HEADERS = {
