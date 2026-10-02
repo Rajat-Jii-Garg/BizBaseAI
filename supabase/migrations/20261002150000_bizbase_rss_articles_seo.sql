@@ -2,11 +2,7 @@
 
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS pg_net;
-CREATE EXTENSION IF NOT EXISTS vault;
 
--- Existing blog_posts are public editorial articles. Automated articles do not
--- need to impersonate a human user, so author_id becomes nullable and a clear
--- editorial author label is stored separately.
 ALTER TABLE public.blog_posts
   ALTER COLUMN author_id DROP NOT NULL,
   ADD COLUMN IF NOT EXISTS author_name TEXT NOT NULL DEFAULT 'BizBase Editorial Desk',
@@ -83,23 +79,17 @@ $$;
 GRANT EXECUTE ON FUNCTION public.increment_blog_post_view(UUID) TO anon, authenticated;
 
 
--- The cron job invokes the Edge Function with a secret stored in Supabase Vault.
--- Before this schedule can execute successfully, create these two Vault secrets:
---   project_url       = https://ahdtenixvhgncwaglxui.supabase.co
---   publishable_key   = your Supabase publishable/anon key
--- The Edge Function itself also needs ARTICLE_CRON_SECRET set as an Edge Function secret.
--- Store the exact same value in Vault as article_cron_secret.
-
 DO $$
 DECLARE
-  job_id BIGINT;
+  old_job_id BIGINT;
 BEGIN
-  SELECT jobid INTO job_id
+  SELECT jobid
+  INTO old_job_id
   FROM cron.job
   WHERE jobname = 'bizbase-rss-articles-every-4h';
 
-  IF job_id IS NOT NULL THEN
-    PERFORM cron.unschedule(job_id);
+  IF old_job_id IS NOT NULL THEN
+    PERFORM cron.unschedule(old_job_id);
   END IF;
 END $$;
 
@@ -107,14 +97,18 @@ SELECT cron.schedule(
   'bizbase-rss-articles-every-4h',
   '0 */4 * * *',
   $$
-    SELECT net.http_post(
-      url := (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'project_url') || '/functions/v1/generate-rss-articles',
-      headers := jsonb_build_object(
-        'Content-Type', 'application/json',
-        'apikey', (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'publishable_key'),
-        'x-article-cron-secret', (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'article_cron_secret')
-      ),
-      body := jsonb_build_object('limit', 1, 'trigger', 'cron')
-    ) AS request_id;
+  SELECT net.http_post(
+    url := 'https://ahdtenixvhgncwaglxui.supabase.co/functions/v1/generate-rss-articles',
+
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'x-article-cron-secret', 'BizBaseRSS2026_xyz123a1b9c0d987pqr_987654'
+    ),
+
+    body := jsonb_build_object(
+      'limit', 1,
+      'trigger', 'cron'
+    )
+  ) AS request_id;
   $$
 );
