@@ -107,8 +107,15 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   };
 
   const shouldTruncate = post.content.length > 300;
-  const displayContent = shouldTruncate && !showFullContent 
-    ? post.content.substring(0, 300) + '...' 
+
+  const hashtags = extractHashtags(post.content);
+  const contentWithoutHashtags = post.content
+    .replace(/#[\p{L}\p{N}_]+/gu, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  const displayContent = shouldTruncate && !showFullContent
+    ? post.content.substring(0, 300) + '...'
     : post.content;
 
   const handleProfileClick = () => {
@@ -330,10 +337,10 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
 
           {/* Hashtags and Mentions */}
           <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3">
-            {extractHashtags(post.content).map((hashtag, index) => (
-              <Badge 
-                key={`hashtag-${index}`} 
-                variant="secondary" 
+            {hashtags.map((hashtag, index) => (
+              <Badge
+                key={`hashtag-${index}`}
+                variant="secondary"
                 className="bg-blue-50 text-blue-700 hover:bg-blue-100 cursor-pointer transition-colors text-[10px] sm:text-xs"
               >
                 <Hash className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
@@ -341,9 +348,9 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
               </Badge>
             ))}
             {extractMentions(post.content).map((mention, index) => (
-              <Badge 
-                key={`mention-${index}`} 
-                variant="secondary" 
+              <Badge
+                key={`mention-${index}`}
+                variant="secondary"
                 className="bg-green-50 text-green-700 hover:bg-green-100 cursor-pointer transition-colors text-[10px] sm:text-xs"
               >
                 <AtSign className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
@@ -363,27 +370,6 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
             </div>
           )}
         </div>
-
-        {post.is_automated && post.source_url && (
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            <span>
-              {post.source_name || "Source"}
-            </span>
-
-            <a
-              href={post.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) =>
-                e.stopPropagation()
-              }
-              className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
-            >
-              Read more
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-        )}
 
         {/* Post Engagement */}
         <div onClick={(e) => e.stopPropagation()}>

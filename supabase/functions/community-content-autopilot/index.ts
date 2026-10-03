@@ -4,6 +4,7 @@ import { XMLParser } from "npm:fast-xml-parser@4.5.0";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
+
 const GEMINI_MODEL =
   Deno.env.get("GEMINI_MODEL") || "gemini-3.5-flash-lite";
 
@@ -55,25 +56,10 @@ function arr<T>(value: T | T[] | undefined): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
-function text(value: any): string {
-  if (typeof value === "string") return value;
-
-  if (
-    value &&
-    typeof value === "object" &&
-    typeof value["#text"] === "string"
-  ) {
-    return value["#text"];
-  }
-
-  return "";
-}
-
 function parseRSS(
   xml: string,
   fallbackSource: string
 ): Candidate[] {
-
   const parser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
@@ -87,15 +73,9 @@ function parseRSS(
 
   return items
     .map((item: any, index) => {
-
-      const title =
-        clean(item?.title);
-
-      const link =
-        clean(item?.link);
-
-      const description =
-        clean(item?.description);
+      const title = clean(item?.title);
+      const link = clean(item?.link);
+      const description = clean(item?.description);
 
       const source =
         clean(item?.source) ||
@@ -110,8 +90,7 @@ function parseRSS(
         const d = new Date(pubDate);
 
         if (!Number.isNaN(d.getTime())) {
-          publishedAt =
-            d.toISOString();
+          publishedAt = d.toISOString();
         }
       }
 
@@ -123,7 +102,6 @@ function parseRSS(
         publishedAt,
         rank: index,
       };
-
     })
     .filter(
       (item) =>
@@ -135,16 +113,14 @@ function parseRSS(
 async function fetchFeed(
   feed: FeedConfig
 ): Promise<Candidate[]> {
-
-  const response =
-    await fetch(feed.url, {
-      headers: {
-        "User-Agent":
-          "BizBase Community News Bot/1.0",
-        Accept:
-          "application/rss+xml, application/xml, text/xml",
-      },
-    });
+  const response = await fetch(feed.url, {
+    headers: {
+      "User-Agent":
+        "BizBase Community News Bot/1.0",
+      Accept:
+        "application/rss+xml, application/xml, text/xml",
+    },
+  });
 
   if (!response.ok) {
     throw new Error(
@@ -152,8 +128,7 @@ async function fetchFeed(
     );
   }
 
-  const xml =
-    await response.text();
+  const xml = await response.text();
 
   return parseRSS(
     xml,
@@ -165,14 +140,12 @@ function keywordScore(
   candidate: Candidate,
   keywords: string[]
 ): number {
-
   const content =
     `${candidate.title} ${candidate.description}`
       .toLowerCase();
 
   return keywords.reduce(
     (score, keyword) => {
-
       if (
         content.includes(
           keyword.toLowerCase()
@@ -182,7 +155,6 @@ function keywordScore(
       }
 
       return score;
-
     },
     0
   );
@@ -191,7 +163,6 @@ function keywordScore(
 function freshnessScore(
   candidate: Candidate
 ): number {
-
   if (!candidate.publishedAt) {
     return 5;
   }
@@ -216,12 +187,9 @@ async function alreadyPublished(
   communityId: string,
   sourceUrl: string
 ): Promise<boolean> {
-
   const { data, error } =
     await supabase
-      .from(
-        "community_news_items"
-      )
+      .from("community_news_items")
       .select("id")
       .eq(
         "community_id",
@@ -246,7 +214,6 @@ async function alreadyPublished(
 function localDateIST(
   date = new Date()
 ): string {
-
   const local =
     new Date(
       date.getTime() +
@@ -264,60 +231,20 @@ function localDateIST(
   ].join("-");
 }
 
-function localPartsIST(
-  date = new Date()
-) {
-
-  const local =
-    new Date(
-      date.getTime() +
-      330 * 60000
-    );
-
-  return {
-    year:
-      local.getUTCFullYear(),
-
-    month:
-      local.getUTCMonth(),
-
-    day:
-      local.getUTCDate(),
-
-    minutes:
-      local.getUTCHours() * 60 +
-      local.getUTCMinutes(),
-  };
-}
-
 function randomInt(
   min: number,
   max: number
 ): number {
-
   return Math.floor(
     Math.random() *
     (max - min + 1)
   ) + min;
 }
 
-/*
- * 1 post:
- * 09:00 - 21:00
- *
- * 2 posts:
- * morning + evening
- *
- * 3 posts:
- * morning + afternoon + evening
- */
-
 function generateSlots(
   postsPerDay: number
 ): number[] {
-
   if (postsPerDay === 1) {
-
     return [
       randomInt(
         9 * 60,
@@ -327,13 +254,11 @@ function generateSlots(
   }
 
   if (postsPerDay === 2) {
-
     return [
       randomInt(
         9 * 60,
         13 * 60
       ),
-
       randomInt(
         16 * 60,
         21 * 60
@@ -346,12 +271,10 @@ function generateSlots(
       9 * 60,
       12 * 60
     ),
-
     randomInt(
       13 * 60,
       17 * 60
     ),
-
     randomInt(
       18 * 60,
       21 * 60
@@ -363,15 +286,13 @@ function localSlotToUTC(
   dateString: string,
   minutes: number
 ): Date {
-
   const [
     year,
     month,
     day,
-  ] =
-    dateString
-      .split("-")
-      .map(Number);
+  ] = dateString
+    .split("-")
+    .map(Number);
 
   const utc =
     Date.UTC(
@@ -397,13 +318,11 @@ async function prepareSchedule(
   config: any,
   now: Date
 ): Promise<any> {
-
   const today =
     localDateIST(now);
 
   if (
-    config.schedule_date ===
-      today &&
+    config.schedule_date === today &&
     Array.isArray(
       config.scheduled_slots
     ) &&
@@ -425,28 +344,18 @@ async function prepareSchedule(
       slots[0]
     );
 
-  const {
-    error
-  } =
+  const { error } =
     await supabase
       .from(
         "community_content_automation"
       )
       .update({
-        schedule_date:
-          today,
-
-        scheduled_slots:
-          slots,
-
-        completed_slots:
-          [],
-
+        schedule_date: today,
+        scheduled_slots: slots,
+        completed_slots: [],
         next_run_at:
           firstUTC.toISOString(),
-
-        last_error:
-          null,
+        last_error: null,
       })
       .eq(
         "id",
@@ -459,16 +368,9 @@ async function prepareSchedule(
 
   return {
     ...config,
-
-    schedule_date:
-      today,
-
-    scheduled_slots:
-      slots,
-
-    completed_slots:
-      [],
-
+    schedule_date: today,
+    scheduled_slots: slots,
+    completed_slots: [],
     next_run_at:
       firstUTC.toISOString(),
   };
@@ -477,7 +379,6 @@ async function prepareSchedule(
 async function scheduleNext(
   config: any
 ): Promise<void> {
-
   const today =
     config.schedule_date;
 
@@ -499,9 +400,7 @@ async function scheduleNext(
     slots
       .filter(
         (slot: number) =>
-          !completed.includes(
-            slot
-          )
+          !completed.includes(slot)
       )
       .sort(
         (a: number, b: number) =>
@@ -509,7 +408,6 @@ async function scheduleNext(
       );
 
   if (remaining.length) {
-
     const next =
       localSlotToUTC(
         today,
@@ -531,11 +429,6 @@ async function scheduleNext(
 
     return;
   }
-
-  /*
-   * Today's slots completed.
-   * Prepare tomorrow.
-   */
 
   const tomorrow =
     new Date(
@@ -572,20 +465,22 @@ async function scheduleNext(
       scheduled_slots:
         tomorrowSlots,
 
-      completed_slots:
-        [],
+      completed_slots: [],
 
       next_run_at:
         next.toISOString(),
 
-      last_error:
-        null,
+      last_error: null,
     })
     .eq(
       "id",
       config.id
     );
 }
+
+/* =========================================================
+   LINKEDIN + X STYLE CONTENT GENERATOR
+   ========================================================= */
 
 async function generateGeminiPost(
   community: any,
@@ -594,54 +489,119 @@ async function generateGeminiPost(
 ): Promise<string> {
 
   const prompt = `
-You are the editorial writer for BizBase,
-a professional work platform for founders,
-entrepreneurs, investors, professionals,
-students and builders.
+You are the professional editorial writer for BizBase.
 
-Community:
+BizBase is a professional work platform for:
+founders, entrepreneurs, investors, freelancers,
+students, freshers, working professionals and builders.
+
+COMMUNITY:
 ${community.name}
 
-Community topic:
+COMMUNITY TOPIC:
 ${config.topic}
 
-Source:
+SOURCE:
 ${candidate.sourceName}
 
-Original headline:
+ARTICLE HEADLINE:
 ${candidate.title}
 
-Original description:
+ARTICLE DESCRIPTION:
 ${candidate.description}
 
-Original article URL:
+ARTICLE URL:
 ${candidate.link}
 
-Create ONE original, useful community post.
+Your task:
 
-RULES:
+Create ONE highly engaging professional social post
+based ONLY on the supplied source information.
 
-1. Use ONLY facts present in the supplied source data.
-2. Do not invent numbers, quotes, companies, funding amounts,
-   dates or claims.
-3. Do not copy the source article.
-4. Rewrite it in original language.
-5. Explain why this matters to professionals/founders/investors.
-6. Keep it useful and concise.
-7. 100-180 words maximum.
-8. Professional but conversational.
-9. No clickbait.
-10. End with the original source link.
-11. Clearly say "Source: ${candidate.sourceName}".
-12. This is AI-assisted editorial content, so do not pretend
-    that the community admin personally researched the story.
+The post should feel similar to a strong LinkedIn/X professional post.
+
+IMPORTANT:
+- Do NOT copy the article.
+- Do NOT invent facts.
+- Do NOT invent numbers.
+- Do NOT invent quotes.
+- Do NOT pretend to have personally experienced something.
+- Do NOT write fake personal stories.
+- Do NOT use "As a founder, I..." unless that fact exists in source.
+- Write naturally and conversationally.
+- Make the post useful for the community.
+- Do not make every post follow the same structure.
+
+RANDOMLY SELECT ONE POST TYPE:
+
+1. NEWS + INSIGHT
+2. STARTUP / FUNDING UPDATE
+3. AI / TECHNOLOGY UPDATE
+4. BUSINESS INSIGHT
+5. MARKET / TREND UPDATE
+6. DATA / TREND EXPLAINER
+7. PRACTICAL PROFESSIONAL TIP
+8. FOUNDER / BUILDER LESSON
+9. DISCUSSION POST
+10. DEEP-DIVE ARTICLE SUMMARY
+
+RANDOMLY SELECT ONE LANGUAGE STYLE:
+
+A. Professional English
+B. Natural Hinglish
+C. English with a few natural Hinglish phrases
+
+Do NOT force Hindi into every post.
+
+POST STYLE:
+
+Start with a strong 1-2 line hook.
+Leave one blank empty line.
+Then use short paragraphs.
+
+Use whitespace generously.
+
+Where useful, use:
+• bullet points
+→ short takeaways
+✓ practical points
+
+Include:
+- What happened
+- Why it matters
+- What professionals/founders/investors can learn
+- A useful takeaway
+
+For discussion-style posts, finish with a natural question.
+
+Avoid generic endings like:
+"What do you think?"
+
+Instead ask a specific useful question related to the topic.
+
+HASHTAGS:
+Generate 3-5 relevant hashtags.
+Do not use irrelevant trending hashtags.
+
+LENGTH:
+Usually 80-120 words.
+Deep-dive posts can be up to 150 words.
+
+DO NOT put the source URL inside the content.
+The application will never show the source separately.
+
+DO NOT write:
+"Source:"
+inside the post.
 
 Return ONLY valid JSON:
 
 {
-  "headline": "...",
-  "content": "...",
-  "hashtags": ["#Startup", "#Business"]
+  "headline": "short headline",
+  "content": "complete social post without source URL",
+  "hashtags": ["#Startup", "#Business"],
+  "post_type": "news_insight",
+  "language": "English"
 }
 `;
 
@@ -649,41 +609,33 @@ Return ONLY valid JSON:
     await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
       {
-        method:
-          "POST",
+        method: "POST",
 
         headers: {
           "Content-Type":
             "application/json",
         },
 
-        body:
-          JSON.stringify({
-            contents: [
-              {
-                role:
-                  "user",
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
 
-                parts: [
-                  {
-                    text:
-                      prompt,
-                  },
-                ],
-              },
-            ],
-
-            generationConfig: {
-              temperature:
-                0.45,
-
-              maxOutputTokens:
-                700,
-
-              responseMimeType:
-                "application/json",
+              parts: [
+                {
+                  text: prompt,
+                },
+              ],
             },
-          }),
+          ],
+
+          generationConfig: {
+            temperature: 0.85,
+            maxOutputTokens: 900,
+            responseMimeType:
+              "application/json",
+          },
+        }),
       }
     );
 
@@ -707,19 +659,27 @@ Return ONLY valid JSON:
     );
   }
 
-  const result =
-    JSON.parse(
-      raw
-        .replace(
-          /^```json/i,
-          ""
-        )
-        .replace(
-          /```$/i,
-          ""
-        )
-        .trim()
+  let result: any;
+
+  try {
+    result =
+      JSON.parse(
+        raw
+          .replace(
+            /^```json/i,
+            ""
+          )
+          .replace(
+            /```$/i,
+            ""
+          )
+          .trim()
+      );
+  } catch {
+    throw new Error(
+      "Gemini returned invalid JSON"
     );
+  }
 
   if (
     !result.content ||
@@ -735,34 +695,38 @@ Return ONLY valid JSON:
       result.hashtags
     )
       ? result.hashtags
-          .slice(0, 4)
+          .filter(
+            (tag: any) =>
+              typeof tag === "string"
+          )
+          .slice(0, 5)
           .join(" ")
       : "";
 
-  return [
-    `📰 ${String(
+  const headline =
+    String(
       result.headline
-    ).trim()}`,
+    ).trim();
 
-    "",
-
+  const content =
     String(
       result.content
-    ).trim(),
+    ).trim();
 
+  return [
+    headline,
     "",
-
+    content,
+    "",
     hashtags,
-
-    "",
-
-    `Source: ${candidate.sourceName}`,
-
-    candidate.link,
   ]
     .filter(Boolean)
     .join("\n");
 }
+
+/* =========================================================
+   AUTOMATION PROCESS
+   ========================================================= */
 
 async function processAutomation(
   config: any
@@ -771,16 +735,11 @@ async function processAutomation(
   const now =
     new Date();
 
-  let prepared =
+  const prepared =
     await prepareSchedule(
       config,
       now
     );
-
-  /*
-   * If the schedule is still in the future,
-   * nothing should happen.
-   */
 
   if (
     prepared.next_run_at &&
@@ -789,12 +748,12 @@ async function processAutomation(
     ).getTime() >
       now.getTime()
   ) {
-
     return {
-      status:
-        "waiting",
+      status: "waiting",
+
       community:
         prepared.communities.name,
+
       next_run_at:
         prepared.next_run_at,
     };
@@ -803,25 +762,23 @@ async function processAutomation(
   const community =
     prepared.communities;
 
-  /*
-   * IMPORTANT:
-   * author must be the actual community owner/admin.
-   */
-
   if (
     prepared.author_user_id !==
     community.user_id
   ) {
-
     throw new Error(
       "Automation author is not the community owner/admin"
     );
   }
 
-  const { data: profile } =
+  const {
+    data: profile,
+  } =
     await supabase
       .from("profiles")
-      .select("id,full_name")
+      .select(
+        "id,full_name"
+      )
       .eq(
         "id",
         prepared.author_user_id
@@ -860,9 +817,7 @@ async function processAutomation(
   for (
     const feed of feeds
   ) {
-
     try {
-
       const items =
         await fetchFeed(
           feed
@@ -871,11 +826,7 @@ async function processAutomation(
       candidates.push(
         ...items
       );
-
-    } catch (
-      error
-    ) {
-
+    } catch (error) {
       console.error(
         "RSS error",
         feed.name,
@@ -888,7 +839,6 @@ async function processAutomation(
     candidates
       .filter(
         (item) => {
-
           if (
             !item.publishedAt
           ) {
@@ -909,7 +859,6 @@ async function processAutomation(
       )
       .filter(
         (item) => {
-
           if (
             !keywords.length
           ) {
@@ -941,8 +890,7 @@ async function processAutomation(
             ) +
             Math.max(
               0,
-              20 -
-                item.rank
+              20 - item.rank
             ),
         })
       )
@@ -953,16 +901,14 @@ async function processAutomation(
       );
 
   let selected:
-    Candidate | null =
-    null;
+    Candidate | null = null;
 
   for (
-    const candidate
-    of scored.map(
+    const candidate of
+    scored.map(
       (x) => x.item
     )
   ) {
-
     const duplicate =
       await alreadyPublished(
         community.id,
@@ -972,13 +918,11 @@ async function processAutomation(
     if (!duplicate) {
       selected =
         candidate;
-
       break;
     }
   }
 
   if (!selected) {
-
     throw new Error(
       "No fresh unused RSS story found"
     );
@@ -991,11 +935,10 @@ async function processAutomation(
       selected
     );
 
-  /*
-   * Publish under REAL community admin.
-   */
-
-  const { data: post, error: postError } =
+  const {
+    data: post,
+    error: postError,
+  } =
     await supabase
       .from("posts")
       .insert({
@@ -1029,11 +972,9 @@ async function processAutomation(
     throw postError;
   }
 
-  /*
-   * Duplicate protection.
-   */
-
-  const { error: sourceError } =
+  const {
+    error: sourceError,
+  } =
     await supabase
       .from(
         "community_news_items"
@@ -1065,25 +1006,20 @@ async function processAutomation(
     );
   }
 
-  /*
-   * Mark current random slot complete.
-   */
-
   const completed =
     Array.isArray(
       prepared.completed_slots
     )
       ? [
           ...prepared.completed_slots,
-          prepared.scheduled_slots
-            .find(
-              (slot: number) =>
-                localSlotToUTC(
-                  prepared.schedule_date,
-                  slot
-                ).getTime() <=
-                Date.now()
-            ),
+          prepared.scheduled_slots.find(
+            (slot: number) =>
+              localSlotToUTC(
+                prepared.schedule_date,
+                slot
+              ).getTime() <=
+              Date.now()
+          ),
         ]
       : [];
 
@@ -1092,15 +1028,13 @@ async function processAutomation(
       "community_content_automation"
     )
     .update({
-      completed_slots:
-        [
-          ...new Set(
-            completed
-              .filter(
-                Boolean
-              )
-          ),
-        ],
+      completed_slots: [
+        ...new Set(
+          completed.filter(
+            Boolean
+          )
+        ),
+      ],
 
       last_post_at:
         new Date().toISOString(),
@@ -1113,17 +1047,20 @@ async function processAutomation(
       prepared.id
     );
 
-  prepared.completed_slots =
-    [
+  const updatedPrepared = {
+    ...prepared,
+
+    completed_slots: [
       ...new Set(
         completed.filter(
           Boolean
         )
       ),
-    ];
+    ],
+  };
 
   await scheduleNext(
-    prepared
+    updatedPrepared
   );
 
   await supabase
@@ -1177,6 +1114,10 @@ async function processAutomation(
   };
 }
 
+/* =========================================================
+   MAIN EDGE FUNCTION
+   ========================================================= */
+
 Deno.serve(
   async (req) => {
 
@@ -1212,7 +1153,6 @@ Deno.serve(
         suppliedSecret !==
         AUTOMATION_SECRET
       ) {
-
         return new Response(
           JSON.stringify({
             ok: false,
@@ -1235,14 +1175,13 @@ Deno.serve(
         );
       }
 
-      /*
-       * Get due automations.
-       */
-
       const now =
         new Date().toISOString();
 
-      const { data: dueByTime, error: dueError } =
+      const {
+        data: dueByTime,
+        error: dueError,
+      } =
         await supabase
           .from(
             "community_content_automation"
@@ -1270,7 +1209,10 @@ Deno.serve(
         throw dueError;
       }
 
-      const { data: neverScheduled, error: nullError } =
+      const {
+        data: neverScheduled,
+        error: nullError,
+      } =
         await supabase
           .from(
             "community_content_automation"
@@ -1315,14 +1257,9 @@ Deno.serve(
       const results = [];
 
       for (
-        const config of map.values()
+        const config of
+        map.values()
       ) {
-
-        /*
-         * Simple lease.
-         * Prevent duplicate execution if two
-         * scheduler invocations overlap.
-         */
 
         const oldNext =
           config.next_run_at;
@@ -1345,15 +1282,12 @@ Deno.serve(
             );
 
         if (oldNext) {
-
           claimQuery =
             claimQuery.eq(
               "next_run_at",
               oldNext
             );
-
         } else {
-
           claimQuery =
             claimQuery.is(
               "next_run_at",
@@ -1378,11 +1312,6 @@ Deno.serve(
 
         try {
 
-          /*
-           * Restore the original schedule object
-           * and process it.
-           */
-
           config.next_run_at =
             oldNext;
 
@@ -1395,9 +1324,7 @@ Deno.serve(
             result
           );
 
-        } catch (
-          error: any
-        ) {
+        } catch (error: any) {
 
           const message =
             error?.message ||
@@ -1472,9 +1399,7 @@ Deno.serve(
         }
       );
 
-    } catch (
-      error: any
-    ) {
+    } catch (error: any) {
 
       console.error(
         "Community autopilot error:",
@@ -1484,6 +1409,7 @@ Deno.serve(
       return new Response(
         JSON.stringify({
           ok: false,
+
           error:
             error?.message ||
             String(error),
