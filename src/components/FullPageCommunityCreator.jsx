@@ -90,12 +90,7 @@
  
        if (error) throw error;
  
-       // Add creator as admin member
-       await supabase.from('community_members').insert({
-         community_id: data.id,
-         user_id: user.id,
-         role: 'admin'
-       });
+       // Owner membership is created automatically by the database trigger.
  
        toast.success('Community Created!', {
          description: `"${formData.name}" is now live`

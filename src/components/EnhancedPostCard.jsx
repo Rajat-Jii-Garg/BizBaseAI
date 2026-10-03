@@ -158,6 +158,24 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const isConnected = post.is_connected === true;
   const isRepost = !!post.repost_of_post_id;
 
+  const handleReport = async () => {
+    if (!user || !post.community_id || isOwnPost) return;
+    try {
+      const { error } = await supabase
+        .from('community_reports')
+        .insert({
+          community_id: post.community_id,
+          post_id: post.id,
+          reported_by: user.id,
+          reason: 'Reported by community member',
+        });
+      if (error) throw error;
+      toast({ title: 'Report submitted', description: 'Community moderators will review this post.' });
+    } catch (error) {
+      toast({ title: 'Unable to report', description: error?.message || 'Please try again.', variant: 'destructive' });
+    }
+  };
+
   const handleConnect = async () => {
     if (!user) return;
 
@@ -311,7 +329,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
               {!isOwnPost && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem onClick={handleReport} className="text-destructive">
                     <Flag className="w-4 h-4 mr-2" />
                     Report Post
                   </DropdownMenuItem>

@@ -16,7 +16,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
-import PostCard from '@/components/PostCard';
+import EnhancedPostCard from '@/components/EnhancedPostCard';
+import CommunityAdminPanel from '@/components/CommunityAdminPanel';
 
 const Community = () => {
   const { id } = useParams();
@@ -41,7 +42,7 @@ const Community = () => {
   const [shareLoading, setShareLoading] = useState(false);
 
   const isOwner = !!user && community?.user_id === user.id;
-  const isAdmin = isOwner || membership?.role === 'admin' || membership?.role === 'moderator';
+  const isAdmin = isOwner || (membership?.status === 'approved' && ['admin', 'moderator'].includes(membership?.role));
   const isApprovedMember = isOwner || membership?.status === 'approved';
   const isPending = membership?.status === 'pending';
   const canViewContent = !community?.is_private || isApprovedMember;
@@ -193,6 +194,7 @@ const Community = () => {
       let profiles = [];
       let likes = [];
       let reposts = [];
+      let pinRows = [];
 
       if (userIds.length > 0) {
         const { data: profileRows } = await supabase
@@ -219,9 +221,20 @@ const Community = () => {
         reposts = repostRows || [];
       }
 
+      if (isApprovedMember && postIds.length > 0) {
+        const { data: rows, error: pinError } = await supabase
+          .from('community_pins')
+          .select('post_id')
+          .eq('community_id', id)
+          .in('post_id', postIds);
+        if (pinError) throw pinError;
+        pinRows = rows || [];
+      }
+
       const profileMap = new Map(profiles.map((profile) => [profile.id, profile]));
       const likedIds = new Set(likes.map((like) => like.post_id));
       const repostedIds = new Set(reposts.map((repost) => repost.post_id));
+      const pinnedIds = new Set(pinRows.map((pin) => pin.post_id));
 
       setPosts(
         rows.map((post) => ({
@@ -237,6 +250,7 @@ const Community = () => {
           },
           user_has_liked: likedIds.has(post.id),
           user_has_reposted: repostedIds.has(post.id),
+          is_pinned: pinnedIds.has(post.id),
         }))
       );
     } catch (error) {
@@ -245,7 +259,7 @@ const Community = () => {
     } finally {
       setPostsLoading(false);
     }
-  }, [canViewContent, id, user]);
+  }, [canViewContent, id, isApprovedMember, user]);
 
   useEffect(() => {
     fetchCommunity();
@@ -752,6 +766,22 @@ const Community = () => {
             </CardContent>
           </Card>
 
+          {isAdmin && (
+            <CommunityAdminPanel
+              community={community}
+              user={user}
+              isOwner={isOwner}
+              isAdmin={isAdmin}
+              onCommunityUpdated={(updated) => {
+                if (updated) setCommunity(updated);
+                fetchCommunity();
+                fetchMembership();
+                fetchMembers();
+                fetchPendingMembers();
+              }}
+            />
+          )}
+
           {!canViewContent && community.is_private && (
             <Card className="border-amber-200 bg-amber-50/70">
               <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -805,6 +835,23 @@ const Community = () => {
                       </Button>
                     </div>
                   </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {isApprovedMember && posts.some((post) => post.is_pinned) && (
+            <Card className="border-amber-200 bg-amber-50/60">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <span>📌</span> Pinned in this community
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {posts.filter((post) => post.is_pinned).slice(0, 3).map((post) => (
+                  <button key={post.id} type="button" className="w-full text-left rounded-lg border bg-white p-3 hover:bg-slate-50" onClick={() => post.profiles?.username && navigate(`/${post.profiles.username}/post/${post.id}`)}>
+                    <p className="text-sm line-clamp-2">{post.content}</p>
+                  </button>
                 ))}
               </CardContent>
             </Card>
@@ -896,7 +943,7 @@ const Community = () => {
               ) : (
                 <div className="space-y-4">
                   {posts.map((post) => (
-                    <PostCard key={post.id} post={post} onEngagementUpdate={fetchPosts} />
+                    <EnhancedPostCard key={post.id} post={post} onEngagementUpdate={fetchPosts} />
                   ))}
                 </div>
               )}

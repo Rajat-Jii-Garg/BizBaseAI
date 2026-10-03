@@ -268,6 +268,11 @@ const Communities = () => {
         return;
       }
 
+      if (community.user_id === user.id) {
+        navigate(`/communities/${community.id}`);
+        return;
+      }
+
       const membership =
         membershipMap.get(
           community.id
@@ -391,15 +396,23 @@ const Communities = () => {
       searchTerm,
     ]);
 
-  const myCommunitiesData = useMemo(
-    () =>
-      filteredCommunities.filter(
-        (community) =>
-          community.user_id === user?.id ||
-          membershipMap.get(community.id)?.status === 'approved'
-      ),
-    [filteredCommunities, membershipMap, user]
-  );
+  const myCommunitiesData =
+    useMemo(
+      () =>
+        filteredCommunities.filter(
+          (community) =>
+            community.user_id === user?.id ||
+            membershipMap.get(
+              community.id
+            )?.status ===
+            'approved'
+        ),
+      [
+        filteredCommunities,
+        membershipMap,
+        user,
+      ]
+    );
 
   const displayData =
     activeTab ===
@@ -627,19 +640,31 @@ const Communities = () => {
             >
               {isJoined ? (
                 <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) =>
-                      handleLeaveCommunity(
-                        e,
-                        community
-                      )
-                    }
-                    className="flex-1 h-9 text-xs sm:text-sm"
-                  >
-                    Leave
-                  </Button>
+                  {community.user_id === user?.id ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/communities/${community.id}`)}
+                      className="flex-1 h-9 text-xs sm:text-sm"
+                    >
+                      <Crown className="w-3.5 h-3.5 mr-1" />
+                      Manage
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) =>
+                        handleLeaveCommunity(
+                          e,
+                          community
+                        )
+                      }
+                      className="flex-1 h-9 text-xs sm:text-sm"
+                    >
+                      Leave
+                    </Button>
+                  )}
 
                   <Button
                     size="sm"

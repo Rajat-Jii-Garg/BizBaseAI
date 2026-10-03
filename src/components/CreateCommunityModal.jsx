@@ -132,21 +132,7 @@ const CreateCommunityModal = ({ onCommunityCreated }) => {
         throw error;
       }
 
-      // Automatically join the creator as a member with admin role
-      const { data: memberData, error: memberError } = await supabase
-        .from('community_members')
-        .insert({
-          community_id: data.id,
-          user_id: user.id,
-          role: 'admin'
-        });
-
-      if (memberError) {
-        // rollback: remove created community to avoid orphan if membership fails
-        console.error('Community created but adding member failed:', memberError);
-        await supabase.from('communities').delete().eq('id', data.id);
-        throw memberError;
-      }
+      // Owner membership is created automatically by the database trigger.
 
       toast({
         title: "Community Created!",
