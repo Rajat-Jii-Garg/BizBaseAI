@@ -391,21 +391,15 @@ const Communities = () => {
       searchTerm,
     ]);
 
-  const myCommunitiesData =
-    useMemo(
-      () =>
-        filteredCommunities.filter(
-          (community) =>
-            membershipMap.get(
-              community.id
-            )?.status ===
-            'approved'
-        ),
-      [
-        filteredCommunities,
-        membershipMap,
-      ]
-    );
+  const myCommunitiesData = useMemo(
+    () =>
+      filteredCommunities.filter(
+        (community) =>
+          community.user_id === user?.id ||
+          membershipMap.get(community.id)?.status === 'approved'
+      ),
+    [filteredCommunities, membershipMap, user]
+  );
 
   const displayData =
     activeTab ===
