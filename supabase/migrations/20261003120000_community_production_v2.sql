@@ -468,18 +468,19 @@ ON public.community_pins
 FOR SELECT
 USING (public.is_community_member(community_id, auth.uid()));
 
-DROP POLICY IF EXISTS "Moderators can pin posts" ON public.community_pins;
+DROP POLICY IF EXISTS "Moderators can pin posts"
+ON public.community_pins;
 
 CREATE POLICY "Moderators can pin posts"
 ON public.community_pins
 FOR INSERT
 WITH CHECK (
-  public.is_community_moderator(community_pins.community_id, auth.uid())
-  AND community_pins.pinned_by = auth.uid()
+  public.is_community_moderator(community_id, auth.uid())
+  AND pinned_by = auth.uid()
   AND EXISTS (
     SELECT 1
     FROM public.posts p
-    WHERE p.id = community_pins.post_id
+    WHERE p.id = post_id
       AND p.community_id = community_pins.community_id
   )
 );
@@ -559,3 +560,25 @@ GRANT SELECT, INSERT, DELETE ON public.community_pins TO authenticated;
 GRANT ALL ON public.community_bans TO service_role;
 GRANT ALL ON public.community_reports TO service_role;
 GRANT ALL ON public.community_pins TO service_role;
+
+-- Allow moderators to review pending requests in the UI while keeping role changes owner-only.
+DROP POLICY IF EXISTS "Users can view community members" ON public.community_members;
+CREATE POLICY "Users can view community members"
+ON public.community_members
+FOR SELECT
+USING (
+  user_id = auth.uid()
+  OR public.is_community_moderator(community_members.community_id, auth.uid())
+  OR (
+    status = 'approved'
+    AND EXISTS (
+      SELECT 1
+      FROM public.communities c
+      WHERE c.id = community_members.community_id
+        AND (
+          c.is_private = false
+          OR public.is_community_member(c.id, auth.uid())
+        )
+    )
+  )
+);
