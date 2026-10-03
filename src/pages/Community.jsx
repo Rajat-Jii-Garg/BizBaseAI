@@ -64,7 +64,7 @@ const Community = () => {
       setCommunity(null);
     } finally {
       setLoading(false);
-    } 
+    }
   }, [id]);
 
   const fetchMembership = useCallback(async () => {
