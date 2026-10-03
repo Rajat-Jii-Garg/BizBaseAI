@@ -28,6 +28,7 @@ const CommunityAdminPanel = ({
   isOwner,
   isAdmin,
   onCommunityUpdated,
+  initialSection = 'settings',
 }) => {
   const [members, setMembers] = useState([]);
   const [pending, setPending] = useState([]);
@@ -37,7 +38,11 @@ const CommunityAdminPanel = ({
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState('settings');
+  const [activeSection, setActiveSection] = useState(initialSection);
+
+  useEffect(() => {
+    setActiveSection(initialSection);
+  }, [initialSection]);
 
   const [form, setForm] = useState({
     name: community?.name || '',

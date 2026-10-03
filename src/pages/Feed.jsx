@@ -49,6 +49,7 @@ const Feed = () => {
                   onEngagementUpdate={refetch}
                   onEdit={editPost}
                   onDelete={deletePost}
+                  showCommunityContext
                 />
               ))}
               

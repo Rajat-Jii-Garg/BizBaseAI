@@ -94,6 +94,53 @@ export const usePersonalizedFeed = () => {
 
       const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
+      const communityIds = [
+        ...new Set(
+          postsData
+            .map((post) => post.community_id)
+            .filter(Boolean)
+        )
+      ];
+
+      let communityRows = [];
+
+      if (communityIds.length) {
+        const { data } = await supabase
+          .from('communities')
+          .select(
+            'id, name, image_url, description, category, is_private, members_count, user_id'
+          )
+          .in('id', communityIds);
+
+        communityRows = data || [];
+      }
+
+      const communitiesMap = new Map(
+        communityRows.map((community) => [
+          community.id,
+          community
+        ])
+      );
+
+      let membershipRows = [];
+
+      if (communityIds.length) {
+        const { data } = await supabase
+          .from('community_members')
+          .select('community_id, status, role')
+          .eq('user_id', user.id)
+          .in('community_id', communityIds);
+
+        membershipRows = data || [];
+      }
+
+      const membershipMap = new Map(
+        membershipRows.map((membership) => [
+          membership.community_id,
+          membership
+        ])
+      );
+
       // Get user's likes, reposts, and connections
       const postIds = postsData.map(p => p.id);
       
@@ -136,6 +183,12 @@ export const usePersonalizedFeed = () => {
         },
         user_has_liked: likedPosts.has(post.id),
         user_has_reposted: repostedPosts.has(post.id),
+        community: post.community_id
+          ? communitiesMap.get(post.community_id) || null
+          : null,
+        community_membership: post.community_id
+          ? membershipMap.get(post.community_id) || null
+          : null,
         is_connected: connectedUserIds.has(post.user_id),
         feed_reasons: []
       }));

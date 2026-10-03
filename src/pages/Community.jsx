@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Hash, Globe, Lock, Users, MessageSquare, ArrowLeft, Loader2,
   UserPlus, Clock, CheckCircle2, Share2, Copy, Shield, UserMinus,
-  Trash2, Send, ImagePlus, X, RefreshCw, Crown, UserCheck
+  Trash2, Send, ImagePlus, X, RefreshCw, Crown, UserCheck, MoreHorizontal, Settings
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,6 +18,8 @@ import { toast } from 'sonner';
 import SEOHead from '@/components/SEOHead';
 import EnhancedPostCard from '@/components/EnhancedPostCard';
 import CommunityAdminPanel from '@/components/CommunityAdminPanel';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import CommunityManagementDialog from '@/components/CommunityManagementDialog';
 
 const Community = () => {
   const { id } = useParams();
@@ -41,12 +43,15 @@ const Community = () => {
   const [posting, setPosting] = useState(false);
   const [shareLoading, setShareLoading] = useState(false);
   const [activeView, setActiveView] = useState('home');
+  const [managementOpen, setManagementOpen] = useState(false);
+  const [managementSection, setManagementSection] = useState('settings');
 
   const isOwner = !!user && community?.user_id === user.id;
   const isAdmin = isOwner || (membership?.status === 'approved' && ['admin', 'moderator'].includes(membership?.role));
   const isApprovedMember = isOwner || membership?.status === 'approved';
   const isPending = membership?.status === 'pending';
   const canViewContent = !community?.is_private || isApprovedMember;
+
 
   const fetchCommunity = useCallback(async () => {
     setLoading(true);
@@ -670,7 +675,6 @@ const Community = () => {
     { id: 'home', label: 'Home' },
     { id: 'members', label: 'Members' },
     { id: 'about', label: 'About' },
-    ...(isAdmin ? [{ id: 'manage', label: 'Manage' }] : []),
   ];
 
   return (
@@ -689,13 +693,86 @@ const Community = () => {
               <ArrowLeft className="w-4 h-4 mr-2" /> Communities
             </Button>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" className="h-9 w-9 bg-white" onClick={copyCommunityLink} title="Copy community link">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 bg-white"
+                onClick={copyCommunityLink}
+                title="Copy community link"
+              >
                 <Copy className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm" className="h-9 bg-white" onClick={handleShare} disabled={shareLoading}>
-                {shareLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Share2 className="w-4 h-4 mr-1.5" />}
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 bg-white"
+                onClick={handleShare}
+                disabled={shareLoading}
+              >
+                {shareLoading ? (
+                  <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                ) : (
+                  <Share2 className="w-4 h-4 mr-1.5" />
+                )}
                 Share
               </Button>
+
+              {isAdmin && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 bg-white"
+                      title="Community options"
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="end" className="w-52">
+                    {isOwner && (
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setManagementSection('settings');
+                          setManagementOpen(true);
+                        }}
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Edit Community
+                      </DropdownMenuItem>
+                    )}
+
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setManagementSection('members');
+                        setManagementOpen(true);
+                      }}
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Manage Members
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setManagementSection('moderation');
+                        setManagementOpen(true);
+                      }}
+                    >
+                      <Shield className="w-4 h-4 mr-2" />
+                      Moderation
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem onClick={copyCommunityLink}>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Community Link
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
 
@@ -865,32 +942,32 @@ const Community = () => {
               </Card>
             </section>
           )}
-
           {activeView === 'about' && (
             <section id="community-about-full" className="mt-5 scroll-mt-24">
               <Card className="border-slate-200 shadow-sm rounded-2xl"><CardHeader><CardTitle>About {community.name}</CardTitle></CardHeader><CardContent className="grid md:grid-cols-2 gap-6"><div><p className="text-sm text-slate-700 leading-7">{community.description || 'A professional community for knowledge sharing, networking and collaboration.'}</p></div><div className="rounded-xl bg-slate-50 border border-slate-100 p-4"><p className="font-semibold text-sm mb-2">Guidelines</p><p className="text-sm text-slate-600 whitespace-pre-wrap leading-6">{community.rules || 'Be respectful, stay on topic and contribute useful professional knowledge.'}</p></div></CardContent></Card>
             </section>
           )}
-
-          {activeView === 'manage' && isAdmin && (
-            <section id="community-manage" className="mt-5 scroll-mt-24">
-              <CommunityAdminPanel
-                community={community}
-                user={user}
-                isOwner={isOwner}
-                isAdmin={isAdmin}
-                onCommunityUpdated={(updated) => {
-                  if (updated) setCommunity(updated);
-                  fetchCommunity();
-                  fetchMembership();
-                  fetchMembers();
-                  fetchPendingMembers();
-                  fetchPosts();
-                }}
-              />
-            </section>
-          )}
         </div>
+        <CommunityManagementDialog
+          open={managementOpen}
+          onOpenChange={setManagementOpen}
+          community={community}
+          user={user}
+          isOwner={isOwner}
+          isAdmin={isAdmin}
+          initialSection={managementSection}
+          onCommunityUpdated={(updated) => {
+            if (updated) {
+              setCommunity(updated);
+            }
+
+            fetchCommunity();
+            fetchMembership();
+            fetchMembers();
+            fetchPendingMembers();
+            fetchPosts();
+          }}
+        />
       </div>
     </DashboardLayout>
   );

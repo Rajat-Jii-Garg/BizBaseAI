@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import EnhancedPostCard from './EnhancedPostCard';
 import { useBehaviorTracking } from '@/hooks/useBehaviorTracking';
 
-const TrackedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
+const TrackedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete, showCommunityContext = false }) => {
   const cardRef = useRef(null);
   const { trackPostView, trackPostViewEnd, trackEngagement, trackPostClick } = useBehaviorTracking();
   const hasTrackedView = useRef(false);
@@ -23,7 +23,7 @@ const TrackedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
         });
       },
       {
-        threshold: 0.5, // 50% of the post must be visible
+        threshold: 0.5,
         rootMargin: '0px'
       }
     );
@@ -65,6 +65,7 @@ const TrackedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
         onEngagementUpdate={handleEngagementUpdate}
         onEdit={onEdit}
         onDelete={onDelete}
+        showCommunityContext={showCommunityContext}
       />
     </div>
   );

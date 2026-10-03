@@ -195,6 +195,48 @@ serve(async (req: Request) => {
       );
     }
 
+    // Community metadata + memberships
+    const communityIds = [
+      ...new Set(
+        (candidatePosts ?? [])
+          .map((post) => post.community_id)
+          .filter(Boolean)
+      ),
+    ];
+
+    let communities: any[] = [];
+
+    if (communityIds.length > 0) {
+      const { data: communityRows } = await supabaseClient
+        .from("communities")
+        .select(
+          "id, name, image_url, description, category, is_private, members_count, user_id"
+        )
+        .in("id", communityIds);
+
+      communities = communityRows ?? [];
+    }
+
+    const communitiesMap = new Map(
+      communities.map((community) => [
+        community.id,
+        community,
+      ])
+    );
+
+    const { data: memberships } = await supabaseClient
+      .from("community_members")
+      .select("community_id, status, role")
+      .eq("user_id", user.id)
+      .in("community_id", communityIds);
+
+    const membershipMap = new Map(
+      (memberships ?? []).map((membership) => [
+        membership.community_id,
+        membership,
+      ])
+    );
+
     // 7. Score posts
     const scoredPosts: PostScore[] = candidatePosts.map((post) => {
       let score = 0;
@@ -281,6 +323,21 @@ serve(async (req: Request) => {
       if (post.user_id === user.id) {
         score += hoursOld < 48 ? 60 : 10;
         reasons.push("your_post");
+      }
+
+      // Community post relevance
+      if (post.community_id) {
+        score += 12;
+        reasons.push("community");
+
+        const membership = membershipMap.get(
+          post.community_id
+        );
+
+        if (membership?.status === "approved") {
+          score += 10;
+          reasons.push("joined_community");
+        }
       }
 
       return {
@@ -410,6 +467,14 @@ serve(async (req: Request) => {
           user_has_reposted: repostedPosts.has(
             post.id
           ),
+
+          community: post.community_id
+            ? communitiesMap.get(post.community_id) ?? null
+            : null,
+
+          community_membership: post.community_id
+            ? membershipMap.get(post.community_id) ?? null
+            : null,
 
           feed_reasons:
             scoreInfo?.reasons ?? [],

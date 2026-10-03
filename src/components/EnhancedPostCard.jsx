@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Textarea } from '@/components/ui/textarea';
-import { MoreHorizontal, CheckCircle, Hash, AtSign, Edit, Copy, Bookmark, Flag, Trash2, X, Save, Repeat2, ExternalLink, Bot } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Textarea } from '@/components/ui/textarea';
+import { AtSign, Bookmark, CheckCircle, Copy, Edit, ExternalLink, Flag, Hash, MoreHorizontal, Repeat2, Save, Trash2, UserPlus, Users, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import PostEngagementActions from './PostEngagementActions';
 
-import { useNavigate } from 'react-router-dom';
-import { formatTimeAgo } from '@/lib/timeAgo';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { buildShareUrl } from '@/lib/siteUrl';
+import { formatTimeAgo } from '@/lib/timeAgo';
+import { useNavigate } from 'react-router-dom';
 
-const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
+const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete, showCommunityContext = false }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -26,6 +26,12 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
   const [userHasReposted, setUserHasReposted] = useState(post.user_has_reposted || false);
   const [connectionStatus, setConnectionStatus] = useState('none');
   const [loadingConnection, setLoadingConnection] = useState(true);
+  const [communityMembership, setCommunityMembership] = useState(post.community_membership || null);
+  const [communityActionLoading, setCommunityActionLoading] = useState(false);
+
+  useEffect(() => {
+    setCommunityMembership(post.community_membership || null);
+  }, [post.community_membership]);
 
   useEffect(() => {
     setUserHasReposted(post.user_has_reposted || false);
@@ -217,6 +223,69 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
     }
   };
 
+  const handleCommunityJoin = async () => {
+    if (!user || !post.community?.id) return;
+
+    if (communityMembership?.status === 'approved') {
+      navigate(`/communities/${post.community.id}`);
+      return;
+    }
+
+    if (communityMembership?.status === 'pending') {
+      toast({
+        title: 'Request pending',
+        description: 'Your request is waiting for approval.'
+      });
+      return;
+    }
+
+    setCommunityActionLoading(true);
+
+    try {
+      const status = post.community.is_private
+        ? 'pending'
+        : 'approved';
+
+      const { error } = await supabase
+        .from('community_members')
+        .insert({
+          community_id: post.community.id,
+          user_id: user.id,
+          role: 'member',
+          status
+        });
+
+      if (error) throw error;
+
+      setCommunityMembership({
+        community_id: post.community.id,
+        status,
+        role: 'member'
+      });
+
+      toast({
+        title:
+          status === 'approved'
+            ? 'Joined community'
+            : 'Join request sent',
+        description:
+          status === 'approved'
+            ? `You are now a member of ${post.community.name}.`
+            : `Your request to join ${post.community.name} is pending approval.`
+      });
+
+    } catch (error) {
+      toast({
+        title: 'Unable to join',
+        description:
+          error?.message || 'Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setCommunityActionLoading(false);
+    }
+  };
+
   return (
     <Card className="bg-card border border-border/50 overflow-hidden rounded-none sm:rounded-xl shadow-none sm:shadow-lg hover:shadow-none sm:hover:shadow-xl transition-shadow">
       <CardContent className="px-3 py-2 sm:p-6">
@@ -225,6 +294,132 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3 pb-2 border-b border-border/50">
             <Repeat2 className="w-4 h-4" />
             <span>Reposted by {post.profiles?.full_name || 'User'}</span>
+          </div>
+        )}
+
+        {showCommunityContext && post.community && (
+          <div className="mb-4 -mx-3 sm:-mx-6 -mt-2 sm:-mt-6">
+            <div className="px-3 sm:px-6 py-3 bg-white">
+              <div className="flex items-center justify-between gap-3">
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/communities/${post.community.id}`);
+                  }}
+                  className="flex items-center gap-3 min-w-0 text-left group"
+                >
+                  <Avatar className="h-10 w-10 shrink-0 border border-slate-200">
+                    <AvatarImage
+                      src={post.community.image_url || undefined}
+                    />
+                    <AvatarFallback className="bg-blue-50 text-blue-700">
+                      <Users className="w-5 h-5" />
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-sm text-slate-900 truncate group-hover:text-blue-600">
+                        {post.community.name}
+                      </span>
+
+                      {post.community.is_private && (
+                        <span className="text-[10px] text-slate-400">
+                          Private
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 truncate">
+                      {post.community.members_count || 0} members
+                      {post.community.category
+                        ? ` • ${post.community.category}`
+                        : ''}
+                    </p>
+                  </div>
+                </button>
+
+                <div
+                  className="flex items-center gap-1 shrink-0"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Button
+                    size="sm"
+                    variant={
+                      communityMembership?.status === 'approved'
+                        ? 'outline'
+                        : 'default'
+                    }
+                    className="h-8 px-3 text-xs"
+                    onClick={handleCommunityJoin}
+                    disabled={communityActionLoading}
+                  >
+                    {communityActionLoading ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : communityMembership?.status === 'approved' ? (
+                      'Joined'
+                    ) : communityMembership?.status === 'pending' ? (
+                      'Requested'
+                    ) : (
+                      <>
+                        <UserPlus className="w-3.5 h-3.5 mr-1" />
+                        Join
+                      </>
+                    )}
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() =>
+                          navigate(
+                            `/communities/${post.community.id}`
+                          )
+                        }
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        View Community
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(
+                              `${window.location.origin}/communities/${post.community.id}`
+                            );
+
+                            toast({
+                              title: 'Community link copied'
+                            });
+                          } catch {
+                            toast({
+                              title: 'Failed to copy community link',
+                              variant: 'destructive'
+                            });
+                          }
+                        }}
+                      >
+                        Copy Community Link
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+
+              <div className="mt-3 border-b border-slate-100" />
+            </div>
           </div>
         )}
 
@@ -249,11 +444,6 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete }) => {
                   {post.profiles?.full_name || 'Professional User'}
                 </h4>
                 <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 shrink-0" />
-                {post.community_id && (
-                  <Badge variant="secondary" className="h-5 px-1.5 text-[9px] sm:text-[10px] gap-1">
-                    Community Admin
-                  </Badge>
-                )}
               </div>
               <p className="text-[11px] sm:text-sm text-muted-foreground font-medium">
                 {post.profiles?.current_position || 'Professional Member'}
