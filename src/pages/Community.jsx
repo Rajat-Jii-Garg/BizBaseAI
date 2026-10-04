@@ -1,4 +1,4 @@
-import React, {
+import {
   useCallback,
   useEffect,
   useMemo,
@@ -36,7 +36,6 @@ import {
   Copy,
   Crown,
   Globe,
-  Hash,
   ImagePlus,
   Loader2,
   Lock,
@@ -49,7 +48,7 @@ import {
   Shield,
   UserPlus,
   Users,
-  X,
+  X
 } from 'lucide-react';
 
 import {
@@ -72,9 +71,9 @@ import {
   toast,
 } from 'sonner';
 
-import SEOHead from '@/components/SEOHead';
-import EnhancedPostCard from '@/components/EnhancedPostCard';
 import CommunityManagementDialog from '@/components/CommunityManagementDialog';
+import EnhancedPostCard from '@/components/EnhancedPostCard';
+import SEOHead from '@/components/SEOHead';
 
 const Community = () => {
   const { id } = useParams();
@@ -1828,88 +1827,68 @@ const Community = () => {
 
   return (
     <DashboardLayout>
-
       <SEOHead
         title={`${community.name} | BizBase Communities`}
         description={
-          community.description?.slice(
-            0,
-            155
-          ) ||
+          community.description?.slice(0, 155) ||
           `Join ${community.name} on BizBase.`
         }
         path={`/communities/${community.id}`}
         type="article"
       />
 
-      <div className="min-h-screen bg-[#f6f8fb]">
-
-        <div className="max-w-[1440px] mx-auto px-3 sm:px-5 lg:px-7 py-4 sm:py-6">
-
-          <div className="grid lg:grid-cols-[220px_minmax(0,1fr)_285px] xl:grid-cols-[235px_minmax(0,1fr)_300px] gap-4 lg:gap-5 items-start">
-
-            {/* =================================================
+      <div className="min-h-screen bg-[#f5f7fb]">
+        <div className="mx-auto max-w-[1480px] px-3 py-4 sm:px-5 lg:px-6">
+          {/* =========================================================
+              PAGE LAYOUT
+              LEFT = COMMUNITY NAV
+              RIGHT = COMMUNITY WORKSPACE
+          ========================================================= */}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[225px_minmax(0,1fr)]">
+            {/* =======================================================
                 LEFT SIDEBAR
-            ================================================= */}
+            ======================================================= */}
+            <aside className="hidden lg:block">
+              <div className="sticky top-20">
+                <Card className="overflow-hidden rounded-2xl border-slate-200 bg-white shadow-sm">
+                  <CardContent className="p-3">
 
-            <aside className="hidden lg:block lg:sticky lg:top-20 self-start">
+                    {/* ALL COMMUNITIES */}
+                    <Button
+                      variant="ghost"
+                      className="mb-3 h-9 w-full justify-start px-2 text-xs text-slate-600 hover:bg-slate-50"
+                      onClick={() =>
+                        navigate('/communities')
+                      }
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      All Communities
+                    </Button>
 
-              <Card className="border-slate-200 shadow-sm rounded-2xl bg-white overflow-hidden">
-
-                <CardContent className="p-3">
-
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start h-9 px-2 text-xs text-slate-600 mb-2"
-                    onClick={() =>
-                      navigate(
-                        '/communities'
-                      )
-                    }
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    All Communities
-                  </Button>
-
-                  {/* Recommended */}
-
-                  <div className="px-2 pt-2 pb-2">
-
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      Recommended Communities
-                    </p>
-
-                  </div>
-
-                  <div className="space-y-1">
-
-                    {railLoading ? (
-
-                      [1, 2, 3].map(
-                        (item) => (
+                    {/* =================================================
+                        RECOMMENDED
+                    ================================================= */}
+                    <div className="mb-2 px-2">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                        Recommended Communities
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      {railLoading ? (
+                        [1, 2, 3, 4].map((item) => (
                           <div
                             key={item}
-                            className="h-10 rounded-xl bg-slate-100 animate-pulse"
+                            className="h-10 animate-pulse rounded-xl bg-slate-100"
                           />
-                        )
-                      )
-
-                    ) : recommendedCommunities.length ? (
-
-                      recommendedCommunities
-                        .slice(
-                          0,
-                          5
-                        )
-                        .map(
-                          (item) => (
+                        ))
+                      ) : recommendedCommunities.length > 0 ? (
+                        recommendedCommunities
+                          .slice(0, 6)
+                          .map((item) => (
                             <div
-                              key={
-                                item.id
-                              }
-                              className="group flex items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-slate-50"
+                              key={item.id}
+                              className="group flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-slate-50"
                             >
-
                               <button
                                 type="button"
                                 onClick={() =>
@@ -1917,347 +1896,276 @@ const Community = () => {
                                     `/communities/${item.id}`
                                   )
                                 }
-                                className="min-w-0 flex-1 flex items-center gap-2 text-left"
+                                className="flex min-w-0 flex-1 items-center gap-2 text-left"
                               >
-
-                                <Avatar className="h-7 w-7 rounded-lg shrink-0">
-
+                                <Avatar className="h-8 w-8 shrink-0 rounded-lg">
                                   <AvatarImage
                                     src={
                                       item.image_url ||
                                       undefined
                                     }
                                   />
-
-                                  <AvatarFallback className="rounded-lg bg-blue-50 text-blue-700 text-[9px]">
+                                  <AvatarFallback className="rounded-lg bg-blue-50 text-[9px] font-bold text-blue-700">
                                     {(
                                       item.name ||
                                       'C'
                                     )
-                                      .slice(
-                                        0,
-                                        2
-                                      )
+                                      .slice(0, 2)
                                       .toUpperCase()}
                                   </AvatarFallback>
-
                                 </Avatar>
+                                <div className="min-w-0">
+                                  <p className="truncate text-[11px] font-semibold text-slate-800">
+                                    {item.name}
+                                  </p>
+                                  <p className="truncate text-[9px] text-slate-400">
+                                    {(
+                                      item.members_count ||
+                                      0
+                                    ).toLocaleString()}{' '}
+                                    members
+                                  </p>
 
-                                <span className="text-[11px] font-semibold truncate">
-                                  {item.name}
-                                </span>
-
+                                </div>
                               </button>
-
                               <button
                                 type="button"
                                 onClick={() =>
-                                  quickJoin(
-                                    item
-                                  )
+                                  quickJoin(item)
                                 }
-                                className="text-[9px] font-bold text-blue-600 hover:text-blue-800"
+                                className="shrink-0 text-[9px] font-bold text-blue-600 hover:text-blue-800"
                               >
                                 Join
                               </button>
-
                             </div>
-                          )
-                        )
+                          ))
+                      ) : (
+                        <p className="px-2 py-2 text-[11px] text-slate-400">
+                          No new recommendations.
+                        </p>
+                      )}
+                    </div>
+                    <div className="my-4 border-t border-slate-100" />
 
-                    ) : (
-
-                      <p className="px-2 py-2 text-[11px] text-slate-400">
-                        No new recommendations.
+                    {/* =================================================
+                        MY COMMUNITIES
+                    ================================================= */}
+                    <div className="mb-2 px-2">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                        My Communities
                       </p>
-
-                    )}
-
-                  </div>
-
-                  <div className="my-4 border-t border-slate-100" />
-
-                  {/* My Communities */}
-
-                  <div className="px-2 pb-2">
-
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      My Communities
-                    </p>
-
-                  </div>
-
-                  <div className="space-y-1">
-
-                    {joinedCommunities.length ? (
-
-                      joinedCommunities
-                        .slice(
-                          0,
-                          10
-                        )
-                        .map(
-                          (item) => (
+                    </div>
+                    <div className="space-y-1">
+                      {joinedCommunities.length > 0 ? (
+                        joinedCommunities
+                          .slice(0, 10)
+                          .map((item) => (
                             <CommunityRailItem
-                              key={
-                                item.id
-                              }
-                              item={
-                                item
-                              }
+                              key={item.id}
+                              item={item}
                               active={
                                 item.id ===
                                 community.id
                               }
                             />
-                          )
-                        )
-
-                    ) : (
-
-                      <p className="px-2 py-2 text-[11px] text-slate-400">
-                        Your joined communities will appear here.
-                      </p>
-
-                    )}
-
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-3 h-8 text-[11px]"
-                    onClick={() =>
-                      navigate(
-                        '/communities'
-                      )
-                    }
-                  >
-                    <Users className="w-3.5 h-3.5 mr-1.5" />
-                    Explore Communities
-                  </Button>
-
-                </CardContent>
-
-              </Card>
-
+                          ))
+                      ) : (
+                        <p className="px-2 py-2 text-[11px] text-slate-400">
+                          Your joined communities will appear here.
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 h-8 w-full text-[11px]"
+                      onClick={() =>
+                        navigate('/communities')
+                      }
+                    >
+                      <Users className="mr-1.5 h-3.5 w-3.5" />
+                      Explore Communities
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </aside>
 
-            {/* =================================================
-                CENTER
-            ================================================= */}
-
-            <main className="min-w-0">
-
-              {/* TOP ACTIONS */}
-
-              <div className="flex items-center justify-between gap-2 mb-3">
-
+            {/* =======================================================
+                RIGHT WORKSPACE
+                HERO + CENTER FEED + RIGHT INFO
+            ======================================================= */}
+            <div className="min-w-0">
+              {/* =====================================================
+                  TOP ACTION BAR
+              ===================================================== */}
+              <div className="mb-3 flex items-center justify-between gap-2">
                 <Button
                   variant="ghost"
                   onClick={() =>
-                    navigate(
-                      '/communities'
-                    )
+                    navigate('/communities')
                   }
                   className="h-8 px-2 text-xs text-slate-500"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
+                  <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
                   Communities
                 </Button>
-
                 <div className="flex items-center gap-1.5">
-
                   <Button
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 bg-white"
-                    onClick={
-                      copyCommunityLink
-                    }
+                    onClick={copyCommunityLink}
                     title="Copy community link"
                   >
-                    <Copy className="w-3.5 h-3.5" />
+                    <Copy className="h-3.5 w-3.5" />
                   </Button>
-
                   <Button
                     variant="outline"
                     size="sm"
                     className="h-8 bg-white text-xs"
-                    onClick={
-                      handleShare
-                    }
-                    disabled={
-                      shareLoading
-                    }
+                    onClick={handleShare}
+                    disabled={shareLoading}
                   >
                     {shareLoading ? (
-                      <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                      <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
                     ) : (
-                      <Share2 className="w-3.5 h-3.5 mr-1" />
+                      <Share2 className="mr-1 h-3.5 w-3.5" />
                     )}
-
                     Share
                   </Button>
-
                   {isAdmin && (
-
                     <DropdownMenu>
-
-                      <DropdownMenuTrigger
-                        asChild
-                      >
+                      <DropdownMenuTrigger asChild>
                         <Button
                           variant="outline"
                           size="icon"
                           className="h-8 w-8 bg-white"
                         >
-                          <MoreHorizontal className="w-4 h-4" />
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-
                       <DropdownMenuContent
                         align="end"
                         className="w-56"
                       >
-
                         {isOwner && (
                           <DropdownMenuItem
                             onClick={() => {
                               setManagementSection(
                                 'settings'
                               );
-
                               setManagementOpen(
                                 true
                               );
                             }}
                           >
-                            <Settings className="w-4 h-4 mr-2" />
+                            <Settings className="mr-2 h-4 w-4" />
                             Edit Community
                           </DropdownMenuItem>
                         )}
-
                         <DropdownMenuItem
                           onClick={() => {
                             setManagementSection(
                               'requests'
                             );
-
                             setManagementOpen(
                               true
                             );
                           }}
                         >
-                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          <CheckCircle2 className="mr-2 h-4 w-4" />
                           Join Requests
                         </DropdownMenuItem>
-
                         <DropdownMenuItem
                           onClick={() => {
                             setManagementSection(
                               'members'
                             );
-
                             setManagementOpen(
                               true
                             );
                           }}
                         >
-                          <Users className="w-4 h-4 mr-2" />
+                          <Users className="mr-2 h-4 w-4" />
                           Manage Members
                         </DropdownMenuItem>
-
                         <DropdownMenuItem
                           onClick={() => {
                             setManagementSection(
                               'moderation'
                             );
-
                             setManagementOpen(
                               true
                             );
                           }}
                         >
-                          <Shield className="w-4 h-4 mr-2" />
+                          <Shield className="mr-2 h-4 w-4" />
                           Moderation
                         </DropdownMenuItem>
-
                         <DropdownMenuSeparator />
-
                         <DropdownMenuItem
                           onClick={
                             copyCommunityLink
                           }
                         >
-                          <Copy className="w-4 h-4 mr-2" />
+                          <Copy className="mr-2 h-4 w-4" />
                           Copy Community Link
                         </DropdownMenuItem>
-
                       </DropdownMenuContent>
-
                     </DropdownMenu>
-
                   )}
-
                 </div>
-
               </div>
 
-              {/* =================================================
+              {/* =====================================================
                   COMMUNITY HERO
-              ================================================= */}
+                  FULL WIDTH OF WORKSPACE
+              ===================================================== */}
 
-              <Card className="overflow-hidden border-slate-200 shadow-sm rounded-2xl bg-white">
-
-                <div className="relative h-48 sm:h-56 lg:h-60 bg-gradient-to-br from-blue-800 via-indigo-800 to-purple-900">
-
-                  {community.image_url && (
+              <Card className="mb-4 overflow-hidden rounded-2xl border-slate-200 bg-white shadow-sm">
+                <div className="relative h-[210px] overflow-hidden sm:h-[240px] lg:h-[255px]">
+                  {community.image_url ? (
                     <img
-                      src={
-                        community.image_url
-                      }
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-cover"
+                      src={community.image_url}
+                      alt={community.name}
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#172554] via-[#1d4ed8] to-[#4f46e5]" />
                   )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#0f172a]/45 to-transparent" />
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/35 to-transparent" />
-
-                  <div className="absolute top-4 left-4 right-4 flex justify-between items-start gap-3">
-
-                    <div className="flex gap-2 flex-wrap">
-
+                  {/* HERO TOP */}
+                  <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3 sm:left-6 sm:right-6">
+                    <div className="flex flex-wrap gap-1.5">
                       <Badge
-                        className={`${
+                        className={`border-0 px-2.5 py-1 text-[9px] font-bold text-white ${
                           community.is_private
                             ? 'bg-rose-500'
                             : 'bg-emerald-500'
-                        } text-white border-0`}
+                        }`}
                       >
                         {community.is_private ? (
                           <>
-                            <Lock className="w-3 h-3 mr-1" />
+                            <Lock className="mr-1 h-3 w-3" />
                             Private
                           </>
                         ) : (
                           <>
-                            <Globe className="w-3 h-3 mr-1" />
+                            <Globe className="mr-1 h-3 w-3" />
                             Public
                           </>
                         )}
                       </Badge>
-
                       {isOwner && (
-                        <Badge className="bg-white/15 text-white border border-white/20">
-                          <Crown className="w-3 h-3 mr-1" />
+                        <Badge className="border border-white/20 bg-white/15 px-2.5 py-1 text-[9px] font-bold text-white backdrop-blur">
+                          <Crown className="mr-1 h-3 w-3" />
                           Owner
                         </Badge>
                       )}
-
                     </div>
-
-                    <span className="text-[10px] sm:text-[11px] text-white/90 bg-black/20 rounded-full px-2.5 py-1 backdrop-blur">
+                    <span className="rounded-full border border-white/10 bg-black/25 px-2.5 py-1 text-[9px] text-white backdrop-blur">
                       {community.activity_level ===
                       'very_active'
                         ? 'Very Active'
@@ -2266,24 +2174,24 @@ const Community = () => {
                         ? 'Active'
                         : 'Professional Community'}
                     </span>
-
                   </div>
 
-                  <div className="absolute bottom-5 left-5 right-5 text-white">
-
-                    <p className="text-[10px] sm:text-xs font-bold text-white/70 uppercase tracking-wider">
+                  {/* HERO CONTENT */}
+                  <div className="absolute bottom-6 left-5 right-5 text-white sm:left-6 sm:right-6">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-200">
                       {community.category ||
                         'Professional Community'}
                     </p>
-
-                    <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1">
+                    <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl lg:text-[42px]">
                       {community.name}
                     </h1>
-
-                    <div className="flex flex-wrap items-center gap-2.5 mt-2 text-xs text-white/80">
-
+                    <p className="mt-1 max-w-3xl text-xs leading-5 text-white/75 sm:text-sm">
+                      {community.description ||
+                        'A professional community for ideas, networking, opportunities and collaboration.'}
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2.5 text-[10px] text-white/80 sm:text-xs">
                       <span className="inline-flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5" />
+                        <Users className="h-3.5 w-3.5" />
                         {(
                           community.members_count ||
                           0
@@ -2292,465 +2200,533 @@ const Community = () => {
                       </span>
 
                       <span>•</span>
-
                       <span>
                         Ideas · Networking · Opportunities
                       </span>
-
                     </div>
-
                   </div>
-
                 </div>
 
-                {/* TABS */}
-
-                <div className="border-t border-slate-100 px-3 sm:px-5">
-
-                  <div className="flex items-center justify-between gap-3 overflow-x-auto">
-
-                    <div className="flex items-center gap-1 py-1.5 min-w-max">
-
+                {/* =================================================
+                    COMMUNITY TABS
+                ================================================= */}
+                <div className="flex items-center justify-between border-t border-slate-100 px-3 sm:px-5">
+                  <div className="flex min-w-0 items-center gap-1 overflow-x-auto py-1.5">
+                    {[
+                      ['home', 'Discussion'],
+                      ['members', 'Members'],
+                      ['about', 'About'],
+                    ].map(([value, label]) => (
                       <button
+                        key={value}
                         type="button"
                         onClick={() =>
-                          navigateSection(
-                            'home'
-                          )
+                          navigateSection(value)
                         }
-                        className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold ${
-                          activeView ===
-                          'home'
+                        className={`whitespace-nowrap rounded-lg px-3.5 py-2 text-xs font-semibold transition ${
+                          activeView === value
                             ? 'bg-blue-50 text-blue-700'
                             : 'text-slate-500 hover:bg-slate-50'
                         }`}
                       >
-                        Discussion
+                        {label}
                       </button>
+                    ))}
+                  </div>
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigateSection(
-                            'members'
-                          )
-                        }
-                        className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold ${
-                          activeView ===
-                          'members'
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-slate-500 hover:bg-slate-50'
-                        }`}
-                      >
-                        Members
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigateSection(
-                            'about'
-                          )
-                        }
-                        className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold ${
-                          activeView ===
-                          'about'
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-slate-500 hover:bg-slate-50'
-                        }`}
-                      >
-                        About
-                      </button>
-
-                    </div>
-
-                    <div className="hidden sm:flex items-center shrink-0">
-
-                      {isApprovedMember ? (
-
-                        !isOwner && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 text-xs"
-                            onClick={
-                              handleLeave
-                            }
-                            disabled={
-                              actionLoading
-                            }
-                          >
-                            Leave
-                          </Button>
-                        )
-
-                      ) : isPending ? (
-
+                  {/* JOIN / LEAVE */}
+                  <div className="hidden shrink-0 sm:block">
+                    {isApprovedMember ? (
+                      !isOwner && (
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled
-                          className="h-8 text-xs text-amber-700"
-                        >
-                          Request Pending
-                        </Button>
-
-                      ) : (
-
-                        <Button
-                          size="sm"
-                          className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
+                          className="h-8 text-xs"
                           onClick={
-                            handleJoin
+                            handleLeave
                           }
                           disabled={
                             actionLoading
                           }
                         >
-                          {actionLoading ? (
-                            <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
-                          ) : (
-                            <UserPlus className="w-3.5 h-3.5 mr-1" />
-                          )}
-
-                          {community.is_private
-                            ? 'Request to Join'
-                            : 'Join Community'}
+                          Leave
                         </Button>
-
-                      )}
-
-                    </div>
-
+                      )
+                    ) : isPending ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled
+                        className="h-8 text-xs text-amber-700"
+                      >
+                        Request Pending
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="h-8 bg-blue-600 text-xs hover:bg-blue-700"
+                        onClick={
+                          handleJoin
+                        }
+                        disabled={
+                          actionLoading
+                        }
+                      >
+                        {actionLoading ? (
+                          <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <UserPlus className="mr-1 h-3.5 w-3.5" />
+                        )}
+                        {community.is_private
+                          ? 'Request to Join'
+                          : 'Join Community'}
+                      </Button>
+                    )}
                   </div>
-
                 </div>
-
               </Card>
 
-              {/* MOBILE COMMUNITY SWITCHER */}
-
-              <div className="lg:hidden flex gap-2 overflow-x-auto py-3">
-
+              {/* =====================================================
+                  MOBILE COMMUNITY SWITCHER
+              ===================================================== */}
+              <div className="mb-3 flex gap-2 overflow-x-auto lg:hidden">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() =>
-                    navigate(
-                      '/communities'
-                    )
+                    navigate('/communities')
                   }
                   className="shrink-0"
                 >
                   Explore
                 </Button>
-
                 {joinedCommunities
-                  .slice(
-                    0,
-                    4
-                  )
-                  .map(
-                    (item) => (
-                      <Button
-                        key={
-                          item.id
-                        }
-                        variant={
-                          item.id ===
-                          community.id
-                            ? 'default'
-                            : 'outline'
-                        }
-                        size="sm"
-                        onClick={() =>
-                          navigate(
-                            `/communities/${item.id}`
-                          )
-                        }
-                        className="shrink-0"
-                      >
-                        {item.name}
-                      </Button>
-                    )
-                  )}
-
+                  .slice(0, 5)
+                  .map((item) => (
+                    <Button
+                      key={item.id}
+                      variant={
+                        item.id ===
+                        community.id
+                          ? 'default'
+                          : 'outline'
+                      }
+                      size="sm"
+                      onClick={() =>
+                        navigate(
+                          `/communities/${item.id}`
+                        )
+                      }
+                      className="shrink-0"
+                    >
+                      {item.name}
+                    </Button>
+                  ))}
               </div>
 
-              {/* =================================================
-                  COMMUNITY CONTENT
-              ================================================= */}
+              {/* =====================================================
+                  FEED + RIGHT INFORMATION
+              ===================================================== */}
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
+                {/* ===================================================
+                    CENTER
+                =================================================== */}
+                <main className="min-w-0">
+                  <div
+                    id="community-home"
+                    className="scroll-mt-24 space-y-4"
+                  >
 
-              <div
-                id="community-home"
-                className="scroll-mt-24 mt-4 space-y-4"
-              >
-
-                {/* PENDING REQUEST NOTICE */}
-
-                {isAdmin &&
-                  pendingMembers.length >
-                    0 && (
-
-                    <Card className="border-amber-200 bg-amber-50/70 rounded-2xl">
-
-                      <CardContent className="p-3.5 flex items-center justify-between gap-3">
-
-                        <div>
-                          <p className="text-sm font-semibold text-amber-900">
-                            {
-                              pendingMembers.length
-                            }{' '}
-                            join request
-                            {pendingMembers.length >
-                            1
-                              ? 's'
-                              : ''}
-                          </p>
-
-                          <p className="text-[11px] text-amber-800 mt-0.5">
-                            Review requests from Community Management.
-                          </p>
-                        </div>
-
-                        <Button
-                          size="sm"
-                          className="h-8 bg-amber-600 hover:bg-amber-700"
-                          onClick={() => {
-                            setManagementSection(
-                              'requests'
-                            );
-
-                            setManagementOpen(
-                              true
-                            );
-                          }}
-                        >
-                          Review
-                        </Button>
-
-                      </CardContent>
-
-                    </Card>
-
-                  )}
-
-                {/* POST COMPOSER */}
-
-                {isApprovedMember && (
-
-                  <Card className="border-slate-200 shadow-sm rounded-2xl">
-
-                    <CardContent className="p-4">
-
-                      <div className="flex items-start gap-3">
-
-                        <Avatar className="h-9 w-9 shrink-0">
-
-                          <AvatarImage
-                            src={
-                              profile?.avatar_url ||
-                              undefined
-                            }
-                          />
-
-                          <AvatarFallback>
-                            {getInitials(
-                              profile
-                            )}
-                          </AvatarFallback>
-
-                        </Avatar>
-
-                        <div className="flex-1 min-w-0">
-
-                          <Textarea
-                            value={
-                              postContent
-                            }
-                            onChange={(event) =>
-                              setPostContent(
-                                event.target.value
-                              )
-                            }
-                            placeholder={`Share something with ${community.name}...`}
-                            className="min-h-[82px] resize-none rounded-xl border-slate-200 text-sm"
-                            maxLength={
-                              3000
-                            }
-                          />
-
-                          {postPreview && (
-
-                            <div className="relative mt-3 rounded-xl overflow-hidden border border-slate-200">
-
-                              <img
-                                src={
-                                  postPreview
-                                }
-                                alt="Selected"
-                                className="w-full max-h-72 object-cover"
-                              />
-
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                size="icon"
-                                onClick={
-                                  removePostFile
-                                }
-                                className="absolute top-2 right-2 h-8 w-8 rounded-full"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-
-                            </div>
-
-                          )}
-
-                          <div className="flex items-center justify-between mt-2.5">
-
-                            <div className="flex items-center gap-1.5">
-
-                              <input
-                                ref={
-                                  fileInputRef
-                                }
-                                type="file"
-                                accept="image/jpeg,image/png,image/webp,image/gif"
-                                className="hidden"
-                                onChange={
-                                  handleFileChange
-                                }
-                              />
-
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  fileInputRef.current?.click()
-                                }
-                                className="h-8 text-xs text-blue-600"
-                              >
-                                <ImagePlus className="w-3.5 h-3.5 mr-1" />
-                                Photo
-                              </Button>
-
-                              <span className="text-[10px] text-slate-400">
-                                {
-                                  postContent.length
-                                }
-                                /3000
-                              </span>
-
+                    {/* =================================================
+                        PENDING REQUEST
+                    ================================================= */}
+                    {isAdmin &&
+                      pendingMembers.length > 0 && (
+                        <Card className="rounded-2xl border-amber-200 bg-amber-50/70">
+                          <CardContent className="flex items-center justify-between gap-3 p-3.5">
+                            <div>
+                              <p className="text-sm font-semibold text-amber-900">
+                                {pendingMembers.length}{' '}
+                                join request
+                                {pendingMembers.length >
+                                1
+                                  ? 's'
+                                  : ''}
+                              </p>
+                              <p className="mt-0.5 text-[11px] text-amber-800">
+                                Review requests from Community Management.
+                              </p>
                             </div>
 
                             <Button
-                              onClick={
-                                handleCreatePost
-                              }
-                              disabled={
-                                posting ||
-                                (
-                                  !postContent.trim() &&
-                                  !postFile
-                                )
-                              }
-                              className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
+                              size="sm"
+                              className="h-8 bg-amber-600 hover:bg-amber-700"
+                              onClick={() => {
+                                setManagementSection(
+                                  'requests'
+                                );
+                                setManagementOpen(
+                                  true
+                                );
+                              }}
                             >
-                              {posting ? (
-                                <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
-                              ) : (
-                                <Send className="w-3.5 h-3.5 mr-1" />
+                              Review
+                            </Button>
+
+                          </CardContent>
+
+                        </Card>
+
+                      )}
+
+
+                    {/* =================================================
+                        POST COMPOSER
+                    ================================================= */}
+
+                    {isApprovedMember && (
+
+                      <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+
+                        <CardContent className="p-4">
+
+                          <div className="flex items-start gap-3">
+
+                            <Avatar className="h-9 w-9 shrink-0">
+
+                              <AvatarImage
+                                src={
+                                  profile?.avatar_url ||
+                                  undefined
+                                }
+                              />
+
+                              <AvatarFallback>
+                                {getInitials(
+                                  profile
+                                )}
+                              </AvatarFallback>
+
+                            </Avatar>
+
+                            <div className="min-w-0 flex-1">
+
+                              <Textarea
+                                value={
+                                  postContent
+                                }
+                                onChange={(event) =>
+                                  setPostContent(
+                                    event.target.value
+                                  )
+                                }
+                                placeholder={`Share something with ${community.name}...`}
+                                className="min-h-[82px] resize-none rounded-xl border-slate-200 text-sm"
+                                maxLength={3000}
+                              />
+
+                              {postPreview && (
+
+                                <div className="relative mt-3 overflow-hidden rounded-xl border border-slate-200">
+
+                                  <img
+                                    src={
+                                      postPreview
+                                    }
+                                    alt="Selected"
+                                    className="max-h-72 w-full object-cover"
+                                  />
+
+                                  <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="icon"
+                                    onClick={
+                                      removePostFile
+                                    }
+                                    className="absolute right-2 top-2 h-8 w-8 rounded-full"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+
+                                </div>
+
                               )}
 
-                              Publish
-                            </Button>
+                              <div className="mt-2.5 flex items-center justify-between">
+
+                                <div className="flex items-center gap-1.5">
+
+                                  <input
+                                    ref={
+                                      fileInputRef
+                                    }
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,image/gif"
+                                    className="hidden"
+                                    onChange={
+                                      handleFileChange
+                                    }
+                                  />
+
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      fileInputRef.current?.click()
+                                    }
+                                    className="h-8 text-xs text-blue-600"
+                                  >
+                                    <ImagePlus className="mr-1 h-3.5 w-3.5" />
+                                    Photo
+                                  </Button>
+
+                                  <span className="text-[10px] text-slate-400">
+                                    {postContent.length}/3000
+                                  </span>
+
+                                </div>
+
+                                <Button
+                                  onClick={
+                                    handleCreatePost
+                                  }
+                                  disabled={
+                                    posting ||
+                                    (
+                                      !postContent.trim() &&
+                                      !postFile
+                                    )
+                                  }
+                                  className="h-8 bg-blue-600 text-xs hover:bg-blue-700"
+                                >
+
+                                  {posting ? (
+                                    <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                                  ) : (
+                                    <Send className="mr-1 h-3.5 w-3.5" />
+                                  )}
+
+                                  Publish
+
+                                </Button>
+
+                              </div>
+
+                            </div>
 
                           </div>
 
-                        </div>
+                        </CardContent>
 
-                      </div>
+                      </Card>
 
-                    </CardContent>
+                    )}
 
-                  </Card>
 
-                )}
+                    {/* =================================================
+                        PINNED
+                    ================================================= */}
 
-                {/* PRIVATE COMMUNITY */}
+                    {canViewContent &&
+                      pinnedPosts.length > 0 && (
 
-                {!canViewContent &&
-                  community.is_private ? (
+                        <section className="space-y-2">
 
-                  <Card className="rounded-2xl">
+                          <div>
 
-                    <CardContent className="p-10 text-center">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                              Community highlights
+                            </p>
 
-                      <div className="h-12 w-12 mx-auto rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
-                        <Lock className="w-5 h-5" />
-                      </div>
+                            <h2 className="text-lg font-bold text-slate-900">
+                              Pinned discussions
+                            </h2>
 
-                      <h2 className="font-bold mt-4">
-                        Private community
-                      </h2>
+                          </div>
 
-                      <p className="text-xs text-slate-500 mt-1">
-                        Request access to view discussions and participate.
-                      </p>
+                          <div className="space-y-3">
 
-                      {!isPending && (
-                        <Button
-                          onClick={
-                            handleJoin
-                          }
-                          className="mt-4 bg-blue-600 hover:bg-blue-700"
-                        >
-                          <UserPlus className="w-4 h-4 mr-2" />
-                          Request to Join
-                        </Button>
+                            {pinnedPosts
+                              .slice(0, 2)
+                              .map((post) => (
+
+                                <EnhancedPostCard
+                                  key={`pinned-${post.id}`}
+                                  post={{
+                                    ...post,
+                                    community,
+                                  }}
+                                  showCommunityContext
+                                  onEngagementUpdate={
+                                    fetchPosts
+                                  }
+                                />
+
+                              ))}
+
+                          </div>
+
+                        </section>
+
                       )}
 
-                    </CardContent>
 
-                  </Card>
+                    {/* =================================================
+                        PRIVATE COMMUNITY
+                    ================================================= */}
 
-                ) : (
+                    {!canViewContent &&
+                    community.is_private ? (
 
-                  <>
-                    {/* PINNED */}
+                      <Card className="rounded-2xl border-slate-200 bg-white">
 
-                    {pinnedPosts.length >
-                      0 && (
+                        <CardContent className="p-10 text-center">
 
-                      <section className="space-y-2">
+                          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+                            <Lock className="h-5 w-5" />
+                          </div>
 
-                        <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
-                            Community highlights
+                          <h2 className="mt-4 font-bold">
+                            Private Community
+                          </h2>
+
+                          <p className="mt-1 text-xs text-slate-500">
+                            Request access to view discussions and participate.
                           </p>
 
-                          <h2 className="text-lg font-bold text-slate-900">
-                            Pinned discussions
-                          </h2>
+                          {!isPending && (
+
+                            <Button
+                              onClick={
+                                handleJoin
+                              }
+                              className="mt-4 bg-blue-600 hover:bg-blue-700"
+                            >
+                              <UserPlus className="mr-2 h-4 w-4" />
+                              Request to Join
+                            </Button>
+
+                          )}
+
+                        </CardContent>
+
+                      </Card>
+
+                    ) : (
+
+                      <section
+                        ref={
+                          discussionRef
+                        }
+                        className="scroll-mt-24 space-y-3"
+                      >
+
+                        {/* FEED HEADER */}
+
+                        <div className="flex items-end justify-between">
+
+                          <div>
+
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                              Community Feed
+                            </p>
+
+                            <h2 className="text-lg font-bold text-slate-900">
+                              Latest Discussions
+                            </h2>
+
+                            <p className="mt-0.5 text-xs text-slate-500">
+                              Ideas, questions, updates and opportunities from members.
+                            </p>
+
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 bg-white"
+                            onClick={
+                              fetchPosts
+                            }
+                            disabled={
+                              postsLoading
+                            }
+                          >
+                            <RefreshCw
+                              className={
+                                postsLoading
+                                  ? 'h-3.5 w-3.5 animate-spin'
+                                  : 'h-3.5 w-3.5'
+                              }
+                            />
+                          </Button>
+
                         </div>
 
-                        <div className="space-y-3">
 
-                          {pinnedPosts
-                            .slice(
-                              0,
-                              2
-                            )
-                            .map(
-                              (
-                                post
-                              ) => (
+                        {/* POSTS */}
+
+                        {postsLoading ? (
+
+                          <div className="space-y-3">
+
+                            {[1, 2, 3].map(
+                              (item) => (
+
+                                <Card
+                                  key={item}
+                                  className="rounded-2xl"
+                                >
+
+                                  <CardContent className="space-y-3 p-5">
+
+                                    <div className="h-9 w-9 animate-pulse rounded-full bg-slate-200" />
+
+                                    <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />
+
+                                    <div className="h-24 animate-pulse rounded bg-slate-200" />
+
+                                  </CardContent>
+
+                                </Card>
+
+                              )
+                            )}
+
+                          </div>
+
+                        ) : regularPosts.length === 0 ? (
+
+                          <Card className="rounded-2xl border-dashed border-slate-300 bg-white">
+
+                            <CardContent className="p-10 text-center">
+
+                              <MessageSquare className="mx-auto h-9 w-9 text-slate-300" />
+
+                              <h3 className="mt-3 text-sm font-bold text-slate-800">
+                                No discussions yet
+                              </h3>
+
+                              <p className="mt-1 text-xs text-slate-500">
+                                Start the first professional conversation in this community.
+                              </p>
+
+                            </CardContent>
+
+                          </Card>
+
+                        ) : (
+
+                          <div className="space-y-3">
+
+                            {regularPosts.map(
+                              (post) => (
+
                                 <EnhancedPostCard
                                   key={
-                                    `pinned-${post.id}`
+                                    post.id
                                   }
                                   post={{
                                     ...post,
@@ -2761,278 +2737,487 @@ const Community = () => {
                                     fetchPosts
                                   }
                                 />
+
                               )
                             )}
 
-                        </div>
+                          </div>
+
+                        )}
 
                       </section>
 
                     )}
 
-                    {/* FEED */}
 
-                    <section
-                      ref={
-                        discussionRef
-                      }
-                      className="space-y-2 scroll-mt-24"
-                    >
+                    {/* =================================================
+                        MEMBERS VIEW
+                    ================================================= */}
 
-                      <div className="flex items-end justify-between">
+                    {activeView ===
+                      'members' &&
+                      canViewContent && (
 
-                        <div>
-
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
-                            Community feed
-                          </p>
-
-                          <h2 className="text-lg font-bold text-slate-900">
-                            Latest discussions
-                          </h2>
-
-                          <p className="text-xs text-slate-500 mt-0.5">
-                            Ideas, questions, updates and opportunities from members.
-                          </p>
-
-                        </div>
-
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 bg-white"
-                          onClick={
-                            fetchPosts
-                          }
-                          disabled={
-                            postsLoading
-                          }
+                        <section
+                          id="community-members-list"
+                          className="scroll-mt-24"
                         >
-                          <RefreshCw
-                            className={`w-3.5 h-3.5 ${
-                              postsLoading
-                                ? 'animate-spin'
-                                : ''
-                            }`}
-                          />
-                        </Button>
 
-                      </div>
+                          <Card className="rounded-2xl border-slate-200 bg-white">
 
-                      {postsLoading ? (
+                            <CardHeader>
 
-                        <div className="space-y-3">
+                              <CardTitle className="text-base">
+                                Community Members
+                              </CardTitle>
 
-                          {[1, 2].map(
-                            (item) => (
-                              <Card
-                                key={
-                                  item
+                            </CardHeader>
+
+                            <CardContent className="grid gap-2 sm:grid-cols-2">
+
+                              {members.map(
+                                (member) => {
+
+                                  const person =
+                                    member.profile;
+
+                                  return (
+
+                                    <button
+                                      key={
+                                        member.id
+                                      }
+                                      type="button"
+                                      onClick={() =>
+                                        person?.username &&
+                                        navigate(
+                                          `/${person.username}`
+                                        )
+                                      }
+                                      className="flex items-center gap-3 rounded-xl border border-slate-100 p-3 text-left transition hover:bg-slate-50"
+                                    >
+
+                                      <Avatar className="h-9 w-9">
+
+                                        <AvatarImage
+                                          src={
+                                            person?.avatar_url ||
+                                            undefined
+                                          }
+                                        />
+
+                                        <AvatarFallback>
+                                          {getInitials(
+                                            person
+                                          )}
+                                        </AvatarFallback>
+
+                                      </Avatar>
+
+                                      <div className="min-w-0 flex-1">
+
+                                        <p className="truncate text-sm font-semibold">
+                                          {person?.full_name ||
+                                            person?.username ||
+                                            'BizBase Member'}
+                                        </p>
+
+                                        <p className="truncate text-[11px] text-slate-500">
+                                          {person?.current_position ||
+                                            person?.company_name ||
+                                            'Professional member'}
+                                        </p>
+
+                                      </div>
+
+                                      <Badge
+                                        variant="secondary"
+                                        className="text-[10px] capitalize"
+                                      >
+                                        {member.user_id ===
+                                        community.user_id
+                                          ? 'Owner'
+                                          : member.role ||
+                                            'member'}
+                                      </Badge>
+
+                                    </button>
+
+                                  );
+
                                 }
-                                className="animate-pulse rounded-2xl"
-                              >
-                                <CardContent className="p-5 space-y-3">
-                                  <div className="h-9 w-9 rounded-full bg-slate-200" />
-                                  <div className="h-4 bg-slate-200 rounded w-2/3" />
-                                  <div className="h-20 bg-slate-200 rounded" />
-                                </CardContent>
-                              </Card>
-                            )
-                          )}
+                              )}
 
-                        </div>
+                            </CardContent>
 
-                      ) : regularPosts.length ===
-                        0 ? (
+                          </Card>
 
-                        <Card className="border-dashed rounded-2xl">
-
-                          <CardContent className="p-10 text-center">
-
-                            <MessageSquare className="w-9 h-9 mx-auto mb-2 text-slate-300" />
-
-                            <h3 className="font-semibold">
-                              No discussions yet
-                            </h3>
-
-                            <p className="text-xs text-slate-500 mt-1">
-                              Be the first to start a professional conversation.
-                            </p>
-
-                          </CardContent>
-
-                        </Card>
-
-                      ) : (
-
-                        <div className="space-y-3">
-
-                          {regularPosts.map(
-                            (post) => (
-                              <EnhancedPostCard
-                                key={
-                                  post.id
-                                }
-                                post={{
-                                  ...post,
-                                  community,
-                                }}
-                                showCommunityContext
-                                onEngagementUpdate={
-                                  fetchPosts
-                                }
-                              />
-                            )
-                          )}
-
-                        </div>
+                        </section>
 
                       )}
 
-                    </section>
 
-                  </>
-                )}
+                    {/* =================================================
+                        ABOUT VIEW
+                    ================================================= */}
 
-                {/* MEMBERS */}
+                    {activeView ===
+                      'about' && (
 
-                {activeView ===
-                  'members' &&
-                  canViewContent && (
+                        <section
+                          id="community-about-full"
+                          className="scroll-mt-24"
+                        >
 
-                    <section
-                      id="community-members-list"
-                      className="scroll-mt-24"
-                    >
+                          <Card className="rounded-2xl border-slate-200 bg-white">
 
-                      <Card className="rounded-2xl">
+                            <CardHeader>
 
-                        <CardHeader>
-                          <CardTitle className="text-base">
-                            Community members
-                          </CardTitle>
-                        </CardHeader>
+                              <CardTitle className="text-base">
+                                About {community.name}
+                              </CardTitle>
 
-                        <CardContent className="grid sm:grid-cols-2 gap-2">
+                            </CardHeader>
 
-                          {members.map(
-                            (member) => {
-                              const person =
-                                member.profile;
+                            <CardContent className="grid gap-5 md:grid-cols-2">
 
-                              return (
-                                <button
-                                  key={
-                                    member.id
-                                  }
-                                  type="button"
-                                  onClick={() =>
-                                    person?.username &&
-                                    navigate(
-                                      `/${person.username}`
-                                    )
-                                  }
-                                  className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 text-left"
-                                >
+                              <div>
 
-                                  <Avatar className="h-9 w-9">
+                                <p className="text-sm leading-7 text-slate-700">
+                                  {community.description ||
+                                    'A professional community for knowledge sharing, networking and collaboration.'}
+                                </p>
 
-                                    <AvatarImage
-                                      src={
-                                        person?.avatar_url ||
-                                        undefined
-                                      }
-                                    />
+                              </div>
 
-                                    <AvatarFallback>
-                                      {getInitials(
-                                        person
-                                      )}
-                                    </AvatarFallback>
+                              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
 
-                                  </Avatar>
+                                <p className="mb-2 text-sm font-semibold">
+                                  Community Guidelines
+                                </p>
 
-                                  <div className="min-w-0 flex-1">
+                                <p className="whitespace-pre-wrap text-xs leading-5 text-slate-600">
+                                  {community.rules ||
+                                    'Be respectful, stay on topic and contribute useful professional knowledge.'}
+                                </p>
 
-                                    <p className="text-sm font-semibold truncate">
-                                      {person?.full_name ||
-                                        person?.username ||
-                                        'BizBase Member'}
-                                    </p>
+                              </div>
 
-                                    <p className="text-[11px] text-slate-500 truncate">
-                                      {person?.current_position ||
-                                        person?.company_name ||
-                                        'Professional member'}
-                                    </p>
+                            </CardContent>
 
-                                  </div>
+                          </Card>
 
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-[10px] capitalize"
-                                  >
-                                    {member.user_id ===
-                                    community.user_id
-                                      ? 'Owner'
-                                      : member.role ||
-                                        'member'}
-                                  </Badge>
+                        </section>
 
-                                </button>
+                      )}
+
+                  </div>
+
+                </main>
+
+
+                {/* ===================================================
+                    RIGHT INFORMATION SIDEBAR
+                =================================================== */}
+
+                <aside className="hidden space-y-3 xl:block">
+
+                  {/* ABOUT */}
+
+                  <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+
+                    <CardHeader className="pb-2">
+
+                      <CardTitle className="flex items-center justify-between text-sm">
+
+                        <span>
+                          About this community
+                        </span>
+
+                        {isOwner && (
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setManagementSection(
+                                'settings'
                               );
-                            }
-                          )}
+                              setManagementOpen(
+                                true
+                              );
+                            }}
+                            className="text-[10px] font-semibold text-blue-600 hover:underline"
+                          >
+                            Edit
+                          </button>
 
-                        </CardContent>
+                        )}
 
-                      </Card>
+                      </CardTitle>
 
-                    </section>
+                    </CardHeader>
 
-                  )}
+                    <CardContent className="space-y-3">
 
-                {/* ABOUT */}
+                      <p className="text-xs leading-5 text-slate-600">
+                        {community.description ||
+                          'A professional space for knowledge, networking, opportunities and collaboration.'}
+                      </p>
 
-                {activeView ===
-                  'about' && (
+                      <div className="grid grid-cols-2 gap-2">
 
-                  <section
-                    id="community-about-full"
-                    className="scroll-mt-24"
-                  >
+                        <div className="rounded-xl bg-slate-50 p-2.5">
 
-                    <Card className="rounded-2xl">
+                          <p className="text-[10px] text-slate-400">
+                            Members
+                          </p>
 
-                      <CardHeader>
-
-                        <CardTitle className="text-base">
-                          About {community.name}
-                        </CardTitle>
-
-                      </CardHeader>
-
-                      <CardContent className="grid md:grid-cols-2 gap-5">
-
-                        <div>
-
-                          <p className="text-sm text-slate-700 leading-7">
-                            {community.description ||
-                              'A professional community for knowledge sharing, networking and collaboration.'}
+                          <p className="mt-0.5 text-sm font-bold">
+                            {(
+                              community.members_count ||
+                              0
+                            ).toLocaleString()}
                           </p>
 
                         </div>
 
-                        <div className="rounded-xl bg-slate-50 border border-slate-100 p-4">
+                        <div className="rounded-xl bg-slate-50 p-2.5">
 
-                          <p className="font-semibold text-sm mb-2">
-                            Community guidelines
+                          <p className="text-[10px] text-slate-400">
+                            Posts
                           </p>
 
-                          <p className="text-xs text-slate-600 whitespace-pre-wrap leading-5">
-                            {community.rules ||
-                              'Be respectful, stay on topic and contribute useful professional knowledge.'}
+                          <p className="mt-0.5 text-sm font-bold">
+                            {posts.length}
                           </p>
+
+                        </div>
+
+                      </div>
+
+                      {Array.isArray(
+                        community.tags
+                      ) &&
+                        community.tags.length >
+                          0 && (
+
+                          <div className="flex flex-wrap gap-1.5">
+
+                            {community.tags
+                              .slice(0, 8)
+                              .map(
+                                (
+                                  tag,
+                                  index
+                                ) => (
+
+                                  <Badge
+                                    key={`${tag}-${index}`}
+                                    variant="secondary"
+                                    className="bg-slate-100 text-[9px]"
+                                  >
+                                    #{tag}
+                                  </Badge>
+
+                                )
+                              )}
+
+                          </div>
+
+                        )}
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-full text-xs"
+                        onClick={
+                          handleShare
+                        }
+                      >
+                        <Share2 className="mr-1.5 h-3.5 w-3.5" />
+                        Invite / Share
+                      </Button>
+
+                    </CardContent>
+
+                  </Card>
+
+
+                  {/* MEMBERS */}
+
+                  <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+
+                    <CardHeader className="pb-2">
+
+                      <CardTitle className="flex items-center justify-between text-sm">
+
+                        <span>
+                          Community Members
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigateSection(
+                              'members'
+                            )
+                          }
+                          className="text-[10px] font-semibold text-blue-600 hover:underline"
+                        >
+                          See all
+                        </button>
+
+                      </CardTitle>
+
+                    </CardHeader>
+
+                    <CardContent className="space-y-1">
+
+                      {activeMembers
+                        .slice(0, 6)
+                        .map((member) => {
+
+                          const person =
+                            member.profile;
+
+                          return (
+
+                            <button
+                              key={
+                                member.id
+                              }
+                              type="button"
+                              onClick={() =>
+                                person?.username &&
+                                navigate(
+                                  `/${person.username}`
+                                )
+                              }
+                              className="flex w-full items-center gap-2 rounded-lg p-1.5 text-left transition hover:bg-slate-50"
+                            >
+
+                              <Avatar className="h-8 w-8">
+
+                                <AvatarImage
+                                  src={
+                                    person?.avatar_url ||
+                                    undefined
+                                  }
+                                />
+
+                                <AvatarFallback className="text-[9px]">
+                                  {getInitials(
+                                    person
+                                  )}
+                                </AvatarFallback>
+
+                              </Avatar>
+
+                              <div className="min-w-0 flex-1">
+
+                                <p className="truncate text-[11px] font-semibold">
+                                  {person?.full_name ||
+                                    person?.username ||
+                                    'BizBase Member'}
+                                </p>
+
+                                <p className="truncate text-[9px] text-slate-400">
+                                  {person?.current_position ||
+                                    'Professional'}
+                                </p>
+
+                              </div>
+
+                              {member.user_id ===
+                                community.user_id && (
+                                <Crown className="h-3 w-3 text-amber-500" />
+                              )}
+
+                            </button>
+
+                          );
+
+                        })}
+
+                      <Button
+                        size="sm"
+                        className="mt-2 h-8 w-full bg-blue-600 text-xs hover:bg-blue-700"
+                        onClick={() =>
+                          navigateSection(
+                            'members'
+                          )
+                        }
+                      >
+                        View Members
+                      </Button>
+
+                    </CardContent>
+
+                  </Card>
+
+
+                  {/* GUIDELINES */}
+
+                  <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+
+                    <CardHeader className="pb-2">
+
+                      <CardTitle className="text-sm">
+                        Community Guidelines
+                      </CardTitle>
+
+                    </CardHeader>
+
+                    <CardContent>
+
+                      <p className="whitespace-pre-wrap text-[11px] leading-5 text-slate-600">
+                        {community.rules ||
+                          'Be respectful and supportive.\nKeep discussions relevant.\nAvoid spam and self-promotion.\nContribute useful professional knowledge.'}
+                      </p>
+
+                    </CardContent>
+
+                  </Card>
+
+
+                  {/* ADMIN MANAGEMENT */}
+
+                  {isAdmin && (
+
+                    <Card className="rounded-2xl border-blue-100 bg-blue-50/60 shadow-sm">
+
+                      <CardContent className="p-3">
+
+                        <div className="flex items-center justify-between gap-2">
+
+                          <div>
+
+                            <p className="text-xs font-bold text-blue-900">
+                              Community Management
+                            </p>
+
+                            <p className="mt-0.5 text-[10px] text-blue-700">
+                              Members, requests & moderation
+                            </p>
+
+                          </div>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 bg-white text-[10px]"
+                            onClick={() => {
+                              setManagementSection(
+                                'settings'
+                              );
+                              setManagementOpen(
+                                true
+                              );
+                            }}
+                          >
+                            <Settings className="mr-1 h-3 w-3" />
+                            Manage
+                          </Button>
 
                         </div>
 
@@ -3040,328 +3225,22 @@ const Community = () => {
 
                     </Card>
 
-                  </section>
+                  )}
 
-                )}
+                </aside>
 
               </div>
 
-            </main>
-
-            {/* =================================================
-                RIGHT SIDEBAR
-            ================================================= */}
-
-            <aside className="hidden lg:block lg:sticky lg:top-20 self-start space-y-3">
-
-              {/* ABOUT */}
-
-              <Card className="border-slate-200 shadow-sm rounded-2xl bg-white">
-
-                <CardHeader className="pb-2">
-
-                  <CardTitle className="text-sm flex items-center justify-between">
-
-                    <span>
-                      About this community
-                    </span>
-
-                    {isOwner && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setManagementSection(
-                            'settings'
-                          );
-
-                          setManagementOpen(
-                            true
-                          );
-                        }}
-                        className="text-[10px] text-blue-600 hover:underline"
-                      >
-                        Edit
-                      </button>
-                    )}
-
-                  </CardTitle>
-
-                </CardHeader>
-
-                <CardContent className="space-y-3">
-
-                  <p className="text-xs text-slate-600 leading-5">
-                    {community.description ||
-                      'A professional space for knowledge, networking, opportunities and collaboration.'}
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-2">
-
-                    <div className="rounded-xl bg-slate-50 p-2.5">
-                      <p className="text-[10px] text-slate-400">
-                        Members
-                      </p>
-                      <p className="font-bold text-sm mt-0.5">
-                        {(
-                          community.members_count ||
-                          0
-                        ).toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className="rounded-xl bg-slate-50 p-2.5">
-                      <p className="text-[10px] text-slate-400">
-                        Posts
-                      </p>
-                      <p className="font-bold text-sm mt-0.5">
-                        {posts.length}
-                      </p>
-                    </div>
-
-                  </div>
-
-                  {Array.isArray(
-                    community.tags
-                  ) &&
-                    community.tags.length >
-                      0 && (
-
-                      <div className="flex flex-wrap gap-1.5">
-
-                        {community.tags
-                          .slice(
-                            0,
-                            8
-                          )
-                          .map(
-                            (
-                              tag,
-                              index
-                            ) => (
-                              <Badge
-                                key={`${tag}-${index}`}
-                                variant="secondary"
-                                className="text-[9px] bg-slate-100"
-                              >
-                                #
-                                {tag}
-                              </Badge>
-                            )
-                          )}
-
-                      </div>
-
-                    )}
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full h-8 text-xs"
-                    onClick={
-                      handleShare
-                    }
-                  >
-                    <Share2 className="w-3.5 h-3.5 mr-1.5" />
-                    Invite / Share
-                  </Button>
-
-                </CardContent>
-
-              </Card>
-
-              {/* MEMBERS */}
-
-              <Card className="border-slate-200 shadow-sm rounded-2xl bg-white">
-
-                <CardHeader className="pb-2">
-
-                  <CardTitle className="text-sm flex items-center justify-between">
-
-                    <span>
-                      Community members
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigateSection(
-                          'members'
-                        )
-                      }
-                      className="text-[10px] text-blue-600 hover:underline"
-                    >
-                      See all
-                    </button>
-
-                  </CardTitle>
-
-                </CardHeader>
-
-                <CardContent className="space-y-1">
-
-                  {activeMembers
-                    .slice(
-                      0,
-                      6
-                    )
-                    .map(
-                      (member) => {
-                        const person =
-                          member.profile;
-
-                        return (
-                          <button
-                            key={
-                              member.id
-                            }
-                            type="button"
-                            onClick={() =>
-                              person?.username &&
-                              navigate(
-                                `/${person.username}`
-                              )
-                            }
-                            className="w-full flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-50 text-left"
-                          >
-
-                            <Avatar className="h-7 w-7">
-
-                              <AvatarImage
-                                src={
-                                  person?.avatar_url ||
-                                  undefined
-                                }
-                              />
-
-                              <AvatarFallback className="text-[9px]">
-                                {getInitials(
-                                  person
-                                )}
-                              </AvatarFallback>
-
-                            </Avatar>
-
-                            <div className="min-w-0">
-
-                              <p className="text-[11px] font-semibold truncate">
-                                {person?.full_name ||
-                                  person?.username ||
-                                  'BizBase Member'}
-                              </p>
-
-                              <p className="text-[9px] text-slate-400 truncate">
-                                {person?.current_position ||
-                                  'Professional'}
-                              </p>
-
-                            </div>
-
-                            {member.user_id ===
-                              community.user_id && (
-                              <Crown className="w-3 h-3 text-amber-500 ml-auto" />
-                            )}
-
-                          </button>
-                        );
-                      }
-                    )}
-
-                  <Button
-                    size="sm"
-                    className="w-full h-8 mt-2 text-xs bg-blue-600 hover:bg-blue-700"
-                    onClick={() =>
-                      navigateSection(
-                        'members'
-                      )
-                    }
-                  >
-                    View Members
-                  </Button>
-
-                </CardContent>
-
-              </Card>
-
-              {/* GUIDELINES */}
-
-              <Card className="border-slate-200 shadow-sm rounded-2xl bg-white">
-
-                <CardHeader className="pb-2">
-
-                  <CardTitle className="text-sm">
-                    Community guidelines
-                  </CardTitle>
-
-                </CardHeader>
-
-                <CardContent>
-
-                  <p className="text-[11px] text-slate-600 whitespace-pre-wrap leading-5">
-                    {community.rules ||
-                      'Be respectful and supportive.\nKeep discussions relevant.\nAvoid spam and self-promotion.\nContribute useful professional knowledge.'}
-                  </p>
-
-                </CardContent>
-
-              </Card>
-
-              {/* ADMIN */}
-
-              {isAdmin && (
-
-                <Card className="border-blue-100 bg-blue-50/60 shadow-sm rounded-2xl">
-
-                  <CardContent className="p-3">
-
-                    <div className="flex items-center justify-between gap-2">
-
-                      <div>
-
-                        <p className="text-xs font-bold text-blue-900">
-                          Community Management
-                        </p>
-
-                        <p className="text-[10px] text-blue-700 mt-0.5">
-                          Members, requests & moderation
-                        </p>
-
-                      </div>
-
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 text-[10px] bg-white"
-                        onClick={() => {
-                          setManagementSection(
-                            'settings'
-                          );
-
-                          setManagementOpen(
-                            true
-                          );
-                        }}
-                      >
-                        <Settings className="w-3 h-3 mr-1" />
-                        Manage
-                      </Button>
-
-                    </div>
-
-                  </CardContent>
-
-                </Card>
-
-              )}
-
-            </aside>
+            </div>
 
           </div>
 
         </div>
 
-        {/* =================================================
-            ADMIN MANAGEMENT MODAL
-        ================================================= */}
+
+        {/* =========================================================
+            COMMUNITY MANAGEMENT DIALOG
+        ========================================================= */}
 
         <CommunityManagementDialog
           open={

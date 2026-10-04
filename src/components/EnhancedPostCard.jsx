@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import { AtSign, Bookmark, CheckCircle, Copy, Edit, ExternalLink, Flag, Hash, MoreHorizontal, Repeat2, Save, Trash2, UserPlus, Users, Loader2 } from 'lucide-react';
+import { AtSign, Bookmark, CheckCircle, Copy, Edit, ExternalLink, Flag, Hash, MoreHorizontal, Repeat2, Save, Trash2, UserPlus, Users, Loader2, Lock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import PostEngagementActions from './PostEngagementActions';
 
@@ -299,72 +299,96 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete, showComm
 
         {showCommunityContext && post.community && (
           <div className="mb-4 -mx-3 sm:-mx-6 -mt-2 sm:-mt-6">
-            <div className="px-3 sm:px-6 py-3 bg-white">
+            <div className="bg-white px-3 pt-3 sm:px-6">
               <div className="flex items-center justify-between gap-3">
-
+                {/* COMMUNITY IDENTITY */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/communities/${post.community.id}`);
+                    navigate(
+                      `/communities/${post.community.id}`
+                    );
                   }}
-                  className="flex items-center gap-3 min-w-0 text-left group"
+                  className="flex min-w-0 items-center gap-3 text-left"
                 >
-                  <Avatar className="h-10 w-10 shrink-0 border border-slate-200">
+
+                  <Avatar className="h-10 w-10 shrink-0 rounded-xl border border-slate-200">
+
                     <AvatarImage
-                      src={post.community.image_url || undefined}
+                      src={
+                        post.community.image_url ||
+                        undefined
+                      }
                     />
-                    <AvatarFallback className="bg-blue-50 text-blue-700">
-                      <Users className="w-5 h-5" />
+
+                    <AvatarFallback className="rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-700">
+                      <Users className="h-5 w-5" />
                     </AvatarFallback>
+
                   </Avatar>
 
                   <div className="min-w-0">
+
                     <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-sm text-slate-900 truncate group-hover:text-blue-600">
+
+                      <span className="truncate text-sm font-bold text-slate-900 hover:text-blue-600">
                         {post.community.name}
                       </span>
 
                       {post.community.is_private && (
-                        <span className="text-[10px] text-slate-400">
-                          Private
-                        </span>
+                        <Lock className="h-3 w-3 shrink-0 text-slate-400" />
                       )}
+
                     </div>
 
-                    <p className="text-[11px] text-slate-500 truncate">
-                      {post.community.members_count || 0} members
+                    <p className="truncate text-[10px] text-slate-500 sm:text-[11px]">
+                      {(
+                        post.community.members_count ||
+                        0
+                      ).toLocaleString()}{' '}
+                      members
                       {post.community.category
                         ? ` • ${post.community.category}`
                         : ''}
                     </p>
                   </div>
                 </button>
-
+                {/* COMMUNITY ACTIONS */}
                 <div
-                  className="flex items-center gap-1 shrink-0"
-                  onClick={(e) => e.stopPropagation()}
+                  className="flex shrink-0 items-center gap-1"
+                  onClick={(e) =>
+                    e.stopPropagation()
+                  }
                 >
                   <Button
                     size="sm"
                     variant={
-                      communityMembership?.status === 'approved'
+                      communityMembership?.status ===
+                      'approved'
                         ? 'outline'
                         : 'default'
                     }
-                    className="h-8 px-3 text-xs"
-                    onClick={handleCommunityJoin}
-                    disabled={communityActionLoading}
+                    className="h-8 rounded-lg px-3 text-xs"
+                    onClick={
+                      handleCommunityJoin
+                    }
+                    disabled={
+                      communityActionLoading
+                    }
                   >
+
                     {communityActionLoading ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : communityMembership?.status === 'approved' ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : communityMembership?.status ===
+                      'approved' ? (
                       'Joined'
-                    ) : communityMembership?.status === 'pending' ? (
+                    ) : communityMembership?.status ===
+                      'pending' ? (
                       'Requested'
                     ) : (
                       <>
-                        <UserPlus className="w-3.5 h-3.5 mr-1" />
+                        <UserPlus className="mr-1 h-3.5 w-3.5" />
                         Join
                       </>
                     )}
@@ -375,13 +399,16 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete, showComm
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8"
+                        className="h-8 w-8 rounded-lg"
                       >
-                        <MoreHorizontal className="w-4 h-4" />
+                        <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end">
+                    
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-48"
+                    >
                       <DropdownMenuItem
                         onClick={() =>
                           navigate(
@@ -389,7 +416,7 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete, showComm
                           )
                         }
                       >
-                        <ExternalLink className="w-4 h-4 mr-2" />
+                        <ExternalLink className="mr-2 h-4 w-4" />
                         View Community
                       </DropdownMenuItem>
 
@@ -399,25 +426,28 @@ const EnhancedPostCard = ({ post, onEngagementUpdate, onEdit, onDelete, showComm
                             await navigator.clipboard.writeText(
                               `${window.location.origin}/communities/${post.community.id}`
                             );
-
                             toast({
-                              title: 'Community link copied'
+                              title:
+                                'Community link copied',
                             });
                           } catch {
                             toast({
-                              title: 'Failed to copy community link',
-                              variant: 'destructive'
+                              title:
+                                'Failed to copy community link',
+                              variant:
+                                'destructive',
                             });
                           }
                         }}
                       >
+                        <Copy className="mr-2 h-4 w-4" />
                         Copy Community Link
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               </div>
-
+              {/* LIGHT DIVIDER — EXACT COMMUNITY/POST SEPARATION */}
               <div className="mt-3 border-b border-slate-100" />
             </div>
           </div>
