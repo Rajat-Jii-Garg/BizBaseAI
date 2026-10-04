@@ -2558,7 +2558,7 @@ const Community = () => {
                                     ...post,
                                     community,
                                   }}
-                                  showCommunityContext
+                                  showCommunityContext={false}
                                   onEngagementUpdate={
                                     fetchPosts
                                   }
@@ -2732,7 +2732,7 @@ const Community = () => {
                                     ...post,
                                     community,
                                   }}
-                                  showCommunityContext
+                                  showCommunityContext={false}
                                   onEngagementUpdate={
                                     fetchPosts
                                   }
