@@ -7,6 +7,7 @@ import SEOHead from '@/components/SEOHead';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ExternalLink, Clock, BookOpen, Sparkles } from 'lucide-react';
 import { CANONICAL_SITE_URL } from '@/lib/siteUrl';
+import DOMPurify from 'dompurify';
 
 const DEFAULT_IMAGE = `${CANONICAL_SITE_URL}/og-image.png`;
 
@@ -97,7 +98,13 @@ const ArticleDetail = () => {
         <SEOHead title="Article Not Found" description="The BizBase article could not be found." path={`/articles/${slug || ''}`} noIndex />
         <Navbar />
         <main className="max-w-4xl mx-auto px-4 pt-32 pb-20 text-center">
-          <BookOpen className="w-14 h-14 mx-auto text-slate-300 mb-4" />
+          {article.cover_image_url ? (
+            <img src={article.cover_image_url} alt={article.title} loading="lazy" className="h-44 w-full object-cover" />
+          ) : (
+            <div className="h-44 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
+              <BookOpen className="w-14 h-14 text-white/30" />
+            </div>
+          )}
           <h1 className="text-3xl font-bold text-slate-900 mb-3">Article not found</h1>
           <p className="text-slate-600 mb-6">This article may have been unpublished or moved.</p>
           <Link to="/articles" className="text-blue-600 font-semibold">Back to Articles</Link>
@@ -159,6 +166,13 @@ const ArticleDetail = () => {
               </a>
             )}
           </div>
+
+          {content.content_html && (
+            <div
+              className="prose prose-lg prose-slate max-w-none mb-10 prose-img:rounded-xl prose-a:text-blue-600"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.content_html) }}
+            />
+          )}
 
           {content.summary && (
             <section className="mb-10">
