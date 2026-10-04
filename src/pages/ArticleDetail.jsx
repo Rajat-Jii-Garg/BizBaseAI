@@ -98,13 +98,7 @@ const ArticleDetail = () => {
         <SEOHead title="Article Not Found" description="The BizBase article could not be found." path={`/articles/${slug || ''}`} noIndex />
         <Navbar />
         <main className="max-w-4xl mx-auto px-4 pt-32 pb-20 text-center">
-          {article.cover_image_url ? (
-            <img src={article.cover_image_url} alt={article.title} loading="lazy" className="h-44 w-full object-cover" />
-          ) : (
-            <div className="h-44 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
-              <BookOpen className="w-14 h-14 text-white/30" />
-            </div>
-          )}
+          <BookOpen className="w-14 h-14 mx-auto text-slate-300 mb-4" />
           <h1 className="text-3xl font-bold text-slate-900 mb-3">Article not found</h1>
           <p className="text-slate-600 mb-6">This article may have been unpublished or moved.</p>
           <Link to="/articles" className="text-blue-600 font-semibold">Back to Articles</Link>

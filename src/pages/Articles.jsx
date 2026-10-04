@@ -124,9 +124,13 @@ const Articles = () => {
             {filtered.map((article) => (
               <Link key={article.id} to={`/articles/${article.slug}`} className="block">
                 <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden">
-                  <div className="h-44 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
-                    <BookOpen className="w-14 h-14 text-white/30" />
-                  </div>
+                  {article.cover_image_url ? (
+                    <img src={article.cover_image_url} alt={article.title} loading="lazy" className="h-44 w-full object-cover" />
+                  ) : (
+                    <div className="h-44 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
+                      <BookOpen className="w-14 h-14 text-white/30" />
+                    </div>
+                  )}
                   <CardContent className="p-5">
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
                       <Badge className={`text-xs ${CATEGORY_CLASSES[article.category] || CATEGORY_CLASSES.General}`}>
