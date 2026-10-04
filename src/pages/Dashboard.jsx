@@ -526,7 +526,7 @@ const Dashboard = () => {
                         onEngagementUpdate={refetch}
                         onEdit={editPost}
                         onDelete={deletePost}
-                        showCommunityCreator={Boolean(post.community_id)}
+                        showCommunityContext={Boolean(post.community_id && post.community)}
                       />
                     ))}
                     
